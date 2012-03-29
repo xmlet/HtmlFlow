@@ -1,0 +1,107 @@
+<!-- ====================================================================== 
+	<Project name>: <Project description>
+     ====================================================================== -->
+
+<project name="HtmlFlowApp" default="package" basedir=".">
+
+  <description>Ant build file</description>
+
+  <!--++++++++++ Properties ++++++++++-->
+  <property name="src-main" location="src/main/java"/>
+  <property name="src-test" location="src/test/java"/>
+  <property name="target"  location="target"/>
+  <property name="target-classes"  location="target/classes"/>
+  <property name="target-test-classes"  location="target/test-classes"/>
+  <property name="target-test-reports"	location="target/test-reports"/>
+  <property name="dist-dir" location="dist"/>
+  <property name="jar-name" value="${ant.project.name}"/>
+
+  <path id="main.extlibs.class.path">
+    <fileset dir="vendor/main/lib">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+  
+  <path id="test.extlibs.class.path">
+    <path refid="main.extlibs.class.path" />
+    <fileset dir="vendor/test/lib">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <!--++++++++++ Targets ++++++++++-->
+
+  <target name="package" depends="test" description="Packages the main classes into a jar" >
+    <buildnumber />
+    <jar jarfile="${dist}/${jar-name}.${build.number}.jar" basedir="${target-classes}"/>
+  </target>
+
+
+  <target name="init" description ="Creates the target folders">
+    <mkdir dir="${target-classes}"/>
+    <mkdir dir="${target-test-classes}"/>
+    <mkdir dir="${target-test-reports}"/>
+  </target>
+
+
+  <target name="clean" description="Removes the target folders" >
+    <!--delete dir="${target}" excludes="applications" verbose="true"/-->
+  	<delete includeEmptyDirs="true" failonerror="false" verbose="true" >
+  	    <fileset dir="${target}" defaultexcludes="false"/>
+    </delete>
+
+  </target>
+
+
+  <target name="compile-main" depends="init"
+        description="Compiles the main source" >
+
+    <javac debug="true"
+           srcdir="${src-main}"
+           destdir="${target-classes}"
+           includeantruntime="false">
+      <classpath>
+        <path refid="main.extlibs.class.path" />
+      </classpath>
+    </javac>
+    <copy todir="${target-classes}">
+      <fileset dir="${src-main}">
+        <include name="**/*.properties"/>
+      </fileset>
+    </copy>
+  </target>
+
+
+  <target name="compile-test" depends="compile-main" description="Compiles the test source" >
+    <javac  debug="true"
+            debugLevel="source"
+            srcdir="${src-test}"
+            destdir="${target-test-classes}"
+            includeantruntime="true">
+      <classpath>
+        <pathelement location="${target-classes}"/>
+        <path refid="test.extlibs.class.path" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="test" depends="compile-test" description="Runs the tests">
+    <junit printsummary="yes" haltonfailure="true" showoutput="true" >
+      <classpath>
+        <pathelement location="${target-classes}"/>
+        <pathelement location="${target-test-classes}"/>
+        <path refid="test.extlibs.class.path" />
+      </classpath>
+
+      <formatter type="plain"/>
+
+      <batchtest fork="yes" todir="${target-test-reports}" >
+        <fileset dir="${src-test}">
+          <include name="**/*Test*.java"/>
+        </fileset>
+        <formatter type="xml"/>
+        <formatter type="plain" usefile="false" />
+      </batchtest>
+    </junit>
+  </target>    
+</project>
