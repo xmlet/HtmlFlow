@@ -1,17 +1,30 @@
 package htmlflow.elements;
 
+import java.io.PrintStream;
+
 import htmlflow.HtmlWriter;
 
-import static htmlflow.HtmlWriterComposite.println;
-import static htmlflow.HtmlWriterComposite.tabs;
-
 public class HtmlScriptLink implements HtmlWriter<Object>{
+	
+	final PrintStream out;
 	final String src;
-	public HtmlScriptLink(String src) {
-	  this.src = src;
-  }
+
+	public HtmlScriptLink(PrintStream out, String src) {
+		this.out = out;
+		this.src = src;
+	}
+	
 	@Override
-  public String write(int depth, Object model) {
-		return println("<script type=\"text/javascript\" src=\"" + src + "\"></script>")+ tabs(depth);
-  }
+	public void write(int depth, Object model) {
+		out.println("<script type=\"text/javascript\" src=\"" + src + "\"></script>");
+		tabs(depth);
+	}
+	
+	/*=========================================================================*/
+	/*-------------------- auxiliar Methods ----------------------------*/
+	/*=========================================================================*/ 
+	
+	public final void tabs(int depth){
+		for (int i = 0; i < depth; i++) out.print("\t");
+	}
 }

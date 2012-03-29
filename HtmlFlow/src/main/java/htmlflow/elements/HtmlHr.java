@@ -1,7 +1,9 @@
 package htmlflow.elements;
 
+import java.io.PrintStream;
+
 public class HtmlHr extends HtmlSingleElement{
-	public HtmlHr() {
-		super("hr");
+	public HtmlHr(PrintStream out) {
+		super(out, "hr");
 	}
 }

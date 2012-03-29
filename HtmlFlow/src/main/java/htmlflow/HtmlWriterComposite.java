@@ -1,5 +1,6 @@
 package htmlflow;
 
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,19 +15,28 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 	/*-------------------------     FIELDS    ---------------------------------*/
 	/*=========================================================================*/ 
 
-	List<HtmlWriter<?>> children = new LinkedList<HtmlWriter<?>>();
+	private final List<HtmlWriter<?>> children;
+	protected final PrintStream out; 
 
+	/*=========================================================================*/
+	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
+	/*=========================================================================*/ 
+	public HtmlWriterComposite(PrintStream out) {
+		this.out = out;
+		children = new LinkedList<HtmlWriter<?>>();
+	}
+
+	
 	/*=========================================================================*/
 	/*--------------------- HtmlPrinter interface -----------------------------*/
 	/*=========================================================================*/ 
 	@Override
-	public final String write(int depth, T model) { 
-		String res = doWriteBefore(depth++);
+	public final void  write(int depth, T model) { 
+		doWriteBefore(out, depth++);
 		for (HtmlWriter elem : children) {
-			res += elem.write(depth, model);
+			elem.write(depth, model);
 		}
-		res += doWriteAfter(--depth);
-		return res;
+		doWriteAfter(out, --depth);
 	}
 	/*=========================================================================*/
 	/*----------------------- Instance Methods --------------------------------*/
@@ -37,19 +47,14 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 		return child;
 	}
 
-	public abstract String doWriteBefore(int depth);
-	public abstract String doWriteAfter(int depth);
+	public abstract void doWriteBefore(PrintStream out, int depth);
+	public abstract void doWriteAfter(PrintStream out, int depth);
 	
 	/*=========================================================================*/
-	/*-------------------- STATIC auxiliar Methods ----------------------------*/
+	/*-------------------- auxiliar Methods ----------------------------*/
 	/*=========================================================================*/ 
 	
-	public final static String tabs(int depth){
-		StringBuffer res = new StringBuffer();
-		for (int i = 0; i < depth; i++) res.append("\t");
-		return res.toString();
-	}
-	public final static String println(String msg){
-		return msg + NEWLINE;
+	public final void tabs(int depth){
+		for (int i = 0; i < depth; i++) out.print("\t");
 	}
 }

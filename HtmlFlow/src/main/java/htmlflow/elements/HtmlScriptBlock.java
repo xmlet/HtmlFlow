@@ -1,17 +1,28 @@
 package htmlflow.elements;
 
+import java.io.PrintStream;
+
 import htmlflow.HtmlWriterComposite;
 
 public class HtmlScriptBlock<T> extends HtmlWriterComposite<T>{
 
-	public HtmlScriptBlock<T> code(String msg){addChild(new TextNode<T>(msg));return this;}
+	public HtmlScriptBlock(PrintStream out) {
+		super(out);
+	}
+
+	public HtmlScriptBlock<T> code(String msg){addChild(new TextNode<T>(out, msg));return this;}
 
 	@Override
-	public String doWriteBefore(int depth) {
-		return println("<script>") + tabs(++depth);
+	public void doWriteBefore(PrintStream out, int depth) {
+		out.println("<script>");
+		tabs(++depth);
 	}
+	
 	@Override
-	public String doWriteAfter(int depth) {
-		return NEWLINE + tabs(depth) + println("</script>") + tabs(depth);
+	public void doWriteAfter(PrintStream out,int depth) {
+		out.println();
+		tabs(depth);
+		out.println("</script>");
+		tabs(depth);
 	}
 }

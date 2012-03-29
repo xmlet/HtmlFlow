@@ -1,8 +1,10 @@
 package htmlflow.elements;
 
+import java.io.PrintStream;
+
 
 public class HtmlTitle<T> extends HtmlTextElement<T>{
-	public HtmlTitle() {
-		super("title");
+	public HtmlTitle(PrintStream out) {
+		super(out, "title");
 	}
 }

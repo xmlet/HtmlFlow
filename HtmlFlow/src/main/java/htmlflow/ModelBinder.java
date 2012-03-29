@@ -1,5 +1,7 @@
 package htmlflow;
 
+import java.io.PrintStream;
+
 public interface ModelBinder<T>{
-	String bind(T model);
+	void bind(PrintStream out, T model);
 }
