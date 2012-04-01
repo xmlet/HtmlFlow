@@ -1,6 +1,6 @@
 The *HTmlFlow* is a simple Java library for writing HTML documents in a fluent style into a `java.io.PrintStream`. For instance, considering a Java class `Task`with three properties: `Title`, `Description` and a `Priority`, then we can produce an HTML document for a `Task` object in the following way:
 
-<!--code-->
+``` java
 	//
 	// Creates a new Task object
 	//
