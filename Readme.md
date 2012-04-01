@@ -85,3 +85,37 @@ The *HtmlFlow* also supports *binders* that enable the same HTML view to be used
 		}};
 	}
 ```
+
+Finally, an example of producing an HTML table bind to a list of tasks:
+
+``` java
+	public static void main(String[] args) throws IOException {
+		HtmlView<Task> taskView = taskDetailsView();
+		try{
+			Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High);
+			Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal);
+			Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High);
+			PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"));
+			taskListView().setPrintStream(out).write(1, Arrays.asList(t1, t2, t3));
+			Runtime.getRuntime().exec("explorer TaskList.html");
+		}finally{
+			out.close();
+		}
+	}
+	private static HtmlView<Iterable<Task>> taskListView(){
+		HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
+		taskView.head().title("Task List");
+
+		HtmlTable<Iterable<Task>> t = taskView.body()
+		.heading(1, "Task Details")
+		.hr()
+		.div()
+		.table();
+		HtmlTr<Iterable<Task>> headerRow = t.tr();
+		headerRow.th().text("Title");
+		headerRow.th().text("Description");
+		headerRow.th().text("Priority");
+		t.trFromIterable(binderGetTitle(), binderGetDescription(), binderGetPriority());
+		return taskView;
+	}
+```
