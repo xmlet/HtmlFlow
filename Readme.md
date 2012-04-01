@@ -30,6 +30,7 @@ The *HTmlFlow* is a simple Java library for writing HTML documents in a fluent s
 	}finally{
 		out.close();
 	}
+```
 
 The *HtmlFlow* also supports *binders* that enable the same HTML view to be used (or **bind**) with different object models. 
 
@@ -83,3 +84,4 @@ The *HtmlFlow* also supports *binders* that enable the same HTML view to be used
 			out.print(model.getPriority());
 		}};
 	}
+```
