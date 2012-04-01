@@ -6,11 +6,7 @@ import htmlflow.HtmlWriterComposite;
 
 public class HtmlScriptBlock<T> extends HtmlWriterComposite<T>{
 
-	public HtmlScriptBlock(PrintStream out) {
-		super(out);
-	}
-
-	public HtmlScriptBlock<T> code(String msg){addChild(new TextNode<T>(out, msg));return this;}
+	public HtmlScriptBlock<T> code(String msg){addChild(new TextNode<T>(msg));return this;}
 
 	@Override
 	public void doWriteBefore(PrintStream out, int depth) {

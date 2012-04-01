@@ -7,10 +7,9 @@ import htmlflow.HtmlWriterComposite;
 public class HtmlA<T> extends HtmlWriterComposite<T>{
 	private final String href;
 	
-	public HtmlA<T> text(String msg){addChild(new TextNode<T>(out, msg)); return this;}
+	public HtmlA<T> text(String msg){addChild(new TextNode<T>(msg)); return this;}
 
-	public HtmlA(PrintStream out, String href) {
-		super(out);
+	public HtmlA(String href) {
 		this.href = href;
 	}
 	@Override

@@ -5,12 +5,11 @@ import java.io.PrintStream;
 import htmlflow.HtmlWriter;
 
 public class HtmlFormSelect implements HtmlWriter<Object>{
-	final PrintStream out;
+	PrintStream out;
 	final String name;
 	final String[] options;
 	
-	public HtmlFormSelect(PrintStream out, String name, String...options) {
-		this.out = out;
+	public HtmlFormSelect(String name, String...options) {
 		this.name = name;
 		this.options = options;
 	}
@@ -27,6 +26,12 @@ public class HtmlFormSelect implements HtmlWriter<Object>{
 		tabs(depth);
 	}
 	
+	@Override
+	public HtmlWriter<Object> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
+	}
+
 	/*=========================================================================*/
 	/*-------------------- auxiliar Methods ----------------------------*/
 	/*=========================================================================*/ 

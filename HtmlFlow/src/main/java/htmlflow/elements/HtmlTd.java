@@ -1,11 +1,9 @@
 package htmlflow.elements;
 
-import java.io.PrintStream;
-
 public class HtmlTd<T> extends HtmlTextElement<T>{
-	public HtmlA<T> a(String href){return addChild(new HtmlA<T>(out, href));}
+	public HtmlA<T> a(String href){return addChild(new HtmlA<T>(href));}
 
-	public HtmlTd(PrintStream out) {
-		super(out, "td");
+	public HtmlTd() {
+		super("td");
 	}
 }

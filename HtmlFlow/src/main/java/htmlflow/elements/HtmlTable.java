@@ -7,14 +7,10 @@ import htmlflow.ModelBinder;
 
 public class HtmlTable<T> extends HtmlWriterComposite<T>{
 
-	public HtmlTable(PrintStream out) {
-		super(out);
-	}
-
-	public HtmlTr<T> tr(){return addChild(new HtmlTr<T>(out));}
+	public HtmlTr<T> tr(){return addChild(new HtmlTr<T>());}
 
 	public <S, I extends Iterable<S>> HtmlTable<T> trFromIterable(ModelBinder<S>...binders){
-		addChild(new HtmlTrFromIterable<S, I>(out, binders));
+		addChild(new HtmlTrFromIterable<S, I>(binders));
 		return this;
 	}
 

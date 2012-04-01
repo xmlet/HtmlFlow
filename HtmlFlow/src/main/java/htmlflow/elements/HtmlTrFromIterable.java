@@ -9,8 +9,8 @@ public class HtmlTrFromIterable<S, T extends Iterable<S>> implements HtmlWriter<
 
 	private final HtmlTr<S> tr; 
 	
-	public HtmlTrFromIterable(PrintStream out, ModelBinder<S>[] binders) {
-		tr = new HtmlTr<S>(out);
+	public HtmlTrFromIterable(ModelBinder<S>[] binders) {
+		tr = new HtmlTr<S>();
 		for (ModelBinder<S> b : binders) {
 			tr.td().text(b);
 		}
@@ -21,5 +21,11 @@ public class HtmlTrFromIterable<S, T extends Iterable<S>> implements HtmlWriter<
 		for (S item : model) {
 			tr.write(depth, item);
 		}
+	}
+
+	@Override
+	public HtmlWriter<T> setPrintStream(PrintStream out) {
+		tr.setPrintStream(out);
+		return this;
 	}
 }

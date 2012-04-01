@@ -6,15 +6,21 @@ import htmlflow.HtmlWriter;
 
 public class HtmlFormInputSubmit implements HtmlWriter<Object>{
 
-	final PrintStream out;
+	PrintStream out;
 	final String value;
 
-	public HtmlFormInputSubmit(PrintStream out, String value) {
-		this.out = out;
+	public HtmlFormInputSubmit(String value) {
 		this.value = value;
 	}
 	@Override
 	public void write(int depth, Object model) {
 		out.print("<input type=\"submit\" value=\""+ value + "\"/>");
 	}
+	
+	@Override
+	public HtmlWriter<Object> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
+	}
+
 }

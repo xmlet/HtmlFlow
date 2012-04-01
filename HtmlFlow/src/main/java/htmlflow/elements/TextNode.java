@@ -7,17 +7,15 @@ import htmlflow.ModelBinder;
 
 public class TextNode<T> implements HtmlWriter<T>{
 	
-	final PrintStream out;
+	PrintStream out;
 	private final String msg;
 	private final ModelBinder<T> binder;
 	
-	public TextNode(PrintStream out, String msg) {
-		this.out = out;
+	public TextNode(String msg) {
 		this.msg = msg;
 		this.binder = null;
 	}
-	public TextNode(PrintStream out, ModelBinder<T> binder) {
-		this.out = out;
+	public TextNode(ModelBinder<T> binder) {
 		this.msg = null;
 		this.binder = binder;
 	}
@@ -30,5 +28,10 @@ public class TextNode<T> implements HtmlWriter<T>{
 			assert(binder != null);
 			binder.bind(out, model);
 		}
+	}
+	@Override
+	public HtmlWriter<T> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
 	}
 }

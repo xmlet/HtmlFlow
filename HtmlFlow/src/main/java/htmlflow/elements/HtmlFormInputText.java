@@ -6,17 +6,15 @@ import htmlflow.HtmlWriter;
 
 public class HtmlFormInputText implements HtmlWriter<Object>{
 
-	final PrintStream out;
+	PrintStream out;
 	final String name;
 	final String id;
 
-	public HtmlFormInputText(PrintStream out, String name) {
-		this.out = out;
+	public HtmlFormInputText(String name) {
 		this.name = name;
 		this.id = null;
 	}
-	public HtmlFormInputText(PrintStream out, String name, String id) {
-		this.out = out;
+	public HtmlFormInputText(String name, String id) {
 		this.name = name;
 		this.id = id;
 	}
@@ -26,4 +24,11 @@ public class HtmlFormInputText implements HtmlWriter<Object>{
 		if(id != null) out.print(" id = \"" + id + "\"");
 		out.print("/>");
 	}
+	
+	@Override
+	public HtmlWriter<Object> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
+	}
+
 }

@@ -13,22 +13,19 @@ public class HRef<T> implements HtmlWriter<T>{
 	/*=========================================================================*/ 
 
 	private final URL url;
-	private final PrintStream out; 
+	private PrintStream out; 
 
 	/*=========================================================================*/
 	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
 	/*=========================================================================*/ 
 
-	public HRef(PrintStream out, String href){
+	public HRef(String href){
 		try {
 			url = new URL(href);
-			this.out = out;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
 	
 	/*=========================================================================*/
 	/*--------------------- HtmlPrinter interface -----------------------------*/
@@ -39,4 +36,9 @@ public class HRef<T> implements HtmlWriter<T>{
 		out.print(url.toExternalForm());
 	}
 
+	@Override
+	public HtmlWriter<T> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
+	}
 }

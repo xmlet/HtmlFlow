@@ -5,11 +5,10 @@ import java.io.PrintStream;
 import htmlflow.HtmlWriter;
 
 public class HtmlLinkCss implements HtmlWriter<Object>{
-	final PrintStream out;
+	PrintStream out;
 	final String href;
 	
-	public HtmlLinkCss(PrintStream out, String href) {
-		this.out = out;
+	public HtmlLinkCss(String href) {
 		this.href = href;
 	}
 
@@ -19,6 +18,12 @@ public class HtmlLinkCss implements HtmlWriter<Object>{
 		tabs(depth);
 	}
 	
+	@Override
+	public HtmlWriter<Object> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
+	}
+
 	/*=========================================================================*/
 	/*-------------------- auxiliar Methods ----------------------------*/
 	/*=========================================================================*/ 

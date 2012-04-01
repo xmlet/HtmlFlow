@@ -5,13 +5,10 @@ import java.io.PrintStream;
 import htmlflow.elements.HtmlBody;
 import htmlflow.elements.HtmlHead;
 
-public class HtmlTemplate<T> extends HtmlWriterComposite<T>{
-	public HtmlTemplate(PrintStream out) {
-		super(out);
-	}
+public class HtmlView<T> extends HtmlWriterComposite<T>{
 	
-	public HtmlHead<T> head(){return addChild(new HtmlHead<T>(out));}
-	public HtmlBody<T> body(){return addChild(new HtmlBody<T>(out));}
+	public HtmlHead<T> head(){return addChild(new HtmlHead<T>());}
+	public HtmlBody<T> body(){return addChild(new HtmlBody<T>());}
 
 	@Override
 	public void doWriteBefore(PrintStream out, int depth) {

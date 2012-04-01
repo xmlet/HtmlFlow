@@ -16,20 +16,25 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 	/*=========================================================================*/ 
 
 	private final List<HtmlWriter<?>> children;
-	protected final PrintStream out; 
+	protected PrintStream out; 
 
 	/*=========================================================================*/
 	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
 	/*=========================================================================*/ 
-	public HtmlWriterComposite(PrintStream out) {
-		this.out = out;
+	public HtmlWriterComposite() {
 		children = new LinkedList<HtmlWriter<?>>();
 	}
-
 	
 	/*=========================================================================*/
 	/*--------------------- HtmlPrinter interface -----------------------------*/
-	/*=========================================================================*/ 
+	/*=========================================================================*/
+	public HtmlWriter<T> setPrintStream(PrintStream out){
+		this.out = out;
+		for (HtmlWriter elem : children) {
+			elem.setPrintStream(out);
+		}
+		return this;
+	}
 	@Override
 	public final void  write(int depth, T model) { 
 		doWriteBefore(out, depth++);

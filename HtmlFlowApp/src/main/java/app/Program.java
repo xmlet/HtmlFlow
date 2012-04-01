@@ -1,6 +1,6 @@
 package app;
 
-import htmlflow.HtmlTemplate;
+import htmlflow.HtmlView;
 import htmlflow.ModelBinder;
 import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
@@ -36,10 +36,14 @@ public class Program {
 			out.print(model.getDescription());
 		}};
 	}
+	private static ModelBinder<Task> binderGetPriority(){
+		return new ModelBinder<Task>() {public void bind(PrintStream out, Task model) {
+			out.print(model.getPriority());
+		}};
+	}
 
-
-	private static HtmlTemplate<Task> taskDetailsView(FileOutputStream out){
-		HtmlTemplate<Task> taskView = new HtmlTemplate<Task>(new PrintStream(out));
+	private static HtmlView<Task> taskDetailsView(){
+		HtmlView<Task> taskView = new HtmlView<Task>();
 
 		taskView.head().title("Task Details");
 		taskView
@@ -51,12 +55,14 @@ public class Program {
 		.br()
 		.text("Title: ").text(binderGetTitle())
 		.br()
-		.text("Description: ").text(binderGetDescription());
+		.text("Description: ").text(binderGetDescription())
+		.br()
+		.text("Priority: ").text(binderGetPriority());
 
 		return taskView;
 	}
-	private static HtmlTemplate<Iterable<Task>> taskListView(FileOutputStream out){
-		HtmlTemplate<Iterable<Task>> taskView = new HtmlTemplate<Iterable<Task>>(new PrintStream(out));
+	private static HtmlView<Iterable<Task>> taskListView(){
+		HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
 		taskView.head().title("Task Details");
 
 		HtmlTable<Iterable<Task>> t = taskView.body()
@@ -75,10 +81,21 @@ public class Program {
 		Task t1 = new Task("Preparar Aula","Desenvolver um problema para contextualização do padrão de desenho template method.",Priority.High,Status.Progress);
 		Task t2 = new Task("Concluir AOM compiler v2","Processar todas as classes como transaccionais com raíz em DoubleLayout",Priority.Normal,Status.Unstarted);
 		Task t3 = new Task("Jantar do dia do pai","Marcar mesa num restaurante interessante!",Priority.High,Status.Progress);
-		taskDetailsView(new FileOutputStream("Tasks.html")).write(1, t1);
-		Runtime.getRuntime().exec("explorer Task.html");
-		taskListView(new FileOutputStream("TaskList.html")).write(1, Arrays.asList(t1, t2, t3));
-		Runtime.getRuntime().exec("explorer TaskList.html");
+		try{
+			PrintStream out = new PrintStream(new FileOutputStream("Task.html"));
+			taskDetailsView().setPrintStream(out).write(1, t1);
+			Runtime.getRuntime().exec("explorer Task.html");
+		}finally{
+			out.close();
+		}
+		try{
+			PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"));
+			taskListView().setPrintStream(out).write(1, Arrays.asList(t1, t2, t3));
+			Runtime.getRuntime().exec("explorer TaskList.html");
+		}finally{
+			out.close();
+		}
+
 	}
 	public static void main(String[] args) throws IOException {
 
@@ -86,6 +103,7 @@ public class Program {
 		//
 		// run command shell
 		//
+		/*
 		Scanner cin = new Scanner(in);
 		out.println("****** Commmand shell application *****");
 		while(true){
@@ -96,6 +114,6 @@ public class Program {
 
 			}
 		}
-
+		 */
 	}
 }

@@ -6,11 +6,10 @@ import htmlflow.HtmlWriter;
 
 public class HtmlScriptLink implements HtmlWriter<Object>{
 	
-	final PrintStream out;
+	PrintStream out;
 	final String src;
 
-	public HtmlScriptLink(PrintStream out, String src) {
-		this.out = out;
+	public HtmlScriptLink(String src) {
 		this.src = src;
 	}
 	
@@ -20,6 +19,12 @@ public class HtmlScriptLink implements HtmlWriter<Object>{
 		tabs(depth);
 	}
 	
+	@Override
+	public HtmlWriter<Object> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
+	}
+
 	/*=========================================================================*/
 	/*-------------------- auxiliar Methods ----------------------------*/
 	/*=========================================================================*/ 

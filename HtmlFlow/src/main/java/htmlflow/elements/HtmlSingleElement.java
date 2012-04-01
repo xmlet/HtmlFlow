@@ -5,11 +5,10 @@ import java.io.PrintStream;
 import htmlflow.HtmlWriter;
 
 public abstract class HtmlSingleElement implements HtmlWriter<Object>{
-	private final PrintStream out;
+	private PrintStream out;
 	private final String element;
 
-	public HtmlSingleElement(PrintStream out, String element) {
-		this.out = out;
+	public HtmlSingleElement(String element) {
 		this.element = element;
 	}
 
@@ -20,6 +19,13 @@ public abstract class HtmlSingleElement implements HtmlWriter<Object>{
 		out.println("<" + element + "/>");
 		tabs(depth);
 	}
+
+	@Override
+	public HtmlWriter<Object> setPrintStream(PrintStream out) {
+		this.out = out;
+		return this;
+	}
+
 	/*=========================================================================*/
 	/*-------------------- auxiliar Methods ----------------------------*/
 	/*=========================================================================*/ 
