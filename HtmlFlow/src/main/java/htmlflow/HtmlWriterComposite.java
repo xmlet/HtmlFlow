@@ -15,6 +15,9 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 	/*-------------------------     FIELDS    ---------------------------------*/
 	/*=========================================================================*/ 
 
+	/**
+	 * @uml.associationEnd  aggregation="shared" inverse="htmlflow.HtmlWriter" multiplicity="(0 -1)" 
+	 */
 	private final List<HtmlWriter<?>> children;
 	protected PrintStream out; 
 
@@ -42,6 +45,7 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 			elem.write(depth, model);
 		}
 		doWriteAfter(out, --depth);
+		out.flush();
 	}
 	/*=========================================================================*/
 	/*----------------------- Instance Methods --------------------------------*/

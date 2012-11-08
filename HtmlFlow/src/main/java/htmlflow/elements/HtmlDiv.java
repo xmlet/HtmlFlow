@@ -5,6 +5,9 @@ import java.io.PrintStream;
 import htmlflow.HtmlWriterComposite;
 import htmlflow.ModelBinder;
 
+/**
+ * @uml.dependency   supplier="htmlflow.ModelBinder"
+ */
 public class HtmlDiv<T> extends HtmlWriterComposite<T>{
 	
 	public HtmlTable<T> table(){return addChild(new HtmlTable<T>());}

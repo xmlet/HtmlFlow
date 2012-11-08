@@ -5,10 +5,17 @@ import java.io.PrintStream;
 import htmlflow.HtmlWriter;
 import htmlflow.ModelBinder;
 
+/**
+ * @author  mcarvalho
+ */
 public class TextNode<T> implements HtmlWriter<T>{
 	
 	PrintStream out;
 	private final String msg;
+	/** 
+	 * @uml.property name="binder"
+	 * @uml.associationEnd aggregation="shared"
+	 */
 	private final ModelBinder<T> binder;
 	
 	public TextNode(String msg) {
