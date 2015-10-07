@@ -4,7 +4,7 @@ package htmlflow;
  *  Mikael KROK
  *  Allows an element to define its own class and id attribute
  */
-public interface HtmlSelector{
+public interface HtmlSelector<T>{
     /**
      * Get the class attribute if the object has one
      * @return
@@ -20,10 +20,10 @@ public interface HtmlSelector{
      * Set the class attribute
      * @return
      */
-    void setClassAttribute(String classAttribute);
+    T setClassAttribute(String classAttribute);
 
     /**
      * Set the id attribute
      */
-	void setIdAttribute(String idAttribute);
+	T setIdAttribute(String idAttribute);
 }

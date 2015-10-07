@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelector {
+public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelector<HtmlWriterComposite<T>> {
 
 	/*=========================================================================*/
 	/*------------------------- STATIC FIELDS ---------------------------------*/
@@ -92,12 +92,14 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
     }
 
     @Override
-    public void setClassAttribute(String classAttribute) {
+    public HtmlWriterComposite<T> setClassAttribute(String classAttribute) {
         this.classAttribute = classAttribute;
+        return this;
     }
 
     @Override
-    public void setIdAttribute(String idAttribute) {
+    public  HtmlWriterComposite<T>  setIdAttribute(String idAttribute) {
         this.idAttribute = idAttribute;
+        return this;
     }
 }
