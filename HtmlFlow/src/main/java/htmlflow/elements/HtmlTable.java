@@ -16,7 +16,7 @@ public class HtmlTable<T> extends HtmlWriterComposite<T>{
 
 	@Override
 	public void doWriteBefore(PrintStream out, int depth) {
-		out.println("<table>");
+		out.println("<table"+getClassAttribute()+getClassAttribute()+">");
 		tabs(++depth);
 	}
 

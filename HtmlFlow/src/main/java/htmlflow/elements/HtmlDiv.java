@@ -20,7 +20,7 @@ public class HtmlDiv<T> extends HtmlWriterComposite<T>{
 
 	@Override
 	public void doWriteBefore(PrintStream out, int depth) {
-		out.println("<div>");
+		out.println("<div"+getClassAttribute()+getClassAttribute()+">");
 		tabs(depth+1);
 	}
 	@Override
