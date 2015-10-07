@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
+public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelector {
 
 	/*=========================================================================*/
 	/*------------------------- STATIC FIELDS ---------------------------------*/
@@ -66,4 +66,38 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 	public final void tabs(int depth){
 		for (int i = 0; i < depth; i++) out.print("\t");
 	}
+
+   	/*=========================================================================*/
+	/*-------------------- Selectors Methods ----------------------------*/
+	/*=========================================================================*/
+
+    private String classAttribute = null;
+
+    private String idAttribute = null;
+
+    @Override
+    public String getClassAttribute() {
+        if(classAttribute != null){
+            return " class=\""+classAttribute+"\" ";
+        }
+        return "";
+    }
+
+    @Override
+    public String getIdAttribute() {
+        if(idAttribute != null){
+            return " id=\""+idAttribute+"\" ";
+        }
+        return "";
+    }
+
+    @Override
+    public void setClassAttribute(String classAttribute) {
+        this.classAttribute = classAttribute;
+    }
+
+    @Override
+    public void setIdAttribute(String idAttribute) {
+        this.idAttribute = idAttribute;
+    }
 }
