@@ -18,15 +18,9 @@ public class HtmlDiv<T> extends HtmlWriterComposite<T>{
 	public HtmlDiv<T> div(){return addChild(new HtmlDiv<T>());}
 	public HtmlForm<T> form(String action){return addChild(new HtmlForm<T>(action));}
 
-	@Override
-	public void doWriteBefore(PrintStream out, int depth) {
-		out.println("<div"+getClassAttribute()+getClassAttribute()+">");
-		tabs(depth+1);
-	}
-	@Override
-	public void doWriteAfter(PrintStream out, int depth) {
-		out.println();
-		tabs(depth);
-		out.println("</div>");
-	}
+    @Override
+    public String getElementName() {
+      return "div";
+    }
+
 }

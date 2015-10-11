@@ -47,6 +47,7 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
 		doWriteAfter(out, --depth);
 		out.flush();
 	}
+	
 	/*=========================================================================*/
 	/*----------------------- Instance Methods --------------------------------*/
 	/*=========================================================================*/ 
@@ -55,9 +56,27 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
 		children.add(child);
 		return child;
 	}
-
-	public abstract void doWriteBefore(PrintStream out, int depth);
-	public abstract void doWriteAfter(PrintStream out, int depth);
+	   
+     public void doWriteBefore(PrintStream out, int depth) {
+         out.println("<"+ getElementName()+" "+getClassAttribute()+" "+getIdAttribute()+" >");
+         tabs(depth+1);
+     }
+     
+        
+    public void doWriteAfter(PrintStream out, int depth) {
+        out.println();
+        tabs(depth);
+        out.println("</"+ getElementName()+">");
+    }
+    
+    /**
+     * basic empty name method.
+     * Should be overriden in pair with doWriteAfter and doWriteBefore
+     * @return
+     */
+    public String getElementName(){
+        return "";
+    };
 	
 	/*=========================================================================*/
 	/*-------------------- auxiliar Methods ----------------------------*/
@@ -78,7 +97,7 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
     @Override
     public String getClassAttribute() {
         if(classAttribute != null){
-            return " class=\""+classAttribute+"\" ";
+            return " class=\""+classAttribute+"\"";
         }
         return "";
     }
@@ -86,19 +105,19 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
     @Override
     public String getIdAttribute() {
         if(idAttribute != null){
-            return " id=\""+idAttribute+"\" ";
+            return " id=\""+idAttribute+"\"";
         }
         return "";
     }
 
     @Override
-    public HtmlWriterComposite<T> setClassAttribute(String classAttribute) {
+    public HtmlWriterComposite<T> classAttr(String classAttribute) {
         this.classAttribute = classAttribute;
         return this;
     }
 
     @Override
-    public  HtmlWriterComposite<T>  setIdAttribute(String idAttribute) {
+    public  HtmlWriterComposite<T>  idAttr(String idAttribute) {
         this.idAttribute = idAttribute;
         return this;
     }

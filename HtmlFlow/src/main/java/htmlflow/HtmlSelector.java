@@ -20,10 +20,10 @@ public interface HtmlSelector<T>{
      * Set the class attribute
      * @return
      */
-    T setClassAttribute(String classAttribute);
+    T classAttr(String classAttribute);
 
     /**
      * Set the id attribute
      */
-	T setIdAttribute(String idAttribute);
+	T idAttr(String idAttribute);
 }
