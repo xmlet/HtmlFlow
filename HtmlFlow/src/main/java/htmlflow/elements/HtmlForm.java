@@ -25,12 +25,9 @@ public class HtmlForm<T> extends HtmlWriterComposite<T>{
 				"application/x-www-form-urlencoded"));
 		tabs(++depth);
 	}
-	
-	@Override
-	public void doWriteAfter(PrintStream out, int depth) {
-		out.println("");
-		tabs(depth);
-		out.println("</form>");
-		tabs(depth);
-	}
+
+  @Override
+  public String getElementName() {
+    return "form";
+  }
 }

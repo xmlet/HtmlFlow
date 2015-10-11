@@ -14,10 +14,8 @@ public abstract class HtmlSingleElement implements HtmlWriter<Object>{
 
 	@Override
 	public final void write(int depth, Object model) {
-		out.println();
 		tabs(depth);
 		out.println("<" + element + "/>");
-		tabs(depth);
 	}
 
 	@Override

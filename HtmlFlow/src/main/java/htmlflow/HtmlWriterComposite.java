@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import htmlflow.elements.TextNode;
+
 public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelector<HtmlWriterComposite<T>> {
 
 	/*=========================================================================*/
@@ -38,13 +40,22 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
 		}
 		return this;
 	}
+	
 	@Override
 	public final void  write(int depth, T model) { 
-		doWriteBefore(out, depth++);
-		for (HtmlWriter elem : children) {
-			elem.write(depth, model);
+		doWriteBefore(out, depth);
+		boolean doTab = true;
+		if(children.get(0) != null && children.get(0) instanceof TextNode){
+		  out.print("");
+		  doTab = false;
+		}else{
+		  out.println();
+		  doTab = true;
 		}
-		doWriteAfter(out, --depth);
+		for (HtmlWriter elem : children) {
+			elem.write(depth+1, model);
+		}
+		doWriteAfter(out, depth, doTab);
 		out.flush();
 	}
 	
@@ -58,14 +69,20 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
 	}
 	   
      public void doWriteBefore(PrintStream out, int depth) {
-         out.println("<"+ getElementName()+" "+getClassAttribute()+" "+getIdAttribute()+" >");
-         tabs(depth+1);
+       tabs(depth);
+       out.print(getElementValue(out));
      }
+
+    protected String getElementValue(PrintStream out) {
+     return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
+    }
      
         
-    public void doWriteAfter(PrintStream out, int depth) {
-        out.println();
-        tabs(depth);
+    public void doWriteAfter(PrintStream out, int depth, boolean doTab) {
+        // RMK : do not insert tabs after a text node
+        if(doTab){
+          tabs(depth);
+        }
         out.println("</"+ getElementName()+">");
     }
     
