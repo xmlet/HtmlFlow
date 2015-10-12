@@ -4,7 +4,7 @@ import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
 
-public class HtmlA<T> extends HtmlWriterComposite {
+public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA> {
   private final String href;
 
   public HtmlA<T> text(String msg) {

@@ -4,7 +4,7 @@ import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
 
-public class HtmlTr<T> extends HtmlWriterComposite<T>{
+public class HtmlTr<T> extends HtmlWriterComposite<T, HtmlTr>{
 	
 	public HtmlTd<T> td(){return addChild(new HtmlTd<T>());}
 	public HtmlTh<T> th(){return addChild(new HtmlTh<T>());}

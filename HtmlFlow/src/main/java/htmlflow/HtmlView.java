@@ -5,7 +5,7 @@ import java.io.PrintStream;
 import htmlflow.elements.HtmlBody;
 import htmlflow.elements.HtmlHead;
 
-public class HtmlView<T> extends HtmlWriterComposite<T>{
+public class HtmlView<T> extends HtmlWriterComposite<T, HtmlView>{
 	
 	public HtmlHead<T> head(){return addChild(new HtmlHead<T>());}
 	public HtmlBody<T> body(){return addChild(new HtmlBody<T>());}

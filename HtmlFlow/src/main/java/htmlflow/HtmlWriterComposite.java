@@ -4,9 +4,11 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import htmlflow.attribute.AttrClass;
+import htmlflow.attribute.AttrId;
 import htmlflow.elements.TextNode;
 
-public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelector<HtmlWriterComposite<T>> {
+public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> implements HtmlWriter<T>, HtmlSelector<U> {
 
 	/*=========================================================================*/
 	/*------------------------- STATIC FIELDS ---------------------------------*/
@@ -45,7 +47,7 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
 	public final void  write(int depth, T model) { 
 		doWriteBefore(out, depth);
 		boolean doTab = true;
-		if(children.get(0) != null && children.get(0) instanceof TextNode){
+		if(children!= null && !children.isEmpty() && children.get(0) != null && children.get(0) instanceof TextNode){
 		  out.print("");
 		  doTab = false;
 		}else{
@@ -70,13 +72,9 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
 	   
      public void doWriteBefore(PrintStream out, int depth) {
        tabs(depth);
-       out.print(getElementValue(out));
+       out.print(getElementValue());
      }
 
-    protected String getElementValue(PrintStream out) {
-     return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
-    }
-     
         
     public void doWriteAfter(PrintStream out, int depth, boolean doTab) {
         // RMK : do not insert tabs after a text node
@@ -85,6 +83,10 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
         }
         out.println("</"+ getElementName()+">");
     }
+    
+    protected String getElementValue() {
+      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
+     }
     
     /**
      * basic empty name method.
@@ -107,35 +109,35 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>, HtmlSelec
 	/*-------------------- Selectors Methods ----------------------------*/
 	/*=========================================================================*/
 
-    private String classAttribute = null;
+    private AttrClass classAttribute = new AttrClass();
 
-    private String idAttribute = null;
+    private AttrId idAttribute2 = new  AttrId(); 
 
     @Override
     public String getClassAttribute() {
-        if(classAttribute != null){
-            return " class=\""+classAttribute+"\"";
+        if(classAttribute.getValue() != null){
+            return " class=\""+classAttribute.getValue()+"\"";
         }
         return "";
     }
 
     @Override
     public String getIdAttribute() {
-        if(idAttribute != null){
-            return " id=\""+idAttribute+"\"";
+        if(idAttribute2.getValue() != null){
+            return " id=\""+idAttribute2.getValue()+"\"";
         }
         return "";
     }
 
     @Override
-    public HtmlWriterComposite<T> classAttr(String classAttribute) {
-        this.classAttribute = classAttribute;
-        return this;
+    public U classAttr(String classAttribute) {
+        this.classAttribute.setValue(classAttribute);
+        return (U) this;
     }
 
     @Override
-    public  HtmlWriterComposite<T>  idAttr(String idAttribute) {
-        this.idAttribute = idAttribute;
-        return this;
+    public  U idAttr(String idAttribute) {
+        idAttribute2.setValue(idAttribute);
+        return (U) this;
     }
 }

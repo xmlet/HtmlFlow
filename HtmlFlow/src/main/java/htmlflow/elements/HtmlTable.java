@@ -5,7 +5,7 @@ import java.io.PrintStream;
 import htmlflow.HtmlWriterComposite;
 import htmlflow.ModelBinder;
 
-public class HtmlTable<T> extends HtmlWriterComposite<T>{
+public class HtmlTable<T> extends HtmlWriterComposite<T, HtmlTable>{
 
 	public HtmlTr<T> tr(){return addChild(new HtmlTr<T>());}
 

@@ -2,7 +2,7 @@ package htmlflow.elements;
 
 import htmlflow.HtmlWriterComposite;
 
-public class HtmlHead<T> extends HtmlWriterComposite<T>{
+public class HtmlHead<T> extends HtmlWriterComposite<T, HtmlHead>{
 	
 	public HtmlHead<T> title(String msg){addChild(new HtmlTitle<T>()).text(msg);return this;}
 	public HtmlHead<T> scriptLink(String src){addChild(new HtmlScriptLink(src));return this;}

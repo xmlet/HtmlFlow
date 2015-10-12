@@ -6,7 +6,7 @@ import htmlflow.ModelBinder;
 /**
  * @uml.dependency   supplier="htmlflow.ModelBinder"
  */
-public class HtmlDiv<T> extends HtmlWriterComposite<T>{
+public class HtmlDiv<T> extends HtmlWriterComposite<T, HtmlDiv> {
 	
   public HtmlTable<T> table(){return addChild(new HtmlTable<T>());}
 	public HtmlDiv<T> text(String msg){addChild(new TextNode<T>(msg));return this;}

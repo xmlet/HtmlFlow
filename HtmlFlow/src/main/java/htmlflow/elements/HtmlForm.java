@@ -3,7 +3,7 @@ import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
 
-public class HtmlForm<T> extends HtmlWriterComposite<T>{
+public class HtmlForm<T> extends HtmlWriterComposite<T, HtmlForm>{
 	public HtmlForm<T> text(String msg){addChild(new TextNode<T>(msg));return this;}
 	public HtmlForm<T> br(){addChild(new HtmlBr());return this;}
 	public HtmlForm<T> select(String name, String...options){addChild(new HtmlFormSelect(name, options));return this;}

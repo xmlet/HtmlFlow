@@ -63,6 +63,26 @@ public class HtmlDivTest {
     assertEquals(ElementType.DIV + " element was expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
   }
 
+  @Test
+  public void testIdAndClassAttribute() throws Exception {
+    HtmlView<Task> taskView = new HtmlView<Task>();
+    assertEquals(ElementType.DIV + " elementwas expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
+
+    String divClass = "divClass";
+    String divId = "divId";
+    taskView.body().div().classAttr(divClass).idAttr(divId);
+    Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    PrintStream out = new PrintStream(byteArrayOutputStream);
+    taskView.setPrintStream(out).write(0, t1);
+    String result = byteArrayOutputStream.toString();
+    System.out.println(result);
+    assertTrue(result.contains("<div"));
+    assertTrue(result.contains("</div>"));
+    assertTrue(result.contains(divClass));
+    assertTrue(result.contains(divId));
+  }
+  
   /**
    * Test method for
    * {@link htmlflow.HtmlWriterComposite#doWriteBefore(java.io.PrintStream, int)}
@@ -70,22 +90,6 @@ public class HtmlDivTest {
    */
   @Test
   public void testDoWrite() throws Exception {
-//    HtmlView<Task> taskView = new HtmlView<Task>();
-//    assertEquals(ElementType.DIV + " elementwas expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
-//
-//    String divClass = "divClass";
-//    String divId = "divId";
-//    taskView.body().div().classAttr(divClass).idAttr(divId);
-//    Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
-//    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//    PrintStream out = new PrintStream(byteArrayOutputStream);
-//    taskView.setPrintStream(out).write(0, t1);
-//    String result = byteArrayOutputStream.toString();
-//    System.out.println(result);
-//    assertTrue(result.contains("<div"));
-//    assertTrue(result.contains("</div>"));
-//    assertTrue(result.contains(divClass));
-//    assertTrue(result.contains(divId));
 
     HtmlView<Task> taskView2 = new HtmlView<Task>();
 
@@ -100,7 +104,7 @@ public class HtmlDivTest {
     Task t2 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
     PrintStream out2 = new PrintStream(byteArrayOutputStream2);
-    taskView2.setPrintStream(out2).write(1, t2);
+    taskView2.setPrintStream(out2).write(0, t2);
     System.out.println(byteArrayOutputStream2.toString());
   }
 

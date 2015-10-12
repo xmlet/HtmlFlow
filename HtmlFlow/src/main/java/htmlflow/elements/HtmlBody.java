@@ -3,7 +3,7 @@ package htmlflow.elements;
 import htmlflow.HtmlWriterComposite;
 import htmlflow.ModelBinder;
 
-public class HtmlBody<T> extends HtmlWriterComposite<T>{	
+public class HtmlBody<T> extends HtmlWriterComposite<T, HtmlBody>{	
 	
 	public HtmlBody<T> heading(int level, String msg){addChild(new HtmlHeading<T>(level)).text(msg); return this;}
 	public HtmlBody<T> heading(int level, ModelBinder<T> binder){addChild(new HtmlHeading<T>(level)).text(binder); return this;}
