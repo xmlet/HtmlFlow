@@ -17,11 +17,14 @@ public enum AttributeType {
   HIDDEN,
   ID,
   LANG,
+  LINK,
+  REL,
   SPELLCHECK,
   STYLE,
   TABINDEX,
   TITLE,
   TRANSLATE,
+    TYPE,
     ;
   
   @Override

@@ -21,4 +21,12 @@ public abstract class AbstractAttribute implements Attribute {
   }
 
   public abstract String getName();
+
+  @Override
+  public String getAttribute() {
+      if(this.getValue() != null){
+          return " "+this.getName()+"=\""+this.getValue()+"\"";
+      }
+      return "";
+  }
 }
