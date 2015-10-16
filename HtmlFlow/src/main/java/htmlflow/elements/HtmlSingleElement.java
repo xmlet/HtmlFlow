@@ -3,32 +3,19 @@ package htmlflow.elements;
 import java.io.PrintStream;
 
 import htmlflow.HtmlWriter;
+import htmlflow.HtmlWriterComposite;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public abstract class HtmlSingleElement implements HtmlWriter<Object>{
-	private PrintStream out;
+public abstract class HtmlSingleElement<T> extends HtmlWriterComposite<T, HtmlSingleElement> {
 	private final String element;
 
 	public HtmlSingleElement(String element) {
 		this.element = element;
 	}
 
-	@Override
-	public final void write(int depth, Object model) {
-		tabs(depth);
-		out.println("<" + element + "/>");
-	}
+    @Override
+    public String getElementName(){
+        return  element;
+    }
 
-	@Override
-	public HtmlWriter<Object> setPrintStream(PrintStream out) {
-		this.out = out;
-		return this;
-	}
-
-	/*=========================================================================*/
-	/*-------------------- auxiliar Methods ----------------------------*/
-	/*=========================================================================*/ 
-
-	public final void tabs(int depth){
-		for (int i = 0; i < depth; i++) out.print("\t");
-	}
 }

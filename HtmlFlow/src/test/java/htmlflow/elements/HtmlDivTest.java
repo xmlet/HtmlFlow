@@ -70,6 +70,7 @@ public class HtmlDivTest {
 
     String divClass = "divClass";
     String divId = "divId";
+      taskView.head().scriptLink("test.css");
     taskView.body().div().classAttr(divClass).idAttr(divId).addAttr("toto", "tutu");
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -81,7 +82,9 @@ public class HtmlDivTest {
     assertTrue(result.contains("</div>"));
     assertTrue(result.contains(divClass));
     assertTrue(result.contains(divId));
-      assertTrue(result.contains("toto=\"tutu\""));
+    assertTrue(result.contains("toto=\"tutu\""));
+    assertTrue("should contains <script type=\"text/javascript\" src=\"test.css\">",
+              result.contains("<script type=\"text/javascript\" src=\"test.css\">"));
   }
   
   /**
