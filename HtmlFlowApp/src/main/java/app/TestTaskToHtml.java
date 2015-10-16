@@ -56,6 +56,7 @@ public class TestTaskToHtml {
 
 		return taskView;
 	}
+	
 	private static HtmlView<Iterable<Task>> taskListView(){
 		HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
 		taskView.head().title("Task Details");

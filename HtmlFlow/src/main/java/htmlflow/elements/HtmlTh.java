@@ -1,10 +1,11 @@
 package htmlflow.elements;
 
-public class HtmlTh<T> extends HtmlTextElement<T>{
+public class HtmlTh<T> extends HtmlTextElement<T, HtmlTh>{
 	
 	public HtmlA<T> a(String href){return addChild(new HtmlA<T>(href));}
-
-	public HtmlTh() {
-		super("th");
-	}
+	
+    @Override
+    public String getElementName() {
+      return ElementType.TH.toString();
+    }
 }

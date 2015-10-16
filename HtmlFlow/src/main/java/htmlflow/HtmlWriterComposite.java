@@ -4,7 +4,11 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
+import htmlflow.attribute.AttrClass;
+import htmlflow.attribute.AttrId;
+import htmlflow.elements.TextNode;
+
+public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> implements HtmlWriter<T>, HtmlSelector<U> {
 
 	/*=========================================================================*/
 	/*------------------------- STATIC FIELDS ---------------------------------*/
@@ -38,15 +42,25 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 		}
 		return this;
 	}
+	
 	@Override
 	public final void  write(int depth, T model) { 
-		doWriteBefore(out, depth++);
-		for (HtmlWriter elem : children) {
-			elem.write(depth, model);
+		doWriteBefore(out, depth);
+		boolean doTab = true;
+		if(children!= null && !children.isEmpty() && children.get(0) != null && children.get(0) instanceof TextNode){
+		  out.print("");
+		  doTab = false;
+		}else{
+		  out.println();
+		  doTab = true;
 		}
-		doWriteAfter(out, --depth);
+		for (HtmlWriter elem : children) {
+			elem.write(depth+1, model);
+		}
+		doWriteAfter(out, depth, doTab);
 		out.flush();
 	}
+	
 	/*=========================================================================*/
 	/*----------------------- Instance Methods --------------------------------*/
 	/*=========================================================================*/ 
@@ -55,9 +69,33 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 		children.add(child);
 		return child;
 	}
+	   
+     public void doWriteBefore(PrintStream out, int depth) {
+       tabs(depth);
+       out.print(getElementValue());
+     }
 
-	public abstract void doWriteBefore(PrintStream out, int depth);
-	public abstract void doWriteAfter(PrintStream out, int depth);
+        
+    public void doWriteAfter(PrintStream out, int depth, boolean doTab) {
+        // RMK : do not insert tabs after a text node
+        if(doTab){
+          tabs(depth);
+        }
+        out.println("</"+ getElementName()+">");
+    }
+    
+    protected String getElementValue() {
+      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
+     }
+    
+    /**
+     * basic empty name method.
+     * Should be overriden in pair with doWriteAfter and doWriteBefore
+     * @return
+     */
+    public String getElementName(){
+        return "";
+    };
 	
 	/*=========================================================================*/
 	/*-------------------- auxiliar Methods ----------------------------*/
@@ -66,4 +104,40 @@ public abstract class HtmlWriterComposite<T> implements HtmlWriter<T>{
 	public final void tabs(int depth){
 		for (int i = 0; i < depth; i++) out.print("\t");
 	}
+
+   	/*=========================================================================*/
+	/*-------------------- Selectors Methods ----------------------------*/
+	/*=========================================================================*/
+
+    private AttrClass classAttribute = new AttrClass();
+
+    private AttrId idAttribute2 = new  AttrId(); 
+
+    @Override
+    public String getClassAttribute() {
+        if(classAttribute.getValue() != null){
+            return " class=\""+classAttribute.getValue()+"\"";
+        }
+        return "";
+    }
+
+    @Override
+    public String getIdAttribute() {
+        if(idAttribute2.getValue() != null){
+            return " id=\""+idAttribute2.getValue()+"\"";
+        }
+        return "";
+    }
+
+    @Override
+    public U classAttr(String classAttribute) {
+        this.classAttribute.setValue(classAttribute);
+        return (U) this;
+    }
+
+    @Override
+    public  U idAttr(String idAttribute) {
+        idAttribute2.setValue(idAttribute);
+        return (U) this;
+    }
 }
