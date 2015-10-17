@@ -1,6 +1,3 @@
-package htmlflow.elements;
-
-import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
 

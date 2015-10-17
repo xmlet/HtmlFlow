@@ -2,6 +2,8 @@ package htmlflow.elements;
 import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
+import htmlflow.attribute.AttrGeneric;
+import htmlflow.attribute.AttributeType;
 
 public class HtmlForm<T> extends HtmlWriterComposite<T, HtmlForm>{
 	public HtmlForm<T> text(String msg){addChild(new TextNode<T>(msg));return this;}
@@ -15,6 +17,9 @@ public class HtmlForm<T> extends HtmlWriterComposite<T, HtmlForm>{
 
 	public HtmlForm(String action) {
 		this.action = action;
+		addAttribute(new AttrGeneric(AttributeType.ACTION.toString(), action));
+		addAttribute(new AttrGeneric(AttributeType.METHOD.toString(), "post"));
+		addAttribute(new AttrGeneric(AttributeType.ENCTYPE.toString(), "application/x-www-form-urlencoded"));
 	}
 
 	@Override

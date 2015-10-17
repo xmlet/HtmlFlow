@@ -1,8 +1,6 @@
-package htmlflow.elements;
 
 import java.io.PrintStream;
 
-import htmlflow.HtmlWriter;
 import htmlflow.HtmlWriterComposite;
 
 public class HtmlLinkCss<T> extends HtmlWriterComposite<T, HtmlLinkCss> {

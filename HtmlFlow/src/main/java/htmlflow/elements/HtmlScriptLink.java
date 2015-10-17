@@ -2,7 +2,6 @@ package htmlflow.elements;
 
 import java.io.PrintStream;
 
-import htmlflow.HtmlWriter;
 import htmlflow.HtmlWriterComposite;
 
 public class HtmlScriptLink<T> extends HtmlWriterComposite<T, HtmlScriptLink> {

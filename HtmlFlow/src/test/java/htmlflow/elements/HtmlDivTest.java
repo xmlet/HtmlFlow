@@ -71,7 +71,11 @@ public class HtmlDivTest {
     String divClass = "divClass";
     String divId = "divId";
       taskView.head().scriptLink("test.css");
-    taskView.body().div().classAttr(divClass).idAttr(divId).addAttr("toto", "tutu");
+    taskView.body()
+    .div()
+      .classAttr(divClass)
+      .idAttr(divId)
+      .addAttr("toto", "tutu").form("/action.do");
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     PrintStream out = new PrintStream(byteArrayOutputStream);

@@ -15,6 +15,7 @@ public enum AttributeType {
   DRAGGABLE,
   DROPZONE,
   HIDDEN,
+  HREF,
   ID,
   LANG,
   LINK,
@@ -24,7 +25,7 @@ public enum AttributeType {
   TABINDEX,
   TITLE,
   TRANSLATE,
-    TYPE,
+    TYPE, ACTION, METHOD, ENCTYPE,
     ;
   
   @Override

@@ -1,10 +1,8 @@
 package htmlflow;
 
-import htmlflow.attribute.Attribute;
-
 /**
  *  Mikael KROK
- *  Allows an element to define its own class and id attribute
+ *  Allows an element to define its own class, id attribute and any generic attribute
  */
 public interface HtmlSelector<T>{
     /**
