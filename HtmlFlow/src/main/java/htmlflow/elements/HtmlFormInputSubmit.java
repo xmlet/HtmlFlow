@@ -12,6 +12,7 @@ public class HtmlFormInputSubmit implements HtmlWriter<Object>{
 	public HtmlFormInputSubmit(String value) {
 		this.value = value;
 	}
+	
 	@Override
 	public void write(int depth, Object model) {
 		out.print("<input type=\"submit\" value=\""+ value + "\"/>");

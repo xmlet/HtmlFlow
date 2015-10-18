@@ -1,34 +1,19 @@
 package htmlflow.elements;
 
-import java.io.PrintStream;
+import htmlflow.HtmlWriterComposite;
 
-import htmlflow.HtmlWriter;
+public class HtmlLinkCss<T> extends HtmlWriterComposite<T, HtmlLinkCss<T>> {
 
-public class HtmlLinkCss implements HtmlWriter<Object>{
-	PrintStream out;
-	final String href;
-	
 	public HtmlLinkCss(String href) {
-		this.href = href;
+        this.addAttr("rel", "Stylesheet");
+        this.addAttr("type", "\"text/css\"");
+        this.addAttr("href", href);
 	}
 
-	@Override
-	public void write(int depth, Object model) {
-		out.print("<link rel=\"Stylesheet\" type=\"text/css\" href=\"" + href + "\"/>");
-		tabs(depth);
-	}
-	
-	@Override
-	public HtmlWriter<Object> setPrintStream(PrintStream out) {
-		this.out = out;
-		return this;
-	}
+  @Override
+  public String getElementName() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/*=========================================================================*/
-	/*-------------------- auxiliar Methods ----------------------------*/
-	/*=========================================================================*/ 
-	
-	public final void tabs(int depth){
-		for (int i = 0; i < depth; i++) out.print("\t");
-	}
 }

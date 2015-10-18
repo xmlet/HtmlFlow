@@ -1,11 +1,9 @@
 package htmlflow.elements;
 
-import java.io.PrintStream;
-
 import htmlflow.HtmlWriterComposite;
 import htmlflow.ModelBinder;
 
-public class HtmlTable<T> extends HtmlWriterComposite<T, HtmlTable>{
+public class HtmlTable<T> extends HtmlWriterComposite<T, HtmlTable<T>>{
 
 	public HtmlTr<T> tr(){return addChild(new HtmlTr<T>());}
 

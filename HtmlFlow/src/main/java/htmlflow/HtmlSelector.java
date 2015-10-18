@@ -2,7 +2,7 @@ package htmlflow;
 
 /**
  *  Mikael KROK
- *  Allows an element to define its own class and id attribute
+ *  Allows an element to define its own class, id attribute and any generic attribute
  */
 public interface HtmlSelector<T>{
     /**
@@ -26,4 +26,12 @@ public interface HtmlSelector<T>{
      * Set the id attribute
      */
 	T idAttr(String idAttribute);
+
+    /**
+     * create a generic attribute
+     * @param name
+     * @param value
+     * @return
+     */
+    T addAttr(String name, String value);
 }
