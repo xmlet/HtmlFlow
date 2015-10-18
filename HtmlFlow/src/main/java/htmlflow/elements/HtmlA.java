@@ -4,7 +4,7 @@ import htmlflow.HtmlWriterComposite;
 import htmlflow.attribute.AttrGeneric;
 import htmlflow.attribute.AttributeType;
 
-public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA> {
+public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA<T>> {
 
   public HtmlA<T> text(String msg) {
     addChild(new TextNode<T>(msg));

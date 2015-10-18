@@ -2,7 +2,7 @@ package htmlflow.elements;
 
 import htmlflow.HtmlWriterComposite;
 
-public abstract class HtmlSingleElement<T> extends HtmlWriterComposite<T, HtmlSingleElement> {
+public abstract class HtmlSingleElement<T> extends HtmlWriterComposite<T, HtmlSingleElement<T>> {
 	private final String element;
 
 	public HtmlSingleElement(String element) {

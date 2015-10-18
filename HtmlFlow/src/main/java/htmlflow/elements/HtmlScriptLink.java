@@ -4,7 +4,7 @@ import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
 
-public class HtmlScriptLink<T> extends HtmlWriterComposite<T, HtmlScriptLink> {
+public class HtmlScriptLink<T> extends HtmlWriterComposite<T, HtmlScriptLink<T>> {
 	
 	PrintStream out;
 
@@ -15,6 +15,6 @@ public class HtmlScriptLink<T> extends HtmlWriterComposite<T, HtmlScriptLink> {
 
     @Override
     public String getElementName() {
-        return ElementType.SCRIPT.toString();
+      return ElementType.SCRIPT.toString();
     }
 }

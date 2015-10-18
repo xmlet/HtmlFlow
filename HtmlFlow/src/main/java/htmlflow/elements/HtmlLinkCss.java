@@ -1,15 +1,19 @@
-
-import java.io.PrintStream;
+package htmlflow.elements;
 
 import htmlflow.HtmlWriterComposite;
 
-public class HtmlLinkCss<T> extends HtmlWriterComposite<T, HtmlLinkCss> {
-	PrintStream out;
+public class HtmlLinkCss<T> extends HtmlWriterComposite<T, HtmlLinkCss<T>> {
 
 	public HtmlLinkCss(String href) {
         this.addAttr("rel", "Stylesheet");
         this.addAttr("type", "\"text/css\"");
         this.addAttr("href", href);
 	}
+
+  @Override
+  public String getElementName() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

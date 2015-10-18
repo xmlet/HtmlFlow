@@ -33,6 +33,8 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 	public HtmlWriterComposite() {
 		children = new LinkedList<HtmlWriter<?>>();
         attributes = new LinkedList<Attribute>();
+        attributes.add(classAttribute);
+        attributes.add(idAttribute);
 	}
 	
 	/*=========================================================================*/
@@ -90,7 +92,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
     protected String getElementValue() {
         String tag = "<" + getElementName();
         for (Attribute attribute : attributes) {
-            tag += attribute.getAttribute();
+            tag += attribute.printAttribute();
         }
 //      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
       return  tag+">";
@@ -101,9 +103,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
      * Should be overriden in pair with doWriteAfter and doWriteBefore
      * @return
      */
-    public String getElementName(){
-        return "";
-    };
+    abstract public String getElementName();
 
     public void addAttribute(Attribute attr){
         attributes.add(attr);
@@ -123,7 +123,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 
     private AttrClass classAttribute = new AttrClass();
 
-    private AttrId idAttribute2 = new  AttrId(); 
+    private AttrId idAttribute = new  AttrId(); 
 
     @Override
     public String getClassAttribute() {
@@ -135,8 +135,8 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 
     @Override
     public String getIdAttribute() {
-        if(idAttribute2.getValue() != null){
-            return " id=\""+idAttribute2.getValue()+"\"";
+        if(idAttribute.getValue() != null){
+            return " id=\""+idAttribute.getValue()+"\"";
         }
         return "";
     }
@@ -149,7 +149,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 
     @Override
     public  U idAttr(String idAttribute) {
-        idAttribute2.setValue(idAttribute);
+        this.idAttribute.setValue(idAttribute);
         return (U) this;
     }
 

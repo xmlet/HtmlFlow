@@ -13,6 +13,6 @@ public interface Attribute {
   
   String getName();
 
-  String getAttribute();
+  String printAttribute();
 
 }
