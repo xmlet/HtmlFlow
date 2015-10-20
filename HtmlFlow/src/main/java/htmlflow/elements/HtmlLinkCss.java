@@ -12,8 +12,7 @@ public class HtmlLinkCss<T> extends HtmlWriterComposite<T, HtmlLinkCss<T>> {
 
   @Override
   public String getElementName() {
-    // TODO Auto-generated method stub
-    return null;
+      return ElementType.SCRIPT.toString();
   }
 
 }

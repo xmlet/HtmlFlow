@@ -2,11 +2,6 @@ package htmlflow.elements;
 
 public class HtmlP<T> extends HtmlTextElement<T, HtmlP<T>>{
 	public HtmlP() {
-		super("p");
+		super(ElementType.P.toString());
 	}
-
-    @Override
-    public String getElementName() {
-      return ElementType.P.toString();
-    }
 }
