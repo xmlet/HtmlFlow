@@ -90,7 +90,7 @@ public class TestTable {
 			Node tr = table.getChildNodes().item(3 + i*2);
 			Assert.assertEquals(NODE_NAME_TR, tr.getNodeName());
 			for (int j = 0; j < output[i].length; j++) {
-				Node td = tr.getChildNodes().item(j + 1);
+				Node td = tr.getChildNodes().item(j*2 + 1);
 				Assert.assertEquals("td", td.getNodeName());
 				String val = td.getFirstChild().getNodeValue();
 				Assert.assertEquals(output[i][j], Integer.parseInt(val));
@@ -154,12 +154,12 @@ public class TestTable {
 			/*
 			 * Check task description
 			 */
-			String desc = tr.getChildNodes().item(2).getFirstChild().getNodeValue();
+			String desc = tr.getChildNodes().item(3).getFirstChild().getNodeValue();
 			Assert.assertEquals(output.get(i).getDescription(), desc);
 			/*
 			 * Check task priority
 			 */
-			String prio = tr.getChildNodes().item(3).getFirstChild().getNodeValue();
+			String prio = tr.getChildNodes().item(5).getFirstChild().getNodeValue();
 			Assert.assertEquals(output.get(i).getPriority().toString(), prio);
 		}        
 		System.out.println(mem.toString());
