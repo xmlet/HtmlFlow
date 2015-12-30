@@ -1,6 +1,10 @@
 target/
 /bin/
 
+# InteliJ
+.idea
+*.iml
+
 # Eclipse Core
 .project
 
