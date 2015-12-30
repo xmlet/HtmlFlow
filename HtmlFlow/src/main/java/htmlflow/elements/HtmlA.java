@@ -1,11 +1,10 @@
 package htmlflow.elements;
 
-import java.io.PrintStream;
-
 import htmlflow.HtmlWriterComposite;
+import htmlflow.attribute.AttrGeneric;
+import htmlflow.attribute.AttributeType;
 
-public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA> {
-  private final String href;
+public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA<T>> {
 
   public HtmlA<T> text(String msg) {
     addChild(new TextNode<T>(msg));
@@ -13,11 +12,7 @@ public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA> {
   }
 
   public HtmlA(String href) {
-    this.href = href;
-  }
-
-  protected String getElementValue(PrintStream out) {
-    return "<" + getElementName() + " href=\"" + href + "\"" + getClassAttribute() + getIdAttribute() + ">";
+    addAttribute(new AttrGeneric(AttributeType.HREF.toString(), href));
   }
 
   @Override

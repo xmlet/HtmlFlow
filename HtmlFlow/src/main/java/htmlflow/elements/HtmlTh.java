@@ -1,6 +1,6 @@
 package htmlflow.elements;
 
-public class HtmlTh<T> extends HtmlTextElement<T, HtmlTh>{
+public class HtmlTh<T> extends HtmlTextElement<T, HtmlTh<T>>{
 	
 	public HtmlA<T> a(String href){return addChild(new HtmlA<T>(href));}
 	

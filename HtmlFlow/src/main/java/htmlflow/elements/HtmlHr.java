@@ -1,7 +1,7 @@
 package htmlflow.elements;
 
-public class HtmlHr extends HtmlSingleElement{
+public class HtmlHr<T> extends HtmlSingleElement<T>{
 	public HtmlHr() {
-		super("hr");
+		super(ElementType.HR.toString());
 	}
 }

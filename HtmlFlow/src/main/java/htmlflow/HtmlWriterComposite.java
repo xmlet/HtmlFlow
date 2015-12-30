@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import htmlflow.attribute.AttrClass;
+import htmlflow.attribute.AttrGeneric;
 import htmlflow.attribute.AttrId;
+import htmlflow.attribute.Attribute;
 import htmlflow.elements.TextNode;
 
 public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> implements HtmlWriter<T>, HtmlSelector<U> {
@@ -24,12 +26,15 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 	 */
 	private final List<HtmlWriter<?>> children;
 	protected PrintStream out; 
-
+    private List<Attribute> attributes;
 	/*=========================================================================*/
 	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
 	/*=========================================================================*/ 
 	public HtmlWriterComposite() {
 		children = new LinkedList<HtmlWriter<?>>();
+        attributes = new LinkedList<Attribute>();
+        attributes.add(classAttribute);
+        attributes.add(idAttribute);
 	}
 	
 	/*=========================================================================*/
@@ -85,18 +90,25 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
     }
     
     protected String getElementValue() {
-      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
-     }
+        String tag = "<" + getElementName();
+        for (Attribute attribute : attributes) {
+            tag += attribute.printAttribute();
+        }
+//      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
+      return  tag+">";
+    }
     
     /**
      * basic empty name method.
      * Should be overriden in pair with doWriteAfter and doWriteBefore
      * @return
      */
-    public String getElementName(){
-        return "";
-    };
-	
+    abstract public String getElementName();
+
+    public void addAttribute(Attribute attr){
+        attributes.add(attr);
+    }
+
 	/*=========================================================================*/
 	/*-------------------- auxiliar Methods ----------------------------*/
 	/*=========================================================================*/ 
@@ -111,7 +123,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 
     private AttrClass classAttribute = new AttrClass();
 
-    private AttrId idAttribute2 = new  AttrId(); 
+    private AttrId idAttribute = new  AttrId(); 
 
     @Override
     public String getClassAttribute() {
@@ -123,8 +135,8 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 
     @Override
     public String getIdAttribute() {
-        if(idAttribute2.getValue() != null){
-            return " id=\""+idAttribute2.getValue()+"\"";
+        if(idAttribute.getValue() != null){
+            return " id=\""+idAttribute.getValue()+"\"";
         }
         return "";
     }
@@ -137,7 +149,14 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 
     @Override
     public  U idAttr(String idAttribute) {
-        idAttribute2.setValue(idAttribute);
+        this.idAttribute.setValue(idAttribute);
         return (U) this;
     }
+
+    @Override
+    public U addAttr(String name, String value) {
+        attributes.add(new AttrGeneric(name, value));
+        return (U) this;
+    }
+
 }

@@ -1,6 +1,6 @@
 package htmlflow.elements;
 
-public class HtmlHeading<T> extends HtmlTextElement<T, HtmlHeading> {
+public class HtmlHeading<T> extends HtmlTextElement<T, HtmlHeading<T>> {
 
   public HtmlHeading(int level) {
     super("h" + level);

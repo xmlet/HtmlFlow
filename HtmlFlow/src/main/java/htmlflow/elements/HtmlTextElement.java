@@ -18,4 +18,9 @@ public abstract class HtmlTextElement<T, U extends HtmlTextElement> extends Html
 		this.element = element;
 	}
 
+    @Override
+    public String getElementName(){
+        return  element;
+    }
+
 }

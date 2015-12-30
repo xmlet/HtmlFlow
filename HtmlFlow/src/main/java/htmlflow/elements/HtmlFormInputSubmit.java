@@ -1,26 +1,16 @@
 package htmlflow.elements;
 
-import java.io.PrintStream;
+import htmlflow.HtmlWriterComposite;
 
-import htmlflow.HtmlWriter;
+public class HtmlFormInputSubmit<T> extends HtmlWriterComposite<T, HtmlFormInputSubmit<T>> {
 
-public class HtmlFormInputSubmit implements HtmlWriter<Object>{
+    public HtmlFormInputSubmit(String value) {
+        addAttr("submit", "submit");
+        addAttr("name", value);
+    }
 
-	PrintStream out;
-	final String value;
-
-	public HtmlFormInputSubmit(String value) {
-		this.value = value;
-	}
-	@Override
-	public void write(int depth, Object model) {
-		out.print("<input type=\"submit\" value=\""+ value + "\"/>");
-	}
-	
-	@Override
-	public HtmlWriter<Object> setPrintStream(PrintStream out) {
-		this.out = out;
-		return this;
-	}
-
+    @Override
+    public String getElementName() {
+        return ElementType.INPUT.toString();
+    }
 }

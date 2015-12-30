@@ -1,10 +1,10 @@
 package htmlflow.elements;
 
-import htmlflow.HtmlWriter;
-
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import htmlflow.HtmlWriter;
 
 
 public class HRef<T> implements HtmlWriter<T>{

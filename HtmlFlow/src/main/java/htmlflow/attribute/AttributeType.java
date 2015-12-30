@@ -15,13 +15,17 @@ public enum AttributeType {
   DRAGGABLE,
   DROPZONE,
   HIDDEN,
+  HREF,
   ID,
   LANG,
+  LINK,
+  REL,
   SPELLCHECK,
   STYLE,
   TABINDEX,
   TITLE,
   TRANSLATE,
+    TYPE, ACTION, METHOD, ENCTYPE,
     ;
   
   @Override
