@@ -1,7 +1,5 @@
-package htmlflow.elements;
+package htmlflow;
 
-import htmlflow.AbstractHtmlElementSelector;
-import htmlflow.HtmlWriter;
 import htmlflow.attribute.Attribute;
 
 import java.io.PrintStream;
