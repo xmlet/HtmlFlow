@@ -11,7 +11,8 @@ import htmlflow.elements.TextNode;
  * @param <T> The type of the model binding to this HTML element.
  * @param <U> The type of HTML element returned by HtmlSelector methods.
  */
-public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> extends AbstractHtmlWriterElement<T,U> {
+public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite>
+		extends AbstractHtmlWriterElement<U> implements HtmlWriter<T> {
 
 	/*=========================================================================*/
 	/*------------------------- STATIC FIELDS ---------------------------------*/

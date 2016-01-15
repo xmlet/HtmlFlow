@@ -11,12 +11,12 @@ import java.util.List;
 
 /**
  * Abstract base classs for all elements.
- * @param <T> The type of the model binding to this HTML element.
  * @param <U> The type of HTML element returned by HtmlSelector methods.
  *
  * @author Miguel Gamboa on 14-01-2016
  */
-public abstract class AbstractHtmlWriterElement<T, U extends AbstractHtmlWriterElement> implements HtmlWriter<T>, HtmlSelector<U> {
+public abstract class AbstractHtmlWriterElement<U extends AbstractHtmlWriterElement>
+        implements HtmlElement<U>, HtmlSelector<U> {
     /*=========================================================================
 	  -------------------------     FIELDS    ---------------------------------
 	  =========================================================================*/
@@ -32,7 +32,7 @@ public abstract class AbstractHtmlWriterElement<T, U extends AbstractHtmlWriterE
     public AbstractHtmlWriterElement() {
         classAttribute = new AttrClass();
         idAttribute = new  AttrId();
-        attributes = new LinkedList<Attribute>();
+        attributes = new LinkedList<>();
         attributes.add(classAttribute);
         attributes.add(idAttribute);
 
@@ -50,17 +50,16 @@ public abstract class AbstractHtmlWriterElement<T, U extends AbstractHtmlWriterE
 	/*--------------------     HtmlElement Methods   ----------------------------*/
 	/*=========================================================================*/
 
-    /**
-     * basic empty name method.
-     * Should be overriden in pair with doWriteAfter and doWriteBefore
-     * @return
-     */
-    abstract public String getElementName();
-
-    public List<Attribute> getAttributes() {
+    @Override
+    public Iterable<Attribute> getAttributes() {
         return attributes;
     }
 
+    @Override
+    public U addAttr(String name, String value) {
+        attributes.add(new AttrGeneric(name, value));
+        return (U) this;
+    }
     /*=========================================================================*/
 	/*--------------------     HtmlSelector Methods   ----------------------------*/
 	/*=========================================================================*/
@@ -90,12 +89,6 @@ public abstract class AbstractHtmlWriterElement<T, U extends AbstractHtmlWriterE
     @Override
     public  U idAttr(String idAttribute) {
         this.idAttribute.setValue(idAttribute);
-        return (U) this;
-    }
-
-    @Override
-    public U addAttr(String name, String value) {
-        attributes.add(new AttrGeneric(name, value));
         return (U) this;
     }
 }
