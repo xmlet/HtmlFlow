@@ -1,6 +1,6 @@
 package htmlflow.elements;
 
-import htmlflow.AbstractHtmlWriterElement;
+import htmlflow.AbstractHtmlElementSelector;
 import htmlflow.HtmlWriter;
 import htmlflow.attribute.Attribute;
 
@@ -15,7 +15,7 @@ import java.io.PrintStream;
  * @param <U> The type of HTML element returned by HtmlSelector methods.
  */
 public abstract class HtmlSingleElement<T, U extends HtmlSingleElement>
-        extends AbstractHtmlWriterElement<U> implements HtmlWriter<T> {
+        extends AbstractHtmlElementSelector<U> implements HtmlWriter<T> {
     /*=========================================================================
 	  -------------------------     FIELDS    ---------------------------------
 	  =========================================================================*/

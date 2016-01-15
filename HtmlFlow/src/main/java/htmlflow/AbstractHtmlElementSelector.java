@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Miguel Gamboa on 14-01-2016
  */
-public abstract class AbstractHtmlWriterElement<U extends AbstractHtmlWriterElement>
+public abstract class AbstractHtmlElementSelector<U extends AbstractHtmlElementSelector>
         implements HtmlElement<U>, HtmlSelector<U> {
     /*=========================================================================
 	  -------------------------     FIELDS    ---------------------------------
@@ -29,7 +29,7 @@ public abstract class AbstractHtmlWriterElement<U extends AbstractHtmlWriterElem
 	  -------------------------  CONSTRUCTOR  ---------------------------------
 	  =========================================================================*/
 
-    public AbstractHtmlWriterElement() {
+    public AbstractHtmlElementSelector() {
         classAttribute = new AttrClass();
         idAttribute = new  AttrId();
         attributes = new LinkedList<>();
