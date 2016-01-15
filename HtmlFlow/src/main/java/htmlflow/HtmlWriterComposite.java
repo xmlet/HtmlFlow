@@ -4,13 +4,15 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import htmlflow.attribute.AttrClass;
-import htmlflow.attribute.AttrGeneric;
-import htmlflow.attribute.AttrId;
 import htmlflow.attribute.Attribute;
 import htmlflow.elements.TextNode;
 
-public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> implements HtmlWriter<T>, HtmlSelector<U> {
+/**
+ * @param <T> The type of the model binding to this HTML element.
+ * @param <U> The type of HTML element returned by HtmlSelector methods.
+ */
+public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite>
+		extends AbstractHtmlElementSelector<U> implements HtmlWriter<T> {
 
 	/*=========================================================================*/
 	/*------------------------- STATIC FIELDS ---------------------------------*/
@@ -25,20 +27,17 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 	 * @uml.associationEnd  aggregation="shared" inverse="htmlflow.HtmlWriter" multiplicity="(0 -1)" 
 	 */
 	private final List<HtmlWriter<?>> children;
-	protected PrintStream out; 
-    private List<Attribute> attributes;
+	private PrintStream out;
+
 	/*=========================================================================*/
 	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
 	/*=========================================================================*/ 
 	public HtmlWriterComposite() {
 		children = new LinkedList<HtmlWriter<?>>();
-        attributes = new LinkedList<Attribute>();
-        attributes.add(classAttribute);
-        attributes.add(idAttribute);
 	}
 	
 	/*=========================================================================*/
-	/*--------------------- HtmlPrinter interface -----------------------------*/
+	/*--------------------- HtmlWriter interface -----------------------------*/
 	/*=========================================================================*/
 	public HtmlWriter<T> setPrintStream(PrintStream out){
 		this.out = out;
@@ -76,7 +75,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
 	}
 	   
      public void doWriteBefore(PrintStream out, int depth) {
-       tabs(depth);
+       tabs(out, depth);
        out.print(getElementValue());
      }
 
@@ -84,79 +83,17 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> impl
     public void doWriteAfter(PrintStream out, int depth, boolean doTab) {
         // RMK : do not insert tabs after a text node
         if(doTab){
-          tabs(depth);
+          tabs(out, depth);
         }
         out.println("</"+ getElementName()+">");
     }
     
     protected String getElementValue() {
         String tag = "<" + getElementName();
-        for (Attribute attribute : attributes) {
+        for (Attribute attribute : getAttributes()) {
             tag += attribute.printAttribute();
         }
 //      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
       return  tag+">";
     }
-    
-    /**
-     * basic empty name method.
-     * Should be overriden in pair with doWriteAfter and doWriteBefore
-     * @return
-     */
-    abstract public String getElementName();
-
-    public void addAttribute(Attribute attr){
-        attributes.add(attr);
-    }
-
-	/*=========================================================================*/
-	/*-------------------- auxiliar Methods ----------------------------*/
-	/*=========================================================================*/ 
-	
-	public final void tabs(int depth){
-		for (int i = 0; i < depth; i++) out.print("\t");
-	}
-
-   	/*=========================================================================*/
-	/*-------------------- Selectors Methods ----------------------------*/
-	/*=========================================================================*/
-
-    private AttrClass classAttribute = new AttrClass();
-
-    private AttrId idAttribute = new  AttrId(); 
-
-    @Override
-    public String getClassAttribute() {
-        if(classAttribute.getValue() != null){
-            return " class=\""+classAttribute.getValue()+"\"";
-        }
-        return "";
-    }
-
-    @Override
-    public String getIdAttribute() {
-        if(idAttribute.getValue() != null){
-            return " id=\""+idAttribute.getValue()+"\"";
-        }
-        return "";
-    }
-
-    @Override
-    public U classAttr(String classAttribute) {
-        this.classAttribute.setValue(classAttribute);
-        return (U) this;
-    }
-
-    @Override
-    public  U idAttr(String idAttribute) {
-        this.idAttribute.setValue(idAttribute);
-        return (U) this;
-    }
-
-    @Override
-    public U addAttr(String name, String value) {
-        attributes.add(new AttrGeneric(name, value));
-        return (U) this;
-    }
-
 }
