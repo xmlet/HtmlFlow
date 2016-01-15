@@ -7,6 +7,10 @@ import java.util.List;
 import htmlflow.attribute.Attribute;
 import htmlflow.elements.TextNode;
 
+/**
+ * @param <T> The type of the model binding to this HTML element.
+ * @param <U> The type of HTML element returned by HtmlSelector methods.
+ */
 public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> extends AbstractHtmlWriterElement<T,U> {
 
 	/*=========================================================================*/
@@ -22,7 +26,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> exte
 	 * @uml.associationEnd  aggregation="shared" inverse="htmlflow.HtmlWriter" multiplicity="(0 -1)" 
 	 */
 	private final List<HtmlWriter<?>> children;
-	protected PrintStream out;
+	private PrintStream out;
 
 	/*=========================================================================*/
 	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
@@ -32,7 +36,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> exte
 	}
 	
 	/*=========================================================================*/
-	/*--------------------- HtmlPrinter interface -----------------------------*/
+	/*--------------------- HtmlWriter interface -----------------------------*/
 	/*=========================================================================*/
 	public HtmlWriter<T> setPrintStream(PrintStream out){
 		this.out = out;
@@ -70,7 +74,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> exte
 	}
 	   
      public void doWriteBefore(PrintStream out, int depth) {
-       tabs(depth);
+       tabs(out, depth);
        out.print(getElementValue());
      }
 
@@ -78,7 +82,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> exte
     public void doWriteAfter(PrintStream out, int depth, boolean doTab) {
         // RMK : do not insert tabs after a text node
         if(doTab){
-          tabs(depth);
+          tabs(out, depth);
         }
         out.println("</"+ getElementName()+">");
     }
@@ -91,12 +95,4 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite> exte
 //      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
       return  tag+">";
     }
-
-	/*=========================================================================*/
-	/*-------------------- auxiliar Methods ----------------------------*/
-	/*=========================================================================*/ 
-	
-	public final void tabs(int depth){
-		for (int i = 0; i < depth; i++) out.print("\t");
-	}
 }

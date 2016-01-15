@@ -5,13 +5,14 @@ import htmlflow.attribute.AttrGeneric;
 import htmlflow.attribute.AttrId;
 import htmlflow.attribute.Attribute;
 
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Abstract base classs for all elements.
- * @param T The type of the model binding to this HTML element.
- * @param U The type of HTML element returned by HtmlSelector methods.
+ * @param <T> The type of the model binding to this HTML element.
+ * @param <U> The type of HTML element returned by HtmlSelector methods.
  *
  * @author Miguel Gamboa on 14-01-2016
  */
@@ -35,6 +36,14 @@ public abstract class AbstractHtmlWriterElement<T, U extends AbstractHtmlWriterE
         attributes.add(classAttribute);
         attributes.add(idAttribute);
 
+    }
+    /*=========================================================================*/
+	/*--------------------    Auxiliary Methods    ----------------------------*/
+	/*=========================================================================*/
+
+    public final void tabs(PrintStream out, int depth){
+        for (int i = 0; i < depth; i++)
+            out.print("\t");
     }
 
     /*=========================================================================*/
