@@ -17,9 +17,9 @@ public class HtmlForm<T> extends HtmlWriterComposite<T, HtmlForm<T>>{
 
 	public HtmlForm(String action) {
 		this.action = action;
-		addAttribute(new AttrGeneric(AttributeType.ACTION.toString(), action));
-		addAttribute(new AttrGeneric(AttributeType.METHOD.toString(), "post"));
-		addAttribute(new AttrGeneric(AttributeType.ENCTYPE.toString(), "application/x-www-form-urlencoded"));
+		addAttr(AttributeType.ACTION.toString(), action);
+		addAttr(AttributeType.METHOD.toString(), "post");
+		addAttr(AttributeType.ENCTYPE.toString(), "application/x-www-form-urlencoded");
 	}
 
 	@Override

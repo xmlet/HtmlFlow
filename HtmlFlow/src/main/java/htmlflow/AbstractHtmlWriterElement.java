@@ -57,10 +57,6 @@ public abstract class AbstractHtmlWriterElement<T, U extends AbstractHtmlWriterE
      */
     abstract public String getElementName();
 
-    public void addAttribute(Attribute attr){
-        attributes.add(attr);
-    }
-
     public List<Attribute> getAttributes() {
         return attributes;
     }

@@ -12,7 +12,7 @@ public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA<T>> {
   }
 
   public HtmlA(String href) {
-    addAttribute(new AttrGeneric(AttributeType.HREF.toString(), href));
+    addAttr(AttributeType.HREF.toString(), href);
   }
 
   @Override
