@@ -28,7 +28,7 @@ public class HtmlForm<T> extends HtmlWriterComposite<T, HtmlForm<T>>{
 				action,
 				"post",
 				"application/x-www-form-urlencoded"));
-		tabs(++depth);
+		tabs(out, ++depth);
 	}
 
   @Override
