@@ -5,6 +5,14 @@ import java.io.PrintStream;
 public interface HtmlWriter<T>{
 	/**
 	 * Writes into an internal PrintStream the HTML content
+	 * of this element with zero indentation and without a
+	 * domain object.
+	 */
+	default void write() {
+		write(0, null);
+	}
+	/**
+	 * Writes into an internal PrintStream the HTML content
 	 * of this element with initial indentation of zero.
 	 *
 	 * @param model An optional object model that could be bind to this element.
