@@ -73,7 +73,7 @@ public class TestTable {
 		}
 		ByteArrayOutputStream mem = new ByteArrayOutputStream();
 		view.setPrintStream(new PrintStream(mem));
-		view.write(0, null);
+		view.write();
 		/*
 		 * Assert
 		 */
@@ -130,7 +130,7 @@ public class TestTable {
         List<Task> output = Arrays.asList(t1, t2, t3);
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
 		view.setPrintStream(new PrintStream(mem));
-		view.write(0,  output);
+		view.write(output);
 		/*
 		 * Assert
 		 */
