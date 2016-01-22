@@ -1,8 +1,9 @@
 The *HTmlFlow* is a simple Java library for writing HTML documents in a fluent 
 style into a `java.io.PrintStream`. 
-For instance, considering a Java class `Task`with three properties: `Title`, 
-`Description` and a `Priority`, then we can produce an HTML document 
-in the following way:
+It also supports *data binders* that enable the same HTML view to be used 
+(or **bind**) with different object models. 
+Next we present an example with NO model binding (move forward to check further 
+examples with data binding):
 
 ``` java
 import htmlflow.HtmlView;
@@ -42,90 +43,116 @@ public class App {
 }
 ```
 
-The *HtmlFlow* also supports *binders* that enable the same HTML view to be used (or **bind**) with different object models. 
+In the following we present an example binding the same view to different domain 
+objects of the same type.
+To that end, consider a Java class `Task` with three properties: `Title`, 
+`Description` and a `Priority`, then we can produce several HTML documents
+in the following way:
+
 
 ``` java
-	public static void main(String[] args) throws IOException {
-		HtmlView<Task> taskView = taskDetailsView();
-		try{
-			Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High);
-			PrintStream out = new PrintStream(new FileOutputStream("Task1.html"));
-			taskView.setPrintStream(out).write(1, t1);
-			Runtime.getRuntime().exec("explorer Task1.html");
-		}finally{
-			out.close();
-		}
-		try{
-			Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal);
-			PrintStream out = new PrintStream(new FileOutputStream("Task2.html"));
-			taskView.setPrintStream(out).write(1, t2); // Now we can use the same HtmlView with a different task
-			Runtime.getRuntime().exec("explorer Task2.html");
-		}finally{
-			out.close();
-		}
-	}	
-	private static HtmlView<Task> taskDetailsView(){
-		HtmlView<Task> taskView = new HtmlView<Task>();
-		taskView.head().title("Task Details");
-		taskView
-		.body()
-		.heading(1, "Task Details")
-		.hr()
-		.div()
-		.text("Title: ").text(binderGetTitle())
-		.br()
-		.text("Description: ").text(binderGetDescription())
-		.br()
-		.text("Priority: ").text(binderGetPriority());
-		return taskView;
-	}
-	private static ModelBinder<Task> binderGetTitle(){
-		return new ModelBinder<Task>() {public void bind(PrintStream out, Task model) {
-			out.print(model.getTitle());
-		}};
-	}
-	private static ModelBinder<Task> binderGetDescription(){
-		return new ModelBinder<Task>() {public void bind(PrintStream out, Task model) {
-			out.print(model.getDescription());
-		}};
-	}
-	private static ModelBinder<Task> binderGetPriority(){
-		return new ModelBinder<Task>() {public void bind(PrintStream out, Task model) {
-			out.print(model.getPriority());
-		}};
-	}
+import htmlflow.HtmlView;
+import htmlflow.HtmlWriter;
+
+import model.Priority;
+import model.Task;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+
+public class App {
+
+    public static void main(String [] args) {
+        HtmlView<Task> taskView = taskDetailsView();
+        Task [] dataSource = {
+            new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+            new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
+            new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+        };
+        Arrays
+            .stream(dataSource)
+            .forEach(task -> printHtml(taskView, task, "task" + task.getId() + ".html"));
+    }
+    private static <T> void printHtml(HtmlWriter<T> html, T model, String path){
+        try(PrintStream out = new PrintStream(new FileOutputStream(path))){
+            html.setPrintStream(out).write(model);
+            Runtime.getRuntime().exec("explorer " + path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private static HtmlView<Task> taskDetailsView(){
+        HtmlView<Task> taskView = new HtmlView<>();
+        taskView
+                .head()
+                .title("Task Details")
+                .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
+        taskView
+                .body().classAttr("container")
+                .heading(1, "Task Details")
+                .hr()
+                .div()
+                .text("Title: ").text(Task::getTitle)
+                .br()
+                .text("Description: ").text(Task::getDescription)
+                .br()
+                .text("Priority: ").text(Task::getPriority);
+        return taskView;
+    }
+}
 ```
 
-Finally, an example of producing an HTML table bind to a list of tasks:
+Finally, an example of producing an HTML table binding to a list of tasks:
 
 ``` java
-	public static void main(String[] args) throws IOException {
-		HtmlView<Task> taskView = taskDetailsView();
-		try{
-			Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High);
-			Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal);
-			Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High);
-			PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"));
-			taskListView().setPrintStream(out).write(1, Arrays.asList(t1, t2, t3));
-			Runtime.getRuntime().exec("explorer TaskList.html");
-		}finally{
-			out.close();
-		}
-	}
-	private static HtmlView<Iterable<Task>> taskListView(){
-		HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
-		taskView.head().title("Task List");
+	import htmlflow.HtmlView;
+import htmlflow.HtmlWriter;
+import htmlflow.elements.HtmlTable;
+import htmlflow.elements.HtmlTr;
 
-		HtmlTable<Iterable<Task>> t = taskView.body()
-		.heading(1, "Task Details")
-		.hr()
-		.div()
-		.table();
-		HtmlTr<Iterable<Task>> headerRow = t.tr();
-		headerRow.th().text("Title");
-		headerRow.th().text("Description");
-		headerRow.th().text("Priority");
-		t.trFromIterable(binderGetTitle(), binderGetDescription(), binderGetPriority());
-		return taskView;
-	}
+import model.Priority;
+import model.Task;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.List;
+
+public class App {
+
+    public static void main(String [] args)  throws IOException {
+        HtmlView<Iterable<Task>>  taskView = taskListView();
+        List<Task> dataSource = Arrays.asList(
+                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+                new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
+                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+        );
+        try(PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"))){
+            taskView.setPrintStream(out).write(dataSource);
+            Runtime.getRuntime().exec("explorer TaskList.html");
+        }
+    }
+    private static HtmlView<Iterable<Task>> taskListView(){
+        HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
+        taskView
+                .head()
+                .title("Task List")
+                .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
+        HtmlTable<Iterable<Task>> table = taskView
+                .body().classAttr("container")
+                .heading(1, "Task List")
+                .div()
+                .table().classAttr("table");
+        HtmlTr<Iterable<Task>> headerRow = table.tr();
+        headerRow.th().text("Title");
+        headerRow.th().text("Description");
+        headerRow.th().text("Priority");
+        table.trFromIterable(Task::getTitle, Task::getDescription, Task::getPriority);
+        return taskView;
+    }
+}
 ```
