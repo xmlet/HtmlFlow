@@ -1,26 +1,28 @@
 /**
  * 
  */
-package htmlflow.elements;
+package htmlflow.test;
 
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import htmlflow.elements.ElementType;
+import org.junit.Assert;
 import org.junit.Test;
 
 import htmlflow.HtmlView;
 import htmlflow.ModelBinder;
-import htmlflow.test.Priority;
-import htmlflow.test.Status;
-import htmlflow.test.Task;
+import htmlflow.test.model.Priority;
+import htmlflow.test.model.Status;
+import htmlflow.test.model.Task;
 
 /**
  * @author Mikael KROK
  *
  */
-public class HtmlDivTest {
+public class TestAttributesClassId {
 
   private static ModelBinder<Task> binderGetId() {
     return new ModelBinder<Task>() {
@@ -60,7 +62,7 @@ public class HtmlDivTest {
   @Test
   public void testGetElementName() throws Exception {
     HtmlView<Task> taskView = new HtmlView<Task>();
-    assertEquals(ElementType.DIV + " element was expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
+    Assert.assertEquals(ElementType.DIV + " element was expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
   }
 
   @Test

@@ -2,46 +2,30 @@ package htmlflow.test;
 
 import htmlflow.HtmlView;
 import htmlflow.ModelBinder;
+import htmlflow.elements.ElementType;
 import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import htmlflow.test.model.Priority;
+import htmlflow.test.model.Status;
+import htmlflow.test.model.Task;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class TestTable {
-
-	private static final String NODE_NAME_TR = "tr";
-	private static final String NODE_NAME_TABLE = "table";
-	private static final String NODE_NAME_DIV = "div";
-	private static final String NODE_NAME_BODY = "body";
-	private static final String NODE_NAME_HEAD = "head";
-	private static final String NODE_NAME_HTML = "html";
-
-	private static Element getRootElement(byte[] input) throws SAXException, IOException, ParserConfigurationException{
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		builderFactory.setValidating(false);
-		builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(input));
-		return doc.getDocumentElement();
-	}
 
 	@Test
 	public void test_simple_table() throws ParserConfigurationException, SAXException, IOException{
@@ -77,18 +61,18 @@ public class TestTable {
 		/*
 		 * Assert
 		 */
-		Element elem = getRootElement(mem.toByteArray());
-		Assert.assertEquals(NODE_NAME_HTML, elem.getNodeName());
+		Element elem = DomUtils.getRootElement(mem.toByteArray());
+		Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
 		NodeList childNodes = elem.getChildNodes();
-		Assert.assertEquals(NODE_NAME_HEAD, childNodes.item(1).getNodeName());
-		Assert.assertEquals(NODE_NAME_BODY, childNodes.item(3).getNodeName());
+		Assert.assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
+		Assert.assertEquals(ElementType.BODY.toString(), childNodes.item(3).getNodeName());
 		Node div = childNodes.item(3).getChildNodes().item(5);
-		Assert.assertEquals(NODE_NAME_DIV, div.getNodeName());
+		Assert.assertEquals(ElementType.DIV.toString(), div.getNodeName());
 		Node table = div.getChildNodes().item(1);
-		Assert.assertEquals(NODE_NAME_TABLE, table.getNodeName());
+		Assert.assertEquals(ElementType.TABLE.toString(), table.getNodeName());
 		for (int i = 0; i < output.length; i++) {
 			Node tr = table.getChildNodes().item(3 + i*2);
-			Assert.assertEquals(NODE_NAME_TR, tr.getNodeName());
+			Assert.assertEquals(ElementType.TR.toString(), tr.getNodeName());
 			for (int j = 0; j < output[i].length; j++) {
 				Node td = tr.getChildNodes().item(j*2 + 1);
 				Assert.assertEquals("td", td.getNodeName());
@@ -134,18 +118,18 @@ public class TestTable {
 		/*
 		 * Assert
 		 */
-		Element elem = getRootElement(mem.toByteArray());
-		Assert.assertEquals(NODE_NAME_HTML, elem.getNodeName());
+		Element elem = DomUtils.getRootElement(mem.toByteArray());
+		Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
 		NodeList childNodes = elem.getChildNodes();
-		Assert.assertEquals(NODE_NAME_HEAD, childNodes.item(1).getNodeName());
-		Assert.assertEquals(NODE_NAME_BODY, childNodes.item(3).getNodeName());
+		Assert.assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
+		Assert.assertEquals(ElementType.BODY.toString(), childNodes.item(3).getNodeName());
 		Node div = childNodes.item(3).getChildNodes().item(5);
-		Assert.assertEquals(NODE_NAME_DIV, div.getNodeName());
+		Assert.assertEquals(ElementType.DIV.toString(), div.getNodeName());
 		Node table = div.getChildNodes().item(1);
-		Assert.assertEquals(NODE_NAME_TABLE, table.getNodeName());
+		Assert.assertEquals(ElementType.TABLE.toString(), table.getNodeName());
 		for (int i = 0; i < output.size(); i++) {
 			Node tr = table.getChildNodes().item(3 + i*2);
-			Assert.assertEquals(NODE_NAME_TR, tr.getNodeName());
+			Assert.assertEquals(ElementType.TR.toString(), tr.getNodeName());
 			/*
 			 * Check title
 			 */
