@@ -12,9 +12,9 @@ import org.junit.Test;
 
 import htmlflow.HtmlView;
 import htmlflow.ModelBinder;
-import htmlflow.test.Priority;
-import htmlflow.test.Status;
-import htmlflow.test.Task;
+import htmlflow.test.model.Priority;
+import htmlflow.test.model.Status;
+import htmlflow.test.model.Task;
 
 /**
  * @author Mikael KROK

@@ -14,6 +14,9 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import htmlflow.test.model.Priority;
+import htmlflow.test.model.Status;
+import htmlflow.test.model.Task;
 import junit.framework.Assert;
 
 import org.junit.Test;
