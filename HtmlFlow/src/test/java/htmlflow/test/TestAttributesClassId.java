@@ -24,20 +24,20 @@ import htmlflow.test.model.Task;
  */
 public class TestAttributesClassId {
 
-  private static ModelBinder<Task> binderGetId() {
-    return (out, model) -> out.print(model.getId());
+  private static ModelBinder<Task, Integer> binderGetId() {
+    return Task::getId;
   }
 
-  private static ModelBinder<Task> binderGetTitle() {
-    return (out, model) -> out.print(model.getTitle());
+  private static ModelBinder<Task, String> binderGetTitle() {
+    return Task::getTitle;
   }
 
-  private static ModelBinder<Task> binderGetDescription() {
-    return (out, model) -> out.print(model.getDescription());
+  private static ModelBinder<Task, String> binderGetDescription() {
+    return Task::getDescription;
   }
 
-  private static ModelBinder<Task> binderGetPriority() {
-    return (out, model) -> out.print(model.getPriority());
+  private static ModelBinder<Task, Priority> binderGetPriority() {
+    return Task::getPriority;
   }
 
   /**

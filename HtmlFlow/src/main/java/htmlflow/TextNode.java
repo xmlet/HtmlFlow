@@ -12,13 +12,13 @@ public class TextNode<T> implements HtmlWriter<T>{
 	
 	PrintStream out;
 	private final String msg;
-	private final ModelBinder<T> binder;
+	private final ModelBinder<T,?> binder;
 	
 	public TextNode(String msg) {
 		this.msg = msg;
 		this.binder = null;
 	}
-	public TextNode(ModelBinder<T> binder) {
+	public TextNode(ModelBinder<T, ?> binder) {
 		this.msg = null;
 		this.binder = binder;
 	}
@@ -29,7 +29,7 @@ public class TextNode<T> implements HtmlWriter<T>{
 		}
 		else{
 			assert(binder != null);
-			binder.bind(out, model);
+			out.print(binder.bind(model));
 		}
 	}
 	@Override
