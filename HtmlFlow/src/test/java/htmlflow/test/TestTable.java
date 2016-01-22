@@ -6,36 +6,23 @@ import htmlflow.elements.ElementType;
 import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class TestTable {
-
-	private static Element getRootElement(byte[] input) throws SAXException, IOException, ParserConfigurationException{
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		builderFactory.setValidating(false);
-		builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(input));
-		return doc.getDocumentElement();
-	}
 
 	@Test
 	public void test_simple_table() throws ParserConfigurationException, SAXException, IOException{
@@ -71,7 +58,7 @@ public class TestTable {
 		/*
 		 * Assert
 		 */
-		Element elem = getRootElement(mem.toByteArray());
+		Element elem = DomUtils.getRootElement(mem.toByteArray());
 		Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
 		NodeList childNodes = elem.getChildNodes();
 		Assert.assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
@@ -128,7 +115,7 @@ public class TestTable {
 		/*
 		 * Assert
 		 */
-		Element elem = getRootElement(mem.toByteArray());
+		Element elem = DomUtils.getRootElement(mem.toByteArray());
 		Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
 		NodeList childNodes = elem.getChildNodes();
 		Assert.assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
