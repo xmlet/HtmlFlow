@@ -2,7 +2,7 @@ The *HTmlFlow* is a simple Java library for writing HTML documents in a fluent
 style into a `java.io.PrintStream`. 
 It also supports *data binders* that enable the same HTML view to be used 
 (or **bind**) with different object models. 
-Next we present an example with NO model binding (move forward to check further 
+Next we present an example withOUT model binding (move forward to check further 
 examples with data binding):
 
 ``` java
@@ -108,7 +108,7 @@ public class App {
 Finally, an example of producing an HTML table binding to a list of tasks:
 
 ``` java
-	import htmlflow.HtmlView;
+import htmlflow.HtmlView;
 import htmlflow.HtmlWriter;
 import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
