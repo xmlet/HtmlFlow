@@ -1,8 +1,11 @@
 package htmlflow.test;
 
 import htmlflow.HtmlView;
+import htmlflow.HtmlWriter;
 import htmlflow.attribute.AttributeType;
 import htmlflow.elements.ElementType;
+import htmlflow.test.model.Priority;
+import htmlflow.test.model.Task;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.w3c.dom.Element;
@@ -12,6 +15,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * Created by mcarvalho on 18-01-2016.
@@ -38,7 +42,7 @@ public class TestDivDetails {
         // Produces an HTML file document
         //
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        try(PrintStream out = new PrintStream(mem)){
+        try (PrintStream out = new PrintStream(mem)) {
             taskView.setPrintStream(out).write();
             // System.out.println(mem.toString());
         }
@@ -60,5 +64,45 @@ public class TestDivDetails {
         childNodes = head.getChildNodes();
         Assert.assertEquals(ElementType.TITLE.toString(), childNodes.item(1).getNodeName());
         Assert.assertEquals(ElementType.LINK.toString(), childNodes.item(3).getNodeName());
+    }
+
+    @Test
+    public void test_div_details_binding() throws IOException, ParserConfigurationException, SAXException {
+        HtmlView<Task> taskView = taskDetailsView();
+        Task [] dataSource = {
+                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+                new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
+                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+        };
+        Arrays
+                .stream(dataSource)
+                .forEach(task -> printHtml(taskView, task, "task" + task.getId() + ".html"));
+    }
+    private static <T> void printHtml(HtmlWriter<T> html, T model, String path){
+        try(PrintStream out = new PrintStream(new FileOutputStream(path))){
+            html.setPrintStream(out).write(model);
+            // Runtime.getRuntime().exec("explorer Task.html");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static HtmlView<Task> taskDetailsView(){
+        HtmlView<Task> taskView = new HtmlView<>();
+        taskView
+                .head()
+                .title("Task Details")
+                .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
+        taskView
+                .body().classAttr("container")
+                .heading(1, "Task Details")
+                .hr()
+                .div()
+                .text("Title: ").text(Task::getTitle)
+                .br()
+                .text("Description: ").text(Task::getDescription)
+                .br()
+                .text("Priority: ").text(Task::getPriority);
+        return taskView;
     }
 }
