@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import htmlflow.attribute.Attribute;
-import htmlflow.elements.TextNode;
 
 /**
  * @param <T> The type of the model binding to this HTML element.

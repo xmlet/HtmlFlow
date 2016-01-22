@@ -13,11 +13,14 @@ public class Task {
 	private Status status;
 	private Date creationDate;
 	private Date completedDate;
-	public Task(String title, String description, Priority priority, Status status) {
+	public Task(String title, String description, Priority priority) {
 		this.id = ++nrOfTasks;
 		this.title = title;
 		this.description = description;
 		this.priority = priority;
+	}
+	public Task(String title, String description, Priority priority, Status status) {
+		this(title,description,priority);
 		this.status = status;
 	}
 	

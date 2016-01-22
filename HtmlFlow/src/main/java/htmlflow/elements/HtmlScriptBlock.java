@@ -1,6 +1,7 @@
 package htmlflow.elements;
 
 import htmlflow.HtmlWriterComposite;
+import htmlflow.TextNode;
 
 public class HtmlScriptBlock<T> extends HtmlWriterComposite<T, HtmlScriptBlock<T>>{
 

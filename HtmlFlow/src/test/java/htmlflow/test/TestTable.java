@@ -7,6 +7,7 @@ import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -149,21 +150,48 @@ public class TestTable {
 		System.out.println(mem.toString());
 	}
 	
-	private static ModelBinder<Task> binderGetTitle(){
-		return new ModelBinder<Task>() {public void bind(PrintStream out, Task model) {
-			out.print(model.getTitle());
-		}};
+	private static ModelBinder<Task, String> binderGetTitle(){
+		return Task::getTitle;
 	}
 	
-	private static ModelBinder<Task> binderGetDescription(){
-		return new ModelBinder<Task>() {public void bind(PrintStream out, Task model) {
-			out.print(model.getDescription());
-		}};
+	private static ModelBinder<Task, String> binderGetDescription(){
+		return Task::getDescription;
 	}
 	
-	private static ModelBinder<Task> binderGetPriority(){
-		return new ModelBinder<Task>() {public void bind(PrintStream out, Task model) {
-			out.print(model.getPriority());
-		}};
+	private static ModelBinder<Task, Priority> binderGetPriority(){
+		return Task::getPriority;
+	}
+
+	@Test
+	public void test_table_binding_for_readme() throws IOException, ParserConfigurationException, SAXException {
+		HtmlView<Iterable<Task>>  taskView = taskListView();
+		List<Task> dataSource = Arrays.asList(
+				new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+				new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
+				new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+		);
+		try(PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"))){
+			taskView.setPrintStream(out).write(dataSource);
+			// Runtime.getRuntime().exec("explorer TaskList.html");
+		}
+	}
+	private static HtmlView<Iterable<Task>> taskListView(){
+		HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
+		taskView
+				.head()
+				.title("Task List")
+				.linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
+		HtmlTable<Iterable<Task>> table = taskView
+				.body().classAttr("container")
+				.heading(1, "Task List")
+				.hr()
+				.div()
+				.table().classAttr("table");
+		HtmlTr<Iterable<Task>> headerRow = table.tr();
+		headerRow.th().text("Title");
+		headerRow.th().text("Description");
+		headerRow.th().text("Priority");
+		table.trFromIterable(Task::getTitle, Task::getDescription, Task::getPriority);
+		return taskView;
 	}
 }

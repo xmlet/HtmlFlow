@@ -2,7 +2,7 @@ package htmlflow.elements;
 import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
-import htmlflow.attribute.AttrGeneric;
+import htmlflow.TextNode;
 import htmlflow.attribute.AttributeType;
 
 public class HtmlForm<T> extends HtmlWriterComposite<T, HtmlForm<T>>{
