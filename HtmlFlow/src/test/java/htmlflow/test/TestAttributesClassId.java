@@ -25,35 +25,19 @@ import htmlflow.test.model.Task;
 public class TestAttributesClassId {
 
   private static ModelBinder<Task> binderGetId() {
-    return new ModelBinder<Task>() {
-      public void bind(PrintStream out, Task model) {
-        out.print(model.getId());
-      }
-    };
+    return (out, model) -> out.print(model.getId());
   }
 
   private static ModelBinder<Task> binderGetTitle() {
-    return new ModelBinder<Task>() {
-      public void bind(PrintStream out, Task model) {
-        out.print(model.getTitle());
-      }
-    };
+    return (out, model) -> out.print(model.getTitle());
   }
 
   private static ModelBinder<Task> binderGetDescription() {
-    return new ModelBinder<Task>() {
-      public void bind(PrintStream out, Task model) {
-        out.print(model.getDescription());
-      }
-    };
+    return (out, model) -> out.print(model.getDescription());
   }
 
   private static ModelBinder<Task> binderGetPriority() {
-    return new ModelBinder<Task>() {
-      public void bind(PrintStream out, Task model) {
-        out.print(model.getPriority());
-      }
-    };
+    return (out, model) -> out.print(model.getPriority());
   }
 
   /**
