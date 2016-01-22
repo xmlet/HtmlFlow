@@ -1,7 +1,7 @@
 package htmlflow.elements;
 
 import htmlflow.HtmlWriterComposite;
-import htmlflow.attribute.AttrGeneric;
+import htmlflow.TextNode;
 import htmlflow.attribute.AttributeType;
 
 public class HtmlA<T> extends HtmlWriterComposite<T, HtmlA<T>> {

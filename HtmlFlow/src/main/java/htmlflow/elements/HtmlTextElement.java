@@ -2,6 +2,7 @@ package htmlflow.elements;
 
 import htmlflow.HtmlWriterComposite;
 import htmlflow.ModelBinder;
+import htmlflow.TextNode;
 
 public abstract class HtmlTextElement<T, U extends HtmlTextElement> extends HtmlWriterComposite<T, HtmlTextElement>{
 

@@ -2,6 +2,7 @@ package htmlflow.elements;
 
 import htmlflow.HtmlWriterComposite;
 import htmlflow.ModelBinder;
+import htmlflow.TextNode;
 
 /**
  * @uml.dependency   supplier="htmlflow.ModelBinder"

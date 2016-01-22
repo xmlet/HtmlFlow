@@ -1,4 +1,4 @@
-package htmlflow.elements;
+package htmlflow;
 
 import java.io.PrintStream;
 
