@@ -7,6 +7,12 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>htmlflow</name>
+    <licenses>
+        <license>
+            <name>GPL license, Version 3.0</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+        </license>
+    </licenses>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
