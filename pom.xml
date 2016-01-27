@@ -13,6 +13,14 @@
             <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
         </license>
     </licenses>
+    <developers>
+        <developer>
+          <name>Miguel Gamboa</name>
+          <email>miguelgamboa@outlook.com</email>
+          <organization>CCISEL</organization>
+          <organizationUrl>http://gamboa.pt</organizationUrl>
+        </developer>
+    </developers>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
