@@ -19,7 +19,9 @@ package htmlflow;
 
 /**
  *  Allows an element to define its own class, id attribute and any generic attribute
+ *
  *  @param <T> The type derived of HtmlSelector
+ *
  *  @author Mikael KROK
  *  created on 07-10-2015
  */

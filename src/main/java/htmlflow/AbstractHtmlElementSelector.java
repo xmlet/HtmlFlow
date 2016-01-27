@@ -27,7 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Abstract base classs for all elements.
+ * Abstract base class for all HTML elements.
+ *
  * @param <U> The type of HTML element returned by HtmlSelector methods.
  *
  *  @author Mikael KROK

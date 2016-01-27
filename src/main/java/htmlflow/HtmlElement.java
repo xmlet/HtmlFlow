@@ -22,8 +22,10 @@ import htmlflow.attribute.Attribute;
 import java.util.List;
 
 /**
- * @author Miguel Gamboa 
-   created on 15-01-2016
+ * Establishes the tag name and attributes of an HTML element.
+ *
+ * @author Miguel Gamboa
+ * created on 15-01-2016
  */
 public interface HtmlElement<T> {
     /**
