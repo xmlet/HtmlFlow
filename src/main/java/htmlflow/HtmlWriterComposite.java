@@ -24,6 +24,9 @@ import java.util.List;
 import htmlflow.attribute.Attribute;
 
 /**
+ * It is an {@link HtmlWriter} object containing other {@link HtmlWriter} objects
+ * following a composite approach.
+ *
  * @param <T> The type of the model binding to this HTML element.
  * @param <U> The type of HTML element returned by HtmlSelector methods.
  *

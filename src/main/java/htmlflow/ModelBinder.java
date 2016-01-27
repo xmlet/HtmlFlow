@@ -20,6 +20,12 @@ package htmlflow;
 import java.io.PrintStream;
 
 /**
+ * Binds the content of an HTML element to a domain object. For instance,
+ * a {@link TextNode} may bind to a property of a domain object.
+ *
+ * @param <T> The type of the domain object.
+ * @param <V> The type od the property extracted from the domain object.
+ *
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */

@@ -20,6 +20,8 @@ package htmlflow;
 import java.io.PrintStream;
 
 /**
+ * Writes HTML content into a {@link java.io.PrintStream}.
+ *
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */

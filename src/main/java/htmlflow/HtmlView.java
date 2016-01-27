@@ -24,6 +24,9 @@ import htmlflow.elements.HtmlBody;
 import htmlflow.elements.HtmlHead;
 
 /**
+ * The root container for HTML elements, representing the main structure of
+ * an  HTML document.
+ *
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */

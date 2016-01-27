@@ -22,8 +22,9 @@ import htmlflow.attribute.Attribute;
 import java.io.PrintStream;
 
 /**
- * HtmlSingleElement represents an HtmlElement without children such as img, br, or hr.
- * Thus the model T is not used byt this kind of element.
+ * HtmlSingleElement represents an {@link HtmlElement} without children,
+ * such as img, br, or hr.
+ * Thus, for now,  the model {@code T} is useless in this kind of element.
  * !!!! TO DO: support model binding on Attributes too.
  *
  * @param <T> The type of the model binding to this HTML element.
