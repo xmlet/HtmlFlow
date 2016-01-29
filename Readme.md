@@ -1,7 +1,26 @@
-The *HTmlFlow* is a simple Java library for writing HTML documents in a fluent 
-style into a `java.io.PrintStream`. 
-It also supports *data binders* that enable the same HTML view to be used 
-(or **bind**) with different object models. 
+HtmlFlow library purpose is to allow Java applications to easily write HTML
+documents in a fluent style into a `java.io.PrintStream`.
+The library also supports *data binders* that enable the same HTML view to be 
+bound with different object models.
+
+## Installation
+
+First, in order to include it to your Maven project, simply add this dependency:
+
+```xml
+<dependency>
+    <groupId>com.github.fmcarvalho</groupId>
+    <artifactId>htmlflow</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+You can also download the artifact
+
+[Maven Search](http://search.maven.org)
+
+## Usage
+
 Next we present an example withOUT model binding (move forward to check further 
 examples with data binding):
 
