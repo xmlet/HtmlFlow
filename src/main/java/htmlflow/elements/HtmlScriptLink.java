@@ -25,8 +25,8 @@ import htmlflow.HtmlWriterComposite;
  *         created on 29-03-2012
  */
 public class HtmlScriptLink<T> extends HtmlWriterComposite<T, HtmlScriptLink<T>> {
-	
-	PrintStream out;
+
+    PrintStream out;
 
     public HtmlScriptLink(String src) {
         this.addAttr("type", "text/javascript");

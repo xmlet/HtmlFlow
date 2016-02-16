@@ -28,37 +28,37 @@ import htmlflow.HtmlWriter;
  *         created on 29-03-2012
  */
 public class HRef<T> implements HtmlWriter<T>{
-	/*=========================================================================*/
-	/*-------------------------     FIELDS    ---------------------------------*/
-	/*=========================================================================*/ 
+    /*=========================================================================*/
+    /*-------------------------     FIELDS    ---------------------------------*/
+    /*=========================================================================*/
 
-	private final URL url;
-	private PrintStream out; 
+    private final URL url;
+    private PrintStream out;
 
-	/*=========================================================================*/
-	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
-	/*=========================================================================*/ 
+    /*=========================================================================*/
+    /*-------------------------  CONSTRUCTOR  ---------------------------------*/
+    /*=========================================================================*/
 
-	public HRef(String href){
-		try {
-			url = new URL(href);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/*=========================================================================*/
-	/*--------------------- HtmlPrinter interface -----------------------------*/
-	/*=========================================================================*/ 
+    public HRef(String href){
+        try {
+            url = new URL(href);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	@Override
-	public void write(int depth, T model) {
-		out.print(url.toExternalForm());
-	}
+    /*=========================================================================*/
+    /*--------------------- HtmlPrinter interface -----------------------------*/
+    /*=========================================================================*/
 
-	@Override
-	public HtmlWriter<T> setPrintStream(PrintStream out) {
-		this.out = out;
-		return this;
-	}
+    @Override
+    public void write(int depth, T model) {
+        out.print(url.toExternalForm());
+    }
+
+    @Override
+    public HtmlWriter<T> setPrintStream(PrintStream out) {
+        this.out = out;
+        return this;
+    }
 }

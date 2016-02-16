@@ -24,63 +24,63 @@ import java.util.Date;
  * @author Miguel Gamboa
  */
 public class Task {
-	private static int nrOfTasks = 0; 
-	private final int id;
-	private String title;
-	private String description;
-	private Priority priority;
-	private Status status;
-	private Date creationDate;
-	private Date completedDate;
-	public Task(String title, String description, Priority priority) {
-		this.id = ++nrOfTasks;
-		this.title = title;
-		this.description = description;
-		this.priority = priority;
-	}
-	public Task(String title, String description, Priority priority, Status status) {
-		this(title,description,priority);
-		this.status = status;
-	}
-	
-	public static int getNrOfTasks() {
-		return nrOfTasks;
-	}
+    private static int nrOfTasks = 0;
+    private final int id;
+    private String title;
+    private String description;
+    private Priority priority;
+    private Status status;
+    private Date creationDate;
+    private Date completedDate;
+    public Task(String title, String description, Priority priority) {
+        this.id = ++nrOfTasks;
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+    }
+    public Task(String title, String description, Priority priority, Status status) {
+        this(title,description,priority);
+        this.status = status;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public static int getNrOfTasks() {
+        return nrOfTasks;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public Priority getPriority() {
-		return priority;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Status getStatus() {
-		return status;
-	}
+    public Priority getPriority() {
+        return priority;
+    }
 
-	public Date getCreationDate() {
-		return creationDate;
-	}
+    public Status getStatus() {
+        return status;
+    }
 
-	public Date getCompletedDate() {
-		return completedDate;
-	}
+    public Date getCreationDate() {
+        return creationDate;
+    }
 
-	@Override
-	public String toString() {
-		return "Task [id=" + id + ", title=" + title + ", description="
-				+ description + ", priority=" + priority + ", status=" + status
-				+ ", creationDate=" + creationDate + ", completedDate="
-				+ completedDate + "]";
-	}
-	
+    public Date getCompletedDate() {
+        return completedDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Task [id=" + id + ", title=" + title + ", description="
+                + description + ", priority=" + priority + ", status=" + status
+                + ", creationDate=" + creationDate + ", completedDate="
+                + completedDate + "]";
+    }
+
 }

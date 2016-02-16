@@ -64,8 +64,8 @@ public class TestDivDetails {
             // System.out.println(mem.toString());
         }
         /*
-		 * Assert HTML document main structure
-		 */
+         * Assert HTML document main structure
+         */
         Element elem = DomUtils.getRootElement(mem.toByteArray());
         Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
@@ -76,8 +76,8 @@ public class TestDivDetails {
         Node bodyClassAttr = body.getAttributes().getNamedItem(AttributeType.CLASS.toString());
         Assert.assertEquals("container", bodyClassAttr.getNodeValue());
         /*
-		 * Assert HTML Head
-		 */
+         * Assert HTML Head
+         */
         childNodes = head.getChildNodes();
         Assert.assertEquals(ElementType.TITLE.toString(), childNodes.item(1).getNodeName());
         Assert.assertEquals(ElementType.LINK.toString(), childNodes.item(3).getNodeName());

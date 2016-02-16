@@ -17,8 +17,6 @@
 
 package htmlflow;
 
-import java.io.PrintStream;
-
 /**
  * Binds the content of an HTML element to a domain object. For instance,
  * a {@link TextNode} may bind to a property of a domain object.
@@ -31,5 +29,5 @@ import java.io.PrintStream;
  */
 @FunctionalInterface
 public interface ModelBinder<T, V>{
-	V bind(T model);
+    V bind(T model);
 }

@@ -27,29 +27,29 @@ import htmlflow.ModelBinder;
  */
 public class HtmlTrFromIterable<S, T extends Iterable<S>> implements HtmlWriter<T>{
 
-	/**
-	 * @uml.property  name="tr"
-	 * @uml.associationEnd  
-	 */
-	private final HtmlTr<S> tr; 
-	
-	public HtmlTrFromIterable(ModelBinder<S, ?>[] binders) {
-		tr = new HtmlTr<>();
-		for (ModelBinder<S, ?> b : binders) {
-			tr.td().text(b);
-		}
-	}
+    /**
+     * @uml.property  name="tr"
+     * @uml.associationEnd
+     */
+    private final HtmlTr<S> tr;
 
-	@Override
-	public void write(int depth, T model) { 
-		for (S item : model) {
-			tr.write(depth, item);
-		}
-	}
+    public HtmlTrFromIterable(ModelBinder<S, ?>[] binders) {
+        tr = new HtmlTr<>();
+        for (ModelBinder<S, ?> b : binders) {
+            tr.td().text(b);
+        }
+    }
 
-	@Override
-	public HtmlWriter<T> setPrintStream(PrintStream out) {
-		tr.setPrintStream(out);
-		return this;
-	}
+    @Override
+    public void write(int depth, T model) {
+        for (S item : model) {
+            tr.write(depth, item);
+        }
+    }
+
+    @Override
+    public HtmlWriter<T> setPrintStream(PrintStream out) {
+        tr.setPrintStream(out);
+        return this;
+    }
 }

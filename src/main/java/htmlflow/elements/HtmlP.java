@@ -21,7 +21,7 @@ package htmlflow.elements;
  *         created on 29-03-2012
  */
 public class HtmlP<T> extends HtmlTextElement<T>{
-	public HtmlP() {
-		super(ElementType.P.toString());
-	}
+    public HtmlP() {
+        super(ElementType.P.toString());
+    }
 }
