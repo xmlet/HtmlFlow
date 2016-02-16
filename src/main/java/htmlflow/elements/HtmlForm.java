@@ -15,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package htmlflow.elements;
-import java.io.PrintStream;
 
 import htmlflow.HtmlWriterComposite;
 import htmlflow.TextNode;
 import htmlflow.attribute.AttributeType;
+
+import java.io.PrintStream;
 
 /**
  * @author Miguel Gamboa

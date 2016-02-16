@@ -16,9 +16,9 @@
  */
 package htmlflow.elements;
 
-import java.io.PrintStream;
-
 import htmlflow.HtmlWriter;
+
+import java.io.PrintStream;
 
 /**
  * @author Miguel Gamboa

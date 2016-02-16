@@ -19,9 +19,6 @@ package htmlflow;
 
 import java.io.PrintStream;
 
-import htmlflow.HtmlWriter;
-import htmlflow.ModelBinder;
-
 /**
  * Represents a leaf of an HTML elements tree. It holds a constant {@link String} or
  * a {@link ModelBinder} that extracts a property value from a domain object.

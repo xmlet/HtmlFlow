@@ -17,11 +17,11 @@
 
 package htmlflow;
 
+import htmlflow.attribute.Attribute;
+
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
-
-import htmlflow.attribute.Attribute;
 
 /**
  * It is an {@link HtmlWriter} object containing other {@link HtmlWriter} objects

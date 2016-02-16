@@ -17,11 +17,11 @@
 
 package htmlflow;
 
-import java.io.PrintStream;
-
 import htmlflow.elements.ElementType;
 import htmlflow.elements.HtmlBody;
 import htmlflow.elements.HtmlHead;
+
+import java.io.PrintStream;
 
 /**
  * The root container for HTML elements, representing the main structure of

@@ -16,8 +16,6 @@
  */
 package htmlflow.test.model;
 
-import htmlflow.test.model.Status;
-
 import java.util.Date;
 
 /**
