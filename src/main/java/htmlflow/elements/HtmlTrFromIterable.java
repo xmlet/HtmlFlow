@@ -34,7 +34,7 @@ public class HtmlTrFromIterable<S, T extends Iterable<S>> implements HtmlWriter<
 	private final HtmlTr<S> tr; 
 	
 	public HtmlTrFromIterable(ModelBinder<S, ?>[] binders) {
-		tr = new HtmlTr<S>();
+		tr = new HtmlTr<>();
 		for (ModelBinder<S, ?> b : binders) {
 			tr.td().text(b);
 		}

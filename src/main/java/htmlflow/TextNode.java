@@ -49,7 +49,7 @@ public class TextNode<T> implements HtmlWriter<T>{
 			out.print(msg);
 		}
 		else{
-			assert(binder != null);
+			assert binder != null;
 			out.print(binder.bind(model));
 		}
 	}

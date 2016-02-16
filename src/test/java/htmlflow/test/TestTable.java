@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -46,6 +48,8 @@ import org.xml.sax.SAXException;
  * @author Miguel Gamboa
  */
 public class TestTable {
+
+	private static final Logger LOGGER = Logger.getLogger("htmlflow.test");
 
 	@Test
 	public void test_simple_table() throws ParserConfigurationException, SAXException, IOException{
@@ -72,7 +76,7 @@ public class TestTable {
 		for (int i = 0; i < output.length; i++) {
 			HtmlTr<?> tr = t.tr();
 			for (int j = 0; j < output[i].length; j++) {
-				tr.td().text(output[i][j] + "");
+				tr.td().text(Integer.toString(output[i][j]));
 			}
 		}
 		ByteArrayOutputStream mem = new ByteArrayOutputStream();
@@ -100,14 +104,14 @@ public class TestTable {
 				Assert.assertEquals(output[i][j], Integer.parseInt(val));
 			}
 		}
-		System.out.println(mem.toString());
+		LOGGER.log(Level.INFO, mem.toString());
 	}
 	@Test
 	public void test_table_with_binding() throws ParserConfigurationException, SAXException, IOException{
 		/*
 		 * Arrange
 		 */
-		HtmlView<Iterable<Task>> view = new HtmlView<Iterable<Task>>();
+		HtmlView<Iterable<Task>> view = new HtmlView<>();
 		view.head().title("Dummy Table");
 
 		HtmlTable<Iterable<Task>> t = view.body()
@@ -165,8 +169,8 @@ public class TestTable {
 			 */
 			String prio = tr.getChildNodes().item(5).getFirstChild().getNodeValue();
 			Assert.assertEquals(output.get(i).getPriority().toString(), prio);
-		}        
-		System.out.println(mem.toString());
+		}
+		LOGGER.log(Level.INFO, mem.toString());
 	}
 	
 	private static ModelBinder<Task, String> binderGetTitle(){
@@ -195,7 +199,7 @@ public class TestTable {
 		}
 	}
 	private static HtmlView<Iterable<Task>> taskListView(){
-		HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
+		HtmlView<Iterable<Task>> taskView = new HtmlView<>();
 		taskView
 				.head()
 				.title("Task List")

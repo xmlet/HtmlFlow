@@ -55,7 +55,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite>
 	/*-------------------------  CONSTRUCTOR  ---------------------------------*/
 	/*=========================================================================*/ 
 	public HtmlWriterComposite() {
-		children = new LinkedList<HtmlWriter<?>>();
+		children = new LinkedList<>();
 	}
 	
 	/*=========================================================================*/
@@ -72,7 +72,7 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite>
 	@Override
 	public final void  write(int depth, T model) { 
 		doWriteBefore(out, depth);
-		boolean doTab = true;
+		boolean doTab;
 		if(children!= null && !children.isEmpty() && children.get(0) != null && children.get(0) instanceof TextNode){
 		  out.print("");
 		  doTab = false;
@@ -115,7 +115,6 @@ public abstract class HtmlWriterComposite<T, U extends HtmlWriterComposite>
         for (Attribute attribute : getAttributes()) {
             tag += attribute.printAttribute();
         }
-//      return  "<"+ getElementName()+getClassAttribute()+getIdAttribute()+">";
       return  tag+">";
     }
 }

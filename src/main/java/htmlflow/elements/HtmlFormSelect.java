@@ -36,12 +36,12 @@ public class HtmlFormSelect implements HtmlWriter<Object>{
 	@Override
 	public void write(int depth, Object model) {
 		out.println("<select name=\""+ name+ "\">");
-		tabs(++depth);
+		tabs(depth + 1);
 		for (String op : options) {
 			out.println("<option>" + op + "</option>");
 			tabs(depth);
 		}
-		tabs(--depth);
+		tabs(depth - 1);
 		out.println("</select>");
 		tabs(depth);
 	}
