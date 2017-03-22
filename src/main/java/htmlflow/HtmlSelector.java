@@ -34,8 +34,8 @@ public interface HtmlSelector<T>{
 
     /**
      * Get the id attribute if the object has one
-	 */
-	String getIdAttribute();
+     */
+    String getIdAttribute();
 
     /**
      * Set the class attribute
@@ -46,5 +46,5 @@ public interface HtmlSelector<T>{
     /**
      * Set the id attribute
      */
-	T idAttr(String idAttribute);
+    T idAttr(String idAttribute);
 }

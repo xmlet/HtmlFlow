@@ -20,5 +20,5 @@ package htmlflow.test.model;
  * @author Miguel Gamboa
  */
 public enum Priority {
-	Low, Normal, High
+    Low, Normal, High
 }

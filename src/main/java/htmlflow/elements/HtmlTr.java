@@ -23,10 +23,10 @@ import htmlflow.HtmlWriterComposite;
  *         created on 29-03-2012
  */
 public class HtmlTr<T> extends HtmlWriterComposite<T, HtmlTr<T>>{
-	
-	public HtmlTd<T> td(){return addChild(new HtmlTd<T>());}
-	public HtmlTh<T> th(){return addChild(new HtmlTh<T>());}
-	
+
+    public HtmlTd<T> td(){return addChild(new HtmlTd<T>());}
+    public HtmlTh<T> th(){return addChild(new HtmlTh<T>());}
+
     @Override
     public String getElementName() {
       return ElementType.TR.toString();

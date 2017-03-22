@@ -24,20 +24,20 @@ import htmlflow.TextNode;
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public abstract class HtmlTextElement<T, U extends HtmlTextElement> extends HtmlWriterComposite<T, HtmlTextElement>{
+public abstract class HtmlTextElement<T> extends HtmlWriterComposite<T, HtmlTextElement>{
 
-	public final void text(String msg){addChild(new TextNode<T>(msg)); }
-	public final void text(ModelBinder<T, ?> binder){addChild(new TextNode<T>(binder));}
+    public final void text(String msg){addChild(new TextNode<T>(msg)); }
+    public final void text(ModelBinder<T, ?> binder){addChild(new TextNode<T>(binder));}
 
-	protected final String element;
-	
-	public HtmlTextElement() {
-	  element = "";
-	}
-	
-	public HtmlTextElement(String element) {
-		this.element = element;
-	}
+    protected final String element;
+
+    public HtmlTextElement() {
+      element = "";
+    }
+
+    public HtmlTextElement(String element) {
+        this.element = element;
+    }
 
     @Override
     public String getElementName(){

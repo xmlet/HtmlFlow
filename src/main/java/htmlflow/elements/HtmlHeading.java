@@ -20,7 +20,7 @@ package htmlflow.elements;
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlHeading<T> extends HtmlTextElement<T, HtmlHeading<T>> {
+public class HtmlHeading<T> extends HtmlTextElement<T> {
 
   public HtmlHeading(int level) {
     super("h" + level);

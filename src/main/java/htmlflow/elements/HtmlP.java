@@ -20,8 +20,8 @@ package htmlflow.elements;
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlP<T> extends HtmlTextElement<T, HtmlP<T>>{
-	public HtmlP() {
-		super(ElementType.P.toString());
-	}
+public class HtmlP<T> extends HtmlTextElement<T>{
+    public HtmlP() {
+        super(ElementType.P.toString());
+    }
 }

@@ -19,8 +19,6 @@ package htmlflow;
 
 import htmlflow.attribute.Attribute;
 
-import java.util.List;
-
 /**
  * Establishes the tag name and attributes of an HTML element.
  *

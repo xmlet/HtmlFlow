@@ -20,7 +20,7 @@ package htmlflow.elements;
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlTitle<T> extends HtmlTextElement<T, HtmlTitle<T>> {
+public class HtmlTitle<T> extends HtmlTextElement<T> {
   @Override
   public String getElementName() {
     return ElementType.TITLE.toString();

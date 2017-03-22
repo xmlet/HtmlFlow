@@ -19,26 +19,30 @@
  */
 package htmlflow.test;
 
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import htmlflow.elements.ElementType;
-import org.junit.Assert;
-import org.junit.Test;
-
 import htmlflow.HtmlView;
 import htmlflow.ModelBinder;
+import htmlflow.elements.ElementType;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mikael KROK
  *
  */
 public class TestAttributesClassId {
+
+  private static final Logger LOGGER = Logger.getLogger("htmlflow.test");
 
   private static ModelBinder<Task, Integer> binderGetId() {
     return Task::getId;
@@ -60,14 +64,14 @@ public class TestAttributesClassId {
    * Test method for {@link htmlflow.elements.HtmlDiv#getElementName()}.
    */
   @Test
-  public void testGetElementName() throws Exception {
-    HtmlView<Task> taskView = new HtmlView<Task>();
+  public void testGetElementName() {
+    HtmlView<Task> taskView = new HtmlView<>();
     Assert.assertEquals(ElementType.DIV + " element was expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
   }
 
   @Test
-  public void testIdAndClassAttribute() throws Exception {
-    HtmlView<Task> taskView = new HtmlView<Task>();
+  public void testIdAndClassAttribute() {
+    HtmlView<Task> taskView = new HtmlView<>();
     assertEquals(ElementType.DIV + " elementwas expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
 
     String divClass = "divClass";
@@ -84,7 +88,7 @@ public class TestAttributesClassId {
     PrintStream out = new PrintStream(byteArrayOutputStream);
     taskView.setPrintStream(out).write(t1);
     String result = byteArrayOutputStream.toString();
-    System.out.println(result);
+    LOGGER.log(Level.INFO, result);
     assertTrue(result.contains("<div"));
     assertTrue(result.contains("</div>"));
     assertTrue(result.contains(divClass));
@@ -100,9 +104,9 @@ public class TestAttributesClassId {
    * .
    */
   @Test
-  public void testDoWrite() throws Exception {
+  public void testDoWrite() {
 
-    HtmlView<Task> taskView2 = new HtmlView<Task>();
+    HtmlView<Task> taskView2 = new HtmlView<>();
 
     taskView2.head().title("Task Details");
     taskView2.body()
@@ -116,7 +120,7 @@ public class TestAttributesClassId {
     ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
     PrintStream out2 = new PrintStream(byteArrayOutputStream2);
     taskView2.setPrintStream(out2).write(t2);
-    System.out.println(byteArrayOutputStream2.toString());
+    LOGGER.log(Level.INFO, byteArrayOutputStream2.toString());
   }
 
 }

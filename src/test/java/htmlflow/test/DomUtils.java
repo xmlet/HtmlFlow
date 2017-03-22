@@ -31,12 +31,15 @@ import java.io.IOException;
  * Created on 22-01-2016.
  */
 public class DomUtils {
-	static Element getRootElement(byte[] input) throws SAXException, IOException, ParserConfigurationException {
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		builderFactory.setValidating(false);
-		builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(input));
-		return doc.getDocumentElement();
-	}
+
+    private DomUtils() {}
+
+    static Element getRootElement(byte[] input) throws SAXException, IOException, ParserConfigurationException {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setValidating(false);
+        builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(input));
+        return doc.getDocumentElement();
+    }
 }

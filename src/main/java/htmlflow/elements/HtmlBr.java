@@ -23,8 +23,8 @@ import htmlflow.HtmlSingleElement;
  *         created on 29-03-2012
  */
 public class HtmlBr<T, U extends HtmlBr> extends HtmlSingleElement<T, U> {
-	@Override
-	public final String getElementName() {
-		return ElementType.BR.toString();
-	}
+    @Override
+    public final String getElementName() {
+        return ElementType.BR.toString();
+    }
 }
