@@ -11,13 +11,12 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.fmcarvalho</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
-You can also download the artifact
-
-[Maven Search](http://search.maven.org)
+You can also download the artifact directly from [Maven
+Central Repository](http://repo1.maven.org/maven2/com/github/fmcarvalho/htmlflow/)
 
 ## Usage
 
@@ -27,9 +26,11 @@ examples with data binding):
 ``` java
 import htmlflow.HtmlView;
 
+import java.awt.Desktop;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 
 public class App {
     public static void main(String [] args) throws IOException {
@@ -56,7 +57,7 @@ public class App {
         //
         try(PrintStream out = new PrintStream(new FileOutputStream("Task.html"))){
             taskView.setPrintStream(out).write();
-            Runtime.getRuntime().exec("explorer Task.html");
+            Desktop.getDesktop().browse(URI.create("Task.html"));
         }
     }
 }
@@ -76,9 +77,11 @@ import htmlflow.HtmlWriter;
 import model.Priority;
 import model.Task;
 
+import java.awt.Desktop;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.util.Arrays;
 
 public class App {
@@ -97,7 +100,7 @@ public class App {
     private static <T> void printHtml(HtmlWriter<T> html, T model, String path){
         try(PrintStream out = new PrintStream(new FileOutputStream(path))){
             html.setPrintStream(out).write(model);
-            Runtime.getRuntime().exec("explorer " + path);
+            Desktop.getDesktop().browse(URI.create(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -135,9 +138,11 @@ import htmlflow.elements.HtmlTr;
 import model.Priority;
 import model.Task;
 
+import java.awt.Desktop;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -152,7 +157,7 @@ public class App {
         );
         try(PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"))){
             taskView.setPrintStream(out).write(dataSource);
-            Runtime.getRuntime().exec("explorer TaskList.html");
+            Desktop.getDesktop().browse(URI.create("TaskList.html"));
         }
     }
     private static HtmlView<Iterable<Task>> taskListView(){
@@ -175,3 +180,18 @@ public class App {
     }
 }
 ```
+
+## Changelog
+
+### 1.1 (March 23, 2017)
+
+* Read HTML header from a template resource located in `templates/HtmlView-Header.txt`.
+This template is bundled and loaded form the HtmlFlow JAR by default.
+However, you are free to use your own header template file `templates/HtmlView-Header.txt`
+and include its location in the classpath to replace the existing one.
+This also solves the #16 Issue.
+
+
+## License
+
+[MIT](https://github.com/fmcarvalho/HtmlFlow/blob/master/LICENSE)
