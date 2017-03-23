@@ -1,22 +1,27 @@
 /*
- * Copyright (c) 2016, Miguel Gamboa
+ * MIT License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package htmlflow.test.model;
-
-import htmlflow.test.model.Status;
 
 import java.util.Date;
 
@@ -24,63 +29,63 @@ import java.util.Date;
  * @author Miguel Gamboa
  */
 public class Task {
-	private static int nrOfTasks = 0; 
-	private final int id;
-	private String title;
-	private String description;
-	private Priority priority;
-	private Status status;
-	private Date creationDate;
-	private Date completedDate;
-	public Task(String title, String description, Priority priority) {
-		this.id = ++nrOfTasks;
-		this.title = title;
-		this.description = description;
-		this.priority = priority;
-	}
-	public Task(String title, String description, Priority priority, Status status) {
-		this(title,description,priority);
-		this.status = status;
-	}
-	
-	public static int getNrOfTasks() {
-		return nrOfTasks;
-	}
+    private static int nrOfTasks = 0;
+    private final int id;
+    private String title;
+    private String description;
+    private Priority priority;
+    private Status status;
+    private Date creationDate;
+    private Date completedDate;
+    public Task(String title, String description, Priority priority) {
+        this.id = ++nrOfTasks;
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+    }
+    public Task(String title, String description, Priority priority, Status status) {
+        this(title,description,priority);
+        this.status = status;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public static int getNrOfTasks() {
+        return nrOfTasks;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public Priority getPriority() {
-		return priority;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Status getStatus() {
-		return status;
-	}
+    public Priority getPriority() {
+        return priority;
+    }
 
-	public Date getCreationDate() {
-		return creationDate;
-	}
+    public Status getStatus() {
+        return status;
+    }
 
-	public Date getCompletedDate() {
-		return completedDate;
-	}
+    public Date getCreationDate() {
+        return creationDate;
+    }
 
-	@Override
-	public String toString() {
-		return "Task [id=" + id + ", title=" + title + ", description="
-				+ description + ", priority=" + priority + ", status=" + status
-				+ ", creationDate=" + creationDate + ", completedDate="
-				+ completedDate + "]";
-	}
-	
+    public Date getCompletedDate() {
+        return completedDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Task [id=" + id + ", title=" + title + ", description="
+                + description + ", priority=" + priority + ", status=" + status
+                + ", creationDate=" + creationDate + ", completedDate="
+                + completedDate + "]";
+    }
+
 }
