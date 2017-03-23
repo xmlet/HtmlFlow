@@ -28,7 +28,15 @@ import htmlflow.elements.ElementType;
 import htmlflow.elements.HtmlBody;
 import htmlflow.elements.HtmlHead;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UncheckedIOException;
+import java.net.URL;
+import java.util.stream.Collectors;
 
 /**
  * The root container for HTML elements, representing the main structure of
@@ -39,13 +47,29 @@ import java.io.PrintStream;
  */
 public class HtmlView<T> extends HtmlWriterComposite<T, HtmlView<T>>{
 
+    private static final String header;
+    private static final String NEWLINE = System.getProperty("line.separator");
+
+    static {
+        try {
+            URL headerUrl = ClassLoader.getSystemResource("templates/HtmlView-Header.txt");
+            if(headerUrl == null) throw new FileNotFoundException("templates/HtmlView-Header.txt");
+            InputStream headerStream = headerUrl.openStream();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(headerStream))) {
+                header = reader.lines().collect(Collectors.joining(NEWLINE));
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public HtmlHead<T> head(){return addChild(new HtmlHead<T>());}
     public HtmlBody<T> body(){return addChild(new HtmlBody<T>());}
 
     @Override
     public void doWriteBefore(PrintStream out, int depth) {
-        out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
-        out.print("<html xmlns=\"http://www.w3.org/1999/xhtml\" >");
+        out.println(header);
+        super.doWriteBefore(out, depth);
     }
 
     @Override
