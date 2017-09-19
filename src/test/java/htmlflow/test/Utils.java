@@ -23,6 +23,7 @@
  */
 package htmlflow.test;
 
+import htmlflow.HtmlWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -30,8 +31,16 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.UncheckedIOException;
+import java.util.stream.Stream;
 
 /**
  * @author Miguel Gamboa
@@ -49,4 +58,45 @@ public class Utils {
         Document doc = builder.parse(new ByteArrayInputStream(input));
         return doc.getDocumentElement();
     }
+
+    static <T> Stream<String> html(HtmlWriter<T> view, T model){
+        try(
+                ByteArrayOutputStream mem = new ByteArrayOutputStream();
+                PrintStream out = new PrintStream(mem))
+        {
+            view.setPrintStream(out).write(model);
+            InputStreamReader actual = new InputStreamReader(new ByteArrayInputStream(mem.toByteArray()));
+            return new BufferedReader(actual).lines();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static Stream<String> loadLines(String path) {
+        try{
+            InputStream in = TestDivDetails.class
+                    .getClassLoader()
+                    .getResource(path)
+                    .openStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            return reader.lines().onClose(asUncheckedRunnable(reader));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /**
+     * Convert a Closeable to a Runnable by converting checked IOException
+     * to UncheckedIOException
+     */
+    private static Runnable asUncheckedRunnable(Closeable c) {
+        return () -> {
+            try {
+                c.close();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        };
+    }
+
 }
