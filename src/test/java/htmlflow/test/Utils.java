@@ -37,9 +37,9 @@ import java.io.IOException;
  * @author Miguel Gamboa
  * Created on 22-01-2016.
  */
-public class DomUtils {
+public class Utils {
 
-    private DomUtils() {}
+    private Utils() {}
 
     static Element getRootElement(byte[] input) throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
