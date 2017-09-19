@@ -26,6 +26,7 @@ package htmlflow.test;
 import htmlflow.HtmlView;
 import htmlflow.ModelBinder;
 import htmlflow.elements.ElementType;
+import htmlflow.elements.HtmlBody;
 import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
 import htmlflow.test.model.Priority;
@@ -214,8 +215,11 @@ public class TestTable {
                 .head()
                 .title("Task List")
                 .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
-        HtmlTable<Iterable<Task>> table = taskView
-                .body().classAttr("container")
+        HtmlBody<Iterable<Task>> body = taskView.body();
+        body.a("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow");
+        body.p("Html page built with HtmlFlow.");
+        HtmlTable<Iterable<Task>> table = body
+                .classAttr("container")
                 .heading(1, "Task List")
                 .hr()
                 .div()
