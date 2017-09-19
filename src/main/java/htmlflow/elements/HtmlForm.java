@@ -52,11 +52,11 @@ public class HtmlForm<T> extends HtmlWriterComposite<T, HtmlForm<T>>{
 
     @Override
     public void doWriteBefore(PrintStream out, int depth) {
+        tabs(out, depth);
         out.print(String.format("<form action=\"%s\" method=\"%s\" enctype=\"%s\">",
                 action,
                 "post",
                 "application/x-www-form-urlencoded"));
-        tabs(out, depth + 1);
     }
 
     @Override
