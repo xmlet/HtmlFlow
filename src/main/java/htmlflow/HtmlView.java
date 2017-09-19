@@ -52,8 +52,11 @@ public class HtmlView<T> extends HtmlWriterComposite<T, HtmlView<T>>{
 
     static {
         try {
-            URL headerUrl = ClassLoader.getSystemResource("templates/HtmlView-Header.txt");
-            if(headerUrl == null) throw new FileNotFoundException("templates/HtmlView-Header.txt");
+            URL headerUrl = HtmlView.class
+                    .getClassLoader()
+                    .getResource("templates/HtmlView-Header.txt");
+            if(headerUrl == null)
+                throw new FileNotFoundException("templates/HtmlView-Header.txt");
             InputStream headerStream = headerUrl.openStream();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(headerStream))) {
                 header = reader.lines().collect(Collectors.joining(NEWLINE));
