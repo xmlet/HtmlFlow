@@ -37,9 +37,15 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import static htmlflow.test.Utils.html;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -79,7 +85,10 @@ public class TestAttributesClassId {
   @Test
   public void testIdAndClassAttribute() {
     HtmlView<Task> taskView = new HtmlView<>();
-    assertEquals(ElementType.DIV + " elementwas expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
+    assertEquals(
+            ElementType.DIV + " elementwas expected",
+            ElementType.DIV.toString(),
+            taskView.body().div().getElementName());
 
     String divClass = "divClass";
     String divId = "divId";
@@ -91,11 +100,9 @@ public class TestAttributesClassId {
       .addAttr("toto", "tutu").form("/action.do");
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    PrintStream out = new PrintStream(byteArrayOutputStream);
-    taskView.setPrintStream(out).write(t1);
-    String result = byteArrayOutputStream.toString();
-    LOGGER.log(Level.INFO, result);
+    List<String> actual = html(taskView, t1).collect(toList());
+
+    String result = actual.stream().collect(joining());
     assertTrue(result.contains("<div"));
     assertTrue(result.contains("</div>"));
     assertTrue(result.contains(divClass));
@@ -103,6 +110,11 @@ public class TestAttributesClassId {
     assertTrue(result.contains("toto=\"tutu\""));
     assertTrue("should contains <script type=\"text/javascript\" src=\"test.css\">",
               result.contains("<script type=\"text/javascript\" src=\"test.css\">"));
+
+    Iterator<String> iter = actual.iterator();
+    Utils
+            .loadLines("testIdAndClassAttribute.html")
+            .forEach(expected -> assertEquals(expected, iter.next()));
   }
   
   /**
@@ -123,11 +135,12 @@ public class TestAttributesClassId {
     .br().text("Title: ")
     .text(binderGetTitle()).br().text("Description: ").text(binderGetDescription()).br().text("Priority: ")
         .text(binderGetPriority());
-    Task t2 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
-    ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
-    PrintStream out2 = new PrintStream(byteArrayOutputStream2);
-    taskView2.setPrintStream(out2).write(t2);
-    LOGGER.log(Level.INFO, byteArrayOutputStream2.toString());
+    Task t2 = new Task(5243, "Unit Test", "Test of element name", Priority.High, Status.Progress);
+
+    Iterator<String> actual = html(taskView2, t2).iterator();
+    Utils
+            .loadLines("testDoWrite.html")
+            .forEach(expected -> assertEquals(expected, actual.next()));
   }
 
 }

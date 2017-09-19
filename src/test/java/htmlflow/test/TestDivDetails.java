@@ -24,12 +24,10 @@
 package htmlflow.test;
 
 import htmlflow.HtmlView;
-import htmlflow.HtmlWriter;
 import htmlflow.attribute.AttributeType;
 import htmlflow.elements.ElementType;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
-import junit.framework.Assert;
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,16 +36,39 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static htmlflow.test.Utils.html;
+import static htmlflow.test.Utils.loadLines;
+import static java.lang.String.format;
+import static java.util.function.Function.identity;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Miguel Gamboa
  * Created on 18-01-2016.
  */
 public class TestDivDetails {
+
+    private final Map<Task, Stream<String>> expectedTaskViews;
+
+    public TestDivDetails() {
+        this.expectedTaskViews =
+                Stream.of(
+                        new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+                        new Task(4, "Special dinner", "Have dinner with someone!", Priority.Normal),
+                        new Task(5, "Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+                ).collect(Collectors.toMap(
+                        identity(),
+                        task -> loadLines(format("task%d.html", task.getId()))
+                ));
+    }
+
     @Test
     public void test_div_details_without_binding() throws IOException, ParserConfigurationException, SAXException {
         HtmlView<?> taskView = new HtmlView<>();
@@ -76,43 +97,37 @@ public class TestDivDetails {
         /*
          * Assert HTML document main structure
          */
-        Element elem = DomUtils.getRootElement(mem.toByteArray());
-        Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
+        Element elem = Utils.getRootElement(mem.toByteArray());
+        assertEquals(ElementType.HTML.toString(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
         Node head = childNodes.item(1);
-        Assert.assertEquals(ElementType.HEAD.toString(), head.getNodeName());
+        assertEquals(ElementType.HEAD.toString(), head.getNodeName());
         Node body = childNodes.item(3);
-        Assert.assertEquals(ElementType.BODY.toString(), body.getNodeName());
+        assertEquals(ElementType.BODY.toString(), body.getNodeName());
         Node bodyClassAttr = body.getAttributes().getNamedItem(AttributeType.CLASS.toString());
-        Assert.assertEquals("container", bodyClassAttr.getNodeValue());
+        assertEquals("container", bodyClassAttr.getNodeValue());
         /*
          * Assert HTML Head
          */
         childNodes = head.getChildNodes();
-        Assert.assertEquals(ElementType.TITLE.toString(), childNodes.item(1).getNodeName());
-        Assert.assertEquals(ElementType.LINK.toString(), childNodes.item(3).getNodeName());
+        assertEquals(ElementType.TITLE.toString(), childNodes.item(1).getNodeName());
+        assertEquals(ElementType.LINK.toString(), childNodes.item(3).getNodeName());
     }
 
     @Test
     public void test_div_details_binding() throws IOException, ParserConfigurationException, SAXException {
-        HtmlView<Task> taskView = taskDetailsView();
-        Task [] dataSource = {
-                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-                new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
-                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
-        };
-        Arrays
-                .stream(dataSource)
-                .forEach(task -> printHtml(taskView, task, "task" + task.getId() + ".html"));
+        expectedTaskViews
+                .keySet()
+                .stream()
+                .map(task -> TaskHtml.of(task, html(taskDetailsView(), task)))
+                .forEach(taskHtml -> {
+                    Iterator<String> actual = taskHtml.html.iterator();
+                    expectedTaskViews
+                            .get(taskHtml.t)
+                            .forEach(line -> assertEquals(line, actual.next()));
+                });
     }
-    private static <T> void printHtml(HtmlWriter<T> html, T model, String path){
-        try(PrintStream out = new PrintStream(new FileOutputStream(path))){
-            html.setPrintStream(out).write(model);
-            // Runtime.getRuntime().exec("explorer Task.html");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     private static HtmlView<Task> taskDetailsView(){
         HtmlView<Task> taskView = new HtmlView<>();
@@ -131,5 +146,16 @@ public class TestDivDetails {
                 .br()
                 .text("Priority: ").text(Task::getPriority);
         return taskView;
+    }
+    private static class TaskHtml {
+        Task t;
+        Stream<String> html;
+        public TaskHtml(Task t, Stream<String> html) {
+            this.t = t;
+            this.html = html;
+        }
+        static TaskHtml of(Task t, Stream<String> html) {
+            return new TaskHtml(t, html);
+        }
     }
 }
