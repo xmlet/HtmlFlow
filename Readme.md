@@ -16,7 +16,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.fmcarvalho</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 
@@ -188,6 +188,12 @@ public class App {
 
 ## Changelog
 
+### 1.2 (September 22, 2017)
+
+* Refactor unit tests to increase code coverage and to load the expected HTML output from the resources. 
+* Include HtmlFlow in [SonarCloud.io](https://sonarcloud.io/dashboard?id=com.github.fmcarvalho%3Ahtmlflow) to analyze code quality. 
+* Fix of [Issue 14](https://github.com/fmcarvalho/HtmlFlow/issues/24) -- _Header.txt can't be loaded from resources_.
+
 ### 1.1 (March 23, 2017)
 
 * Read HTML header from a template resource located in `templates/HtmlView-Header.txt`.
@@ -195,7 +201,6 @@ This template is bundled and loaded form the HtmlFlow JAR by default.
 However, you are free to use your own header template file `templates/HtmlView-Header.txt`
 and include its location in the classpath to replace the existing one.
 This also solves the #16 Issue.
-
 
 ## License
 
