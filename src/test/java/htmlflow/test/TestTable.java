@@ -26,6 +26,7 @@ package htmlflow.test;
 import htmlflow.HtmlView;
 import htmlflow.ModelBinder;
 import htmlflow.elements.ElementType;
+import htmlflow.elements.HtmlBody;
 import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
 import htmlflow.test.model.Priority;
@@ -44,9 +45,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
+
+import static htmlflow.test.Utils.html;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Miguel Gamboa
@@ -89,26 +95,26 @@ public class TestTable {
         /*
          * Assert
          */
-        Element elem = DomUtils.getRootElement(mem.toByteArray());
-        Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
+        Element elem = Utils.getRootElement(mem.toByteArray());
+        assertEquals(ElementType.HTML.toString(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        Assert.assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
-        Assert.assertEquals(ElementType.BODY.toString(), childNodes.item(3).getNodeName());
+        assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
+        assertEquals(ElementType.BODY.toString(), childNodes.item(3).getNodeName());
         Node div = childNodes.item(3).getChildNodes().item(5);
-        Assert.assertEquals(ElementType.DIV.toString(), div.getNodeName());
+        assertEquals(ElementType.DIV.toString(), div.getNodeName());
         Node table = div.getChildNodes().item(1);
-        Assert.assertEquals(ElementType.TABLE.toString(), table.getNodeName());
+        assertEquals(ElementType.TABLE.toString(), table.getNodeName());
         for (int i = 0; i < output.length; i++) {
             Node tr = table.getChildNodes().item(3 + i*2);
-            Assert.assertEquals(ElementType.TR.toString(), tr.getNodeName());
+            assertEquals(ElementType.TR.toString(), tr.getNodeName());
             for (int j = 0; j < output[i].length; j++) {
                 Node td = tr.getChildNodes().item(j*2 + 1);
-                Assert.assertEquals("td", td.getNodeName());
+                assertEquals("td", td.getNodeName());
                 String val = td.getFirstChild().getNodeValue();
-                Assert.assertEquals(output[i][j], Integer.parseInt(val));
+                assertEquals(output[i][j], Integer.parseInt(val));
             }
         }
-        LOGGER.log(Level.INFO, mem.toString());
+        // LOGGER.log(Level.INFO, mem.toString());
     }
     @Test
     public void test_table_with_binding() throws ParserConfigurationException, SAXException, IOException{
@@ -146,35 +152,35 @@ public class TestTable {
         /*
          * Assert
          */
-        Element elem = DomUtils.getRootElement(mem.toByteArray());
-        Assert.assertEquals(ElementType.HTML.toString(), elem.getNodeName());
+        Element elem = Utils.getRootElement(mem.toByteArray());
+        assertEquals(ElementType.HTML.toString(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        Assert.assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
-        Assert.assertEquals(ElementType.BODY.toString(), childNodes.item(3).getNodeName());
+        assertEquals(ElementType.HEAD.toString(), childNodes.item(1).getNodeName());
+        assertEquals(ElementType.BODY.toString(), childNodes.item(3).getNodeName());
         Node div = childNodes.item(3).getChildNodes().item(5);
-        Assert.assertEquals(ElementType.DIV.toString(), div.getNodeName());
+        assertEquals(ElementType.DIV.toString(), div.getNodeName());
         Node table = div.getChildNodes().item(1);
-        Assert.assertEquals(ElementType.TABLE.toString(), table.getNodeName());
+        assertEquals(ElementType.TABLE.toString(), table.getNodeName());
         for (int i = 0; i < output.size(); i++) {
             Node tr = table.getChildNodes().item(3 + i*2);
-            Assert.assertEquals(ElementType.TR.toString(), tr.getNodeName());
+            assertEquals(ElementType.TR.toString(), tr.getNodeName());
             /*
              * Check title
              */
             String title = tr.getChildNodes().item(1).getFirstChild().getNodeValue();
-            Assert.assertEquals(output.get(i).getTitle(), title);
+            assertEquals(output.get(i).getTitle(), title);
             /*
              * Check task description
              */
             String desc = tr.getChildNodes().item(3).getFirstChild().getNodeValue();
-            Assert.assertEquals(output.get(i).getDescription(), desc);
+            assertEquals(output.get(i).getDescription(), desc);
             /*
              * Check task priority
              */
             String prio = tr.getChildNodes().item(5).getFirstChild().getNodeValue();
-            Assert.assertEquals(output.get(i).getPriority().toString(), prio);
+            assertEquals(output.get(i).getPriority().toString(), prio);
         }
-        LOGGER.log(Level.INFO, mem.toString());
+        // LOGGER.log(Level.INFO, mem.toString());
     }
 
     private static ModelBinder<Task, String> binderGetTitle(){
@@ -197,10 +203,11 @@ public class TestTable {
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
-        try(PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"))){
-            taskView.setPrintStream(out).write(dataSource);
-            // Runtime.getRuntime().exec("explorer TaskList.html");
-        }
+        Iterator<String> actual = html(taskView, dataSource).iterator();
+        Utils
+                .loadLines("TaskList.html")
+                .forEach(expected -> assertEquals(expected, actual.next()));
+
     }
     private static HtmlView<Iterable<Task>> taskListView(){
         HtmlView<Iterable<Task>> taskView = new HtmlView<>();
@@ -208,8 +215,11 @@ public class TestTable {
                 .head()
                 .title("Task List")
                 .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
-        HtmlTable<Iterable<Task>> table = taskView
-                .body().classAttr("container")
+        HtmlBody<Iterable<Task>> body = taskView.body();
+        body.a("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow");
+        body.p("Html page built with HtmlFlow.");
+        HtmlTable<Iterable<Task>> table = body
+                .classAttr("container")
                 .heading(1, "Task List")
                 .hr()
                 .div()

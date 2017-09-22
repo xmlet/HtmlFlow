@@ -47,16 +47,20 @@ import java.util.stream.Collectors;
  */
 public class HtmlView<T> extends HtmlWriterComposite<T, HtmlView<T>>{
 
-    private static final String header;
+    private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
+    public static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
 
     static {
         try {
-            URL headerUrl = ClassLoader.getSystemResource("templates/HtmlView-Header.txt");
-            if(headerUrl == null) throw new FileNotFoundException("templates/HtmlView-Header.txt");
+            URL headerUrl = HtmlView.class
+                    .getClassLoader()
+                    .getResource(HEADER_TEMPLATE);
+            if(headerUrl == null)
+                throw new FileNotFoundException(HEADER_TEMPLATE);
             InputStream headerStream = headerUrl.openStream();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(headerStream))) {
-                header = reader.lines().collect(Collectors.joining(NEWLINE));
+                HEADER = reader.lines().collect(Collectors.joining(NEWLINE));
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -68,7 +72,7 @@ public class HtmlView<T> extends HtmlWriterComposite<T, HtmlView<T>>{
 
     @Override
     public void doWriteBefore(PrintStream out, int depth) {
-        out.println(header);
+        out.println(HEADER);
         super.doWriteBefore(out, depth);
     }
 

@@ -44,6 +44,7 @@ public class HtmlBody<T> extends HtmlWriterComposite<T, HtmlBody<T>>{
     public HtmlTable<T> table(){return addChild(new HtmlTable<T>());}
     public HtmlBody<T> p(String msg){addChild(new HtmlP<T>()).text(msg); return this;}
     public HtmlBody<T> p(ModelBinder<T, ?> binder){addChild(new HtmlP<T>()).text(binder); return this;}
+    public HtmlA<T> a(String href){return addChild(new HtmlA<T>(href));}
 
     @Override
     public String getElementName() {

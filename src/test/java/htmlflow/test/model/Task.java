@@ -29,7 +29,7 @@ import java.util.Date;
  * @author Miguel Gamboa
  */
 public class Task {
-    private static int nrOfTasks = 0;
+
     private final int id;
     private String title;
     private String description;
@@ -37,19 +37,28 @@ public class Task {
     private Status status;
     private Date creationDate;
     private Date completedDate;
+
     public Task(String title, String description, Priority priority) {
-        this.id = ++nrOfTasks;
         this.title = title;
         this.description = description;
         this.priority = priority;
+        this.id = hashCode();
+    }
+
+    public Task(int id, String title, String description, Priority priority) {
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+        this.id = id;
     }
     public Task(String title, String description, Priority priority, Status status) {
         this(title,description,priority);
         this.status = status;
     }
 
-    public static int getNrOfTasks() {
-        return nrOfTasks;
+    public Task(int id, String title, String description, Priority priority, Status status) {
+        this(id, title, description, priority);
+        this.status = status;
     }
 
     public int getId() {
