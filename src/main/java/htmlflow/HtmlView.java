@@ -24,11 +24,15 @@
 
 package htmlflow;
 
-import htmlflow.elements.ElementType;
-import htmlflow.elements.HtmlBody;
-import htmlflow.elements.HtmlHead;
+import org.xmlet.htmlapi.Body;
+import org.xmlet.htmlapi.Div;
+import org.xmlet.htmlapi.Element;
+import org.xmlet.htmlapi.ElementVisitor;
+import org.xmlet.htmlapi.Head;
+import org.xmlet.htmlapi.Html;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,13 +43,15 @@ import java.net.URL;
 import java.util.stream.Collectors;
 
 /**
- * The root container for HTML elements, representing the main structure of
- * an  HTML document.
+ * The root container for HTML elements.
+ * It it responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
+ * implementation, which is responsible for printing the tree of elements and
+ * attributes.
  *
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlView<T> extends HtmlWriterComposite<T, HtmlView<T>>{
+public class HtmlView<T> implements HtmlWriter<T>{
 
     private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -67,17 +73,62 @@ public class HtmlView<T> extends HtmlWriterComposite<T, HtmlView<T>>{
         }
     }
 
-    public HtmlHead<T> head(){return addChild(new HtmlHead<T>());}
-    public HtmlBody<T> body(){return addChild(new HtmlBody<T>());}
+    private PrintStream out;
+    private ByteArrayOutputStream mem;
+    private Html root = new Html();
 
-    @Override
-    public void doWriteBefore(PrintStream out, int depth) {
-        out.println(HEADER);
-        super.doWriteBefore(out, depth);
+    public Head<Html> head(){
+        return root.head();
+    }
+
+    public Body<Html> body(){
+        return root.body();
     }
 
     @Override
-    public String getElementName() {
-        return ElementType.HTML.toString();
+    public void write() {
+        initByteArrayStream();
+        out.print(HEADER);
+        root.accept(new HtmlVisitor(out));
+        closeByteArrayStream();
+    }
+
+    @Override
+    public final void write(int depth, T model) {
+        initByteArrayStream();
+        out.print(HEADER);
+        root.accept(new HtmlVisitorBinder<>(out, model));
+        closeByteArrayStream();
+    }
+
+    private void initByteArrayStream() {
+        if(out == null) {
+            mem = new ByteArrayOutputStream();
+            out = new PrintStream(mem);
+        }
+    }
+
+    private void closeByteArrayStream() {
+        if(mem != null) {
+            out.close();
+            out = null;
+        }
+    }
+
+    @Override
+    public HtmlWriter<T> setPrintStream(PrintStream out) {
+        this.out = out;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return mem != null ? mem.toString(): super.toString();
+    }
+
+    public byte[] toByteArray() {
+        if(mem == null)
+            throw new IllegalStateException("There is not internal stream!");
+        return mem.toByteArray();
     }
 }
