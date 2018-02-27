@@ -21,23 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package htmlflow.elements;
 
-import htmlflow.HtmlWriterComposite;
+package htmlflow;
+
+import org.xmlet.htmlapi.Element;
+import org.xmlet.htmlapi.Text;
+
+import java.io.PrintStream;
 
 /**
+ * An optimized version of HtmlVisitorBinder which suppresses the binder check
+ * on traversal of children elements.
+ * This Vistor does not have a model and thus it does not need to check whether
+ * the elements have a binder, or not.
+ * Since it does not have a model, then it has no object to pass to the binders.
+ *
  * @author Miguel Gamboa
- *         created on 29-03-2012
+ *         created on 17-01-2018
  */
-public class HtmlFormInputSubmit<T> extends HtmlWriterComposite<T, HtmlFormInputSubmit<T>> {
+public class HtmlVisitor extends HtmlVisitorBinder<Object> {
 
-    public HtmlFormInputSubmit(String value) {
-        addAttr("submit", "submit");
-        addAttr("name", value);
+    public HtmlVisitor(PrintStream out) {
+        super(out, null);
     }
 
     @Override
-    public String getElementName() {
-        return ElementType.INPUT.toString();
+    protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
+        elem.getChildren().forEach(item -> item.accept(this));
+    }
+
+    /**
+     * Type parameter R is the type of property in model T.
+     */
+    @Override
+    public <R> void visit(Text<Object, R, ?> text) {
+        out.println();
+        tabs();
+        out.print(text.getValue());
     }
 }
