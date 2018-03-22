@@ -31,10 +31,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlet.htmlapi.AttrClass;
+import org.xmlet.htmlapi.AttrClassString;
+import org.xmlet.htmlapi.BaseAttribute;
 import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Enumrel;
-import org.xmlet.htmlapi.Enumtype;
+import org.xmlet.htmlapi.EnumRelLinkType;
+import org.xmlet.htmlapi.EnumTypeContentType;
 import org.xmlet.htmlapi.Head;
 import org.xmlet.htmlapi.Html;
 import org.xmlet.htmlapi.Link;
@@ -80,8 +81,8 @@ public class TestDivDetails {
                 .head()
                 .title().text("Task Details").º()
                 .link()
-                .attrRel(Enumrel.STYLESHEET)
-                .attrType(Enumtype.TEXT_CSS)
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXTCSS)
                 .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         taskView
                 .body().attrClass("container")
@@ -107,7 +108,7 @@ public class TestDivDetails {
         assertEquals(Head.class.getSimpleName().toLowerCase(), head.getNodeName());
         Node body = childNodes.item(3);
         assertEquals(Body.class.getSimpleName().toLowerCase(), body.getNodeName());
-        Node bodyClassAttr = body.getAttributes().getNamedItem(new AttrClass("").getName());
+        Node bodyClassAttr = body.getAttributes().getNamedItem(new AttrClassString("container").getName());
         assertEquals("container", bodyClassAttr.getNodeValue());
         /*
          * Assert HTML Head
@@ -139,8 +140,8 @@ public class TestDivDetails {
                 .title()
                 .text("Task Details").º()
                 .link()
-                .attrRel(Enumrel.STYLESHEET)
-                .attrType(Enumtype.TEXT_CSS)
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXTCSS)
                 .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         taskView
                 .body().attrClass("container")

@@ -34,8 +34,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlet.htmlapi.Body;
 import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.Enumrel;
-import org.xmlet.htmlapi.Enumtype;
+import org.xmlet.htmlapi.EnumRelLinkType;
+import org.xmlet.htmlapi.EnumTypeContentType;
 import org.xmlet.htmlapi.Head;
 import org.xmlet.htmlapi.Html;
 import org.xmlet.htmlapi.Table;
@@ -220,8 +220,8 @@ public class TestTable {
         taskView
                 .head().title().text("Task List").º()
                 .link()
-                .attrRel(Enumrel.STYLESHEET)
-                .attrType(Enumtype.TEXT_CSS)
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXTCSS)
                 .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         Body<Html> body = taskView.body();
         body.a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow");
