@@ -223,7 +223,7 @@ public class TestTable {
                 .head().title().text("Task List").º()
                 .link()
                 .attrRel(EnumRelLinkType.STYLESHEET)
-                .attrType(EnumTypeContentType.TEXTCSS)
+                .attrType(EnumTypeContentType.TEXT_CSS)
                 .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         Body<Html> body = taskView.body();
         body.a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow");

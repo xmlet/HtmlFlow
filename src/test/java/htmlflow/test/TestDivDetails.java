@@ -82,7 +82,7 @@ public class TestDivDetails {
                 .title().text("Task Details").º()
                 .link()
                 .attrRel(EnumRelLinkType.STYLESHEET)
-                .attrType(EnumTypeContentType.TEXTCSS)
+                .attrType(EnumTypeContentType.TEXT_CSS)
                 .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         taskView
                 .body().attrClass("container")
@@ -141,7 +141,7 @@ public class TestDivDetails {
                 .text("Task Details").º()
                 .link()
                 .attrRel(EnumRelLinkType.STYLESHEET)
-                .attrType(EnumTypeContentType.TEXTCSS)
+                .attrType(EnumTypeContentType.TEXT_CSS)
                 .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         taskView
                 .body().attrClass("container")

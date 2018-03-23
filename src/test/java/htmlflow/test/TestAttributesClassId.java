@@ -76,7 +76,7 @@ public class TestAttributesClassId {
     taskView
             .head()
             .script()
-            .attrType(EnumTypescript.TEXTJAVASCRIPT)
+            .attrType(EnumTypescript.TEXT_JAVASCRIPT)
             .attrSrc("test.css");
     taskView.body()
             .div()
@@ -86,7 +86,7 @@ public class TestAttributesClassId {
             .form()
             .attrAction("/action.do")
             .attrMethod(EnumMethodform.POST)
-            .attrEnctype(EnumEnctypeform.APPLICATIONXWWWFORMURLENCODED);
+            .attrEnctype(EnumEnctypeform.APPLICATION_X_WWW_FORM_URLENCODED);
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     List<String> actual = html(taskView, t1).collect(toList());
