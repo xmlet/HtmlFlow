@@ -104,9 +104,9 @@ public class TestDivDetails {
         Element elem = Utils.getRootElement(taskView.toByteArray());
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        Node head = childNodes.item(1);
+        Node head = childNodes.item(0);
         assertEquals(Head.class.getSimpleName().toLowerCase(), head.getNodeName());
-        Node body = childNodes.item(3);
+        Node body = childNodes.item(2);
         assertEquals(Body.class.getSimpleName().toLowerCase(), body.getNodeName());
         Node bodyClassAttr = body.getAttributes().getNamedItem(new AttrClassString("container").getName());
         assertEquals("container", bodyClassAttr.getNodeValue());
