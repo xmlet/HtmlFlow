@@ -25,11 +25,20 @@
 package htmlflow;
 
 import org.xmlet.htmlapi.AbstractElementVisitor;
+import org.xmlet.htmlapi.Area;
 import org.xmlet.htmlapi.Attribute;
+import org.xmlet.htmlapi.Base;
 import org.xmlet.htmlapi.Br;
+import org.xmlet.htmlapi.Col;
 import org.xmlet.htmlapi.Element;
+import org.xmlet.htmlapi.Embed;
 import org.xmlet.htmlapi.Hr;
 import org.xmlet.htmlapi.Img;
+import org.xmlet.htmlapi.Input;
+import org.xmlet.htmlapi.Link;
+import org.xmlet.htmlapi.Meta;
+import org.xmlet.htmlapi.Param;
+import org.xmlet.htmlapi.Source;
 import org.xmlet.htmlapi.Text;
 
 import java.io.PrintStream;
@@ -50,7 +59,23 @@ public class HtmlVisitorBinder<T> extends AbstractElementVisitor<T> {
     private static final char EQUALS = '=';
     private static final char SLASH = '/';
 
-    private static final Class<?>[] INLINES = {Img.class, Br.class, Hr.class};
+    /**
+     * According to https://www.w3.org/TR/html5/syntax.html#void-elements
+     */
+    private static final Class<?>[] VOID_ELEMENTS = {
+            Area.class,
+            Base.class,
+            Br.class,
+            Col.class,
+            Embed.class,
+            Hr.class,
+            Img.class,
+            Input.class,
+            Link.class,
+            Meta.class,
+            Param.class,
+            Source.class
+    };
 
     protected final PrintStream out;
     protected final T model;
@@ -72,7 +97,7 @@ public class HtmlVisitorBinder<T> extends AbstractElementVisitor<T> {
         incTabs();
         visitChildrem(elem);
         decTabs();
-        if(isInline(elem)) return;
+        if(isVoidElement(elem)) return;
         out.println();
         tabs();
         out.print(BEGIN_TAG);      // <
@@ -126,15 +151,14 @@ public class HtmlVisitorBinder<T> extends AbstractElementVisitor<T> {
             out.print(attribute.getValue());
             out.print(QUOTATION);
         }
-        if(isInline(elem)) out.print(SLASH);
         out.print(FINISH_TAG);
     }
 
 
-    static final boolean isInline(Element elem) {
+    static final boolean isVoidElement(Element elem) {
         Class<? extends Element> k = elem.getClass();
-        for (int i = 0; i < INLINES.length; i++) {
-            if(INLINES[i] == k)
+        for (int i = 0; i < VOID_ELEMENTS.length; i++) {
+            if(VOID_ELEMENTS[i] == k)
                 return true;
         }
         return false;
