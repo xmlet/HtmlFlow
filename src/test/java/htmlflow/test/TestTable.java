@@ -97,14 +97,15 @@ public class TestTable {
         Element elem = Utils.getRootElement(view.toByteArray());
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(1).getNodeName());
-        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(3).getNodeName());
-        Node div = childNodes.item(3).getChildNodes().item(5);
+        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(0).getNodeName());
+        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(2).getNodeName());
+        Node div = childNodes.item(2).getChildNodes().item(5);
         assertEquals(Div.class.getSimpleName().toLowerCase(), div.getNodeName());
         Node table = div.getChildNodes().item(1);
         assertEquals(Table.class.getSimpleName().toLowerCase(), table.getNodeName());
+        Node tbody = table.getChildNodes().item(1);
         for (int i = 0; i < output.length; i++) {
-            Node tr = table.getChildNodes().item(3 + i*2);
+            Node tr = tbody.getChildNodes().item(2 + i*2);
             assertEquals(Tr.class.getSimpleName().toLowerCase(), tr.getNodeName());
             for (int j = 0; j < output[i].length; j++) {
                 Node td = tr.getChildNodes().item(j*2 + 1);
@@ -166,14 +167,15 @@ public class TestTable {
         Element elem = Utils.getRootElement(view.toByteArray());
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(1).getNodeName());
-        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(3).getNodeName());
-        Node div = childNodes.item(3).getChildNodes().item(5);
+        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(0).getNodeName());
+        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(2).getNodeName());
+        Node div = childNodes.item(2).getChildNodes().item(5);
         assertEquals(Div.class.getSimpleName().toLowerCase(), div.getNodeName());
         Node table = div.getChildNodes().item(1);
         assertEquals(Table.class.getSimpleName().toLowerCase(), table.getNodeName());
+        Node tbody = table.getChildNodes().item(1);
         for (int i = 0; i < output.size(); i++) {
-            Node tr = table.getChildNodes().item(3 + i*2);
+            Node tr = tbody .getChildNodes().item(2 + i*2);
             assertEquals(Tr.class.getSimpleName().toLowerCase(), tr.getNodeName());
             /*
              * Check title
