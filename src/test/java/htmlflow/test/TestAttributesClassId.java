@@ -27,21 +27,20 @@
 package htmlflow.test;
 
 import htmlflow.HtmlView;
-import htmlflow.ModelBinder;
-import htmlflow.elements.ElementType;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xmlet.htmlapi.BaseAttribute;
+import org.xmlet.htmlapi.Div;
+import org.xmlet.htmlapi.EnumEnctypeForm;
+import org.xmlet.htmlapi.EnumMethodForm;
+import org.xmlet.htmlapi.EnumTypeScript;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static htmlflow.test.Utils.html;
 import static java.util.stream.Collectors.joining;
@@ -56,53 +55,44 @@ import static org.junit.Assert.assertTrue;
 public class TestAttributesClassId {
 
   private static final Logger LOGGER = Logger.getLogger("htmlflow.test");
+  private static final String DIV_NAME = Div.class.getSimpleName().toLowerCase();
 
-  private static ModelBinder<Task, Integer> binderGetId() {
-    return Task::getId;
-  }
-
-  private static ModelBinder<Task, String> binderGetTitle() {
-    return Task::getTitle;
-  }
-
-  private static ModelBinder<Task, String> binderGetDescription() {
-    return Task::getDescription;
-  }
-
-  private static ModelBinder<Task, Priority> binderGetPriority() {
-    return Task::getPriority;
-  }
-
-  /**
-   * Test method for {@link htmlflow.elements.HtmlDiv#getElementName()}.
-   */
   @Test
   public void testGetElementName() {
     HtmlView<Task> taskView = new HtmlView<>();
-    Assert.assertEquals(ElementType.DIV + " element was expected", ElementType.DIV.toString(), taskView.body().div().getElementName());
+    Assert.assertEquals(DIV_NAME + " element was expected", DIV_NAME, taskView.body().div().getName());
   }
 
   @Test
   public void testIdAndClassAttribute() {
     HtmlView<Task> taskView = new HtmlView<>();
     assertEquals(
-            ElementType.DIV + " elementwas expected",
-            ElementType.DIV.toString(),
-            taskView.body().div().getElementName());
+            DIV_NAME + " element was expected",
+            DIV_NAME,
+            taskView.body().div().getName());
 
     String divClass = "divClass";
     String divId = "divId";
-      taskView.head().scriptLink("test.css");
+    taskView
+            .head()
+            .script()
+            .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
+            .attrSrc("test.css");
     taskView.body()
-    .div()
-      .classAttr(divClass)
-      .idAttr(divId)
-      .addAttr("toto", "tutu").form("/action.do");
+            .div()
+            .attrId(divId)
+            .attrClass(divClass)
+            .addAttr(new BaseAttribute("tutu", "toto"))
+            .form()
+            .attrAction("/action.do")
+            .attrMethod(EnumMethodForm.POST)
+            .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED);
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     List<String> actual = html(taskView, t1).collect(toList());
 
-    String result = actual.stream().collect(joining());
+    String result = actual.stream().collect(joining("\n"));
+    //System.out.println(result);
     assertTrue(result.contains("<div"));
     assertTrue(result.contains("</div>"));
     assertTrue(result.contains(divClass));
@@ -117,30 +107,30 @@ public class TestAttributesClassId {
             .forEach(expected -> assertEquals(expected, iter.next()));
   }
   
-  /**
-   * Test method for
-   * {@link htmlflow.HtmlWriterComposite#doWriteBefore(java.io.PrintStream, int)}
-   * .
-   */
   @Test
   public void testDoWrite() {
 
     HtmlView<Task> taskView2 = new HtmlView<>();
 
-    taskView2.head().title("Task Details");
+    taskView2.head().title().text("Task Details");
     taskView2.body()
-    .heading(0, "Task Details")
-    .hr()
-    .div().text("Id: ").text(binderGetId())
-    .br().text("Title: ")
-    .text(binderGetTitle()).br().text("Description: ").text(binderGetDescription()).br().text("Priority: ")
-        .text(binderGetPriority());
+            .h1().text("Task Details").º()
+            .hr().º()
+            .div().text("Id:").text(Task::getId)
+            .br().º()
+            .text("Title:").text(Task::getTitle)
+            .br().º()
+            .text("Description:").text(Task::getDescription)
+            .br().º()
+            .text("Priority:").text(Task::getPriority);
     Task t2 = new Task(5243, "Unit Test", "Test of element name", Priority.High, Status.Progress);
 
-    Iterator<String> actual = html(taskView2, t2).iterator();
+    List<String> actual = html(taskView2, t2).collect(toList());
+    actual.forEach(System.out::println);
+    Iterator<String> iter = actual.iterator();
     Utils
             .loadLines("testDoWrite.html")
-            .forEach(expected -> assertEquals(expected, actual.next()));
+            .forEach(expected -> assertEquals(expected, iter.next()));
   }
 
 }

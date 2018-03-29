@@ -24,8 +24,6 @@
 package htmlflow.test;
 
 import htmlflow.HtmlView;
-import htmlflow.attribute.AttributeType;
-import htmlflow.elements.ElementType;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
@@ -33,11 +31,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xmlet.htmlapi.AttrClassString;
+import org.xmlet.htmlapi.BaseAttribute;
+import org.xmlet.htmlapi.Body;
+import org.xmlet.htmlapi.EnumRelLinkType;
+import org.xmlet.htmlapi.EnumTypeContentType;
+import org.xmlet.htmlapi.Head;
+import org.xmlet.htmlapi.Html;
+import org.xmlet.htmlapi.Link;
+import org.xmlet.htmlapi.Title;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -74,44 +79,43 @@ public class TestDivDetails {
         HtmlView<?> taskView = new HtmlView<>();
         taskView
                 .head()
-                .title("Task Details")
-                .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
+                .title().text("Task Details").º()
+                .link()
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXT_CSS)
+                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         taskView
-                .body().classAttr("container")
-                .heading(1, "Task Details")
-                .hr()
-                .div()
-                .text("Title: ").text("ISEL MPD project")
-                .br()
-                .text("Description: ").text("A Java library for serializing objects in HTML.")
-                .br()
-                .text("Priority: ").text("HIGH");
+                .body().attrClass("container")
+                .h1().text("Task Details").º()
+                .hr().º()
+                .div().text("Title: ISEL MPD project")
+                .br().º()
+                .text("Description: A Java library for serializing objects in HTML.")
+                .br().º()
+                .text("Priority: HIGH");
         //
         // Produces an HTML file document
         //
-        ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        try (PrintStream out = new PrintStream(mem)) {
-            taskView.setPrintStream(out).write();
-            // System.out.println(mem.toString());
-        }
+        taskView.write();
+        //System.out.println(taskView.toString());
         /*
          * Assert HTML document main structure
          */
-        Element elem = Utils.getRootElement(mem.toByteArray());
-        assertEquals(ElementType.HTML.toString(), elem.getNodeName());
+        Element elem = Utils.getRootElement(taskView.toByteArray());
+        assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        Node head = childNodes.item(1);
-        assertEquals(ElementType.HEAD.toString(), head.getNodeName());
-        Node body = childNodes.item(3);
-        assertEquals(ElementType.BODY.toString(), body.getNodeName());
-        Node bodyClassAttr = body.getAttributes().getNamedItem(AttributeType.CLASS.toString());
+        Node head = childNodes.item(0);
+        assertEquals(Head.class.getSimpleName().toLowerCase(), head.getNodeName());
+        Node body = childNodes.item(2);
+        assertEquals(Body.class.getSimpleName().toLowerCase(), body.getNodeName());
+        Node bodyClassAttr = body.getAttributes().getNamedItem(new AttrClassString("container").getName());
         assertEquals("container", bodyClassAttr.getNodeValue());
         /*
          * Assert HTML Head
          */
         childNodes = head.getChildNodes();
-        assertEquals(ElementType.TITLE.toString(), childNodes.item(1).getNodeName());
-        assertEquals(ElementType.LINK.toString(), childNodes.item(3).getNodeName());
+        assertEquals(Title.class.getSimpleName().toLowerCase(), childNodes.item(1).getNodeName());
+        assertEquals(Link.class.getSimpleName().toLowerCase(), childNodes.item(3).getNodeName());
     }
 
     @Test
@@ -133,20 +137,26 @@ public class TestDivDetails {
         HtmlView<Task> taskView = new HtmlView<>();
         taskView
                 .head()
-                .title("Task Details")
-                .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
+                .title()
+                .text("Task Details").º()
+                .link()
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXT_CSS)
+                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
         taskView
-                .body().classAttr("container")
-                .heading(1, "Task Details")
-                .hr()
+                .body().attrClass("container")
+                .h1()
+                .text("Task Details").º()
+                .hr().º()
                 .div()
-                .text("Title: ").text(Task::getTitle)
-                .br()
-                .text("Description: ").text(Task::getDescription)
-                .br()
-                .text("Priority: ").text(Task::getPriority);
+                .text("Title:").text(Task::getTitle)
+                .br().º()
+                .text("Description:").text(Task::getDescription)
+                .br().º()
+                .text("Priority:").text(Task::getPriority);
         return taskView;
     }
+
     private static class TaskHtml {
         Task t;
         Stream<String> html;

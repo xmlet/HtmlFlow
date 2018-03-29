@@ -24,13 +24,11 @@
 package htmlflow.test;
 
 import htmlflow.HtmlWriter;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
 import java.util.stream.Stream;
 
 /**
@@ -50,12 +49,9 @@ public class Utils {
 
     private Utils() {}
 
-    static Element getRootElement(byte[] input) throws SAXException, IOException, ParserConfigurationException {
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setValidating(false);
-        builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        DocumentBuilder builder = builderFactory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(input));
+    static Element getRootElement(byte[] input) throws UnsupportedEncodingException {
+        W3CDom w3cDom = new W3CDom();
+        Document doc = w3cDom.fromJsoup(Jsoup.parse(new String(input, "UTF-8")));
         return doc.getDocumentElement();
     }
 

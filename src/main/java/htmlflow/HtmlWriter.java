@@ -38,9 +38,7 @@ public interface HtmlWriter<T>{
      * of this element with zero indentation and without a
      * domain object.
      */
-    default void write() {
-        write(0, null);
-    }
+    void write();
     /**
      * Writes into an internal PrintStream the HTML content
      * of this element with initial indentation of zero.
