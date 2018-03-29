@@ -34,9 +34,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xmlet.htmlapi.BaseAttribute;
 import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.EnumEnctypeform;
-import org.xmlet.htmlapi.EnumMethodform;
-import org.xmlet.htmlapi.EnumTypescript;
+import org.xmlet.htmlapi.EnumEnctypeForm;
+import org.xmlet.htmlapi.EnumMethodForm;
+import org.xmlet.htmlapi.EnumTypeScript;
 
 import java.util.Iterator;
 import java.util.List;
@@ -76,7 +76,7 @@ public class TestAttributesClassId {
     taskView
             .head()
             .script()
-            .attrType(EnumTypescript.TEXT_JAVASCRIPT)
+            .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
             .attrSrc("test.css");
     taskView.body()
             .div()
@@ -85,8 +85,8 @@ public class TestAttributesClassId {
             .addAttr(new BaseAttribute("tutu", "toto"))
             .form()
             .attrAction("/action.do")
-            .attrMethod(EnumMethodform.POST)
-            .attrEnctype(EnumEnctypeform.APPLICATION_X_WWW_FORM_URLENCODED);
+            .attrMethod(EnumMethodForm.POST)
+            .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED);
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     List<String> actual = html(taskView, t1).collect(toList());
