@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.fmcarvalho</groupId>
+    <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -10,7 +10,7 @@
         HtmlFlow library purpose is to allow Java applications to easily writing
         HTML documents in a fluent style into a java.io.PrintStream.
     </description>
-    <url>https://github.com/fmcarvalho/HtmlFlow</url>
+    <url>https://github.com/xmlet/HtmlFlow</url>
     <licenses>
         <license>
             <name>MIT license</name>
@@ -26,9 +26,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:fmcarvalho/HtmlFlow.git</connection>
-        <developerConnection>scm:git:git@github.com:fmcarvalho/HtmlFlow.git</developerConnection>
-        <url>git@github.com:fmcarvalho/HtmlFlow.git</url>
+        <connection>scm:git:git@github.com:xmlet/HtmlFlow.git</connection>
+        <developerConnection>scm:git:git@github.com:xmlet/HtmlFlow.git</developerConnection>
+        <url>git@github.com:xmlet/HtmlFlow.git</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>

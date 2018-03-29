@@ -25,14 +25,14 @@ First, in order to include it to your Maven project, simply add this dependency:
 
 ```xml
 <dependency>
-    <groupId>com.github.fmcarvalho</groupId>
+    <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
     <version>2.0</version>
 </dependency>
 ```
 
 You can also download the artifact directly from [Maven
-Central Repository](http://repo1.maven.org/maven2/com/github/fmcarvalho/htmlflow/)
+Central Repository](http://repo1.maven.org/maven2/com/github/xmlet/htmlflow/)
 
 ## Usage
 
@@ -270,7 +270,7 @@ See the `htmlflow.HtmlVisitor` implementation as a guideline.
 
 * Refactor unit tests to increase code coverage and to load the expected HTML output from the resources. 
 * Include HtmlFlow in [SonarCloud.io](https://sonarcloud.io/dashboard?id=com.github.fmcarvalho%3Ahtmlflow) to analyze code quality. 
-* Fix of [Issue 14](https://github.com/fmcarvalho/HtmlFlow/issues/24) -- _Header.txt can't be loaded from resources_.
+* Fix of [Issue 14](https://github.com/xmlet/HtmlFlow/issues/24) -- _Header.txt can't be loaded from resources_.
 
 ### 1.1 (March 23, 2017)
 
@@ -282,4 +282,4 @@ This also solves the #16 Issue.
 
 ## License
 
-[MIT](https://github.com/fmcarvalho/HtmlFlow/blob/master/LICENSE)
+[MIT](https://github.com/xmlet/HtmlFlow/blob/master/LICENSE)
