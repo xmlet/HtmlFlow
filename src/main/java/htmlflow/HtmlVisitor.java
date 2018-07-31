@@ -25,7 +25,6 @@
 package htmlflow;
 
 import org.xmlet.htmlapi.Element;
-import org.xmlet.htmlapi.Text;
 
 import java.io.PrintStream;
 
@@ -48,15 +47,5 @@ public class HtmlVisitor extends HtmlVisitorBinder<Object> {
     @Override
     protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
         elem.getChildren().forEach(item -> item.accept(this));
-    }
-
-    /**
-     * Type parameter R is the type of property in model T.
-     */
-    @Override
-    public <R> void visit(Text<Object, R, ?> text) {
-        out.println();
-        tabs();
-        out.print(text.getValue());
     }
 }

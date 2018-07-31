@@ -25,9 +25,6 @@
 package htmlflow;
 
 import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.Element;
-import org.xmlet.htmlapi.ElementVisitor;
 import org.xmlet.htmlapi.Head;
 import org.xmlet.htmlapi.Html;
 

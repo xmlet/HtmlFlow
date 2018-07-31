@@ -24,13 +24,13 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapi.AbstractElementVisitor;
 import org.xmlet.htmlapi.Area;
 import org.xmlet.htmlapi.Attribute;
 import org.xmlet.htmlapi.Base;
 import org.xmlet.htmlapi.Br;
 import org.xmlet.htmlapi.Col;
 import org.xmlet.htmlapi.Element;
+import org.xmlet.htmlapi.ElementVisitor;
 import org.xmlet.htmlapi.Embed;
 import org.xmlet.htmlapi.Hr;
 import org.xmlet.htmlapi.Img;
@@ -40,6 +40,7 @@ import org.xmlet.htmlapi.Meta;
 import org.xmlet.htmlapi.Param;
 import org.xmlet.htmlapi.Source;
 import org.xmlet.htmlapi.Text;
+import org.xmlet.htmlapi.TextFunction;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -50,7 +51,7 @@ import java.util.List;
  * @author Miguel Gamboa
  *         created on 17-01-2018
  */
-public class HtmlVisitorBinder<T> extends AbstractElementVisitor<T> {
+public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
 
     private static final char BEGIN_TAG = '<';
     private static final char FINISH_TAG = '>';
@@ -90,7 +91,7 @@ public class HtmlVisitorBinder<T> extends AbstractElementVisitor<T> {
     protected final void decTabs() { depth--;}
 
     @Override
-    public final <U extends Element> void visit(Element<U,?> elem) {
+    public final <U extends Element> void sharedVisit(Element<U,?> elem) {
         out.println();
         tabs();
         printOpenTag(out, elem);
@@ -109,6 +110,11 @@ public class HtmlVisitorBinder<T> extends AbstractElementVisitor<T> {
 
     protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
         if(elem.isBound()) {
+            /**
+             * Some binding function append new elements and change the original
+             * parent element. Thus we clone it to preserve its original structure
+             * and guarantee the same behavior on next traversals.
+             */
             List<Element> children = elem.cloneElem().bindTo(model).getChildren();
             children.forEach(item -> item.accept(this));
         } else {
@@ -121,14 +127,23 @@ public class HtmlVisitorBinder<T> extends AbstractElementVisitor<T> {
      * Type parameter R is the type of property in model T.
      */
     @Override
-    public <R> void visit(Text<T, R, ?> text) {
+    public <R> void visit(TextFunction<T, R, ?> text) {
         out.println();
         tabs();
-        // The text element checks whether it has a model binder,
-        // or a constant value.
+        // The text element checks whether it has a model binder.
         // It returns NULL whenever there is NO model binder.
         R val = text.getValue(model);
-        out.print(val != null ? val : text.getValue());
+        out.print(val);
+    }
+
+    /**
+     * An optimized version of Text without binder.
+     */
+    @Override
+    public void visit(Text text) {
+        out.println();
+        tabs();
+        out.print(text.getValue());
     }
 
     /*=========================================================================*/
