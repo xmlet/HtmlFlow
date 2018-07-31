@@ -1,7 +1,8 @@
+# HtmlFlow
 
-[![Build](https://sonarcloud.io/api/badges/gate?key=com.github.fmcarvalho%3Ahtmlflow)](https://sonarcloud.io/dashboard?id=com.github.fmcarvalho%3Ahtmlflow)
-[![Coverage](https://sonarcloud.io/api/badges/measure?key=com.github.fmcarvalho%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=com.github.fmcarvalho%3Ahtmlflow)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.fmcarvalho/htmlflow.svg)](http://search.maven.org/#artifactdetails%7Ccom.github.fmcarvalho%7Chtmlflow%7C1.2%7Cjar)
+[![Build Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.xmlet%3Ahtmlflow)
+[![Maven Central Version](http://img.shields.io/maven-central/v/com.github.xmlet/htmlflow.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
+[![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
 
 HtmlFlow library purpose is to allow Java applications to easily write typesafe
 HTML documents in a fluent style respecting all HTML 5 rules (for example,
