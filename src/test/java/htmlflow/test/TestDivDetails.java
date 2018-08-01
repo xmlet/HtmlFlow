@@ -32,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlet.htmlapi.AttrClassString;
-import org.xmlet.htmlapi.BaseAttribute;
 import org.xmlet.htmlapi.Body;
 import org.xmlet.htmlapi.EnumRelLinkType;
 import org.xmlet.htmlapi.EnumTypeContentType;
@@ -48,7 +47,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.html;
+import static htmlflow.test.Utils.htmlWrite;
+import static htmlflow.test.Utils.htmlRender;
 import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
@@ -96,12 +96,12 @@ public class TestDivDetails {
         //
         // Produces an HTML file document
         //
-        taskView.write();
+        String html = taskView.render();
         //System.out.println(taskView.toString());
         /*
          * Assert HTML document main structure
          */
-        Element elem = Utils.getRootElement(taskView.toByteArray());
+        Element elem = Utils.getRootElement(html.getBytes());
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
         Node head = childNodes.item(0);
@@ -123,7 +123,7 @@ public class TestDivDetails {
         expectedTaskViews
                 .keySet()
                 .stream()
-                .map(task -> TaskHtml.of(task, html(taskDetailsView(), task)))
+                .map(task -> TaskHtml.of(task, htmlWrite(taskDetailsView(), task)))
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
@@ -132,6 +132,19 @@ public class TestDivDetails {
                 });
     }
 
+    @Test
+    public void test_div_details_binding_with_render() {
+        expectedTaskViews
+                .keySet()
+                .stream()
+                .map(task -> TaskHtml.of(task, htmlRender(taskDetailsView(), task)))
+                .forEach(taskHtml -> {
+                    Iterator<String> actual = taskHtml.html.iterator();
+                    expectedTaskViews
+                            .get(taskHtml.t)
+                            .forEach(line -> assertEquals(line, actual.next()));
+                });
+    }
 
     private static HtmlView<Task> taskDetailsView(){
         HtmlView<Task> taskView = new HtmlView<>();

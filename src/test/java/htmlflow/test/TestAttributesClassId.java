@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static htmlflow.test.Utils.html;
+import static htmlflow.test.Utils.htmlWrite;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
@@ -89,7 +89,7 @@ public class TestAttributesClassId {
             .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED);
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
-    List<String> actual = html(taskView, t1).collect(toList());
+    List<String> actual = htmlWrite(taskView, t1).collect(toList());
 
     String result = actual.stream().collect(joining("\n"));
     //System.out.println(result);
@@ -125,7 +125,7 @@ public class TestAttributesClassId {
             .text("Priority:").text(Task::getPriority);
     Task t2 = new Task(5243, "Unit Test", "Test of element name", Priority.High, Status.Progress);
 
-    List<String> actual = html(taskView2, t2).collect(toList());
+    List<String> actual = htmlWrite(taskView2, t2).collect(toList());
     actual.forEach(System.out::println);
     Iterator<String> iter = actual.iterator();
     Utils

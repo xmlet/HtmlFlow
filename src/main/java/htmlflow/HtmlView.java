@@ -71,7 +71,6 @@ public class HtmlView<T> implements HtmlWriter<T>{
     }
 
     private PrintStream out;
-    private ByteArrayOutputStream mem;
     private Html root = new Html();
 
     public Head<Html> head(){
@@ -82,9 +81,20 @@ public class HtmlView<T> implements HtmlWriter<T>{
         return root.body();
     }
 
+    public String render() {
+        StringBuilder sb = new StringBuilder(HEADER);
+        root.accept(new HtmlVisitorStringBuilder(sb));
+        return sb.toString();
+    }
+
+    public String render(T model) {
+        StringBuilder sb = new StringBuilder(HEADER);
+        root.accept(new HtmlVisitorStringBuilderBinder<>(sb, model));
+        return sb.toString();
+    }
+
     @Override
     public void write() {
-        initByteArrayStream();
         out.print(HEADER);
         root.accept(new HtmlVisitor(out));
         closeByteArrayStream();
@@ -92,21 +102,14 @@ public class HtmlView<T> implements HtmlWriter<T>{
 
     @Override
     public final void write(int depth, T model) {
-        initByteArrayStream();
         out.print(HEADER);
         root.accept(new HtmlVisitorBinder<>(out, model));
         closeByteArrayStream();
     }
 
-    private void initByteArrayStream() {
-        if(out == null) {
-            mem = new ByteArrayOutputStream();
-            out = new PrintStream(mem);
-        }
-    }
-
     private void closeByteArrayStream() {
-        if(mem != null) {
+        if(out != null) {
+            out.flush();
             out.close();
             out = null;
         }
@@ -116,16 +119,5 @@ public class HtmlView<T> implements HtmlWriter<T>{
     public HtmlWriter<T> setPrintStream(PrintStream out) {
         this.out = out;
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return mem != null ? mem.toString(): super.toString();
-    }
-
-    public byte[] toByteArray() {
-        if(mem == null)
-            throw new IllegalStateException("There is not internal stream!");
-        return mem.toByteArray();
     }
 }

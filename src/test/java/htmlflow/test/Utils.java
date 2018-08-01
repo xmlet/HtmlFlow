@@ -23,6 +23,7 @@
  */
 package htmlflow.test;
 
+import htmlflow.HtmlView;
 import htmlflow.HtmlWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
@@ -39,6 +40,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -46,6 +48,8 @@ import java.util.stream.Stream;
  * Created on 22-01-2016.
  */
 public class Utils {
+
+    static final Pattern NEWLINE = Pattern.compile("\\n");
 
     private Utils() {}
 
@@ -55,7 +59,7 @@ public class Utils {
         return doc.getDocumentElement();
     }
 
-    static <T> Stream<String> html(HtmlWriter<T> view, T model){
+    static <T> Stream<String> htmlWrite(HtmlWriter<T> view, T model){
         try(
                 ByteArrayOutputStream mem = new ByteArrayOutputStream();
                 PrintStream out = new PrintStream(mem))
@@ -66,6 +70,11 @@ public class Utils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static <T> Stream<String> htmlRender(HtmlView<T> view, T model){
+        String html = view.render(model);
+        return NEWLINE.splitAsStream(html);
     }
 
     static Stream<String> loadLines(String path) {
