@@ -25,6 +25,7 @@
 package htmlflow;
 
 import org.xmlet.htmlapi.Body;
+import org.xmlet.htmlapi.Element;
 import org.xmlet.htmlapi.Head;
 import org.xmlet.htmlapi.Html;
 
@@ -71,13 +72,13 @@ public class HtmlView<T> implements HtmlWriter<T>{
     }
 
     private PrintStream out;
-    private Html root = new Html();
+    private Html<Element> root = new Html<Element>();
 
-    public Head<Html> head(){
+    public Head<Html<Element>> head(){
         return root.head();
     }
 
-    public Body<Html> body(){
+    public Body<Html<Element>> body(){
         return root.body();
     }
 
