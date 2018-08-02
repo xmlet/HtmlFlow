@@ -65,28 +65,32 @@ public class TestAttributesClassId {
 
   @Test
   public void testIdAndClassAttribute() {
-    HtmlView<Task> taskView = new HtmlView<>();
-    assertEquals(
-            DIV_NAME + " element was expected",
-            DIV_NAME,
-            taskView.body().div().getName());
-
     String divClass = "divClass";
     String divId = "divId";
-    taskView
+    HtmlView<Task> taskView = HtmlView.<Task>html()
+            .body()
+                .div()
+                .º() //div
+            .º()//body
             .head()
-            .script()
-            .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
-            .attrSrc("test.css");
-    taskView.body()
-            .div()
-            .attrId(divId)
-            .attrClass(divClass)
-            .addAttr(new BaseAttribute("tutu", "toto"))
-            .form()
-            .attrAction("/action.do")
-            .attrMethod(EnumMethodForm.POST)
-            .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED);
+                .script()
+                    .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
+                    .attrSrc("test.css")
+                .º() //script
+            .º() // head
+            .body()
+                .div()
+                    .attrId(divId)
+                    .attrClass(divClass)
+                    .addAttr(new BaseAttribute("tutu", "toto"))
+                    .form()
+                        .attrAction("/action.do")
+                        .attrMethod(EnumMethodForm.POST)
+                        .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED)
+                    .º() //form
+                .º() //div
+            .º() //body
+        .º(); //html
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     List<String> actual = htmlWrite(taskView, t1).collect(toList());
@@ -110,19 +114,26 @@ public class TestAttributesClassId {
   @Test
   public void testDoWrite() {
 
-    HtmlView<Task> taskView2 = new HtmlView<>();
-
-    taskView2.head().title().text("Task Details");
-    taskView2.body()
+    HtmlView<Task> taskView2 = HtmlView
+    .<Task>html()
+        .head()
+            .title().text("Task Details")
+            .º() //title
+        .º()//head
+        .body()
             .h1().text("Task Details").º()
             .hr().º()
             .div().text("Id:").text(Task::getId)
-            .br().º()
-            .text("Title:").text(Task::getTitle)
-            .br().º()
-            .text("Description:").text(Task::getDescription)
-            .br().º()
-            .text("Priority:").text(Task::getPriority);
+                .br().º()
+                .text("Title:").text(Task::getTitle)
+                .br().º()
+                .text("Description:").text(Task::getDescription)
+                .br().º()
+                .text("Priority:").text(Task::getPriority)
+            .º() //div
+        .º() //body
+    .º(); //html
+
     Task t2 = new Task(5243, "Unit Test", "Test of element name", Priority.High, Status.Progress);
 
     List<String> actual = htmlWrite(taskView2, t2).collect(toList());

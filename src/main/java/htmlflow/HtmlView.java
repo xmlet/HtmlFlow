@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-18, Miguel Gamboa (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,14 @@
 
 package htmlflow;
 
+import org.xmlet.htmlapi.AbstractElement;
 import org.xmlet.htmlapi.Body;
 import org.xmlet.htmlapi.Element;
+import org.xmlet.htmlapi.ElementVisitor;
 import org.xmlet.htmlapi.Head;
 import org.xmlet.htmlapi.Html;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,10 +47,12 @@ import java.util.stream.Collectors;
  * implementation, which is responsible for printing the tree of elements and
  * attributes.
  *
+ * @param <T> The type of domain object bound to this View.
+ *
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlView<T> implements HtmlWriter<T>{
+public class HtmlView<T> extends AbstractElement<HtmlView<T>, Element> implements HtmlWriter<T>{
 
     private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -72,13 +75,26 @@ public class HtmlView<T> implements HtmlWriter<T>{
     }
 
     private PrintStream out;
-    private Html<Element> root = new Html<Element>();
+    private Html<HtmlView<T>> root;
 
-    public Head<Html<Element>> head(){
+    /**
+     * @param <R> The type of domain object bound to the html.
+     */
+    public static <R> HtmlView<R> html(){
+        return new HtmlView<>();
+    }
+
+    public HtmlView() {
+        super("HtmlView");
+        root = new Html<>(this);
+        addChild(root);
+    }
+
+    public Head<Html<HtmlView<T>>> head(){
         return root.head();
     }
 
-    public Body<Html<Element>> body(){
+    public Body<Html<HtmlView<T>>> body(){
         return root.body();
     }
 
@@ -120,5 +136,21 @@ public class HtmlView<T> implements HtmlWriter<T>{
     public HtmlWriter<T> setPrintStream(PrintStream out) {
         this.out = out;
         return this;
+    }
+
+
+    @Override
+    public HtmlView<T> self() {
+        return this;
+    }
+
+    @Override
+    public void accept(ElementVisitor visitor) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HtmlView cloneElem() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -33,7 +33,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlet.htmlapi.Body;
 import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.Element;
 import org.xmlet.htmlapi.EnumRelLinkType;
 import org.xmlet.htmlapi.EnumTypeContentType;
 import org.xmlet.htmlapi.Head;
@@ -53,6 +52,7 @@ import java.util.logging.Logger;
 
 import static htmlflow.test.Utils.htmlWrite;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
 import static junit.framework.Assert.assertEquals;
 
 /**
@@ -100,17 +100,13 @@ public class TestTable {
     @Test
     public void test_table_with_binding() throws ParserConfigurationException, SAXException, IOException{
         /*
-         * Arrange
-         */
-        HtmlView<Iterable<Task>> view = taskTableView();
-        /*
          * Act
          */
         Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High, Status.Progress);
         Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal, Status.Completed);
         Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High, Status.Deferred);
         List<Task> output = Arrays.asList(t1, t2, t3);
-        String html = view.render(output);
+        String html = taskTableView.render(output);
         /*
          * Assert
          */
@@ -119,9 +115,8 @@ public class TestTable {
 
     @Test
     public void test_table_binding_for_readme_twice() throws IOException, ParserConfigurationException, SAXException {
-        HtmlView<Iterable<Task>> taskView = taskListView();
-        validateBindingTable(taskView);
-        validateBindingTable(taskView);
+        validateBindingTable(taskListView);
+        validateBindingTable(taskListView);
     }
 
     static void validateBindingTable(HtmlView<Iterable<Task>> taskView){
@@ -138,79 +133,83 @@ public class TestTable {
                 .forEach(expected -> assertEquals(expected, iter.next()));
 
     }
-    private static HtmlView<Iterable<Task>> taskListView(){
-        HtmlView<Iterable<Task>> view = new HtmlView<>();
-        view
-            .head().title().text("Task List").º()
+
+    final static HtmlView<Iterable<Task>> taskListView = HtmlView
+        .<Iterable<Task>>html()
+            .head()
+                .title()
+                    .text("Task List")
+                    .º()
                 .link()
-                .attrRel(EnumRelLinkType.STYLESHEET)
-                .attrType(EnumTypeContentType.TEXT_CSS)
-                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+                    .attrRel(EnumRelLinkType.STYLESHEET)
+                    .attrType(EnumTypeContentType.TEXT_CSS)
+                    .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
                 .º()
             .º()
             .body()
+                .attrClass("container")
                 .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").º()
                 .p().text("Html page built with HtmlFlow.").º()
-                .attrClass("container")
                 .h1().text("Task List").º()
                 .hr().º()
                 .div()
                     .table()
-                    .attrClass("table")
+                        .attrClass("table")
                         .tr()
                             .th().text("Title").º()
                             .th().text("Description").º()
                             .th().text("Priority").º()
                         .º()
-                        // table.trFromIterable(Task::getTitle, Task::getDescription, Task::getPriority);
-                        .<List<Task>>binder((tbl, list) -> {
+                        // prior version 2.0: table.trFromIterable(Task::getTitle, Task::getDescription, Task::getPriority);
+                        .<Iterable<Task>>binder((tbl, list) -> {
                             list.forEach(task -> {
-                                tbl.tr()
-                                    .td().text(task.getTitle()).º()
-                                    .td().text(task.getDescription()).º()
-                                    .td().text(task.getPriority().toString());
+                                tbl
+                                    .tr()
+                                        .td().text(task.getTitle()).º()
+                                        .td().text(task.getDescription()).º()
+                                        .td().text(task.getPriority().toString()).º()
+                                    .º(); // tr
                             });
-                        }).º()
-                    .º()
-                .º();
-        return view;
-    }
+                        })
+                    .º() // table
+                .º() // div
+            .º() // body
+        .º(); // html
 
-    private static HtmlView<Iterable<Task>> taskTableView(){
-        HtmlView<Iterable<Task>> view = new HtmlView<>();
-        view
-                .head()
-                .title()
-                .text("Dummy Table");
-
-        view.body()
-            .h1()
-            .text("Dummy Table")
-            .º()
-            .hr()
-            .º()
-            .div()
-            .table()
-                .tr()
-                    .th().text("Title").º()
-                    .th().text("Description").º()
-                    .th().text("Priority").º()
+    final static HtmlView<Iterable<Task>> taskTableView = HtmlView
+        .<Iterable<Task>>html()
+            .head()
+                .title().text("Dummy Table")
                 .º()
-                /*
-                 * Adds a dynamic Tr, which creates new Tr elements for each item
-                 * contained in the model received as argument of the write method.
-                 */
-                // t.trFromIterable(binderGetTitle(), binderGetDescription(), binderGetPriority());
-                .<List<Task>>binder((tbl, list) -> {
-                    list.forEach(item -> {
-                        tbl.tr()
-                                .td().text(item.getTitle()).º()
-                                .td().text(item.getDescription()).º()
-                                .td().text(item.getPriority().toString());
-                    });
-                });
-        return view;
-    }
+            .º()
+            .body()
+                .h1().text("Dummy Table").º()
+                .hr().º()
+                .div()
+                    .table()
+                        .tr()
+                            .th().text("Title").º()
+                            .th().text("Description").º()
+                            .th().text("Priority").º()
+                        .º() // tr
+                        /*
+                         * Adds a dynamic Tr, which creates new Tr elements for each item
+                         * contained in the model received as argument of the write method.
+                         */
+                        // t.trFromIterable(binderGetTitle(), binderGetDescription(), binderGetPriority());
+                        .<Iterable<Task>>binder((tbl, list) -> {
+                            list.forEach(item -> {
+                                tbl.tr()
+                                    .td().text(item.getTitle()).º()
+                                    .td().text(item.getDescription()).º()
+                                    .td().text(item.getPriority().toString());
+                            });
+                        })
+                    .º() // table
+                .º() // div
+            .º() // body
+        .º(); // html
+
     private static void assertTaskHtmlView(byte[] html, List<Task> output) throws UnsupportedEncodingException {
         org.w3c.dom.Element elem = Utils.getRootElement(html);
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
@@ -245,33 +244,46 @@ public class TestTable {
     }
 
     private static HtmlView<?> simpleTableView(int[][] output){
-        HtmlView<?> view = new HtmlView();
-        view
-                .head()
-                .title()
-                .text("Dummy Table");
-
-        Table t = view.body()
+        Table<Div<Body<Html<HtmlView<Object>>>>> t = HtmlView.html()
+            .head()
+                .title().text("Dummy Table")
+                .º()// title
+            .º()// head
+            .body()
                 .h1().text("Dummy Table").º()
                 .hr().º()
                 .div()
-                .table();
-
-        Tr headerRow = t.tr();
-        headerRow.th().text("Id1");
-        headerRow.th().text("Id2");
-        headerRow.th().text("Id3");
-        /*
-         * Act
-         */
-        for (int i = 0; i < output.length; i++) {
-            Tr tr = t.tr();
-            for (int j = 0; j < output[i].length; j++) {
-                tr.td().text(Integer.toString(output[i][j]));
-            }
-        }
-        return view;
+                    .table()
+                        .tr()
+                            .th().text("Id1").º()
+                            .th().text("Id2").º()
+                            .th().text("Id3").º()
+                        .º();//tr
+        range(0, output.length)
+            .mapToObj(i -> pair(i, t.tr()))
+            .forEach(p -> range(0, output.length).forEach(j -> {
+                p.tr.td().text(Integer.toString(output[p.i][j]));
+            }));
+        return t
+                    .º() //table
+                .º() //div
+            .º() //body
+        .º();//html
     }
+
+    static class Pair {
+        final int i;
+        final Tr<Table<Div<Body<Html<HtmlView<Object>>>>>> tr;
+
+            public Pair(int i, Tr<Table<Div<Body<Html<HtmlView<Object>>>>>> tr) {
+            this.i = i;
+            this.tr = tr;
+        }
+    }
+    private static Pair pair(int i, Tr<Table<Div<Body<Html<HtmlView<Object>>>>>> tr) {
+        return new Pair(i, tr);
+    }
+
     private static void assertSimpleHtmlView(byte[] html, int[][] output) throws UnsupportedEncodingException {
         org.w3c.dom.Element elem = Utils.getRootElement(html);
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
