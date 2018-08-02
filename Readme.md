@@ -28,7 +28,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
 </dependency>
 ```
 
@@ -70,12 +70,13 @@ final static HtmlView viewDetails = HtmlView
     .º(); //html
 ```
 
-From the previous `viewDetails` view you can get the resulting HTML in different ways:
-1) get the resulting `String` through its `render()` method or 2) directly
+From the previous `viewDetails` view you can get the resulting HTML in different 
+ways: 1) get the resulting `String` through its `render()` method or 2) directly
 write to any `Printstream` such as `System.out` or 3) or any other `PrintStream` chain
 such as `new PrintStream(new FileOutputStream(path)`. **NOTE**: `PrintStream` is not
 buffered, so you may need to interleave a `BufferedOutputStream` object to improve
-performance, whereas `render()` internally uses a `StringBuilder` which shows better speedup.
+performance. On the other hand `render()` internally uses a `StringBuilder` which
+shows better speedup.
 
 ```java
 String html = viewDetails.render(); // 1) Get a string with the HTML
