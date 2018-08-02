@@ -49,6 +49,9 @@ public class HtmlTags {
     static final char EQUALS = '=';
     static final char SLASH = '/';
 
+    private HtmlTags() {
+    }
+
     /**
      * According to https://www.w3.org/TR/html5/syntax.html#void-elements
      */
