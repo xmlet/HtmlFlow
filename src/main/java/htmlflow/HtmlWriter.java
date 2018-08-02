@@ -29,6 +29,8 @@ import java.io.PrintStream;
 /**
  * Writes HTML content into a {@link java.io.PrintStream}.
  *
+ * @param <T> The type of domain object bound to this View.
+ *
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
