@@ -41,11 +41,7 @@ import org.xmlet.htmlapi.Link;
 import org.xmlet.htmlapi.Title;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,35 +74,12 @@ public class TestDivDetails {
                 ));
     }
 
-    final static HtmlView viewDetails = HtmlView
-        .html()
-            .head()
-                .title().text("Task Details").º()
-                .link()
-                    .attrRel(EnumRelLinkType.STYLESHEET)
-                    .attrType(EnumTypeContentType.TEXT_CSS)
-                    .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-                .º() //link
-            .º() //head
-            .body()
-                .attrClass("container")
-                .h1().text("Task Details").º()
-                .hr().º()
-                .div().text("Title: ISEL MPD project")
-                    .br().º()
-                    .text("Description: A Java library for serializing objects in HTML.")
-                    .br().º()
-                    .text("Priority: HIGH")
-                .º() //div
-            .º() //body
-        .º(); //html
-
     @Test
-    public void test_div_details_without_binding() throws IOException, ParserConfigurationException, SAXException {
+    public void testDivDetailsWithoutBinding() throws IOException, ParserConfigurationException, SAXException {
         //
         // Produces an HTML document
         //
-        String html = viewDetails.render(); // 1) Get a string with the HTML
+        String html = HtmlLists.viewDetails.render(); // 1) Get a string with the HTML
         /*
         viewDetails
             .setPrintStream(System.out)
@@ -137,11 +110,11 @@ public class TestDivDetails {
     }
 
     @Test
-    public void test_div_details_binding() throws IOException, ParserConfigurationException, SAXException {
+    public void testDivDetailsBinding() throws IOException, ParserConfigurationException, SAXException {
         expectedTaskViews
                 .keySet()
                 .stream()
-                .map(task -> TaskHtml.of(task, htmlWrite(taskDetailsView, task)))
+                .map(task -> TaskHtml.of(task, htmlWrite(HtmlLists.taskDetailsView, task)))
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
@@ -151,11 +124,11 @@ public class TestDivDetails {
     }
 
     @Test
-    public void test_div_details_binding_with_render() {
+    public void testDivDetailsBindingWithRender() {
         expectedTaskViews
                 .keySet()
                 .stream()
-                .map(task -> TaskHtml.of(task, htmlRender(taskDetailsView, task)))
+                .map(task -> TaskHtml.of(task, htmlRender(HtmlLists.taskDetailsView, task)))
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
@@ -163,30 +136,6 @@ public class TestDivDetails {
                             .forEach(line -> assertEquals(line, actual.next()));
                 });
     }
-
-    final static HtmlView<Task> taskDetailsView = HtmlView
-        .<Task>html()
-            .head()
-                .title().text("Task Details").º()
-                .link()
-                    .attrRel(EnumRelLinkType.STYLESHEET)
-                    .attrType(EnumTypeContentType.TEXT_CSS)
-                    .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-                .º() //link
-            .º() //head
-            .body()
-                .attrClass("container")
-                .h1().text("Task Details").º()
-                .hr().º()
-                .div()
-                    .text("Title:").text(Task::getTitle)
-                    .br().º()
-                    .text("Description:").text(Task::getDescription)
-                    .br().º()
-                    .text("Priority:").text(Task::getPriority)
-                .º() // div
-            .º() //body
-        .º(); // html
 
     private static class TaskHtml {
         Task t;
