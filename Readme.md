@@ -19,8 +19,8 @@ the set of accepted values.
 Finally, HtmlFlow also supports *data binders* that enable the same HTML view to
 be bound with different object models.
 
-[Get started](getting-started) or check our examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java)
-and [HtmlLists](src/test/java/htmlflow/test/HtmlLists.java). 
+[Get started](#getting-started) or check our examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java)
+and [HtmlLists](src/test/java/htmlflow/test/HtmlLists.java).
 
 ## Installation
 
@@ -252,12 +252,13 @@ Yet, it does not support `accept(ElementVisitor visitor)` nor `cloneElem()`.
 * Fix `Html root` field definition in `HtmlView` to include the generic parent as `Html<HtmlView>`
 and add it as child of that `HtmlView`.
 
-* New static factory method `html()` used to start build a `HtmlView`.
+* New static factory method `html()` used to start building a `HtmlView`.
 
 * All these features together with the existing `º()` make possible to build a view in a single
 pass, reducing the number of auxiliary variables capturing intermediate elements.
-Now all the views of the examples of this `README.md` are built in static fields assignment.  
-
+Now all the views of the examples of this `README.md` are built in static fields assignment.
+More usage examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java) and
+[HtmlLists](src/test/java/htmlflow/test/HtmlLists.java).
 
 ### 2.0 (March, 2018)
 
