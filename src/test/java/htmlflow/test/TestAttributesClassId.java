@@ -32,11 +32,7 @@ import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlet.htmlapi.BaseAttribute;
 import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.EnumEnctypeForm;
-import org.xmlet.htmlapi.EnumMethodForm;
-import org.xmlet.htmlapi.EnumTypeScript;
 
 import java.util.Iterator;
 import java.util.List;
@@ -65,42 +61,16 @@ public class TestAttributesClassId {
 
   @Test
   public void testIdAndClassAttribute() {
-    String divClass = "divClass";
-    String divId = "divId";
-    HtmlView<Task> taskView = HtmlView.<Task>html()
-            .body()
-                .div()
-                .º() //div
-            .º()//body
-            .head()
-                .script()
-                    .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
-                    .attrSrc("test.css")
-                .º() //script
-            .º() // head
-            .body()
-                .div()
-                    .attrId(divId)
-                    .attrClass(divClass)
-                    .addAttr(new BaseAttribute("tutu", "toto"))
-                    .form()
-                        .attrAction("/action.do")
-                        .attrMethod(EnumMethodForm.POST)
-                        .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED)
-                    .º() //form
-                .º() //div
-            .º() //body
-        .º(); //html
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
-    List<String> actual = htmlWrite(taskView, t1).collect(toList());
+    List<String> actual = htmlWrite(HtmlLists.taskView, t1).collect(toList());
 
     String result = actual.stream().collect(joining("\n"));
     //System.out.println(result);
     assertTrue(result.contains("<div"));
     assertTrue(result.contains("</div>"));
-    assertTrue(result.contains(divClass));
-    assertTrue(result.contains(divId));
+    assertTrue(result.contains(HtmlLists.divClass));
+    assertTrue(result.contains(HtmlLists.divId));
     assertTrue(result.contains("toto=\"tutu\""));
     assertTrue("should contains <script type=\"text/javascript\" src=\"test.css\">",
               result.contains("<script type=\"text/javascript\" src=\"test.css\">"));
@@ -110,38 +80,4 @@ public class TestAttributesClassId {
             .loadLines("testIdAndClassAttribute.html")
             .forEach(expected -> assertEquals(expected, iter.next()));
   }
-  
-  @Test
-  public void testDoWrite() {
-
-    HtmlView<Task> taskView2 = HtmlView
-    .<Task>html()
-        .head()
-            .title().text("Task Details")
-            .º() //title
-        .º()//head
-        .body()
-            .h1().text("Task Details").º()
-            .hr().º()
-            .div().text("Id:").text(Task::getId)
-                .br().º()
-                .text("Title:").text(Task::getTitle)
-                .br().º()
-                .text("Description:").text(Task::getDescription)
-                .br().º()
-                .text("Priority:").text(Task::getPriority)
-            .º() //div
-        .º() //body
-    .º(); //html
-
-    Task t2 = new Task(5243, "Unit Test", "Test of element name", Priority.High, Status.Progress);
-
-    List<String> actual = htmlWrite(taskView2, t2).collect(toList());
-    actual.forEach(System.out::println);
-    Iterator<String> iter = actual.iterator();
-    Utils
-            .loadLines("testDoWrite.html")
-            .forEach(expected -> assertEquals(expected, iter.next()));
-  }
-
 }
