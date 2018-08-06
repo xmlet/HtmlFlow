@@ -1,15 +1,14 @@
 # HtmlFlow
 
 [![Build Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.xmlet%3Ahtmlflow)
-[![Maven Central Version](http://img.shields.io/maven-central/v/com.github.xmlet/htmlflow.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
+[![Maven Central Version](https://maven-badges.herokuapp.com/maven-central/com.github.xmlet/htmlflow/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
 
 HtmlFlow library purpose is to allow Java applications to easily write typesafe
-HTML documents in a fluent style respecting all HTML 5 rules (for example,
-`h1().div()` gives a compilation error because it goes against the content
-allowed by a `h1` element according to HTML specification).  
-So, whenever you type `.` after an element the intelissense will just suggest
-the set of allowed elements and attributes.
+HTML documents in a fluent style respecting all HTML 5 rules (e.g. `h1().div()`
+gives a compilation error because it goes against the content
+allowed by `h1` according to HTML5). So, whenever you type `.` after an element
+the intelissense will just suggest the set of allowed elements and attributes.
 
 The HtmlFlow API is according to HTML5 and is generated with the support
 of an automated framework ([xmlet](https://github.com/xmlet/)) based on an [XSD
@@ -19,6 +18,9 @@ Thus, all attributes are strongly typed with enumerated types which restrict
 the set of accepted values.
 Finally, HtmlFlow also supports *data binders* that enable the same HTML view to
 be bound with different object models.
+
+[Get started](getting-started) or check our examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java)
+and [HtmlLists](src/test/java/htmlflow/test/HtmlLists.java). 
 
 ## Installation
 
@@ -73,7 +75,7 @@ final static HtmlView viewDetails = HtmlView
 From the previous `viewDetails` view you can get the resulting HTML in different 
 ways: 1) get the resulting `String` through its `render()` method or 2) directly
 write to any `Printstream` such as `System.out` or 3) or any other `PrintStream` chain
-such as `new PrintStream(new FileOutputStream(path)`. **NOTE**: `PrintStream` is not
+such as `new PrintStream(new FileOutputStream(path))`. **NOTE**: `PrintStream` is not
 buffered, so you may need to interleave a `BufferedOutputStream` object to improve
 performance. On the other hand `render()` internally uses a `StringBuilder` which
 shows better speedup.
@@ -237,7 +239,7 @@ public class App {
 ### 2.1 (August, 2018)
 
 HtmlFlow version 2.1 was updated to release 1.0.10 of `com.github.xmlet.HtmlApi` and
-introduces a couple of new fetaures:
+introduces a couple of new features:
 
 * New `render()` which produces a `String` rather then writing to a `PrintStream`.
 This `render()` uses internally a `StringBuilder` and shows better performance
