@@ -33,10 +33,12 @@ import htmlflow.test.model.Task;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlet.htmlapi.BaseAttribute;
+import org.xmlet.htmlapi.Body;
 import org.xmlet.htmlapi.Div;
 import org.xmlet.htmlapi.EnumEnctypeForm;
 import org.xmlet.htmlapi.EnumMethodForm;
 import org.xmlet.htmlapi.EnumTypeScript;
+import org.xmlet.htmlapi.Html;
 
 import java.util.Iterator;
 import java.util.List;
@@ -78,7 +80,9 @@ public class TestAttributesClassId {
                     .attrSrc("test.css")
                 .º() //script
             .º() // head
-            .body()
+            .<Body<Html<HtmlView<Task>>>>find(elem -> elem instanceof Body)
+            .findFirst() // get previously created body
+            .get()
                 .div()
                     .attrId(divId)
                     .attrClass(divClass)
