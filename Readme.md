@@ -1,14 +1,14 @@
+# HtmlFlow
 
-[![Build](https://sonarcloud.io/api/badges/gate?key=com.github.fmcarvalho%3Ahtmlflow)](https://sonarcloud.io/dashboard?id=com.github.fmcarvalho%3Ahtmlflow)
-[![Coverage](https://sonarcloud.io/api/badges/measure?key=com.github.fmcarvalho%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=com.github.fmcarvalho%3Ahtmlflow)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.fmcarvalho/htmlflow.svg)](http://search.maven.org/#artifactdetails%7Ccom.github.fmcarvalho%7Chtmlflow%7C1.2%7Cjar)
+[![Build Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.xmlet%3Ahtmlflow)
+[![Maven Central Version](https://maven-badges.herokuapp.com/maven-central/com.github.xmlet/htmlflow/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
+[![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
 
 HtmlFlow library purpose is to allow Java applications to easily write typesafe
-HTML documents in a fluent style respecting all HTML 5 rules (for example,
-`h1().div()` gives a compilation error because that would place a `div` inside
-an `h1` which is not allowed in HTML).
-So, whenever we write `.` after an element the intelissense will just suggest
-the set of allowed elements and attributes.
+HTML documents in a fluent style respecting all HTML 5 rules (e.g. `h1().div()`
+gives a compilation error because it goes against the content
+allowed by `h1` according to HTML5). So, whenever you type `.` after an element
+the intelissense will just suggest the set of allowed elements and attributes.
 
 The HtmlFlow API is according to HTML5 and is generated with the support
 of an automated framework ([xmlet](https://github.com/xmlet/)) based on an [XSD
@@ -19,6 +19,9 @@ the set of accepted values.
 Finally, HtmlFlow also supports *data binders* that enable the same HTML view to
 be bound with different object models.
 
+[Get started](#getting-started) or check our examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java)
+and [HtmlLists](src/test/java/htmlflow/test/HtmlLists.java).
+
 ## Installation
 
 First, in order to include it to your Maven project, simply add this dependency:
@@ -27,194 +30,235 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
 </dependency>
 ```
 
 You can also download the artifact directly from [Maven
 Central Repository](http://repo1.maven.org/maven2/com/github/xmlet/htmlflow/)
 
-## Usage
+## Getting started
 
 All methods return the created element, except `text()` which returns
 the element containing the text node (the `this`).
 There is also a method `º()` which returns the parent element.   
-Next we present an example withOUT model binding (move forward to check
+Next we present an example building a static view (move forward to check
 further examples with data binding):
 
-``` java
+```java
 import htmlflow.HtmlView;
 
-import java.awt.Desktop;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URI;
-
-public class App {
-    public static void main(String [] args) throws IOException {
-        //
-        // Creates and setup an HtmlView object for task details
-        //
-        HtmlView<?> taskView = new HtmlView<>();
-        taskView
-            .head()
+final static HtmlView viewDetails = HtmlView
+    .html()
+        .head()
             .title().text("Task Details").º()
             .link()
-            .attrRel(Enumrel.STYLESHEET)
-            .attrType(Enumtype.TEXT_CSS)
-            .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
-        taskView
-            .body().attrClass("container")
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXT_CSS)
+                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+            .º() //link
+        .º() //head
+        .body()
+            .attrClass("container")
             .h1().text("Task Details").º()
             .hr().º()
             .div().text("Title: ISEL MPD project")
-            .br().º()
-            .text("Description: A Java library for serializing objects in HTML.")
-            .br().º()
-            .text("Priority: HIGH");
-        //
-        // Produces an HTML file document
-        //
-        try(PrintStream out = new PrintStream(new FileOutputStream("Task.html"))){
-            taskView.setPrintStream(out).write();
-            Desktop.getDesktop().browse(URI.create("Task.html"));
-        }
-    }
-}
+                .br().º()
+                .text("Description: A Java library for serializing objects in HTML.")
+                .br().º()
+                .text("Priority: HIGH")
+            .º() //div
+        .º() //body
+    .º(); //html
 ```
 
-In the following we present an example binding the same view to different domain 
-objects of the same type.
-To that end, consider a Java class `Task` with three properties: `Title`, 
-`Description` and a `Priority`, then we can produce several HTML documents
-in the following way:
+From the previous `viewDetails` view you can get the resulting HTML in different 
+ways: 1) get the resulting `String` through its `render()` method or 2) directly
+write to any `Printstream` such as `System.out` or 3) or any other `PrintStream` chain
+such as `new PrintStream(new FileOutputStream(path))`. **NOTE**: `PrintStream` is not
+buffered, so you may need to interleave a `BufferedOutputStream` object to improve
+performance. On the other hand `render()` internally uses a `StringBuilder` which
+shows better speedup.
+
+```java
+String html = viewDetails.render(); // 1) Get a string with the HTML
+viewDetails
+    .setPrintStream(System.out)
+    .write();                       // 2) print to the standard output
+viewDetails
+    .setPrintStream(new PrintStream(new FileOutputStream("details.html")))
+    .write();                       // 3) write to details.html file
+
+Desktop.getDesktop().browse(URI.create("details.html"));
+```
+
+Regardless the output approach you will get the same formatted HTML document:
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Task Details
+		</title>
+		<link rel="Stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	</head>
+	<body class="container">
+		<h1>
+			Task Details
+		</h1>
+		<hr>
+		<div>
+			Title: ISEL MPD project
+			<br>
+			Description: A Java library for serializing objects in HTML.
+			<br>
+			Priority: HIGH
+		</div>
+	</body>
+</html>
+``` 
+
+## Dynamic Views
+
+Next we present an example binding the same view to different domain 
+objects of the same type i.e. `Task`, which has three properties: `Title`,
+`Description` and a `Priority`.
+Given the dynamic view `taskDetailsView` we can bind this same view with different 
+object models producing several HTML documents.
+In the following example we bind three different `Task` instances with `taskDetailsView`
+to produce three HTML documents: `task3.html`,`task4.html` and `task5.html`.     
 
 
 ``` java
-import htmlflow.HtmlView;
-
-import model.Priority;
-import model.Task;
-
-import java.awt.Desktop;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URI;
-import java.util.Arrays;
-
+final static HtmlView<Task> taskDetailsView = HtmlView
+    .<Task>html()
+        .head()
+            .title().text("Task Details").º()
+            .link()
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXT_CSS)
+                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+            .º() //link
+        .º() //head
+        .body()
+            .attrClass("container")
+            .h1().text("Task Details").º()
+            .hr().º()
+            .div()
+                .text("Title:").text(Task::getTitle)
+                .br().º()
+                .text("Description:").text(Task::getDescription)
+                .br().º()
+                .text("Priority:").text(Task::getPriority)
+            .º() // div
+        .º() //body
+    .º(); // html
+        
 public class App {
 
-    public static void main(String [] args) throws IOException {
-        HtmlView<Task> taskView = taskDetailsView();
-        Task [] dataSource = {
-            new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-            new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
-            new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
-        };
-        Arrays
-            .stream(dataSource)
-            .forEach(task -> printHtml(taskView, task, "task" + task.getId() + ".html"));
+    public static void main(String [] args) {
+        Stream.of(
+            new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+            new Task(4, "Special dinner", "Have dinner with someone!", Priority.Normal),
+            new Task(5, "Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+        )
+        .forEach(task -> {
+            String path = "task" + task.getId() + ".html";
+            printHtml(path);
+        });
     }
-    private static <T> void printHtml(HtmlView<T> html, T model, String path) throws IOException {{
+    
+    private static <T> void printHtml(HtmlView<T> html, T model, String path) {
         try(PrintStream out = new PrintStream(new FileOutputStream(path))){
             html.setPrintStream(out).write(model);
             Desktop.getDesktop().browse(URI.create(path));
         }
     }
-    
-    private static HtmlView<Task> taskDetailsView(){
-        HtmlView<Task> taskView = new HtmlView<>();
-        taskView
-            .head()
-            .title().text("Task Details").º()
-            .link()
-            .attrRel(Enumrel.STYLESHEET)
-            .attrType(Enumtype.TEXT_CSS)
-            .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
-        taskView
-            .body().attrClass("container")
-            .h1()
-            .text("Task Details").º()
-            .hr().º()
-            .div()
-            .text("Title:").text(Task::getTitle)
-            .br().º()
-            .text("Description:").text(Task::getDescription)
-            .br().º()
-            .text("Priority:").text(Task::getPriority);
-        return taskView;
-    }
 }
 ```
 
-Finally, an example of producing an HTML table binding to a list of tasks:
+Finally, an example of a dynamic HTML table binding to a list of tasks:
 
 ``` java
-import htmlflow.HtmlView;
-import htmlflow.elements.HtmlTable;
-import htmlflow.elements.HtmlTr;
-
-import model.Priority;
-import model.Task;
-
-import java.awt.Desktop;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
+final static HtmlView<Iterable<Task>> taskListView = HtmlView
+    .<Iterable<Task>>html()
+        .head()
+            .title()
+                .text("Task List")
+                .º()
+            .link()
+                .attrRel(EnumRelLinkType.STYLESHEET)
+                .attrType(EnumTypeContentType.TEXT_CSS)
+                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+            .º()
+        .º()
+        .body()
+            .attrClass("container")
+            .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").º()
+            .p().text("Html page built with HtmlFlow.").º()
+            .h1().text("Task List").º()
+            .hr().º()
+            .div()
+                .table()
+                    .attrClass("table")
+                    .tr()
+                        .th().text("Title").º()
+                        .th().text("Description").º()
+                        .th().text("Priority").º()
+                    .º()
+                    // prior version 2.0: table.trFromIterable(Task::getTitle, Task::getDescription, Task::getPriority);
+                    .<Iterable<Task>>binder((tbl, list) -> {
+                        list.forEach(task -> {
+                            tbl.tr()
+                                .td().text(task.getTitle()).º()
+                                .td().text(task.getDescription()).º()
+                                .td().text(task.getPriority().toString()).td().text(task.getPriority().toString()).º()
+                            .º(); // tr
+                        });
+                    })
+                .º() // table
+            .º() // div
+        .º() // body
+    .º(); // html
 
 public class App {
-
-    public static void main(String [] args)  throws IOException {
-        HtmlView<Iterable<Task>>  taskView = taskListView();
-        List<Task> dataSource = Arrays.asList(
+    public static void main(String [] args)  {
+        List<Task> model = Arrays.asList(
                 new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
-        try(PrintStream out = new PrintStream(new FileOutputStream("TaskList.html"))){
-            taskView.setPrintStream(out).write(dataSource);
-            Desktop.getDesktop().browse(URI.create("TaskList.html"));
-        }
-    }
-    private static HtmlView<Iterable<Task>> taskListView(){
-        HtmlView<Iterable<Task>> taskView = new HtmlView<Iterable<Task>>();
-        taskView
-           .head().title().text("Task List").º()
-           .link()
-           .attrRel(Enumrel.STYLESHEET)
-           .attrType(Enumtype.TEXT_CSS)
-           .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
-        Table<Div<Body<Html>>> table = taskView
-            .body().attrClass("container")
-            .h1().text("Task List").º()
-            .hr().º()
-            .div()
-            .table()
-            .attrClass("table")
-            .tr()
-              .th().text("Title").º()
-              .th().text("Description").º()
-              .th().text("Priority").º()
-            .º();
-       table.<List<Task>>binder((tbl, list) -> {
-           list.forEach(task -> {
-               tbl.tr()
-                       .td().text(task.getTitle()).º()
-                       .td().text(task.getDescription()).º()
-                       .td().text(task.getPriority().toString());
-           });
-       });
-        return taskView;
+        String htmlTable = taskListView.render(model);
     }
 }
 ```
 
 ## Changelog
+
+### 2.1 (August, 2018)
+
+HtmlFlow version 2.1 was updated to release 1.0.10 of `com.github.xmlet.HtmlApi` and
+introduces a couple of new features:
+
+* New `render()` which produces a `String` rather then writing to a `PrintStream`.
+This `render()` uses internally a `StringBuilder` and shows better performance
+than the `write()` approach.
+
+* To allow `HtmlView` being a parent element of `Html` we made `HtmlView<T>` extend
+`AbstractElement<HtmlView<T>, Element>` and turn it compatible with `Element`. 
+Yet, it does not support `accept(ElementVisitor visitor)` nor `cloneElem()`.
+
+* Fix `Html root` field definition in `HtmlView` to include the generic parent as `Html<HtmlView>`
+and add it as child of that `HtmlView`.
+
+* New static factory method `html()` used to start building a `HtmlView`.
+
+* All these features together with the existing `º()` make possible to build a view in a single
+pass, reducing the number of auxiliary variables capturing intermediate elements.
+Now all the views of the examples of this `README.md` are built in static fields assignment.
+More usage examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java) and
+[HtmlLists](src/test/java/htmlflow/test/HtmlLists.java).
 
 ### 2.0 (March, 2018)
 

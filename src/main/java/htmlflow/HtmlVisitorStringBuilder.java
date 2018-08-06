@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,6 @@ package htmlflow;
 
 import org.xmlet.htmlapi.Element;
 
-import java.io.PrintStream;
-
 /**
  * An optimized version of HtmlVisitorBinder which suppresses the binder check
  * on traversal of children elements.
@@ -36,16 +34,15 @@ import java.io.PrintStream;
  * Since it does not have a model, then it has no object to pass to the binders.
  *
  * @author Miguel Gamboa
- *         created on 17-01-2018
  */
-public class HtmlVisitor extends HtmlVisitorBinder<Object> {
-
-    public HtmlVisitor(PrintStream out) {
-        super(out, null);
+public class HtmlVisitorStringBuilder extends HtmlVisitorStringBuilderBinder<Object> {
+    public HtmlVisitorStringBuilder(StringBuilder sb) {
+        super(sb, null);
     }
 
     @Override
     protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
         elem.getChildren().forEach(item -> item.accept(this));
     }
+
 }

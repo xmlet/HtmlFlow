@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import org.xmlet.htmlapi.ElementVisitor;
 import org.xmlet.htmlapi.Text;
 import org.xmlet.htmlapi.TextFunction;
 
-import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -38,14 +37,16 @@ import java.util.List;
  * @author Miguel Gamboa
  *         created on 17-01-2018
  */
-public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
+public class HtmlVisitorStringBuilderBinder<T> extends ElementVisitor<T> {
 
-    protected final PrintStream out;
+    static final char NEWLINE = '\n';
+
+    protected final StringBuilder sb;
     protected final T model;
     private int depth;
 
-    public HtmlVisitorBinder(PrintStream out, T model) {
-        this.out = out;
+    public HtmlVisitorStringBuilderBinder(StringBuilder sb, T model) {
+        this.sb = sb;
         this.model = model;
     }
 
@@ -54,16 +55,16 @@ public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
 
     @Override
     public final <U extends Element> void sharedVisit(Element<U,?> elem) {
-        out.println();
+        sb.append(NEWLINE);
         tabs();
-        HtmlTags.printOpenTag(out, elem);
+        HtmlTags.appendOpenTag(sb, elem);
         incTabs();
         visitChildrem(elem);
         decTabs();
         if(HtmlTags.isVoidElement(elem)) return;
-        out.println();
+        sb.append(NEWLINE);
         tabs();
-        HtmlTags.printCloseTag(out, elem);
+        HtmlTags.appendCloseTag(sb, elem);
     }
 
     protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
@@ -86,12 +87,12 @@ public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
      */
     @Override
     public <R> void visit(TextFunction<T, R, ?> text) {
-        out.println();
+        sb.append(NEWLINE);
         tabs();
         // The text element checks whether it has a model binder.
         // It returns NULL whenever there is NO model binder.
         R val = text.getValue(model);
-        out.print(val);
+        sb.append(val);
     }
 
     /**
@@ -99,9 +100,9 @@ public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
      */
     @Override
     public void visit(Text text) {
-        out.println();
+        sb.append(NEWLINE);
         tabs();
-        out.print(text.getValue());
+        sb.append(text.getValue());
     }
 
     /*=========================================================================*/
@@ -110,6 +111,6 @@ public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
 
     final void tabs(){
         for (int i = 0; i < depth; i++)
-            out.print('\t');
+            sb.append('\t');
     }
 }

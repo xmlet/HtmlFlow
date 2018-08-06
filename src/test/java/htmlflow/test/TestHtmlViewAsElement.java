@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,30 +22,27 @@
  * SOFTWARE.
  */
 
-package htmlflow;
+package htmlflow.test;
 
-import org.xmlet.htmlapi.Element;
+import htmlflow.HtmlView;
+import junit.framework.Assert;
+import org.junit.Test;
 
-import java.io.PrintStream;
+public class TestHtmlViewAsElement {
 
-/**
- * An optimized version of HtmlVisitorBinder which suppresses the binder check
- * on traversal of children elements.
- * This Vistor does not have a model and thus it does not need to check whether
- * the elements have a binder, or not.
- * Since it does not have a model, then it has no object to pass to the binders.
- *
- * @author Miguel Gamboa
- *         created on 17-01-2018
- */
-public class HtmlVisitor extends HtmlVisitorBinder<Object> {
-
-    public HtmlVisitor(PrintStream out) {
-        super(out, null);
+    @Test
+    public void testSelf() {
+        HtmlView<?> html = HtmlView.html();
+        Assert.assertSame(html, html.self());
     }
 
-    @Override
-    protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
-        elem.getChildren().forEach(item -> item.accept(this));
+    @Test(expected = UnsupportedOperationException.class)
+    public void testVisitor() {
+        HtmlView.html().accept(null);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testCloneElem() {
+        HtmlView.html().cloneElem();
     }
 }

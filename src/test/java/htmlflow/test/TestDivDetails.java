@@ -32,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlet.htmlapi.AttrClassString;
-import org.xmlet.htmlapi.BaseAttribute;
 import org.xmlet.htmlapi.Body;
 import org.xmlet.htmlapi.EnumRelLinkType;
 import org.xmlet.htmlapi.EnumTypeContentType;
@@ -48,7 +47,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.html;
+import static htmlflow.test.Utils.htmlRender;
+import static htmlflow.test.Utils.htmlWrite;
 import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
@@ -75,33 +75,24 @@ public class TestDivDetails {
     }
 
     @Test
-    public void test_div_details_without_binding() throws IOException, ParserConfigurationException, SAXException {
-        HtmlView<?> taskView = new HtmlView<>();
-        taskView
-                .head()
-                .title().text("Task Details").º()
-                .link()
-                .attrRel(EnumRelLinkType.STYLESHEET)
-                .attrType(EnumTypeContentType.TEXT_CSS)
-                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
-        taskView
-                .body().attrClass("container")
-                .h1().text("Task Details").º()
-                .hr().º()
-                .div().text("Title: ISEL MPD project")
-                .br().º()
-                .text("Description: A Java library for serializing objects in HTML.")
-                .br().º()
-                .text("Priority: HIGH");
+    public void testDivDetailsWithoutBinding() throws IOException, ParserConfigurationException, SAXException {
         //
-        // Produces an HTML file document
+        // Produces an HTML document
         //
-        taskView.write();
-        //System.out.println(taskView.toString());
+        String html = HtmlLists.viewDetails.render(); // 1) Get a string with the HTML
+        /*
+        viewDetails
+            .setPrintStream(System.out)
+            .write();                       // 2) print to the standard output
+        viewDetails
+            .setPrintStream(new PrintStream(new FileOutputStream("details.html")))
+            .write();                       // 3) write to details.html file
+        Desktop.getDesktop().browse(URI.create("details.html"));
+        */
         /*
          * Assert HTML document main structure
          */
-        Element elem = Utils.getRootElement(taskView.toByteArray());
+        Element elem = Utils.getRootElement(html.getBytes());
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
         Node head = childNodes.item(0);
@@ -119,11 +110,11 @@ public class TestDivDetails {
     }
 
     @Test
-    public void test_div_details_binding() throws IOException, ParserConfigurationException, SAXException {
+    public void testDivDetailsBinding() throws IOException, ParserConfigurationException, SAXException {
         expectedTaskViews
                 .keySet()
                 .stream()
-                .map(task -> TaskHtml.of(task, html(taskDetailsView(), task)))
+                .map(task -> TaskHtml.of(task, htmlWrite(HtmlLists.taskDetailsView, task)))
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
@@ -132,29 +123,18 @@ public class TestDivDetails {
                 });
     }
 
-
-    private static HtmlView<Task> taskDetailsView(){
-        HtmlView<Task> taskView = new HtmlView<>();
-        taskView
-                .head()
-                .title()
-                .text("Task Details").º()
-                .link()
-                .attrRel(EnumRelLinkType.STYLESHEET)
-                .attrType(EnumTypeContentType.TEXT_CSS)
-                .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
-        taskView
-                .body().attrClass("container")
-                .h1()
-                .text("Task Details").º()
-                .hr().º()
-                .div()
-                .text("Title:").text(Task::getTitle)
-                .br().º()
-                .text("Description:").text(Task::getDescription)
-                .br().º()
-                .text("Priority:").text(Task::getPriority);
-        return taskView;
+    @Test
+    public void testDivDetailsBindingWithRender() {
+        expectedTaskViews
+                .keySet()
+                .stream()
+                .map(task -> TaskHtml.of(task, htmlRender(HtmlLists.taskDetailsView, task)))
+                .forEach(taskHtml -> {
+                    Iterator<String> actual = taskHtml.html.iterator();
+                    expectedTaskViews
+                            .get(taskHtml.t)
+                            .forEach(line -> assertEquals(line, actual.next()));
+                });
     }
 
     private static class TaskHtml {
