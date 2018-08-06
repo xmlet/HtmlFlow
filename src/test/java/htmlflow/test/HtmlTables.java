@@ -144,4 +144,39 @@ public class HtmlTables {
             .º() // body
         .º(); // html
 
+    /**
+     * View with a nested table based on issue:
+     *    https://github.com/xmlet/HtmlFlow/issues/18
+     */
+    static final HtmlView nestedTable = HtmlView
+        .html()
+            .body()
+                .table()
+                    .tr()
+                        .attrClass("top")
+                        .td()
+                            .attrColspan("2")
+                            .table()
+                                .tr()
+                                    .td()
+                                        .attrClass("title")
+                                        .img()
+                                            .attrSrc("logo.png")
+                                            .attrStyle("width:100%; max-width:300px;")
+                                        .º() // img
+                                    .º() // td
+                                .º() // tr
+                            .º() // table
+                        .º() // td
+                        .td()
+                            .text("Invoice #: 123")
+                            .br().º()
+                            .text("Created: January 1, 2015")
+                            .br().º()
+                            .text("Due: February 1, 2015")
+                        .º() // td
+                    .º() // tr
+                .º() // table
+            .º() // body
+        .º(); // html
 }

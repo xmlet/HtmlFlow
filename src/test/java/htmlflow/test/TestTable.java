@@ -47,6 +47,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static htmlflow.test.Utils.htmlWrite;
 import static java.util.stream.Collectors.toList;
@@ -93,6 +95,25 @@ public class TestTable {
          * Assert
          */
         assertSimpleHtmlView(mem.toByteArray(), output);
+    }
+    @Test
+    public void testNestedTable(){
+        /*
+         * Arrange
+         */
+        Pattern NEWLINE = Pattern.compile("\n");
+        Iterator<String> expected = Utils.loadLines("nestedTable.html").iterator();
+        /*
+         * Act
+         */
+        String html = HtmlTables.nestedTable.render();
+        /*
+         * Assert
+         */
+        NEWLINE
+            .splitAsStream(html)
+            .forEach(actual -> assertEquals(expected.next(), actual));
+
     }
     @Test
     public void testTableWithBinding() throws ParserConfigurationException, SAXException, IOException{
@@ -187,5 +208,4 @@ public class TestTable {
         }
         // LOGGER.log(Level.INFO, mem.toString());
     }
-
 }
