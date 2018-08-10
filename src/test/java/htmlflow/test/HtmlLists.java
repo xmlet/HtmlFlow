@@ -26,38 +26,32 @@ package htmlflow.test;
 
 import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapi.BaseAttribute;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.EnumEnctypeForm;
-import org.xmlet.htmlapi.EnumMethodForm;
-import org.xmlet.htmlapi.EnumRelLinkType;
-import org.xmlet.htmlapi.EnumTypeContentType;
-import org.xmlet.htmlapi.EnumTypeScript;
-import org.xmlet.htmlapi.Html;
+import org.xmlet.htmlapifaster.EnumEnctypeForm;
+import org.xmlet.htmlapifaster.EnumMethodForm;
+import org.xmlet.htmlapifaster.EnumRelLinkType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
+import org.xmlet.htmlapifaster.EnumTypeScript;
 
 public class HtmlLists {
     static final String divClass = "divClass";
     static final String divId = "divId";
 
-    static final HtmlView<Task> taskView = HtmlView
-        .<Task>html()
-            .body()
-                .div()
-                .º() //div
-            .º()//body
+    static final HtmlView taskView(HtmlView view, Task task) {
+        return view
             .head()
                 .script()
                     .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
                     .attrSrc("test.css")
                 .º() //script
             .º() // head
-            .<Body<Html<HtmlView<Task>>>>find(elem -> elem instanceof Body)
-            .findFirst() // get previously created body
-            .get()
+            .body()
+                .div()
+                .º() //div
                 .div()
                     .attrId(divId)
                     .attrClass(divClass)
-                    .addAttr(new BaseAttribute("tutu", "toto"))
+                    // !!!!!! Missing feature in HtmlApiFaster !!!!
+                    // .addAttr(new BaseAttribute("tutu", "toto"))
                     .form()
                         .attrAction("/action.do")
                         .attrMethod(EnumMethodForm.POST)
@@ -66,10 +60,10 @@ public class HtmlLists {
                 .º() //div
             .º() //body
         .º(); //html
+    }
 
-
-    static final HtmlView viewDetails = HtmlView
-        .html()
+    static final HtmlView viewDetails(HtmlView view) {
+        return view
             .head()
                 .title().text("Task Details").º()
                 .link()
@@ -90,9 +84,10 @@ public class HtmlLists {
                 .º() //div
             .º() //body
         .º(); //html
+    }
 
-    static final HtmlView<Task> taskDetailsView = HtmlView
-        .<Task>html()
+    static final HtmlView taskDetailsView(HtmlView view, Task task) {
+        return view
             .head()
                 .title().text("Task Details").º()
                 .link()
@@ -106,13 +101,13 @@ public class HtmlLists {
                 .h1().text("Task Details").º()
                 .hr().º()
                 .div()
-                    .text("Title:").text(Task::getTitle)
+                    .text("Title:").text(task.getTitle())
                     .br().º()
-                    .text("Description:").text(Task::getDescription)
+                    .text("Description:").text(task.getDescription())
                     .br().º()
-                    .text("Priority:").text(Task::getPriority)
+                    .text("Priority:").text(task.getPriority() + "")
                 .º() // div
             .º() //body
         .º(); // html
-
+    }
 }

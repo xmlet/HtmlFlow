@@ -24,12 +24,11 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapi.AbstractElement;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Element;
-import org.xmlet.htmlapi.ElementVisitor;
-import org.xmlet.htmlapi.Head;
-import org.xmlet.htmlapi.Html;
+import org.xmlet.htmlapifaster.AbstractElement;
+import org.xmlet.htmlapifaster.Body;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Head;
+import org.xmlet.htmlapifaster.Html;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -47,12 +46,10 @@ import java.util.stream.Collectors;
  * implementation, which is responsible for printing the tree of elements and
  * attributes.
  *
- * @param <T> The type of domain object bound to this View.
- *
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlView<T> extends AbstractElement<HtmlView<T>, Element> implements HtmlWriter<T>{
+public class HtmlView extends AbstractElement<HtmlView, Element> {
 
     private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -74,83 +71,51 @@ public class HtmlView<T> extends AbstractElement<HtmlView<T>, Element> implement
         }
     }
 
-    private PrintStream out;
-    private Html<HtmlView<T>> root;
+    private StringBuilder sb;
+    private Html<HtmlView> root;
 
-    /**
-     * @param <R> The type of domain object bound to the html.
-     */
-    public static <R> HtmlView<R> html(){
-        return new HtmlView<>();
+    public static HtmlView html() {
+        return html(new StringBuilder());
     }
 
-    public HtmlView() {
-        super("HtmlView");
+    public static HtmlView html(StringBuilder sb){
+        sb.append(HEADER);
+        return new HtmlView(sb);
+    }
+
+    public static HtmlView html(PrintStream out){
+        out.print(HEADER);
+        return new HtmlView(out);
+    }
+
+    public HtmlView(StringBuilder sb) {
+        super(new HtmlVisitorStringBuilder(sb), "HtmlView", 0);
+        this.sb = sb;
         root = new Html<>(this);
-        addChild(root);
     }
 
-    public Head<Html<HtmlView<T>>> head(){
+    public HtmlView(PrintStream out) {
+        super(new HtmlVisitorPrintStream(out), "HtmlView", 0);
+        root = new Html<>(this);
+    }
+
+    public Head<Html<HtmlView>> head(){
         return root.head();
     }
 
-    public Body<Html<HtmlView<T>>> body(){
+    public Body<Html<HtmlView>> body(){
         return root.body();
     }
 
     public String render() {
-        StringBuilder sb = new StringBuilder(HEADER);
-        root.accept(new HtmlVisitorStringBuilder(sb));
-        return sb.toString();
-    }
-
-    public String render(T model) {
-        StringBuilder sb = new StringBuilder(HEADER);
-        root.accept(new HtmlVisitorStringBuilderBinder<>(sb, model));
+        if(sb == null)
+            throw new IllegalStateException("Missing StringBuilder!!!! HtmlView not initialized with a StringBuilder!");
         return sb.toString();
     }
 
     @Override
-    public void write() {
-        out.print(HEADER);
-        root.accept(new HtmlVisitor(out));
-        closeByteArrayStream();
-    }
-
-    @Override
-    public final void write(int depth, T model) {
-        out.print(HEADER);
-        root.accept(new HtmlVisitorBinder<>(out, model));
-        closeByteArrayStream();
-    }
-
-    private void closeByteArrayStream() {
-        if(out != null) {
-            out.flush();
-            out.close();
-            out = null;
-        }
-    }
-
-    @Override
-    public HtmlWriter<T> setPrintStream(PrintStream out) {
-        this.out = out;
+    public HtmlView self() {
         return this;
     }
 
-
-    @Override
-    public HtmlView<T> self() {
-        return this;
-    }
-
-    @Override
-    public void accept(ElementVisitor visitor) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public HtmlView cloneElem() {
-        throw new UnsupportedOperationException();
-    }
 }

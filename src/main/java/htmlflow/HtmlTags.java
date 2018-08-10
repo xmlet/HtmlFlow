@@ -24,20 +24,20 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapi.Area;
-import org.xmlet.htmlapi.Attribute;
-import org.xmlet.htmlapi.Base;
-import org.xmlet.htmlapi.Br;
-import org.xmlet.htmlapi.Col;
-import org.xmlet.htmlapi.Element;
-import org.xmlet.htmlapi.Embed;
-import org.xmlet.htmlapi.Hr;
-import org.xmlet.htmlapi.Img;
-import org.xmlet.htmlapi.Input;
-import org.xmlet.htmlapi.Link;
-import org.xmlet.htmlapi.Meta;
-import org.xmlet.htmlapi.Param;
-import org.xmlet.htmlapi.Source;
+import org.xmlet.htmlapifaster.Area;
+import org.xmlet.htmlapifaster.Attribute;
+import org.xmlet.htmlapifaster.Base;
+import org.xmlet.htmlapifaster.Br;
+import org.xmlet.htmlapifaster.Col;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Embed;
+import org.xmlet.htmlapifaster.Hr;
+import org.xmlet.htmlapifaster.Img;
+import org.xmlet.htmlapifaster.Input;
+import org.xmlet.htmlapifaster.Link;
+import org.xmlet.htmlapifaster.Meta;
+import org.xmlet.htmlapifaster.Param;
+import org.xmlet.htmlapifaster.Source;
 
 import java.io.PrintStream;
 
@@ -73,14 +73,18 @@ public class HtmlTags {
     static void printOpenTag(PrintStream out, Element<?, ?> elem) {
         out.print(BEGIN_TAG);
         out.print(elem.getName());
-        for (Attribute attribute : elem.getAttributes()) {
-            out.print(SPACE);
-            out.print(attribute.getName());
-            out.print(EQUALS);
-            out.print(QUOTATION);
-            out.print(attribute.getValue());
-            out.print(QUOTATION);
-        }
+    }
+
+    public static void printAttribute(PrintStream out, Attribute attribute) {
+        out.print(SPACE);
+        out.print(attribute.getName());
+        out.print(EQUALS);
+        out.print(QUOTATION);
+        out.print(attribute.getValue());
+        out.print(QUOTATION);
+    }
+
+    static void printOpenTagEnd(PrintStream out) {
         out.print(FINISH_TAG);
     }
 
@@ -94,16 +98,21 @@ public class HtmlTags {
     public static void appendOpenTag(StringBuilder sb, Element<?, ?> elem) {
         sb.append(BEGIN_TAG);
         sb.append(elem.getName());
-        for (Attribute attribute : elem.getAttributes()) {
-            sb.append(SPACE);
-            sb.append(attribute.getName());
-            sb.append(EQUALS);
-            sb.append(QUOTATION);
-            sb.append(attribute.getValue());
-            sb.append(QUOTATION);
-        }
+    }
+
+    public static void appendAttribute(StringBuilder sb, Attribute attribute) {
+        sb.append(SPACE);
+        sb.append(attribute.getName());
+        sb.append(EQUALS);
+        sb.append(QUOTATION);
+        sb.append(attribute.getValue());
+        sb.append(QUOTATION);
+    }
+
+    public static void appendOpenTagEnd(StringBuilder sb) {
         sb.append(FINISH_TAG);
     }
+
 
     public static void appendCloseTag(StringBuilder sb, Element<?, ?> elem) {
         sb.append(BEGIN_TAG);      // <

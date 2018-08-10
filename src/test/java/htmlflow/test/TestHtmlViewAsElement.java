@@ -27,22 +27,20 @@ package htmlflow.test;
 import htmlflow.HtmlView;
 import junit.framework.Assert;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class TestHtmlViewAsElement {
 
     @Test
     public void testSelf() {
-        HtmlView<?> html = HtmlView.html();
+        HtmlView html = HtmlView.html();
         Assert.assertSame(html, html.self());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testVisitor() {
-        HtmlView.html().accept(null);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testCloneElem() {
-        HtmlView.html().cloneElem();
+    @Test(expected = IllegalStateException.class)
+    public void testWrongRender() {
+        HtmlView
+            .html(System.out)
+            .render();
     }
 }

@@ -24,25 +24,82 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapi.Element;
+import org.xmlet.htmlapifaster.Attribute;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.ElementVisitor;
+import org.xmlet.htmlapifaster.Text;
 
 /**
- * An optimized version of HtmlVisitorBinder which suppresses the binder check
- * on traversal of children elements.
- * This Vistor does not have a model and thus it does not need to check whether
- * the elements have a binder, or not.
- * Since it does not have a model, then it has no object to pass to the binders.
- *
  * @author Miguel Gamboa
+ *         created on 17-01-2018
  */
-public class HtmlVisitorStringBuilder extends HtmlVisitorStringBuilderBinder<Object> {
+public class HtmlVisitorStringBuilder extends ElementVisitor {
+
+    static final char NEWLINE = '\n';
+
+    protected final StringBuilder sb;
+    private int depth;
+    private boolean isClosed = true;
+
     public HtmlVisitorStringBuilder(StringBuilder sb) {
-        super(sb, null);
+        this.sb = sb;
+    }
+
+    protected final void incTabs() { depth++;}
+    protected final void decTabs() { depth--;}
+
+    @Override
+    public final void visit(Element elem) {
+        if (!isClosed){
+            HtmlTags.appendOpenTagEnd(sb);
+            incTabs();
+        }
+        sb.append(NEWLINE);
+        tabs();
+        HtmlTags.appendOpenTag(sb, elem);
+        isClosed = false;
     }
 
     @Override
-    protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
-        elem.getChildren().forEach(item -> item.accept(this));
+    public void visitParent(Element elem) {
+        if (!isClosed)
+            HtmlTags.appendOpenTagEnd(sb);
+        else
+            decTabs();
+        isClosed = true;
+
+        if(HtmlTags.isVoidElement(elem)) return;
+        sb.append(NEWLINE);
+        tabs();
+        HtmlTags.appendCloseTag(sb, elem);
     }
 
+    @Override
+    public void visit(Attribute attribute) {
+        HtmlTags.appendAttribute(sb, attribute);
+    }
+
+    /**
+     * An optimized version of Text without binder.
+     */
+    @Override
+    public void visit(Text text) {
+        if (!isClosed){
+            HtmlTags.appendOpenTagEnd(sb);
+            incTabs();
+            isClosed = true;
+        }
+        sb.append(NEWLINE);
+        tabs();
+        sb.append(text.getValue());
+    }
+
+    /*=========================================================================*/
+    /*--------------------    Auxiliary Methods    ----------------------------*/
+    /*=========================================================================*/
+
+    final void tabs(){
+        for (int i = 0; i < depth; i++)
+            sb.append('\t');
+    }
 }

@@ -31,17 +31,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlet.htmlapi.AttrClassString;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.EnumRelLinkType;
-import org.xmlet.htmlapi.EnumTypeContentType;
-import org.xmlet.htmlapi.Head;
-import org.xmlet.htmlapi.Html;
-import org.xmlet.htmlapi.Link;
-import org.xmlet.htmlapi.Title;
+import org.xmlet.htmlapifaster.AttrClassString;
+import org.xmlet.htmlapifaster.Body;
+import org.xmlet.htmlapifaster.Head;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Link;
+import org.xmlet.htmlapifaster.Title;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,15 +79,16 @@ public class TestDivDetails {
         //
         // Produces an HTML document
         //
-        String html = HtmlLists.viewDetails.render(); // 1) Get a string with the HTML
+        String html = HtmlLists
+            .viewDetails(HtmlView.html()).render(); // 1) Get a string with the HTML
+
         /*
-        viewDetails
-            .setPrintStream(System.out)
-            .write();                       // 2) print to the standard output
-        viewDetails
-            .setPrintStream(new PrintStream(new FileOutputStream("details.html")))
-            .write();                       // 3) write to details.html file
-        Desktop.getDesktop().browse(URI.create("details.html"));
+        HtmlLists   // 2) print to the standard output
+            .viewDetails(HtmlView.html(System.out));
+
+        HtmlView view = HtmlView.html(new PrintStream(new FileOutputStream("details.html")));
+        HtmlLists   // 3) write to details.html file
+            .viewDetails(view);
         */
         /*
          * Assert HTML document main structure
@@ -114,7 +115,11 @@ public class TestDivDetails {
         expectedTaskViews
                 .keySet()
                 .stream()
-                .map(task -> TaskHtml.of(task, htmlWrite(HtmlLists.taskDetailsView, task)))
+                .map(task -> {
+                    ByteArrayOutputStream mem = new ByteArrayOutputStream();
+                    HtmlLists.taskDetailsView(HtmlView.html(new PrintStream(mem)), task);
+                    return TaskHtml.of(task, htmlWrite(mem));
+                })
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
@@ -128,7 +133,9 @@ public class TestDivDetails {
         expectedTaskViews
                 .keySet()
                 .stream()
-                .map(task -> TaskHtml.of(task, htmlRender(HtmlLists.taskDetailsView, task)))
+                .map(task -> TaskHtml.of(task,
+                                htmlRender(
+                                        HtmlLists.taskDetailsView(HtmlView.html(), task))))
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews

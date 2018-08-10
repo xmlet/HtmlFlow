@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 /**
@@ -40,10 +41,12 @@ import java.net.URL;
 public class TestResourceNotFound {
 
     @Test(expected = ExceptionInInitializerError.class)
-    public void testHtmlViewHeaderNotFound() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+    public void testHtmlViewHeaderNotFound()
+        throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
+    {
         ClassLoaderGw gw = new ClassLoaderGw();
         Class<?> klassView = gw.loadClass("htmlflow.HtmlView");
-        Object view = klassView.newInstance();
+        Object view = klassView.getMethod("html").invoke(null);
     }
 }
 
@@ -65,6 +68,7 @@ class ClassLoaderGw extends ClassLoader {
             throw new ClassNotFoundException(name);
         }
     }
+
     private static byte[] bytes(InputStream is) throws IOException{
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int nRead;

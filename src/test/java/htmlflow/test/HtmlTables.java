@@ -26,20 +26,20 @@ package htmlflow.test;
 
 import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.EnumRelLinkType;
-import org.xmlet.htmlapi.EnumTypeContentType;
-import org.xmlet.htmlapi.Html;
-import org.xmlet.htmlapi.Table;
-import org.xmlet.htmlapi.Tr;
+import org.xmlet.htmlapifaster.Body;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.EnumRelLinkType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Table;
+import org.xmlet.htmlapifaster.Tr;
 
 import static java.util.stream.IntStream.range;
 
 public class HtmlTables {
 
-    static final HtmlView<?> simpleTableView(int[][] output){
-        Table<Div<Body<Html<HtmlView<Object>>>>> t = HtmlView.html()
+    static final HtmlView simpleTableView(HtmlView view, int[][] output){
+        Table<Div<Body<Html<HtmlView>>>> t = view
             .head()
                 .title().text("Dummy Table")
                 .º()// title
@@ -58,8 +58,11 @@ public class HtmlTables {
             .forEach(i -> {
                 Tr tr = t.tr();
                 range(0, output.length).forEach(j ->
-                    tr.td().text("" + output[i][j])
+                    tr
+                        .td().text("" + output[i][j])
+                        .º()
                 );
+                tr.º();
             });
         return t
                     .º() //table
@@ -68,8 +71,8 @@ public class HtmlTables {
         .º();//html
     }
 
-    static final HtmlView<Iterable<Task>> taskListView = HtmlView
-        .<Iterable<Task>>html()
+    static final HtmlView taskListView(HtmlView view, Iterable<Task> tasks){
+        Table<Div<Body<Html<HtmlView>>>> table = view
             .head()
                 .title()
                     .text("Task List")
@@ -93,25 +96,24 @@ public class HtmlTables {
                             .th().text("Title").º()
                             .th().text("Description").º()
                             .th().text("Priority").º()
-                        .º()
-                        // prior version 2.0: table.trFromIterable(Task::getTitle, Task::getDescription, Task::getPriority);
-                        .<Iterable<Task>>binder((tbl, list) -> {
-                            list.forEach(task -> {
-                                tbl
-                                    .tr()
-                                        .td().text(task.getTitle()).º()
-                                        .td().text(task.getDescription()).º()
-                                        .td().text(task.getPriority().toString()).º()
-                                    .º(); // tr
-                            });
-                        })
+                        .º();
+                        tasks.forEach(task -> {
+                            table
+                                .tr()
+                                    .td().text(task.getTitle()).º()
+                                    .td().text(task.getDescription()).º()
+                                    .td().text(task.getPriority().toString()).º()
+                                .º(); // tr
+                        });
+                    return table
                     .º() // table
                 .º() // div
             .º() // body
         .º(); // html
+    }
 
-    static final HtmlView<Iterable<Task>> taskTableView = HtmlView
-        .<Iterable<Task>>html()
+    static final HtmlView taskTableView(HtmlView view, Iterable<Task> tasks){
+        Table<Div<Body<Html<HtmlView>>>> table = view
             .head()
                 .title().text("Dummy Table")
                 .º()
@@ -125,31 +127,32 @@ public class HtmlTables {
                             .th().text("Title").º()
                             .th().text("Description").º()
                             .th().text("Priority").º()
-                        .º() // tr
+                        .º(); // tr
                         /*
                          * Adds a dynamic Tr, which creates new Tr elements for each item
                          * contained in the model received as argument of the write method.
                          */
-                        // t.trFromIterable(binderGetTitle(), binderGetDescription(), binderGetPriority());
-                        .<Iterable<Task>>binder((tbl, list) -> {
-                            list.forEach(item -> {
-                                tbl.tr()
+                        tasks.forEach(item ->
+                            table
+                                .tr()
                                     .td().text(item.getTitle()).º()
                                     .td().text(item.getDescription()).º()
-                                    .td().text(item.getPriority().toString());
-                            });
-                        })
+                                    .td().text(item.getPriority().toString()).º()
+                                .º() // tr
+                        );
+                    return table
                     .º() // table
                 .º() // div
             .º() // body
         .º(); // html
+    }
 
     /**
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    static final HtmlView nestedTable = HtmlView
-        .html()
+    static final HtmlView nestedTable(HtmlView view) {
+        return view
             .body()
                 .table()
                     .tr()
@@ -179,4 +182,5 @@ public class HtmlTables {
                 .º() // table
             .º() // body
         .º(); // html
+    }
 }

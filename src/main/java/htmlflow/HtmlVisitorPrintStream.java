@@ -24,74 +24,59 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapi.Element;
-import org.xmlet.htmlapi.ElementVisitor;
-import org.xmlet.htmlapi.Text;
-import org.xmlet.htmlapi.TextFunction;
+import org.xmlet.htmlapifaster.Attribute;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.ElementVisitor;
+import org.xmlet.htmlapifaster.Text;
 
 import java.io.PrintStream;
-import java.util.List;
 
 /**
- * Type parameter T is the type of the model bound to this Visitor.
- *
  * @author Miguel Gamboa
  *         created on 17-01-2018
  */
-public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
+public class HtmlVisitorPrintStream extends ElementVisitor {
 
     protected final PrintStream out;
-    protected final T model;
     private int depth;
+    private boolean isClosed = true;
 
-    public HtmlVisitorBinder(PrintStream out, T model) {
+    public HtmlVisitorPrintStream(PrintStream out) {
         this.out = out;
-        this.model = model;
     }
 
     protected final void incTabs() { depth++;}
     protected final void decTabs() { depth--;}
 
     @Override
-    public final <U extends Element> void sharedVisit(Element<U,?> elem) {
+    public final void visit(Element elem) {
+        if (!isClosed){
+            HtmlTags.printOpenTagEnd(out);
+            incTabs();
+        }
         out.println();
         tabs();
         HtmlTags.printOpenTag(out, elem);
-        incTabs();
-        visitChildrem(elem);
-        decTabs();
+        isClosed = false;
+    }
+
+    @Override
+    public void visitParent(Element elem) {
+        if (!isClosed)
+            HtmlTags.printOpenTagEnd(out);
+        else
+            decTabs();
+        isClosed = true;
+
         if(HtmlTags.isVoidElement(elem)) return;
         out.println();
         tabs();
         HtmlTags.printCloseTag(out, elem);
     }
 
-    protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
-        if(elem.isBound()) {
-            /**
-             * Some binding function append new elements and change the original
-             * parent element. Thus we clone it to preserve its original structure
-             * and guarantee the same behavior on next traversals.
-             */
-            List<Element> children = elem.cloneElem().bindTo(model).getChildren();
-            children.forEach(item -> item.accept(this));
-        } else {
-            elem.getChildren().forEach(item -> item.accept(this));
-        }
-
-    }
-
-    /**
-     * Type parameter R is the type of property in model T.
-     */
     @Override
-    public <R> void visit(TextFunction<T, R, ?> text) {
-        out.println();
-        tabs();
-        // The text element checks whether it has a model binder.
-        // It returns NULL whenever there is NO model binder.
-        R val = text.getValue(model);
-        out.print(val);
+    public void visit(Attribute attribute) {
+        HtmlTags.printAttribute(out, attribute);
     }
 
     /**
@@ -99,6 +84,11 @@ public class HtmlVisitorBinder<T> extends ElementVisitor<T> {
      */
     @Override
     public void visit(Text text) {
+        if (!isClosed){
+            HtmlTags.printOpenTagEnd(out);
+            incTabs();
+            isClosed = true;
+        }
         out.println();
         tabs();
         out.print(text.getValue());

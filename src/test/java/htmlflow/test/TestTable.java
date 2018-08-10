@@ -31,12 +31,12 @@ import org.junit.Test;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.Head;
-import org.xmlet.htmlapi.Html;
-import org.xmlet.htmlapi.Table;
-import org.xmlet.htmlapi.Tr;
+import org.xmlet.htmlapifaster.Body;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Head;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Table;
+import org.xmlet.htmlapifaster.Tr;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +48,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import static htmlflow.test.Utils.htmlWrite;
 import static java.util.stream.Collectors.toList;
@@ -67,7 +66,7 @@ public class TestTable {
          * Arrange
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
-        HtmlView<?> view = HtmlTables.simpleTableView(output);
+        HtmlView view = HtmlTables.simpleTableView(HtmlView.html(), output);
         /*
          * Act
          */
@@ -80,17 +79,11 @@ public class TestTable {
     @Test
     public void testSimpleTableWrite() throws ParserConfigurationException, SAXException, IOException{
         /*
-         * Arrange
+         * Arrange and Act
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
-        HtmlView<?> view = HtmlTables.simpleTableView(output);
-        /*
-         * Act
-         */
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        view
-                .setPrintStream(new PrintStream(mem))
-                .write();
+        HtmlTables.simpleTableView(HtmlView.html(new PrintStream(mem)), output);
         /*
          * Assert
          */
@@ -106,7 +99,7 @@ public class TestTable {
         /*
          * Act
          */
-        String html = HtmlTables.nestedTable.render();
+        String html = HtmlTables.nestedTable(HtmlView.html()).render();
         /*
          * Assert
          */
@@ -124,7 +117,7 @@ public class TestTable {
         Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal, Status.Completed);
         Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High, Status.Deferred);
         List<Task> output = Arrays.asList(t1, t2, t3);
-        String html = HtmlTables.taskTableView.render(output);
+        String html = HtmlTables.taskTableView(HtmlView.html(), output).render();
         /*
          * Assert
          */
@@ -133,17 +126,19 @@ public class TestTable {
 
     @Test
     public void testTableBindingForReadmeTwice() throws IOException, ParserConfigurationException, SAXException {
-        validateBindingTable(HtmlTables.taskListView);
-        validateBindingTable(HtmlTables.taskListView);
+        validateBindingTable();
+        validateBindingTable();
     }
 
-    static void validateBindingTable(HtmlView<Iterable<Task>> taskView){
+    static void validateBindingTable(){
         List<Task> dataSource = Arrays.asList(
                 new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
-        List<String> actual = htmlWrite(taskView, dataSource).collect(toList());
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        HtmlTables.taskListView(HtmlView.html(new PrintStream(mem)), dataSource);
+        List<String> actual = htmlWrite(mem).collect(toList());
         Iterator<String> iter = actual.iterator();
         actual.forEach(System.out::println);
         Utils
