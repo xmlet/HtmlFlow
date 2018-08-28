@@ -26,20 +26,12 @@ package htmlflow.test;
 
 import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapifaster.Body;
-import org.xmlet.htmlapifaster.Div;
-import org.xmlet.htmlapifaster.EnumRelLinkType;
-import org.xmlet.htmlapifaster.EnumTypeContentType;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Table;
-import org.xmlet.htmlapifaster.Tr;
-
-import static java.util.stream.IntStream.range;
+import org.xmlet.htmlapifaster.*;
 
 public class HtmlTables {
 
-    static final HtmlView simpleTableView(HtmlView view, int[][] output){
-        Table<Div<Body<Html<HtmlView>>>> t = view
+    static HtmlView simpleTableView(HtmlView view, int[][] outputRows){
+        return view
             .head()
                 .title().text("Dummy Table")
                 .º()// title
@@ -53,26 +45,27 @@ public class HtmlTables {
                             .th().text("Id1").º()
                             .th().text("Id2").º()
                             .th().text("Id3").º()
-                        .º();//tr
-        range(0, output.length)
-            .forEach(i -> {
-                Tr tr = t.tr();
-                range(0, output.length).forEach(j ->
-                    tr
-                        .td().text("" + output[i][j])
-                        .º()
-                );
-                tr.º();
-            });
-        return t
-                    .º() //table
-                .º() //div
-            .º() //body
-        .º();//html
+                        .º() //tr
+                        .of(table -> {
+                            for (int[] outputRow : outputRows) {
+                                table.tr()
+                                     .of(tr -> {
+                                         for (int rowValue : outputRow) {
+                                             tr.td()
+                                                 .text("" + rowValue)
+                                             .º();
+                                         }
+                                     }).º();
+                            }
+                        })
+                    .º()
+                .º()
+            .º()
+        .º();
     }
 
-    static final HtmlView taskListView(HtmlView view, Iterable<Task> tasks){
-        Table<Div<Body<Html<HtmlView>>>> table = view
+    static HtmlView taskListView(HtmlView view, Iterable<Task> tasks){
+        return view
             .head()
                 .title()
                     .text("Task List")
@@ -96,24 +89,24 @@ public class HtmlTables {
                             .th().text("Title").º()
                             .th().text("Description").º()
                             .th().text("Priority").º()
-                        .º();
-                        tasks.forEach(task -> {
-                            table
-                                .tr()
-                                    .td().text(task.getTitle()).º()
-                                    .td().text(task.getDescription()).º()
-                                    .td().text(task.getPriority().toString()).º()
-                                .º(); // tr
-                        });
-                    return table
-                    .º() // table
-                .º() // div
-            .º() // body
-        .º(); // html
+                        .º()
+                        .of(table ->
+                            tasks.forEach(task ->
+                                table.tr()
+                                        .td().text(task.getTitle()).º()
+                                        .td().text(task.getDescription()).º()
+                                        .td().text(task.getPriority().toString()).º()
+                                    .º() // tr
+                            )
+                        )
+                    .º()
+                .º()
+            .º()
+        .º();
     }
 
-    static final HtmlView taskTableView(HtmlView view, Iterable<Task> tasks){
-        Table<Div<Body<Html<HtmlView>>>> table = view
+    static HtmlView taskTableView(HtmlView view, Iterable<Task> tasks){
+        return view
             .head()
                 .title().text("Dummy Table")
                 .º()
@@ -127,31 +120,28 @@ public class HtmlTables {
                             .th().text("Title").º()
                             .th().text("Description").º()
                             .th().text("Priority").º()
-                        .º(); // tr
-                        /*
-                         * Adds a dynamic Tr, which creates new Tr elements for each item
-                         * contained in the model received as argument of the write method.
-                         */
-                        tasks.forEach(item ->
-                            table
-                                .tr()
-                                    .td().text(item.getTitle()).º()
-                                    .td().text(item.getDescription()).º()
-                                    .td().text(item.getPriority().toString()).º()
-                                .º() // tr
-                        );
-                    return table
-                    .º() // table
-                .º() // div
-            .º() // body
-        .º(); // html
+                        .º() // tr
+                        .of(table ->
+                            tasks.forEach(item ->
+                                table
+                                    .tr()
+                                        .td().text(item.getTitle()).º()
+                                        .td().text(item.getDescription()).º()
+                                        .td().text(item.getPriority().toString()).º()
+                                    .º() // tr
+                            )
+                        )
+                    .º()
+                .º()
+            .º()
+        .º();
     }
 
     /**
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    static final HtmlView nestedTable(HtmlView view) {
+    static HtmlView nestedTable(HtmlView view) {
         return view
             .body()
                 .table()

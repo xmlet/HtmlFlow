@@ -24,10 +24,7 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.Attribute;
-import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
-import org.xmlet.htmlapifaster.Text;
 
 import java.io.PrintStream;
 
@@ -49,41 +46,41 @@ public class HtmlVisitorPrintStream extends ElementVisitor {
     protected final void decTabs() { depth--;}
 
     @Override
-    public final void visit(Element elem) {
+    public final void visitElement(String elementName) {
         if (!isClosed){
             HtmlTags.printOpenTagEnd(out);
             incTabs();
         }
         out.println();
         tabs();
-        HtmlTags.printOpenTag(out, elem);
+        HtmlTags.printOpenTag(out, elementName);
         isClosed = false;
     }
 
     @Override
-    public void visitParent(Element elem) {
+    public void visitParent(String elementName) {
         if (!isClosed)
             HtmlTags.printOpenTagEnd(out);
         else
             decTabs();
         isClosed = true;
 
-        if(HtmlTags.isVoidElement(elem)) return;
+        if(HtmlTags.isVoidElement(elementName)) return;
         out.println();
         tabs();
-        HtmlTags.printCloseTag(out, elem);
+        HtmlTags.printCloseTag(out, elementName);
     }
 
     @Override
-    public void visit(Attribute attribute) {
-        HtmlTags.printAttribute(out, attribute);
+    public void visitAttribute(String attributeName, String attributeValue) {
+        HtmlTags.printAttribute(out, attributeName, attributeValue);
     }
 
     /**
      * An optimized version of Text without binder.
      */
     @Override
-    public void visit(Text text) {
+    public <R> void visitText(R text) {
         if (!isClosed){
             HtmlTags.printOpenTagEnd(out);
             incTabs();
@@ -91,7 +88,21 @@ public class HtmlVisitorPrintStream extends ElementVisitor {
         }
         out.println();
         tabs();
-        out.print(text.getValue());
+        out.print(text);
+    }
+
+    @Override
+    public <R> void visitComment(R comment) {
+        if (!isClosed){
+            HtmlTags.printOpenTagEnd(out);
+            incTabs();
+            isClosed = true;
+        }
+        out.println();
+        tabs();
+        HtmlTags.printOpenComment(out);
+        out.print(comment);
+        HtmlTags.printEndComment(out);
     }
 
     /*=========================================================================*/

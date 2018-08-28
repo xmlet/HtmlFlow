@@ -76,6 +76,7 @@ public class TestTable {
          */
         assertSimpleHtmlView(html.getBytes(), output);
     }
+
     @Test
     public void testSimpleTableWrite() throws ParserConfigurationException, SAXException, IOException{
         /*
@@ -89,6 +90,7 @@ public class TestTable {
          */
         assertSimpleHtmlView(mem.toByteArray(), output);
     }
+
     @Test
     public void testNestedTable(){
         /*
@@ -103,11 +105,13 @@ public class TestTable {
         /*
          * Assert
          */
+
         NEWLINE
             .splitAsStream(html)
             .forEach(actual -> assertEquals(expected.next(), actual));
 
     }
+
     @Test
     public void testTableWithBinding() throws ParserConfigurationException, SAXException, IOException{
         /*

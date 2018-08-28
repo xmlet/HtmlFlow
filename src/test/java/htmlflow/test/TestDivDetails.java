@@ -31,12 +31,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlet.htmlapifaster.AttrClassString;
-import org.xmlet.htmlapifaster.Body;
-import org.xmlet.htmlapifaster.Head;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Link;
-import org.xmlet.htmlapifaster.Title;
+import org.xmlet.htmlapifaster.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
@@ -100,7 +95,7 @@ public class TestDivDetails {
         assertEquals(Head.class.getSimpleName().toLowerCase(), head.getNodeName());
         Node body = childNodes.item(2);
         assertEquals(Body.class.getSimpleName().toLowerCase(), body.getNodeName());
-        Node bodyClassAttr = body.getAttributes().getNamedItem(new AttrClassString("container").getName());
+        Node bodyClassAttr = body.getAttributes().getNamedItem("class");
         assertEquals("container", bodyClassAttr.getNodeValue());
         /*
          * Assert HTML Head

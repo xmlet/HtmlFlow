@@ -24,19 +24,9 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.AbstractElement;
-import org.xmlet.htmlapifaster.Body;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Head;
-import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.*;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.URL;
 import java.util.stream.Collectors;
 
@@ -49,11 +39,11 @@ import java.util.stream.Collectors;
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlView extends AbstractElement<HtmlView, Element> {
+public class HtmlView implements Element<HtmlView, Element> {
 
     private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
-    public static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
+    private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
 
     static {
         try {
@@ -73,6 +63,7 @@ public class HtmlView extends AbstractElement<HtmlView, Element> {
 
     private StringBuilder sb;
     private Html<HtmlView> root;
+    private ElementVisitor visitor;
 
     public static HtmlView html() {
         return html(new StringBuilder());
@@ -89,13 +80,13 @@ public class HtmlView extends AbstractElement<HtmlView, Element> {
     }
 
     public HtmlView(StringBuilder sb) {
-        super(new HtmlVisitorStringBuilder(sb), "HtmlView", 0);
+        this.visitor = new HtmlVisitorStringBuilder(sb);
         this.sb = sb;
         root = new Html<>(this);
     }
 
     public HtmlView(PrintStream out) {
-        super(new HtmlVisitorPrintStream(out), "HtmlView", 0);
+        this.visitor = new HtmlVisitorPrintStream(out);
         root = new Html<>(this);
     }
 
@@ -116,6 +107,26 @@ public class HtmlView extends AbstractElement<HtmlView, Element> {
     @Override
     public HtmlView self() {
         return this;
+    }
+
+    @Override
+    public ElementVisitor getVisitor() {
+        return visitor;
+    }
+
+    @Override
+    public String getName() {
+        return "HtmlView";
+    }
+
+    @Override
+    public Element º() {
+        return null;
+    }
+
+    @Override
+    public Element getParent() {
+        return null;
     }
 
 }

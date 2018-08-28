@@ -24,25 +24,16 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.Area;
-import org.xmlet.htmlapifaster.Attribute;
-import org.xmlet.htmlapifaster.Base;
-import org.xmlet.htmlapifaster.Br;
-import org.xmlet.htmlapifaster.Col;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Embed;
-import org.xmlet.htmlapifaster.Hr;
-import org.xmlet.htmlapifaster.Img;
-import org.xmlet.htmlapifaster.Input;
-import org.xmlet.htmlapifaster.Link;
-import org.xmlet.htmlapifaster.Meta;
-import org.xmlet.htmlapifaster.Param;
-import org.xmlet.htmlapifaster.Source;
+import org.xmlet.htmlapifaster.*;
 
 import java.io.PrintStream;
 
 public class HtmlTags {
     static final char BEGIN_TAG = '<';
+    static final String BEGIN_CLOSE_TAG = "</";
+    static final String BEGIN_COMMENT_TAG = "<!-- ";
+    static final String END_COMMENT_TAG = " -->";
+    static final String ATTRIBUTE_MID = "=\"";
     static final char FINISH_TAG = '>';
     static final char SPACE = ' ';
     static final char QUOTATION = '"';
@@ -55,32 +46,35 @@ public class HtmlTags {
     /**
      * According to https://www.w3.org/TR/html5/syntax.html#void-elements
      */
-    static final Class<?>[] VOID_ELEMENTS = {
-            Area.class,
-            Base.class,
-            Br.class,
-            Col.class,
-            Embed.class,
-            Hr.class,
-            Img.class,
-            Input.class,
-            Link.class,
-            Meta.class,
-            Param.class,
-            Source.class
+    static final String[] VOID_ELEMENTS = {
+            firstToLower(Area.class.getSimpleName()),
+            firstToLower(Base.class.getSimpleName()),
+            firstToLower(Br.class.getSimpleName()),
+            firstToLower(Col.class.getSimpleName()),
+            firstToLower(Embed.class.getSimpleName()),
+            firstToLower(Hr.class.getSimpleName()),
+            firstToLower(Img.class.getSimpleName()),
+            firstToLower(Input.class.getSimpleName()),
+            firstToLower(Link.class.getSimpleName()),
+            firstToLower(Meta.class.getSimpleName()),
+            firstToLower(Param.class.getSimpleName()),
+            firstToLower(Source.class.getSimpleName())
     };
 
-    static void printOpenTag(PrintStream out, Element<?, ?> elem) {
-        out.print(BEGIN_TAG);
-        out.print(elem.getName());
+    static String firstToLower(String name){
+        return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
-    public static void printAttribute(PrintStream out, Attribute attribute) {
+    static void printOpenTag(PrintStream out, String elementName) {
+        out.print(BEGIN_TAG);
+        out.print(elementName);
+    }
+
+    public static void printAttribute(PrintStream out, String attributeName, String attributeValue) {
         out.print(SPACE);
-        out.print(attribute.getName());
-        out.print(EQUALS);
-        out.print(QUOTATION);
-        out.print(attribute.getValue());
+        out.print(attributeName);
+        out.print(ATTRIBUTE_MID);
+        out.print(attributeValue);
         out.print(QUOTATION);
     }
 
@@ -88,24 +82,40 @@ public class HtmlTags {
         out.print(FINISH_TAG);
     }
 
-    static void printCloseTag(PrintStream out, Element<?, ?> elem) {
-        out.print(BEGIN_TAG);      // <
-        out.print(SLASH);          // </
-        out.print(elem.getName()); // </name
-        out.print(FINISH_TAG);     // </name>
+    static void printOpenComment(PrintStream out) {
+        out.print(BEGIN_COMMENT_TAG);
     }
 
-    public static void appendOpenTag(StringBuilder sb, Element<?, ?> elem) {
+    static void printEndComment(PrintStream out) {
+        out.print(END_COMMENT_TAG);
+    }
+
+    static void printCloseTag(PrintStream out, String elementName) {
+        out.print(BEGIN_CLOSE_TAG);     // </
+        out.print(elementName);         // </name
+        out.print(FINISH_TAG);          // </name>
+    }
+
+    public static void appendOpenTag(StringBuilder sb, String elementName) {
         sb.append(BEGIN_TAG);
-        sb.append(elem.getName());
+        sb.append(elementName);
     }
 
-    public static void appendAttribute(StringBuilder sb, Attribute attribute) {
+    public static void appendOpenTag2(StringBuilder sb, String openingTag) {
+        sb.append(openingTag);
+    }
+
+    public static void appendAttribute(StringBuilder sb, String attributeName, String attributeValue) {
         sb.append(SPACE);
-        sb.append(attribute.getName());
-        sb.append(EQUALS);
+        sb.append(attributeName);
+        sb.append(ATTRIBUTE_MID);
+        sb.append(attributeValue);
         sb.append(QUOTATION);
-        sb.append(attribute.getValue());
+    }
+
+    public static void appendAttribute2(StringBuilder sb, String firstBlock, String attributeValue) {
+        sb.append(firstBlock); // " attributeName=\""
+        sb.append(attributeValue);
         sb.append(QUOTATION);
     }
 
@@ -114,17 +124,27 @@ public class HtmlTags {
     }
 
 
-    public static void appendCloseTag(StringBuilder sb, Element<?, ?> elem) {
-        sb.append(BEGIN_TAG);      // <
-        sb.append(SLASH);          // </
-        sb.append(elem.getName()); // </name
-        sb.append(FINISH_TAG);     // </name>
+    public static void appendCloseTag(StringBuilder sb, String elementName) {
+        sb.append(BEGIN_CLOSE_TAG);     // </
+        sb.append(elementName);         // </name
+        sb.append(FINISH_TAG);          // </name>
     }
 
-    static boolean isVoidElement(Element elem) {
-        Class<? extends Element> k = elem.getClass();
+    public static void appendCloseTag2(StringBuilder sb, String closingTag) {
+        sb.append(closingTag);          // </name>
+    }
+
+    public static void appendOpenComment(StringBuilder sb) {
+        sb.append(BEGIN_COMMENT_TAG);      // <!--
+    }
+
+    public static void appendEndComment(StringBuilder sb) {
+        sb.append(END_COMMENT_TAG);      // -->
+    }
+
+    static boolean isVoidElement(String elementName) {
         for (int i = 0; i < VOID_ELEMENTS.length; i++) {
-            if(VOID_ELEMENTS[i] == k)
+            if(VOID_ELEMENTS[i].equals(elementName))
                 return true;
         }
         return false;
