@@ -29,7 +29,7 @@ import org.xmlet.htmlapifaster.ElementVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static htmlflow.HtmlViewCached.HEADER;
+import static htmlflow.HtmlTags.FINISH_TAG;
 
 /**
  * @author Miguel Gamboa
@@ -40,22 +40,18 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
     private static final char NEWLINE = '\n';
     private static final int tabsMax;
     private static String[] tabs;
+    private static String[] closedTabs;
 
     static {
         tabsMax = 1000;
-        tabs = new String[tabsMax];
-
-        for (int i = 0; i < tabsMax; i++) {
-            char[] aux = new char[i + 1];
-            aux[0] = NEWLINE;
-
-            tabs[i] = new String(aux).replace('\0', '\t');
-        }
+        tabs = HtmlUtils.createTabs(tabsMax);
+        closedTabs = HtmlUtils.createClosedTabs(tabsMax);
     }
 
     private final StringBuilder sb;
     private StringBuilder cacheBitsStorage;
     private int depth;
+    private int startingDepth;
     private boolean isClosed = true;
     private boolean openDynamic = false;
     private boolean isCached = false;
@@ -63,75 +59,65 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
     private PartInfo[] cacheBitsArray;
     private int cacheIndex = 0;
 
-    public HtmlVisitorStringBuilderCached(StringBuilder sb) {
+    HtmlVisitorStringBuilderCached(StringBuilder sb) {
         this.sb = sb;
-        this.cacheBitsStorage = new StringBuilder();
+        this.cacheBitsStorage = new StringBuilder(sb.toString());
+    }
+
+    @SuppressWarnings("unused")
+    public HtmlVisitorStringBuilderCached(StringBuilder sb, int depth) {
+        this.sb = sb;
+        this.cacheBitsStorage = new StringBuilder(sb.toString());
+        this.depth = depth;
+        this.startingDepth = depth;
+
+        for (int i = 0; i < depth; i++) {
+            sb.append('\t');
+            cacheBitsStorage.append('\t');
+        }
     }
 
     @Override
     public final void visitElement(String elementName) {
-        if (!isCached){
+        if (!isCached || openDynamic){
             if (!isClosed){
-                HtmlTags.appendOpenTagEnd(sb);
-                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
                 depth++;
             }
 
             tabs();
             HtmlTags.appendOpenTag(sb, elementName);
-            HtmlTags.appendOpenTag(cacheBitsStorage, elementName);
-            isClosed = false;
-        } else {
-            if (openDynamic){
-                if (!isClosed){
-                    HtmlTags.appendOpenTagEnd(sb);
-                    depth++;
-                }
 
-                tabs();
-                HtmlTags.appendOpenTag(sb, elementName);
-                isClosed = false;
+            if (!isCached){
+                HtmlTags.appendOpenTag(cacheBitsStorage, elementName);
             }
+
+            isClosed = false;
         }
     }
 
     @Override
     public final void visitParent(String elementName) {
-        if (!isCached){
-            if (!isClosed) {
-                HtmlTags.appendOpenTagEnd(sb);
-                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
-            }
-            else
+        if (!isCached || openDynamic){
+            if (isClosed) {
                 depth--;
-            isClosed = true;
+            }
 
             tabs();
             HtmlTags.appendCloseTag(sb, elementName);
-            HtmlTags.appendCloseTag(cacheBitsStorage, elementName);
-        } else {
-            if (openDynamic){
-                if (!isClosed) {
-                    HtmlTags.appendOpenTagEnd(sb);
-                }
-                else
-                    depth--;
-                isClosed = true;
 
-                tabs();
-                HtmlTags.appendCloseTag(sb, elementName);
+            if(!isCached){
+                HtmlTags.appendCloseTag(cacheBitsStorage, elementName);
             }
         }
     }
 
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
-        if (!isCached){
+        if (!isCached || openDynamic){
             HtmlTags.appendAttribute(sb, attributeName, attributeValue);
-            HtmlTags.appendAttribute(cacheBitsStorage, attributeName, attributeValue);
-        } else {
-            if (openDynamic){
-                HtmlTags.appendAttribute(sb, attributeName, attributeValue);
+
+            if (!isCached){
+                HtmlTags.appendAttribute(cacheBitsStorage, attributeName, attributeValue);
             }
         }
     }
@@ -141,82 +127,86 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
      */
     @Override
     public final <R> void visitText(R text) {
-        if (!isCached){
+        if (!isCached || openDynamic){
             if (!isClosed){
-                HtmlTags.appendOpenTagEnd(sb);
-                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
                 depth++;
-                isClosed = true;
             }
 
             tabs();
             sb.append(text);
-            cacheBitsStorage.append(text);
-        } else {
-            if (openDynamic){
-                if (!isClosed){
-                    HtmlTags.appendOpenTagEnd(sb);
-                    depth++;
-                    isClosed = true;
-                }
 
-                tabs();
-                sb.append(text);
+            if (!isCached){
+                cacheBitsStorage.append(text);
             }
         }
     }
 
     @Override
     public final <R> void visitComment(R comment) {
-        if (!isCached){
+        if (!isCached || openDynamic){
             if (!isClosed){
-                HtmlTags.appendOpenTagEnd(sb);
-                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
                 depth++;
-                isClosed = true;
             }
 
             tabs();
             HtmlTags.appendOpenComment(sb);
-            HtmlTags.appendOpenComment(cacheBitsStorage);
             sb.append(comment);
-            cacheBitsStorage.append(comment);
             HtmlTags.appendEndComment(sb);
-            HtmlTags.appendEndComment(cacheBitsStorage);
-        } else {
-            if (openDynamic){
-                if (!isClosed){
-                    HtmlTags.appendOpenTagEnd(sb);
-                    depth++;
-                    isClosed = true;
-                }
 
-                tabs();
-                HtmlTags.appendOpenComment(sb);
-                sb.append(comment);
-                HtmlTags.appendEndComment(sb);
+            if (!isCached){
+                HtmlTags.appendOpenComment(cacheBitsStorage);
+                cacheBitsStorage.append(comment);
+                HtmlTags.appendEndComment(cacheBitsStorage);
             }
         }
     }
 
-    public final void visitDynamicOpen(){
+    @Override
+    public final void visitOpenDynamic(){
+        openDynamic = true;
+
         if (isCached){
             PartInfo partInfo = cacheBitsArray[cacheIndex];
             sb.append(partInfo.part);
             this.depth = partInfo.currentDepth;
             this.isClosed = partInfo.isClosed;
             ++cacheIndex;
-            openDynamic = true;
         } else {
             cacheBitsList.add(new PartInfo(cacheBitsStorage.toString(), depth, isClosed));
         }
     }
 
-    public final void visitDynamicClose(){
+    public final void visitCloseDynamic(){
+        openDynamic = false;
+
         if (!isCached){
             cacheBitsStorage = new StringBuilder();
-        } else {
-            openDynamic = false;
+        }
+    }
+
+    /*=========================================================================*/
+    /*--------------------    Auxiliary Methods    ----------------------------*/
+    /*=========================================================================*/
+
+    private void tabs(){
+        if (!isCached || openDynamic){
+            if (isClosed){
+                if (sb.length() != startingDepth){
+                    sb.append(tabs[depth]);
+
+                    if (!isCached){
+                        cacheBitsStorage.append(tabs[depth]);
+                    }
+                }
+            } else {
+                sb.append(closedTabs[depth]);
+
+                if (!isCached){
+                    cacheBitsStorage.append(closedTabs[depth]);
+                }
+
+                isClosed = true;
+            }
         }
     }
 
@@ -225,7 +215,7 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
             sb.append(cacheBitsArray[cacheIndex].part);
         }
 
-        if (cacheBitsArray == null){
+        if (!isCached){
             cacheBitsList.add(new PartInfo(cacheBitsStorage.toString(), depth, isClosed));
             cacheBitsArray = new PartInfo[cacheBitsList.size()];
 
@@ -237,11 +227,32 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
         String result = sb.toString();
 
         sb.setLength(0);
-        sb.append(HEADER);
         cacheIndex = 0;
-        depth = 0;
+        depth = startingDepth;
 
         return result;
+    }
+
+    void add(String innerView) {
+        if (!isClosed){
+            HtmlTags.appendOpenTagEnd(sb);
+
+            if (!isCached){
+                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
+            }
+
+            ++depth;
+        }
+
+        sb.append(NEWLINE);
+        sb.append(innerView);
+
+        if (!isCached){
+            cacheBitsStorage.append(NEWLINE);
+            cacheBitsStorage.append(innerView);
+        }
+
+        isClosed = true;
     }
 
     class PartInfo{
@@ -250,26 +261,15 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
         int currentDepth;
         boolean isClosed;
 
-        public PartInfo(String part, int currentDepth, boolean isClosed){
+        PartInfo(String part, int currentDepth, boolean isClosed){
             this.part = part;
             this.currentDepth = currentDepth;
             this.isClosed = isClosed;
         }
     }
 
-    /*=========================================================================*/
-    /*--------------------    Auxiliary Methods    ----------------------------*/
-    /*=========================================================================*/
-
-    private void tabs(){
-        if (!isCached){
-            sb.append(tabs[depth]);
-            cacheBitsStorage.append(tabs[depth]);
-        } else {
-            if (openDynamic){
-                sb.append(tabs[depth]);
-            }
-        }
+    StringBuilder getStringBuilder(){
+        return sb;
     }
 
     /*=========================================================================*/
@@ -277,50 +277,32 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
     /*=========================================================================*/
 
     private void visitParentSpecial(){
-        if (!isCached){
+        if (!isCached || openDynamic){
             if (!isClosed){
                 HtmlTags.appendOpenTagEnd(sb);
-                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
+
+                if (!isCached){
+                    HtmlTags.appendOpenTagEnd(cacheBitsStorage);
+                }
             }
             else
                 depth--;
+
             isClosed = true;
-        } else {
-            if (openDynamic){
-                if (!isClosed){
-                    HtmlTags.appendOpenTagEnd(sb);
-                }
-                else
-                    depth--;
-                isClosed = true;
-            }
         }
     }
 
     private void visitParent2(String closingTag){
-        if (!isCached){
-            if (!isClosed){
-                HtmlTags.appendOpenTagEnd(sb);
-                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
-            }
-            else
+        if (!isCached || openDynamic){
+            if (isClosed) {
                 depth--;
-            isClosed = true;
+            }
 
             tabs();
             HtmlTags.appendCloseTag2(sb, closingTag);
-            HtmlTags.appendCloseTag2(cacheBitsStorage, closingTag);
-        } else {
-            if (openDynamic){
-                if (!isClosed){
-                    HtmlTags.appendOpenTagEnd(sb);
-                }
-                else
-                    depth--;
-                isClosed = true;
 
-                tabs();
-                HtmlTags.appendCloseTag2(sb, closingTag);
+            if (!isCached){
+                HtmlTags.appendCloseTag2(cacheBitsStorage, closingTag);
             }
         }
     }
@@ -746,28 +728,19 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
     /*=========================================================================*/
 
     private void visitElement2(String openingTag) {
-        if (!isCached){
+        if (!isCached || openDynamic){
             if (!isClosed){
-                HtmlTags.appendOpenTagEnd(sb);
-                HtmlTags.appendOpenTagEnd(cacheBitsStorage);
                 depth++;
             }
 
             tabs();
             HtmlTags.appendOpenTag2(sb, openingTag);
-            HtmlTags.appendOpenTag2(cacheBitsStorage, openingTag);
-            isClosed = false;
-        } else {
-            if (openDynamic){
-                if (!isClosed){
-                    HtmlTags.appendOpenTagEnd(sb);
-                    depth++;
-                }
 
-                tabs();
-                HtmlTags.appendOpenTag2(sb, openingTag);
-                isClosed = false;
+            if (!isCached){
+                HtmlTags.appendOpenTag2(cacheBitsStorage, openingTag);
             }
+
+            isClosed = false;
         }
     }
 
@@ -1192,12 +1165,11 @@ public class HtmlVisitorStringBuilderCached extends ElementVisitor {
     /*=========================================================================*/
 
     private void visitAttribute2(String name, String attributeValue){
-        if (!isCached){
+        if (!isCached || openDynamic) {
             HtmlTags.appendAttribute2(sb, name, attributeValue);
-            HtmlTags.appendAttribute2(cacheBitsStorage, name, attributeValue);
-        } else {
-            if (openDynamic){
-                HtmlTags.appendAttribute2(sb, name, attributeValue);
+
+            if (!isCached) {
+                HtmlTags.appendAttribute2(cacheBitsStorage, name, attributeValue);
             }
         }
     }

@@ -26,7 +26,8 @@ package htmlflow.test;
 
 import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.EnumRelLinkType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
 
 public class HtmlTables {
 

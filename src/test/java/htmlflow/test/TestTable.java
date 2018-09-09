@@ -31,12 +31,7 @@ import org.junit.Test;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlet.htmlapifaster.Body;
-import org.xmlet.htmlapifaster.Div;
-import org.xmlet.htmlapifaster.Head;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Table;
-import org.xmlet.htmlapifaster.Tr;
+import org.xmlet.htmlapifaster.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;

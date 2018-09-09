@@ -24,15 +24,12 @@
 
 package htmlflow.test;
 
-import htmlflow.HtmlView;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 
 /**
  * @author Miguel Gamboa

@@ -27,7 +27,6 @@ package htmlflow.test;
 import htmlflow.HtmlView;
 import junit.framework.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class TestHtmlViewAsElement {
 

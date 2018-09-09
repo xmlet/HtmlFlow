@@ -26,11 +26,7 @@ package htmlflow.test;
 
 import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapifaster.EnumEnctypeForm;
-import org.xmlet.htmlapifaster.EnumMethodForm;
-import org.xmlet.htmlapifaster.EnumRelLinkType;
-import org.xmlet.htmlapifaster.EnumTypeContentType;
-import org.xmlet.htmlapifaster.EnumTypeScript;
+import org.xmlet.htmlapifaster.*;
 
 public class HtmlLists {
     static final String divClass = "divClass";

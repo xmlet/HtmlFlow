@@ -24,13 +24,12 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Html;
 
 import java.io.*;
-import java.lang.Object;
 import java.net.URL;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
  * @author Miguel Gamboa
  *         created on 29-03-2012
  */
-public class HtmlViewCached implements Element<HtmlViewCached, Element> {
+public class HtmlViewCached<L extends Element> {
 
     static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -65,24 +64,19 @@ public class HtmlViewCached implements Element<HtmlViewCached, Element> {
     }
 
     private StringBuilder sb;
-    private Html<HtmlViewCached> root;
+    private L root;
     private HtmlVisitorStringBuilderCached visitor;
-    private BiConsumer<HtmlViewCached, Object> viewFunction;
+    private BiConsumer<HtmlViewCached<L>, Object> viewFunction;
 
-    public HtmlViewCached(BiConsumer<HtmlViewCached, Object> viewFunction) {
-        this.sb = new StringBuilder();
-        sb.append(HEADER);
-        this.visitor = new HtmlVisitorStringBuilderCached(sb);
+    public static HtmlViewCached<Html<Element>> html(BiConsumer<HtmlViewCached<Html<Element>>, Object> viewFunction){
+        return new HtmlViewCached<>(viewFunction, new Html<>(new HtmlVisitorStringBuilderCached(new StringBuilder().append(HEADER))));
+    }
+
+    public HtmlViewCached(BiConsumer<HtmlViewCached<L>, Object> viewFunction, L root) {
+        this.visitor = (HtmlVisitorStringBuilderCached) root.getVisitor();
+        this.sb = this.visitor.getStringBuilder();
         this.viewFunction = viewFunction;
-        root = new Html<>(this);
-    }
-
-    public Head<Html<HtmlViewCached>> head(){
-        return root.head();
-    }
-
-    public Body<Html<HtmlViewCached>> body(){
-        return root.body();
+        this.root = root;
     }
 
     public <R> String render(R model) {
@@ -91,29 +85,23 @@ public class HtmlViewCached implements Element<HtmlViewCached, Element> {
         return visitor.setTemplateDefined();
     }
 
-    @Override
-    public HtmlViewCached self() {
-        return this;
-    }
-
-    @Override
+    @SuppressWarnings("unused")
     public HtmlVisitorStringBuilderCached getVisitor() {
         return visitor;
     }
 
-    @Override
-    public String getName() {
-        return "HtmlView";
+    public L getRoot() {
+        return root;
     }
 
-    @Override
-    public Element º() {
-        return null;
+    @SuppressWarnings("unused")
+    public L addHeader(){
+        sb.append(HEADER);
+        return root;
     }
 
-    @Override
-    public Element getParent() {
-        return null;
+    @SuppressWarnings("unused")
+    public <K extends Element, R> void addInnerView(HtmlViewCached<K> innerView, R model){
+        visitor.add(innerView.render(model));
     }
-
 }

@@ -42,9 +42,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.htmlRender;
-import static htmlflow.test.Utils.htmlWrite;
-import static htmlflow.test.Utils.loadLines;
+import static htmlflow.test.Utils.*;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static junit.framework.Assert.assertEquals;

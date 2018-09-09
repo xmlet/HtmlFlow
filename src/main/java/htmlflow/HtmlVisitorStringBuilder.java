@@ -24,7 +24,7 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.ElementVisitor;
 
 /**
  * @author Miguel Gamboa
@@ -32,57 +32,40 @@ import org.xmlet.htmlapifaster.*;
  */
 public class HtmlVisitorStringBuilder extends ElementVisitor {
 
-    private static final char NEWLINE = '\n';
     private static final int tabsMax;
     private static String[] tabs;
-
-    private int elementCount = 0;
-    private int attributeCount = 0;
-    private int parentCount = 0;
-    private int parentRegularCount = 0;
-    private int textCount = 0;
-    private int commentCount = 0;
+    private static String[] closedTabs;
 
     static {
         tabsMax = 1000;
-        tabs = new String[tabsMax];
-
-        for (int i = 0; i < tabsMax; i++) {
-            char[] aux = new char[i + 1];
-            aux[0] = NEWLINE;
-
-            tabs[i] = new String(aux).replace('\0', '\t');
-        }
+        tabs = HtmlUtils.createTabs(tabsMax);
+        closedTabs = HtmlUtils.createClosedTabs(tabsMax);
     }
 
     private final StringBuilder sb;
     private int depth;
     private boolean isClosed = true;
 
-    public HtmlVisitorStringBuilder(StringBuilder sb) {
+    HtmlVisitorStringBuilder(StringBuilder sb) {
         this.sb = sb;
     }
 
     @Override
     public final void visitElement(String elementName) {
         if (!isClosed){
-            HtmlTags.appendOpenTagEnd(sb);
             depth++;
         }
 
         tabs();
         HtmlTags.appendOpenTag(sb, elementName);
         isClosed = false;
-        //++elementCount;
     }
 
     @Override
     public final void visitParent(String elementName) {
-        if (!isClosed)
-            HtmlTags.appendOpenTagEnd(sb);
-        else
+        if (isClosed){
             depth--;
-        isClosed = true;
+        }
 
         tabs();
         HtmlTags.appendCloseTag(sb, elementName);
@@ -91,7 +74,6 @@ public class HtmlVisitorStringBuilder extends ElementVisitor {
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
         HtmlTags.appendAttribute(sb, attributeName, attributeValue);
-        //++attributeCount;
     }
 
     /**
@@ -100,29 +82,23 @@ public class HtmlVisitorStringBuilder extends ElementVisitor {
     @Override
     public final <R> void visitText(R text) {
         if (!isClosed){
-            HtmlTags.appendOpenTagEnd(sb);
             depth++;
-            isClosed = true;
         }
 
         tabs();
         sb.append(text);
-        //++textCount;
     }
 
     @Override
     public final <R> void visitComment(R comment) {
         if (!isClosed){
-            HtmlTags.appendOpenTagEnd(sb);
             depth++;
-            isClosed = true;
         }
 
         tabs();
         HtmlTags.appendOpenComment(sb);
         sb.append(comment);
         HtmlTags.appendEndComment(sb);
-        //++commentCount;
     }
 
     /*=========================================================================*/
@@ -130,35 +106,12 @@ public class HtmlVisitorStringBuilder extends ElementVisitor {
     /*=========================================================================*/
 
     private void tabs(){
-        sb.append(tabs[depth]);
-    }
-
-    /*=========================================================================*/
-    /*--------------------    Statistic Methods    ----------------------------*/
-    /*=========================================================================*/
-
-    public int getElementCount() {
-        return elementCount;
-    }
-
-    public int getParentCount() {
-        return parentCount;
-    }
-
-    public int getParentRegularCount() {
-        return parentRegularCount;
-    }
-
-    public int getAttributeCount() {
-        return attributeCount;
-    }
-
-    public int getCommentCount() {
-        return commentCount;
-    }
-
-    public int getTextCount() {
-        return textCount;
+        if (isClosed){
+            sb.append(tabs[depth]);
+        } else {
+            sb.append(closedTabs[depth]);
+            isClosed = true;
+        }
     }
 
     /*=========================================================================*/
@@ -174,11 +127,9 @@ public class HtmlVisitorStringBuilder extends ElementVisitor {
     }
 
     private void visitParent2(String closingTag){
-        if (!isClosed)
-            HtmlTags.appendOpenTagEnd(sb);
-        else
+        if (isClosed){
             depth--;
-        isClosed = true;
+        }
 
         tabs();
         HtmlTags.appendCloseTag2(sb, closingTag);
@@ -606,16 +557,13 @@ public class HtmlVisitorStringBuilder extends ElementVisitor {
 
     private void visitElement2(String openingTag) {
         if (!isClosed){
-            HtmlTags.appendOpenTagEnd(sb);
             depth++;
         }
 
         tabs();
         HtmlTags.appendOpenTag2(sb, openingTag);
         isClosed = false;
-        //++elementCount;
     }
-
 
     public final void visitElementSelect() {
         this.visitElement2("<select");
