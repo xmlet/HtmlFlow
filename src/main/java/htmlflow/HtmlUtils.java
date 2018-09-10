@@ -4,7 +4,10 @@ import static htmlflow.HtmlTags.FINISH_TAG;
 
 class HtmlUtils {
 
-    private static final char NEWLINE = '\n';
+    static final char NEWLINE = '\n';
+    static final char TAB = '\t';
+
+    private HtmlUtils(){ }
 
     static String[] createTabs(int tabsMax){
         String[] tabs = new String[tabsMax];
@@ -13,7 +16,7 @@ class HtmlUtils {
             char[] newTab = new char[i + 1];
             newTab[0] = NEWLINE;
 
-            tabs[i] = new String(newTab).replace('\0', '\t');
+            tabs[i] = new String(newTab).replace('\0', TAB);
         }
 
         return tabs;
@@ -28,7 +31,7 @@ class HtmlUtils {
             newClosedTab[0] = FINISH_TAG;
             newClosedTab[1] = NEWLINE;
 
-            closedTabs[i] = new String(newClosedTab).replace('\0', '\t');
+            closedTabs[i] = new String(newClosedTab).replace('\0', TAB);
         }
 
         return closedTabs;

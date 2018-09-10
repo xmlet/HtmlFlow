@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  */
 public class HtmlViewCached<L extends Element> {
 
-    static final String HEADER;
+    private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
     private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
 
@@ -72,6 +72,7 @@ public class HtmlViewCached<L extends Element> {
         return new HtmlViewCached<>(viewFunction, new Html<>(new HtmlVisitorStringBuilderCached(new StringBuilder().append(HEADER))));
     }
 
+    @SuppressWarnings("WeakerAccess")
     public HtmlViewCached(BiConsumer<HtmlViewCached<L>, Object> viewFunction, L root) {
         this.visitor = (HtmlVisitorStringBuilderCached) root.getVisitor();
         this.sb = this.visitor.getStringBuilder();

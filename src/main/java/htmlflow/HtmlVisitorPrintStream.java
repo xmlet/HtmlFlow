@@ -34,24 +34,30 @@ import java.io.PrintStream;
  */
 public class HtmlVisitorPrintStream extends ElementVisitor {
 
+    private static final int tabsMax;
+    private static String[] tabs;
+    private static String[] closedTabs;
+
+    static {
+        tabsMax = 1000;
+        tabs = HtmlUtils.createTabs(tabsMax);
+        closedTabs = HtmlUtils.createClosedTabs(tabsMax);
+    }
+
     protected final PrintStream out;
     private int depth;
     private boolean isClosed = true;
 
-    public HtmlVisitorPrintStream(PrintStream out) {
+    HtmlVisitorPrintStream(PrintStream out) {
         this.out = out;
     }
-
-    protected final void incTabs() { depth++;}
-    protected final void decTabs() { depth--;}
 
     @Override
     public final void visitElement(String elementName) {
         if (!isClosed){
-            HtmlTags.printOpenTagEnd(out);
-            incTabs();
+            depth++;
         }
-        out.println();
+
         tabs();
         HtmlTags.printOpenTag(out, elementName);
         isClosed = false;
@@ -59,14 +65,10 @@ public class HtmlVisitorPrintStream extends ElementVisitor {
 
     @Override
     public void visitParent(String elementName) {
-        if (!isClosed)
-            HtmlTags.printOpenTagEnd(out);
-        else
-            decTabs();
-        isClosed = true;
+        if (isClosed){
+            depth--;
+        }
 
-        if(HtmlTags.isVoidElement(elementName)) return;
-        out.println();
         tabs();
         HtmlTags.printCloseTag(out, elementName);
     }
@@ -82,11 +84,9 @@ public class HtmlVisitorPrintStream extends ElementVisitor {
     @Override
     public <R> void visitText(R text) {
         if (!isClosed){
-            HtmlTags.printOpenTagEnd(out);
-            incTabs();
-            isClosed = true;
+            depth++;
         }
-        out.println();
+
         tabs();
         out.print(text);
     }
@@ -94,23 +94,98 @@ public class HtmlVisitorPrintStream extends ElementVisitor {
     @Override
     public <R> void visitComment(R comment) {
         if (!isClosed){
-            HtmlTags.printOpenTagEnd(out);
-            incTabs();
-            isClosed = true;
+            depth++;
         }
-        out.println();
+
         tabs();
-        HtmlTags.printOpenComment(out);
-        out.print(comment);
-        HtmlTags.printEndComment(out);
+        HtmlTags.printComment(out, comment.toString());
     }
 
     /*=========================================================================*/
     /*--------------------    Auxiliary Methods    ----------------------------*/
     /*=========================================================================*/
 
-    final void tabs(){
-        for (int i = 0; i < depth; i++)
-            out.print('\t');
+    private void tabs(){
+        if (isClosed){
+            out.print(tabs[depth]);
+        } else {
+            out.print(closedTabs[depth]);
+            isClosed = true;
+        }
+    }
+
+    /*=========================================================================*/
+    /*--------------------      Parent Methods     ----------------------------*/
+    /*=========================================================================*/
+
+    /**
+     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
+     */
+    private void visitParentSpecial(){
+        if (!isClosed)
+            HtmlTags.printOpenTagEnd(out);
+        else
+            depth--;
+        isClosed = true;
+    }
+
+    @Override
+    public final void visitParentHr() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentEmbed() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentInput() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentMeta() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentBr() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentCol() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentSource() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentImg() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentArea() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentLink() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentParam() {
+        visitParentSpecial();
+    }
+
+    @Override
+    public final void visitParentBase() {
+        visitParentSpecial();
     }
 }
