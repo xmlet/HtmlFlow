@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,31 +22,42 @@
  * SOFTWARE.
  */
 
-package htmlflow.test;
+package htmlflow.util;
 
-import htmlflow.StaticHtml;
-import junit.framework.Assert;
-import org.junit.Test;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
-public class TestHtmlViewAsElement {
+public class PrintStringBuilder extends PrintStream{
 
-    @Test
-    public void testSelf() {
-        StaticHtml
-            .view(view -> {
-                Html<Element> html = view.html();
-                Assert.assertSame(html, html.self());
-            })
-            .render();
+    private final StringBuilder sb = new StringBuilder();
 
+    public PrintStringBuilder(OutputStream out) {
+        super(out);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testWrongRender() {
-        StaticHtml
-            .view(System.out, view -> {})
-            .render();
+    @Override
+    public void print(char c) {
+        super.print(c);
+        sb.append(c);
+    }
+
+    @Override
+    public void print(String s) {
+        super.print(s);
+        sb.append(s);
+    }
+
+    @Override
+    public void println(String x) {
+        super.println(x);
+        sb.append('\n');
+    }
+
+    public String substring(int startingIndex) {
+        return sb.substring(startingIndex);
+    }
+
+    public int length() {
+        return sb.length();
     }
 }

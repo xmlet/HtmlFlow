@@ -26,7 +26,7 @@ package htmlflow;
 
 import java.io.PrintStream;
 
-public class HtmlTags {
+public class Tags {
     private static final char BEGIN_TAG = '<';
     private static final String BEGIN_CLOSE_TAG = "</";
     private static final String BEGIN_COMMENT_TAG = "<!-- ";
@@ -36,7 +36,7 @@ public class HtmlTags {
     private static final char SPACE = ' ';
     private static final char QUOTATION = '"';
 
-    private HtmlTags() { }
+    private Tags() { }
 
     static void printOpenTag(PrintStream out, String elementName) {
         out.print(BEGIN_TAG);
@@ -70,10 +70,6 @@ public class HtmlTags {
     static void appendOpenTag(StringBuilder sb, String elementName) {
         sb.append(BEGIN_TAG);
         sb.append(elementName);
-    }
-
-    static void appendOpenTagEnd(StringBuilder sb) {
-        sb.append(FINISH_TAG);
     }
 
     static void appendAttribute(StringBuilder sb, String attributeName, String attributeValue) {

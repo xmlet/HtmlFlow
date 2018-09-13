@@ -26,11 +26,11 @@
  */
 package htmlflow.test;
 
-import htmlflow.HtmlView;
+import htmlflow.DynamicHtml;
+import htmlflow.StaticHtml;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
-import org.junit.Assert;
 import org.junit.Test;
 import org.xmlet.htmlapifaster.Div;
 
@@ -57,8 +57,10 @@ public class TestAttributesClassId {
 
   @Test
   public void testGetElementName() {
-    HtmlView taskView = new HtmlView(new StringBuilder());
-    Assert.assertEquals(DIV_NAME + " element was expected", DIV_NAME, taskView.body().div().getName());
+    StaticHtml
+      .view(v -> assertEquals(DIV_NAME, v.html().body().div().getName()))
+      .render();
+
   }
 
   @Test
@@ -66,11 +68,13 @@ public class TestAttributesClassId {
 
     Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     ByteArrayOutputStream mem = new ByteArrayOutputStream();
-    HtmlLists.taskView(HtmlView.html(new PrintStream(mem)), t1);
+    DynamicHtml
+      .view(new PrintStream(mem), HtmlLists::taskView)
+      .write(t1);
     List<String> actual = htmlWrite(mem).collect(toList());
 
     String result = actual.stream().collect(joining("\n"));
-    //System.out.println(result);
+    System.out.println(result);
     assertTrue(result.contains("<div"));
     assertTrue(result.contains("</div>"));
     assertTrue(result.contains(HtmlLists.divClass));

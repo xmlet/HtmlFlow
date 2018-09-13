@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,31 +22,45 @@
  * SOFTWARE.
  */
 
-package htmlflow.test;
+package htmlflow;
 
-import htmlflow.StaticHtml;
-import junit.framework.Assert;
-import org.junit.Test;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
+import java.io.PrintStream;
 
-public class TestHtmlViewAsElement {
+/**
+ * Writes HTML content into a {@link java.io.PrintStream}.
+ *
+ * @param <T> The type of domain object bound to this View.
+ *
+ * @author Miguel Gamboa
+ *         created on 29-03-2012
+ */
+public interface HtmlWriter<T>{
+    /**
+     * Writes into an internal PrintStream the HTML content.
+     */
+    void write();
+    /**
+     * Writes into an internal PrintStream the HTML content
+     * binding the object model with the HTML elements.
+     *
+     * @param model An object model that could be bind to each element.
+     */
+    void write(T model);
 
-    @Test
-    public void testSelf() {
-        StaticHtml
-            .view(view -> {
-                Html<Element> html = view.html();
-                Assert.assertSame(html, html.self());
-            })
-            .render();
+    /**
+     * Sets the current PrintStream.
+     */
+    HtmlWriter<T> setPrintStream(PrintStream out);
 
-    }
+    /**
+     * Returns a new String with the HTML content of this view.
+     */
+    String render();
 
-    @Test(expected = IllegalStateException.class)
-    public void testWrongRender() {
-        StaticHtml
-            .view(System.out, view -> {})
-            .render();
-    }
+    /**
+     * Returns a new String with the HTML content of this view.
+     *
+     * @param model An object model that could be bind to each element of the view.
+     */
+    String render(T model);
 }

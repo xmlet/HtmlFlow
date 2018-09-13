@@ -1,26 +1,27 @@
 package htmlflow.test;
 
-import htmlflow.HtmlViewCached;
+import htmlflow.DynamicHtml;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
 
 public class TestCached {
 
-    @Test
-    public void cacheTest(){
-        HtmlViewCached<Html<Element>> testView = HtmlViewCached.html((HtmlViewCached<Html<Element>> view, Object name) ->
-            view.getRoot()
-                .body()
-                    .div()
-                        .h1()
-                            .of(h1 -> h1.text(name))
+    static void testView(DynamicHtml<String> view, String name) {
+            view
+                .html()
+                    .body()
+                        .div()
+                            .h1()
+                                .of(h1 -> h1.text(name))
+                            .º()
                         .º()
                     .º()
-                .º()
-            .º()
-        );
+                .º();
+    }
+
+    @Test
+    public void cacheTest(){
+
 
         String expected1 =  "<!DOCTYPE html>\n" +
                             "<html>\n" +
@@ -44,6 +45,7 @@ public class TestCached {
                             "\t</body>\n" +
                             "</html>";
 
+        DynamicHtml<String> testView = DynamicHtml.view(TestCached::testView);
         Assert.assertEquals(testView.render("Luis"), expected1);
         Assert.assertEquals(testView.render("Duarte"), expected2);
     }

@@ -23,7 +23,8 @@
  */
 package htmlflow.test;
 
-import htmlflow.HtmlView;
+import htmlflow.DynamicHtml;
+import htmlflow.StaticHtml;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
@@ -31,7 +32,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.Body;
+import org.xmlet.htmlapifaster.Head;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Link;
+import org.xmlet.htmlapifaster.Title;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
@@ -42,7 +47,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.*;
+import static htmlflow.test.Utils.htmlRender;
+import static htmlflow.test.Utils.htmlWrite;
+import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static junit.framework.Assert.assertEquals;
@@ -72,8 +79,9 @@ public class TestDivDetails {
         //
         // Produces an HTML document
         //
-        String html = HtmlLists
-            .viewDetails(HtmlView.html()).render(); // 1) Get a string with the HTML
+        String html = StaticHtml
+            .view(HtmlLists::viewDetails)  // HtmlView for template function viewDetails
+            .render();                     // Get a string with the HTML
 
         /*
         HtmlLists   // 2) print to the standard output
@@ -110,7 +118,9 @@ public class TestDivDetails {
                 .stream()
                 .map(task -> {
                     ByteArrayOutputStream mem = new ByteArrayOutputStream();
-                    HtmlLists.taskDetailsView(HtmlView.html(new PrintStream(mem)), task);
+                    DynamicHtml
+                        .view(new PrintStream(mem), HtmlLists::taskDetailsView)
+                        .write(task);
                     return TaskHtml.of(task, htmlWrite(mem));
                 })
                 .forEach(taskHtml -> {
@@ -127,8 +137,7 @@ public class TestDivDetails {
                 .keySet()
                 .stream()
                 .map(task -> TaskHtml.of(task,
-                                htmlRender(
-                                        HtmlLists.taskDetailsView(HtmlView.html(), task))))
+                                htmlRender(DynamicHtml.view(HtmlLists::taskDetailsView), task)))
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews

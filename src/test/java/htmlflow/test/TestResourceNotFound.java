@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.BiConsumer;
 
 /**
  * @author Miguel Gamboa
@@ -42,8 +43,8 @@ public class TestResourceNotFound {
         throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
     {
         ClassLoaderGw gw = new ClassLoaderGw();
-        Class<?> klassView = gw.loadClass("htmlflow.HtmlView");
-        Object view = klassView.getMethod("html").invoke(null);
+        Class<?> klassView = gw.loadClass("htmlflow.DynamicHtml");
+        Object view = klassView.getMethod("view", BiConsumer.class).invoke(null);
     }
 }
 
