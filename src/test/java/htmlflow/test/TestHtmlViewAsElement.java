@@ -24,25 +24,29 @@
 
 package htmlflow.test;
 
-import htmlflow.HtmlView;
+import htmlflow.StaticHtml;
 import junit.framework.Assert;
 import org.junit.Test;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Html;
 
 public class TestHtmlViewAsElement {
 
     @Test
     public void testSelf() {
-        HtmlView<?> html = HtmlView.html();
-        Assert.assertSame(html, html.self());
+        StaticHtml
+            .view(view -> {
+                Html<Element> html = view.html();
+                Assert.assertSame(html, html.self());
+            })
+            .render();
+
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testVisitor() {
-        HtmlView.html().accept(null);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testCloneElem() {
-        HtmlView.html().cloneElem();
+    @Test(expected = IllegalStateException.class)
+    public void testWrongRender() {
+        StaticHtml
+            .view(System.out, view -> {})
+            .render();
     }
 }

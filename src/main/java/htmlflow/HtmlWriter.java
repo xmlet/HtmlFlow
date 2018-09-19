@@ -36,32 +36,31 @@ import java.io.PrintStream;
  */
 public interface HtmlWriter<T>{
     /**
-     * Writes into an internal PrintStream the HTML content
-     * of this element with zero indentation and without a
-     * domain object.
+     * Writes into an internal PrintStream the HTML content.
      */
     void write();
     /**
      * Writes into an internal PrintStream the HTML content
-     * of this element with initial indentation of zero.
+     * binding the object model with the HTML elements.
      *
-     * @param model An optional object model that could be bind to this element.
+     * @param model An object model that could be bind to each element.
      */
-    default void write(T model) {
-        write(0, model);
-    }
-    /**
-     * Writes into an internal PrintStream the HTML content
-     * of this element.
-     *
-     * @param depth The number of tabs indentation.
-     * @param model An optional object model that could be bind to this element.
-     */
-    void write(int depth, T model);
+    void write(T model);
 
     /**
      * Sets the current PrintStream.
-     * @param out
      */
     HtmlWriter<T> setPrintStream(PrintStream out);
+
+    /**
+     * Returns a new String with the HTML content of this view.
+     */
+    String render();
+
+    /**
+     * Returns a new String with the HTML content of this view.
+     *
+     * @param model An object model that could be bind to each element of the view.
+     */
+    String render(T model);
 }

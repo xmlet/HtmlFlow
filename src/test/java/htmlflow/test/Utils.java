@@ -23,23 +23,13 @@
  */
 package htmlflow.test;
 
-import htmlflow.HtmlView;
-import htmlflow.HtmlWriter;
+import htmlflow.DynamicHtml;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -59,20 +49,12 @@ public class Utils {
         return doc.getDocumentElement();
     }
 
-    static <T> Stream<String> htmlWrite(HtmlWriter<T> view, T model){
-        try(
-                ByteArrayOutputStream mem = new ByteArrayOutputStream();
-                PrintStream out = new PrintStream(mem))
-        {
-            view.setPrintStream(out).write(model);
-            InputStreamReader actual = new InputStreamReader(new ByteArrayInputStream(mem.toByteArray()));
-            return new BufferedReader(actual).lines();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    static <T> Stream<String> htmlWrite(ByteArrayOutputStream mem){
+        InputStreamReader actual = new InputStreamReader(new ByteArrayInputStream(mem.toByteArray()));
+        return new BufferedReader(actual).lines();
     }
 
-    static <T> Stream<String> htmlRender(HtmlView<T> view, T model){
+    static <T> Stream<String> htmlRender(DynamicHtml<T> view, T model){
         String html = view.render(model);
         return NEWLINE.splitAsStream(html);
     }

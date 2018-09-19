@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,12 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapi.AbstractElement;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Element;
-import org.xmlet.htmlapi.ElementVisitor;
-import org.xmlet.htmlapi.Head;
-import org.xmlet.htmlapi.Html;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Tr;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.URL;
 import java.util.stream.Collectors;
 
@@ -49,18 +41,24 @@ import java.util.stream.Collectors;
  *
  * @param <T> The type of domain object bound to this View.
  *
- * @author Miguel Gamboa
+ * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
-public class HtmlView<T> extends AbstractElement<HtmlView<T>, Element> implements HtmlWriter<T>{
+public abstract class HtmlView<T> implements HtmlWriter<T> {
+
+    final static String WRONG_USE_OF_RENDER_WITH_PRINTSTREAM =
+            "Wrong use of render(). " +
+            "Use write() instead to output to PrintStream. " +
+            "To get a String from render() then use view() without a PrintStream ";
+
 
     private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
-    public static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
+    private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
 
     static {
         try {
-            URL headerUrl = HtmlView.class
+            URL headerUrl = DynamicHtml.class
                     .getClassLoader()
                     .getResource(HEADER_TEMPLATE);
             if(headerUrl == null)
@@ -74,83 +72,33 @@ public class HtmlView<T> extends AbstractElement<HtmlView<T>, Element> implement
         }
     }
 
-    private PrintStream out;
-    private Html<HtmlView<T>> root;
+    protected ThreadLocal<HtmlVisitorCache> visitor;
 
-    /**
-     * @param <R> The type of domain object bound to the html.
-     */
-    public static <R> HtmlView<R> html(){
-        return new HtmlView<>();
+    public HtmlView(PrintStream out) {
+        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorPrintStream(out));
     }
 
     public HtmlView() {
-        super("HtmlView");
-        root = new Html<>(this);
-        addChild(root);
+        this.visitor = ThreadLocal.withInitial(HtmlVisitorStringBuilder::new);
     }
 
-    public Head<Html<HtmlView<T>>> head(){
-        return root.head();
+    public Html<Element> html() {
+        HtmlVisitorCache visitor = this.visitor.get();
+
+        if(!visitor.isCached) visitor.write(HEADER);
+        return new Html<>(visitor);
     }
 
-    public Body<Html<HtmlView<T>>> body(){
-        return root.body();
+    public Div<Element> div() {
+        return new Div<>(visitor.get());
     }
 
-    public String render() {
-        StringBuilder sb = new StringBuilder(HEADER);
-        root.accept(new HtmlVisitorStringBuilder(sb));
-        return sb.toString();
-    }
-
-    public String render(T model) {
-        StringBuilder sb = new StringBuilder(HEADER);
-        root.accept(new HtmlVisitorStringBuilderBinder<>(sb, model));
-        return sb.toString();
-    }
-
-    @Override
-    public void write() {
-        out.print(HEADER);
-        root.accept(new HtmlVisitor(out));
-        closeByteArrayStream();
-    }
-
-    @Override
-    public final void write(int depth, T model) {
-        out.print(HEADER);
-        root.accept(new HtmlVisitorBinder<>(out, model));
-        closeByteArrayStream();
-    }
-
-    private void closeByteArrayStream() {
-        if(out != null) {
-            out.flush();
-            out.close();
-            out = null;
-        }
+    public Tr<Element> tr() {
+        return new Tr<>(visitor.get());
     }
 
     @Override
     public HtmlWriter<T> setPrintStream(PrintStream out) {
-        this.out = out;
-        return this;
-    }
-
-
-    @Override
-    public HtmlView<T> self() {
-        return this;
-    }
-
-    @Override
-    public void accept(ElementVisitor visitor) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public HtmlView cloneElem() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 }

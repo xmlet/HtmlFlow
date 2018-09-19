@@ -24,159 +24,173 @@
 
 package htmlflow.test;
 
+import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
+import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.EnumRelLinkType;
-import org.xmlet.htmlapi.EnumTypeContentType;
-import org.xmlet.htmlapi.Html;
-import org.xmlet.htmlapi.Table;
-import org.xmlet.htmlapi.Tr;
-
-import static java.util.stream.IntStream.range;
+import org.xmlet.htmlapifaster.EnumRelLinkType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
 
 public class HtmlTables {
 
-    static final HtmlView<?> simpleTableView(int[][] output){
-        Table<Div<Body<Html<HtmlView<Object>>>>> t = HtmlView.html()
-            .head()
-                .title().text("Dummy Table")
-                .º()// title
-            .º()// head
-            .body()
-                .h1().text("Dummy Table").º()
-                .hr().º()
-                .div()
-                    .table()
-                        .tr()
-                            .th().text("Id1").º()
-                            .th().text("Id2").º()
-                            .th().text("Id3").º()
-                        .º();//tr
-        range(0, output.length)
-            .forEach(i -> {
-                Tr tr = t.tr();
-                range(0, output.length).forEach(j ->
-                    tr.td().text("" + output[i][j])
-                );
-            });
-        return t
-                    .º() //table
-                .º() //div
-            .º() //body
-        .º();//html
+    static void simpleTableView(DynamicHtml<int[][]> view, int[][] outputRows){
+        view
+            .html()
+                .head()
+                    .title().text("Dummy Table")
+                    .º()// title
+                .º()// head
+                .body()
+                    .h1().text("Dummy Table").º()
+                    .hr().º()
+                    .div()
+                        .table()
+                            .tr()
+                                .th().text("Id1").º()
+                                .th().text("Id2").º()
+                                .th().text("Id3").º()
+                            .º() //tr
+                            .dynamic(table -> {
+                                for (int[] outputRow : outputRows) {
+                                    table.tr()
+                                         .dynamic(tr -> {
+                                             for (int rowValue : outputRow) {
+                                                 tr.td()
+                                                     .text("" + rowValue)
+                                                 .º();
+                                             }
+                                         }).º();
+                                }
+                            })
+                        .º()
+                    .º()
+                .º()
+            .º();
     }
 
-    static final HtmlView<Iterable<Task>> taskListView = HtmlView
-        .<Iterable<Task>>html()
-            .head()
-                .title()
-                    .text("Task List")
-                    .º()
-                .link()
-                    .attrRel(EnumRelLinkType.STYLESHEET)
-                    .attrType(EnumTypeContentType.TEXT_CSS)
-                    .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-                .º()
-            .º()
-            .body()
-                .attrClass("container")
-                .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").º()
-                .p().text("Html page built with HtmlFlow.").º()
-                .h1().text("Task List").º()
-                .hr().º()
-                .div()
-                    .table()
-                        .attrClass("table")
-                        .tr()
-                            .th().text("Title").º()
-                            .th().text("Description").º()
-                            .th().text("Priority").º()
+    static void taskListViewWithPartials(DynamicHtml<Iterable<Task>> view, Iterable<Task> tasks){
+        view
+            .html()
+                .head()
+                    .title()
+                        .text("Task List")
                         .º()
-                        // prior version 2.0: table.trFromIterable(Task::getTitle, Task::getDescription, Task::getPriority);
-                        .<Iterable<Task>>binder((tbl, list) -> {
-                            list.forEach(task -> {
-                                tbl
-                                    .tr()
-                                        .td().text(task.getTitle()).º()
-                                        .td().text(task.getDescription()).º()
-                                        .td().text(task.getPriority().toString()).º()
-                                    .º(); // tr
-                            });
-                        })
-                    .º() // table
-                .º() // div
-            .º() // body
-        .º(); // html
-
-    static final HtmlView<Iterable<Task>> taskTableView = HtmlView
-        .<Iterable<Task>>html()
-            .head()
-                .title().text("Dummy Table")
+                    .link()
+                        .attrRel(EnumRelLinkType.STYLESHEET)
+                        .attrType(EnumTypeContentType.TEXT_CSS)
+                        .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+                    .º()
                 .º()
-            .º()
-            .body()
-                .h1().text("Dummy Table").º()
-                .hr().º()
-                .div()
-                    .table()
-                        .tr()
-                            .th().text("Title").º()
-                            .th().text("Description").º()
-                            .th().text("Priority").º()
-                        .º() // tr
-                        /*
-                         * Adds a dynamic Tr, which creates new Tr elements for each item
-                         * contained in the model received as argument of the write method.
-                         */
-                        // t.trFromIterable(binderGetTitle(), binderGetDescription(), binderGetPriority());
-                        .<Iterable<Task>>binder((tbl, list) -> {
-                            list.forEach(item -> {
-                                tbl.tr()
-                                    .td().text(item.getTitle()).º()
-                                    .td().text(item.getDescription()).º()
-                                    .td().text(item.getPriority().toString());
-                            });
-                        })
-                    .º() // table
-                .º() // div
-            .º() // body
-        .º(); // html
+                .body()
+                    .attrClass("container")
+                    .dynamic(__ ->
+                        view.addPartial(taskListViewHeader)
+                    )
+                    .hr().º()
+                    .div()
+                        .table()
+                            .attrClass("table")
+                            .tr()
+                                .th().text("Title").º()
+                                .th().text("Description").º()
+                                .th().text("Priority").º()
+                            .º()
+                            .tbody()
+                                .dynamic(tbody ->
+                                    tasks.forEach(task -> view.addPartial(taskListRow, task))
+                                )
+                            .º() // tbody
+                        .º() // table
+                    .º() // div
+                .º() // body
+            .º(); // html
+    }
+
+    static StaticHtml taskListViewHeader = StaticHtml.view(view -> view
+        .div()
+            .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").º()
+            .p().text("Html page built with HtmlFlow.").º()
+            .h1().text("Task List").º()
+        .º() // div
+    );
+
+    static DynamicHtml<Task> taskListRow = DynamicHtml.view((view, task) -> {
+        view
+            .tr()
+                .td().dynamic(td -> td.text(task.getTitle())).º()
+                .td().dynamic(td -> td.text(task.getDescription())).º()
+                .td().dynamic(td -> td.text(task.getPriority().toString())).º()
+            .º(); // tr
+    });
+
+    public static void taskTableView(DynamicHtml<Iterable<Task>> view, Iterable<Task> tasks){
+        view
+            .html()
+                .head()
+                    .title().text("Dummy Table")
+                    .º()
+                .º()
+                .body()
+                    .h1().text("Dummy Table").º()
+                    .hr().º()
+                    .div()
+                        .table()
+                            .tr()
+                                .th().text("Title").º()
+                                .th().text("Description").º()
+                                .th().text("Priority").º()
+                            .º() // tr
+                            .dynamic(table ->
+                                tasks.forEach(item ->
+                                    table
+                                        .tr()
+                                            .td().text(item.getTitle()).º()
+                                            .td().text(item.getDescription()).º()
+                                            .td().text(item.getPriority().toString()).º()
+                                        .º() // tr
+                                )
+                            )
+                        .º()
+                    .º()
+                .º()
+            .º();
+    }
 
     /**
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    static final HtmlView nestedTable = HtmlView
-        .html()
-            .body()
-                .table()
-                    .tr()
-                        .attrClass("top")
-                        .td()
-                            .attrColspan("2")
-                            .table()
-                                .tr()
-                                    .td()
-                                        .attrClass("title")
-                                        .img()
-                                            .attrSrc("logo.png")
-                                            .attrStyle("width:100%; max-width:300px;")
-                                        .º() // img
-                                    .º() // td
-                                .º() // tr
-                            .º() // table
-                        .º() // td
-                        .td()
-                            .text("Invoice #: 123")
-                            .br().º()
-                            .text("Created: January 1, 2015")
-                            .br().º()
-                            .text("Due: February 1, 2015")
-                        .º() // td
-                    .º() // tr
-                .º() // table
-            .º() // body
-        .º(); // html
+    static void nestedTable(StaticHtml view) {
+        view
+            .html()
+                .body()
+                    .table()
+                        .tr()
+                            .attrClass("top")
+                            .td()
+                                .attrColspan("2")
+                                .table()
+                                    .tr()
+                                        .td()
+                                            .attrClass("title")
+                                            .img()
+                                                .attrSrc("logo.png")
+                                                .attrStyle("width:100%; max-width:300px;")
+                                            .º() // img
+                                        .º() // td
+                                    .º() // tr
+                                .º() // table
+                            .º() // td
+                            .td()
+                                .text("Invoice #: 123")
+                                .br().º()
+                                .text("Created: January 1, 2015")
+                                .br().º()
+                                .text("Due: February 1, 2015")
+                            .º() // td
+                        .º() // tr
+                    .º() // table
+                .º() // body
+            .º(); // html
+    }
 }

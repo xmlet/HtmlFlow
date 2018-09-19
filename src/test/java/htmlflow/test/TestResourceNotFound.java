@@ -24,14 +24,13 @@
 
 package htmlflow.test;
 
-import htmlflow.HtmlView;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.net.URL;
+import java.lang.reflect.InvocationTargetException;
+import java.util.function.BiConsumer;
 
 /**
  * @author Miguel Gamboa
@@ -40,10 +39,12 @@ import java.net.URL;
 public class TestResourceNotFound {
 
     @Test(expected = ExceptionInInitializerError.class)
-    public void testHtmlViewHeaderNotFound() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+    public void testHtmlViewHeaderNotFound()
+        throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
+    {
         ClassLoaderGw gw = new ClassLoaderGw();
-        Class<?> klassView = gw.loadClass("htmlflow.HtmlView");
-        Object view = klassView.newInstance();
+        Class<?> klassView = gw.loadClass("htmlflow.DynamicHtml");
+        Object view = klassView.getMethod("view", BiConsumer.class).invoke(null);
     }
 }
 
@@ -65,6 +66,7 @@ class ClassLoaderGw extends ClassLoader {
             throw new ClassNotFoundException(name);
         }
     }
+
     private static byte[] bytes(InputStream is) throws IOException{
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int nRead;
