@@ -61,17 +61,17 @@ public class DynamicHtml<T> extends HtmlView<T> {
 
     @Override
     public String render() {
-        if(visitor instanceof HtmlVisitorPrintStream)
+        if(visitor.get() instanceof HtmlVisitorPrintStream)
             throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
     @Override
     public String render(T model) {
-        if(visitor instanceof HtmlVisitorPrintStream)
+        if(visitor.get() instanceof HtmlVisitorPrintStream)
             throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
         template.accept(this, model);
-        return visitor.finished();
+        return visitor.get().finished();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class DynamicHtml<T> extends HtmlView<T> {
     @Override
     public void write(T model) {
         template.accept(this, model);
-        visitor.finished();
+        visitor.get().finished();
     }
 
     /**
@@ -93,8 +93,10 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * @param <U> the type of the domain model of the partial view.
      */
     public <U> void addPartial(HtmlView<U> partial, U model) {
+        HtmlVisitorCache visitor = this.visitor.get();
+
         visitor.closeBeginTag();
-        partial.visitor.depth = visitor.depth;
+        partial.visitor.get().depth = visitor.depth;
         visitor.write(partial.render(model));
     }
 
@@ -105,8 +107,10 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * @param <U> the type of the domain model of the partial view.
      */
     public <U> void addPartial(HtmlView<U> partial) {
+        HtmlVisitorCache visitor = this.visitor.get();
+
         visitor.closeBeginTag();
-        partial.visitor.depth = visitor.depth;
+        partial.visitor.get().depth = visitor.depth;
         visitor.write(partial.render());
     }
 }

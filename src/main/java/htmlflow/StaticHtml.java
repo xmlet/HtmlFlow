@@ -59,10 +59,10 @@ public class StaticHtml extends HtmlView<Object> {
 
     @Override
     public String render() {
-        if(visitor instanceof HtmlVisitorPrintStream)
+        if(visitor.get() instanceof HtmlVisitorPrintStream)
             throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
         template.accept(this);
-        return visitor.finished();
+        return visitor.get().finished();
 
     }
 

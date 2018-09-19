@@ -72,27 +72,29 @@ public abstract class HtmlView<T> implements HtmlWriter<T> {
         }
     }
 
-    protected HtmlVisitorCache visitor;
+    protected ThreadLocal<HtmlVisitorCache> visitor;
 
     public HtmlView(PrintStream out) {
-        this.visitor = new HtmlVisitorPrintStream(out);
+        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorPrintStream(out));
     }
 
     public HtmlView() {
-        this.visitor = new HtmlVisitorStringBuilder();
+        this.visitor = ThreadLocal.withInitial(HtmlVisitorStringBuilder::new);
     }
 
     public Html<Element> html() {
-        if(!this.visitor.isCached) this.visitor.write(HEADER);
+        HtmlVisitorCache visitor = this.visitor.get();
+
+        if(!visitor.isCached) visitor.write(HEADER);
         return new Html<>(visitor);
     }
 
     public Div<Element> div() {
-        return new Div(visitor);
+        return new Div<>(visitor.get());
     }
 
     public Tr<Element> tr() {
-        return new Tr<>(visitor);
+        return new Tr<>(visitor.get());
     }
 
     @Override
