@@ -74,7 +74,7 @@ public class TestAttributesClassId {
     List<String> actual = htmlWrite(mem).collect(toList());
 
     String result = actual.stream().collect(joining("\n"));
-    System.out.println(result);
+    // System.out.println(result);
     assertTrue(result.contains("<div"));
     assertTrue(result.contains("</div>"));
     assertTrue(result.contains(HtmlLists.divClass));

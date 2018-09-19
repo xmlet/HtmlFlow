@@ -29,6 +29,8 @@ import java.util.function.Consumer;
 
 /**
  * Static Html view.
+ *
+ * @author Miguel Gamboa, Luís Duare
  */
 public class StaticHtml extends HtmlView<Object> {
 

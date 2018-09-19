@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,9 @@ package htmlflow;
 
 import java.io.PrintStream;
 
+/**
+ * @author Miguel Gamboa, Luís Duare
+ */
 public class Tags {
     private static final char BEGIN_TAG = '<';
     private static final String BEGIN_CLOSE_TAG = "</";
@@ -41,10 +44,6 @@ public class Tags {
     static void printOpenTag(PrintStream out, String elementName) {
         out.print(BEGIN_TAG);
         out.print(elementName);
-    }
-
-    static void printOpenTagEnd(PrintStream out) {
-        out.print(FINISH_TAG);
     }
 
     static void printAttribute(PrintStream out, String attributeName, String attributeValue) {

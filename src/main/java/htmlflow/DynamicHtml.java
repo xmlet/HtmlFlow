@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@ import java.util.function.BiConsumer;
  * Dynamic views can be bound to a domain object.
  *
  * @param <T> The type of domain object bound to this View.
+ *
+ * @author Miguel Gamboa, Luís Duare
  */
 public class DynamicHtml<T> extends HtmlView<T> {
 
@@ -91,11 +93,9 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * @param <U> the type of the domain model of the partial view.
      */
     public <U> void addPartial(HtmlView<U> partial, U model) {
+        visitor.closeBeginTag();
         partial.visitor.depth = visitor.depth;
-        partial.visitor.isClosed= visitor.isClosed;
         visitor.write(partial.render(model));
-        visitor.isClosed= partial.visitor.isClosed;
-        visitor.depth= partial.visitor.depth;
     }
 
     /**
@@ -105,10 +105,8 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * @param <U> the type of the domain model of the partial view.
      */
     public <U> void addPartial(HtmlView<U> partial) {
+        visitor.closeBeginTag();
         partial.visitor.depth = visitor.depth;
-        partial.visitor.isClosed= visitor.isClosed;
         visitor.write(partial.render());
-        visitor.isClosed= partial.visitor.isClosed;
-        visitor.depth= partial.visitor.depth;
     }
 }

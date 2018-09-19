@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> The type of domain object bound to this View.
  *
- * @author Miguel Gamboa
+ * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
 public abstract class HtmlView<T> implements HtmlWriter<T> {

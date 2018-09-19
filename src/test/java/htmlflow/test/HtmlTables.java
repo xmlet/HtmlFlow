@@ -95,9 +95,11 @@ public class HtmlTables {
                                 .th().text("Description").º()
                                 .th().text("Priority").º()
                             .º()
-                            .of(table ->
-                                tasks.forEach(task -> view.addPartial(taskListRow, task))
-                            )
+                            .tbody()
+                                .of(tbody ->
+                                    tasks.forEach(task -> view.addPartial(taskListRow, task))
+                                )
+                            .º() // tbody
                         .º() // table
                     .º() // div
                 .º() // body

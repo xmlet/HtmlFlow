@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

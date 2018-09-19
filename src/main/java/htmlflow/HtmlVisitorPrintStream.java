@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import htmlflow.util.PrintStringBuilder;
 import java.io.PrintStream;
 
 /**
- * @author Miguel Gamboa
+ * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
 public class HtmlVisitorPrintStream extends HtmlVisitorCache {
