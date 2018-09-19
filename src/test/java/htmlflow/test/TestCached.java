@@ -6,17 +6,17 @@ import org.junit.Test;
 
 public class TestCached {
 
-    static void testView(DynamicHtml<String> view, String name) {
-            view
-                .html()
-                    .body()
-                        .div()
-                            .h1()
-                                .of(h1 -> h1.text(name))
-                            .º()
+    private static void testView(DynamicHtml<String> view, String name) {
+        view
+            .html()
+                .body()
+                    .div()
+                        .h1()
+                            .dynamic(h1 -> h1.text(name))
                         .º()
                     .º()
-                .º();
+                .º()
+            .º();
     }
 
     @Test

@@ -50,10 +50,10 @@ public class HtmlTables {
                                 .th().text("Id2").º()
                                 .th().text("Id3").º()
                             .º() //tr
-                            .of(table -> {
+                            .dynamic(table -> {
                                 for (int[] outputRow : outputRows) {
                                     table.tr()
-                                         .of(tr -> {
+                                         .dynamic(tr -> {
                                              for (int rowValue : outputRow) {
                                                  tr.td()
                                                      .text("" + rowValue)
@@ -83,7 +83,7 @@ public class HtmlTables {
                 .º()
                 .body()
                     .attrClass("container")
-                    .of(__ ->
+                    .dynamic(__ ->
                         view.addPartial(taskListViewHeader)
                     )
                     .hr().º()
@@ -96,7 +96,7 @@ public class HtmlTables {
                                 .th().text("Priority").º()
                             .º()
                             .tbody()
-                                .of(tbody ->
+                                .dynamic(tbody ->
                                     tasks.forEach(task -> view.addPartial(taskListRow, task))
                                 )
                             .º() // tbody
@@ -117,9 +117,9 @@ public class HtmlTables {
     static DynamicHtml<Task> taskListRow = DynamicHtml.view((view, task) -> {
         view
             .tr()
-                .td().of(td -> td.text(task.getTitle())).º()
-                .td().of(td -> td.text(task.getDescription())).º()
-                .td().of(td -> td.text(task.getPriority().toString())).º()
+                .td().dynamic(td -> td.text(task.getTitle())).º()
+                .td().dynamic(td -> td.text(task.getDescription())).º()
+                .td().dynamic(td -> td.text(task.getPriority().toString())).º()
             .º(); // tr
     });
 
@@ -140,7 +140,7 @@ public class HtmlTables {
                                 .th().text("Description").º()
                                 .th().text("Priority").º()
                             .º() // tr
-                            .of(table ->
+                            .dynamic(table ->
                                 tasks.forEach(item ->
                                     table
                                         .tr()

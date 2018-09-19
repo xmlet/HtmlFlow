@@ -24,7 +24,7 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.ElementVisitor;
+import org.xmlet.htmlapifaster.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,13 +82,13 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * The newlineAndIndent() is responsible for this job to check whether the parent element
      * is still opened or not.
      *
-     * @param elementName
+     * @param element
      */
     @Override
-    public final void visitElement(String elementName) {
+    public final void visitElement(Element element) {
         newlineAndIndent();
         if (!isCached || openDynamic){
-            beginTag(elementName); // "<elementName"
+            beginTag(element.getName()); // "<elementName"
             isClosed = false;
         }
     }
@@ -98,11 +98,11 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * This visit occurs when the º() is invoked.
      */
     @Override
-    public final void visitParent(String elementName) {
+    public final void visitParent(Element element) {
         if (!isCached || openDynamic){
             depth--;
             newlineAndIndent();
-            endTag(elementName); // </elementName>
+            endTag(element.getName()); // </elementName>
         }
     }
 
@@ -114,22 +114,22 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     }
 
     @Override
-    public final <R> void visitText(R text) {
+    public final <R> void visitText(Text<? extends Element, R> text) {
         newlineAndIndent();
         if (!isCached || openDynamic){
-            write(text.toString());
+            write(text.getValue());
         }
     }
 
 
     @Override
-    public final <R> void visitComment(R comment) {
+    public final <R> void visitComment(Text<? extends Element, R> text) {
         if (!isCached || openDynamic){
             if (!isClosed){
                 depth++;
             }
             newlineAndIndent();
-            addComment(comment.toString());
+            addComment(text.getValue());
         }
     }
 
@@ -291,62 +291,62 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /*=========================================================================*/
 
     @Override
-    public final void visitParentHr() {
-        visitParentOnVoidElements();
+    public final <Z extends Element> void visitParentHr(Hr<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentEmbed() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentEmbed(Embed<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentInput() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentInput(Input<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentMeta() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentMeta(Meta<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentBr() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentBr(Br<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentCol() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentCol(Col<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentSource() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentSource(Source<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentImg() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentImg(Img<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentArea() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentArea(Area<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentLink() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentLink(Link<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentParam() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentParam(Param<Z> element) {
+        visitParentOnVoidElements ();
     }
 
     @Override
-    public final void visitParentBase() {
-        visitParentOnVoidElements();
+    public final <Z extends Element>  void visitParentBase(Base<Z> element) {
+        visitParentOnVoidElements ();
     }
 }
