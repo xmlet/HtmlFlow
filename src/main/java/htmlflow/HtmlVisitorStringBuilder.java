@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,166 +24,65 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.ElementVisitor;
-
 /**
- * @author Miguel Gamboa
+ * This is the implementation of the ElementVisitor (from HtmlApiFaster
+ * library) which uses an internal StringBuilder to collect information
+ * about visited Html elements of a HtmlView.
+ *
+ * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlVisitorStringBuilder extends ElementVisitor {
-
-    private static final int tabsMax;
-    private static String[] tabs;
-    private static String[] closedTabs;
-
-    static {
-        tabsMax = 1000;
-        tabs = HtmlUtils.createTabs(tabsMax);
-        closedTabs = HtmlUtils.createClosedTabs(tabsMax);
-    }
-
-    private final StringBuilder sb;
-    private int depth;
-    private boolean isClosed = true;
-
-    HtmlVisitorStringBuilder(StringBuilder sb) {
-        this.sb = sb;
-    }
-
-    @Override
-    public final void visitElement(String elementName) {
-        if (!isClosed){
-            depth++;
-        }
-
-        tabs();
-        HtmlTags.appendOpenTag(sb, elementName);
-        isClosed = false;
-    }
-
-    @Override
-    public final void visitParent(String elementName) {
-        if (isClosed){
-            depth--;
-        }
-
-        tabs();
-        HtmlTags.appendCloseTag(sb, elementName);
-    }
-
-    @Override
-    public final void visitAttribute(String attributeName, String attributeValue) {
-        HtmlTags.appendAttribute(sb, attributeName, attributeValue);
-    }
-
+public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
     /**
-     * An optimized version of Text without binder.
+     * The main StringBuilder. Read by the finished() to return the
+     * resulting string with the Html content.
      */
-    @Override
-    public final <R> void visitText(R text) {
-        if (!isClosed){
-            depth++;
-        }
+    private final StringBuilder sb = new StringBuilder();
 
-        tabs();
+    @Override
+    protected void beginTag(String elementName) {
+        Tags.appendOpenTag(sb, elementName); // "<elementName"
+    }
+
+    @Override
+    protected void endTag(String elementName) {
+        Tags.appendCloseTag(sb, elementName); // </elementName>
+    }
+
+    @Override
+    protected void addAttribute(String attributeName, String attributeValue) {
+        Tags.appendAttribute(sb, attributeName, attributeValue);
+    }
+
+    @Override
+    protected void addComment(String comment) {
+        Tags.appendComment(sb, comment);
+    }
+
+    @Override
+    protected void write(String text) {
         sb.append(text);
     }
-
     @Override
-    public final <R> void visitComment(R comment) {
-        if (!isClosed){
-            depth++;
-        }
-
-        tabs();
-        HtmlTags.appendComment(sb, comment.toString());
-    }
-
-    /*=========================================================================*/
-    /*--------------------    Auxiliary Methods    ----------------------------*/
-    /*=========================================================================*/
-
-    private void tabs(){
-        if (isClosed){
-            sb.append(tabs[depth]);
-        } else {
-            sb.append(closedTabs[depth]);
-            isClosed = true;
-        }
-    }
-
-    /*=========================================================================*/
-    /*--------------------      Parent Methods     ----------------------------*/
-    /*=========================================================================*/
-
-    /**
-     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
-     */
-    private void visitParentSpecial(){
-        if (!isClosed)
-            HtmlTags.appendOpenTagEnd(sb);
-        else
-            depth--;
-        isClosed = true;
+    protected void write(char c) {
+        sb.append(c);
     }
 
     @Override
-    public final void visitParentHr() {
-        visitParentSpecial();
+    protected String substring(int staticBlockIndex) {
+        return sb.substring(staticBlockIndex);
     }
 
     @Override
-    public final void visitParentEmbed() {
-        visitParentSpecial();
+    protected int size() {
+        return sb.length();
     }
 
     @Override
-    public final void visitParentInput() {
-        visitParentSpecial();
+    protected String readAndReset() {
+        String data = sb.toString();
+        sb.setLength(0);
+        return data;
     }
 
-    @Override
-    public final void visitParentMeta() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentBr() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentCol() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentSource() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentImg() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentArea() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentLink() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentParam() {
-        visitParentSpecial();
-    }
-
-    @Override
-    public final void visitParentBase() {
-        visitParentSpecial();
-    }
 }

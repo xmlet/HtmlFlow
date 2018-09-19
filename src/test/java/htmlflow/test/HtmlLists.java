@@ -24,86 +24,94 @@
 
 package htmlflow.test;
 
-import htmlflow.HtmlView;
+import htmlflow.DynamicHtml;
+import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.EnumEnctypeForm;
+import org.xmlet.htmlapifaster.EnumMethodForm;
+import org.xmlet.htmlapifaster.EnumRelLinkType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
+import org.xmlet.htmlapifaster.EnumTypeScript;
 
 public class HtmlLists {
     static final String divClass = "divClass";
     static final String divId = "divId";
 
-    static final HtmlView taskView(HtmlView view, Task task) {
-        return view
-            .head()
-                .script()
-                    .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
-                    .attrSrc("test.css")
-                .º() //script
-            .º() // head
-            .body()
-                .div()
-                .º() //div
-                .div()
-                    .attrId(divId)
-                    .attrClass(divClass)
-                    // !!!!!! Missing feature in HtmlApiFaster !!!!
-                    // .addAttr(new BaseAttribute("tutu", "toto"))
-                    .form()
-                        .attrAction("/action.do")
-                        .attrMethod(EnumMethodForm.POST)
-                        .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED)
-                    .º() //form
-                .º() //div
-            .º() //body
-        .º(); //html
+    public static final void taskView(DynamicHtml<Task> view, Task task) {
+        view
+            .html()
+                .head()
+                    .script()
+                        .attrType(EnumTypeScript.TEXT_JAVASCRIPT)
+                        .attrSrc("test.css")
+                    .º() //script
+                .º() // head
+                .body()
+                    .div()
+                    .º() //div
+                    .div()
+                        .attrId(divId)
+                        .attrClass(divClass)
+                        // !!!!!! Missing feature in HtmlApiFaster !!!!
+                        // .addAttr(new BaseAttribute("tutu", "toto"))
+                        .form()
+                            .attrAction("/action.do")
+                            .attrMethod(EnumMethodForm.POST)
+                            .attrEnctype(EnumEnctypeForm.APPLICATION_X_WWW_FORM_URLENCODED)
+                        .º() //form
+                    .º() //div
+                .º() //body
+            .º(); //html
     }
 
-    static final HtmlView viewDetails(HtmlView view) {
-        return view
-            .head()
-                .title().text("Task Details").º()
-                .link()
-                    .attrRel(EnumRelLinkType.STYLESHEET)
-                    .attrType(EnumTypeContentType.TEXT_CSS)
-                    .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-                .º() //link
-            .º() //head
-            .body()
-                .attrClass("container")
-                .h1().text("Task Details").º()
-                .hr().º()
-                .div().text("Title: ISEL MPD project")
-                    .br().º()
-                    .text("Description: A Java library for serializing objects in HTML.")
-                    .br().º()
-                    .text("Priority: HIGH")
-                .º() //div
-            .º() //body
-        .º(); //html
+    public static final void viewDetails(StaticHtml view) {
+        view
+            .html()
+                .head()
+                    .title().text("Task Details").º()
+                    .link()
+                        .attrRel(EnumRelLinkType.STYLESHEET)
+                        .attrType(EnumTypeContentType.TEXT_CSS)
+                        .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+                    .º() //link
+                .º() //head
+                .body()
+                    .attrClass("container")
+                    .h1().text("Task Details").º()
+                    .hr().º()
+                    .div().text("Title: ISEL MPD project")
+                        .br().º()
+                        .text("Description: A Java library for serializing objects in HTML.")
+                        .br().º()
+                        .text("Priority: HIGH")
+                    .º() //div
+                .º() //body
+            .º(); //html
     }
 
-    static final HtmlView taskDetailsView(HtmlView view, Task task) {
-        return view
-            .head()
-                .title().text("Task Details").º()
-                .link()
-                    .attrRel(EnumRelLinkType.STYLESHEET)
-                    .attrType(EnumTypeContentType.TEXT_CSS)
-                    .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-                .º() //link
-            .º() //head
-            .body()
-                .attrClass("container")
-                .h1().text("Task Details").º()
-                .hr().º()
-                .div()
-                    .text("Title:").text(task.getTitle())
-                    .br().º()
-                    .text("Description:").text(task.getDescription())
-                    .br().º()
-                    .text("Priority:").text(task.getPriority() + "")
-                .º() // div
-            .º() //body
-        .º(); // html
+    public static final void taskDetailsView(DynamicHtml<Task> view, Task task) {
+        view
+            .html()
+                .head()
+                    .title().text("Task Details").º()
+                    .link()
+                        .attrRel(EnumRelLinkType.STYLESHEET)
+                        .attrType(EnumTypeContentType.TEXT_CSS)
+                        .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+                    .º() //link
+                .º() //head
+                .body()
+                    .attrClass("container")
+                    .h1().text("Task Details").º()
+                    .hr().º()
+                    .div()
+                        .text("Title:").text(task.getTitle())
+                        .br().º()
+                        .text("Description:").text(task.getDescription())
+                        .br().º()
+                        .text("Priority:").text(task.getPriority() + "")
+                    .º() // div
+                .º() //body
+            .º(); // html
     }
 }

@@ -23,7 +23,7 @@
  */
 package htmlflow.test;
 
-import htmlflow.HtmlView;
+import htmlflow.DynamicHtml;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
@@ -54,8 +54,8 @@ public class Utils {
         return new BufferedReader(actual).lines();
     }
 
-    static <T> Stream<String> htmlRender(HtmlView view){
-        String html = view.render();
+    static <T> Stream<String> htmlRender(DynamicHtml<T> view, T model){
+        String html = view.render(model);
         return NEWLINE.splitAsStream(html);
     }
 

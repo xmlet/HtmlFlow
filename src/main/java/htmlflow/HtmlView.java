@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,10 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Tr;
 
 import java.io.*;
 import java.net.URL;
@@ -36,10 +39,18 @@ import java.util.stream.Collectors;
  * implementation, which is responsible for printing the tree of elements and
  * attributes.
  *
- * @author Miguel Gamboa
+ * @param <T> The type of domain object bound to this View.
+ *
+ * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
-public class HtmlView implements Element<HtmlView, Element> {
+public abstract class HtmlView<T> implements HtmlWriter<T> {
+
+    final static String WRONG_USE_OF_RENDER_WITH_PRINTSTREAM =
+            "Wrong use of render(). " +
+            "Use write() instead to output to PrintStream. " +
+            "To get a String from render() then use view() without a PrintStream ";
+
 
     private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -47,7 +58,7 @@ public class HtmlView implements Element<HtmlView, Element> {
 
     static {
         try {
-            URL headerUrl = HtmlView.class
+            URL headerUrl = DynamicHtml.class
                     .getClassLoader()
                     .getResource(HEADER_TEMPLATE);
             if(headerUrl == null)
@@ -61,72 +72,31 @@ public class HtmlView implements Element<HtmlView, Element> {
         }
     }
 
-    private StringBuilder sb;
-    private Html<HtmlView> root;
-    private ElementVisitor visitor;
-
-    public static HtmlView html() {
-        return html(new StringBuilder());
-    }
-
-    public static HtmlView html(StringBuilder sb){
-        sb.append(HEADER);
-        return new HtmlView(sb);
-    }
-
-    public static HtmlView html(PrintStream out){
-        out.print(HEADER);
-        return new HtmlView(out);
-    }
-
-    public HtmlView(StringBuilder sb) {
-        this.visitor = new HtmlVisitorStringBuilder(sb);
-        this.sb = sb;
-        root = new Html<>(this);
-    }
+    protected HtmlVisitorCache visitor;
 
     public HtmlView(PrintStream out) {
         this.visitor = new HtmlVisitorPrintStream(out);
-        root = new Html<>(this);
     }
 
-    public Head<Html<HtmlView>> head(){
-        return root.head();
+    public HtmlView() {
+        this.visitor = new HtmlVisitorStringBuilder();
     }
 
-    public Body<Html<HtmlView>> body(){
-        return root.body();
+    public Html<Element> html() {
+        if(!this.visitor.isCached) this.visitor.write(HEADER);
+        return new Html<>(visitor);
     }
 
-    public String render() {
-        if(sb == null)
-            throw new IllegalStateException("Missing StringBuilder!!!! HtmlView not initialized with a StringBuilder!");
-        return sb.toString();
+    public Div<Element> div() {
+        return new Div(visitor);
     }
 
-    @Override
-    public HtmlView self() {
-        return this;
+    public Tr<Element> tr() {
+        return new Tr<>(visitor);
     }
 
     @Override
-    public ElementVisitor getVisitor() {
-        return visitor;
-    }
-
-    @Override
-    public String getName() {
-        return "HtmlView";
-    }
-
-    @Override
-    public Element º() {
+    public HtmlWriter<T> setPrintStream(PrintStream out) {
         return null;
     }
-
-    @Override
-    public Element getParent() {
-        return null;
-    }
-
 }
