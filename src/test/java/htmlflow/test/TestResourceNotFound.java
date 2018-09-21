@@ -29,10 +29,15 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.function.BiConsumer;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 /**
+ *  Unit Test to coverage the case where ClassLoader does not find
+ *  resource for HTML template.
+ *  To that end we use a custom ClassLoader, the ClassLoaderGw, that
+ *  will fail to load resources.
+ *
  * @author Miguel Gamboa
  *         created on 20-09-2017
  */
@@ -40,11 +45,12 @@ public class TestResourceNotFound {
 
     @Test(expected = ExceptionInInitializerError.class)
     public void testHtmlViewHeaderNotFound()
-        throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
-    {
+        throws ClassNotFoundException, IllegalAccessException, NoSuchFieldException {
         ClassLoaderGw gw = new ClassLoaderGw();
-        Class<?> klassView = gw.loadClass("htmlflow.DynamicHtml");
-        Object view = klassView.getMethod("view", BiConsumer.class).invoke(null);
+        Class<?> klassView = gw.loadClass("htmlflow.HtmlView");
+        Field f = klassView.getDeclaredField("HEADER");
+        f.setAccessible(true);
+        Object header = f.get(null);
     }
 }
 

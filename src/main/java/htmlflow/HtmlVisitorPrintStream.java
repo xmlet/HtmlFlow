@@ -46,7 +46,8 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
      */
     private PrintStream current;
 
-    public HtmlVisitorPrintStream(PrintStream out) {
+    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic) {
+        super(isDynamic);
         this.out = out;
         this.current = new PrintStringBuilder(out);
     }

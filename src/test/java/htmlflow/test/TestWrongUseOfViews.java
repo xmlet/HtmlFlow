@@ -22,36 +22,22 @@
  * SOFTWARE.
  */
 
-package htmlflow.util;
+package htmlflow.test;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import htmlflow.StaticHtml;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class PrintStringBuilder extends PrintStream{
+public class TestWrongUseOfViews {
 
-    private final StringBuilder sb = new StringBuilder();
-
-    public PrintStringBuilder(OutputStream out) {
-        super(out);
-    }
-
-    @Override
-    public void print(char c) {
-        super.print(c);
-        sb.append(c);
-    }
-
-    @Override
-    public void print(String s) {
-        super.print(s);
-        sb.append(s);
-    }
-
-    public String substring(int startingIndex) {
-        return sb.substring(startingIndex);
-    }
-
-    public int length() {
-        return sb.length();
+    @Test(expected = IllegalStateException.class)
+    public void testWrongUseOfDynamicInStaticHtml(){
+        StaticHtml.view()
+            .html()
+                .head()
+                    .title().text("Task Details").º()
+                    .dynamic(head -> {
+                        Assert.fail("It should not reach here!");
+                    });
     }
 }

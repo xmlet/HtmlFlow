@@ -27,12 +27,15 @@
 package htmlflow.test;
 
 import htmlflow.DynamicHtml;
+import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
 import org.junit.Test;
+import org.xmlet.htmlapifaster.Body;
 import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Html;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -57,10 +60,8 @@ public class TestAttributesClassId {
 
   @Test
   public void testGetElementName() {
-    StaticHtml
-      .view(v -> assertEquals(DIV_NAME, v.html().body().div().getName()))
-      .render();
-
+    Div<Body<Html<HtmlView>>> div = StaticHtml.view().html().body().div();
+    assertEquals(DIV_NAME, div.getName());
   }
 
   @Test

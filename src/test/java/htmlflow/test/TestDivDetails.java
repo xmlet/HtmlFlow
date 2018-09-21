@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,6 +61,7 @@ import static junit.framework.Assert.assertEquals;
  */
 public class TestDivDetails {
 
+    private static final Pattern NEWLINE = Pattern.compile("\n");
     private final Map<Task, Stream<String>> expectedTaskViews;
 
     public TestDivDetails() {
@@ -79,9 +81,7 @@ public class TestDivDetails {
         //
         // Produces an HTML document
         //
-        String html = StaticHtml
-            .view(HtmlLists::viewDetails)  // HtmlView for template function viewDetails
-            .render();                     // Get a string with the HTML
+        String html = HtmlLists.viewDetails.render();
 
         /*
         HtmlLists   // 2) print to the standard output
@@ -156,5 +156,34 @@ public class TestDivDetails {
         static TaskHtml of(Task t, Stream<String> html) {
             return new TaskHtml(t, html);
         }
+    }
+
+    @Test
+    public void testWritePartialViewToPrintStream() {
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        HtmlTables
+            .taskListViewHeader
+            .setPrintStream(new PrintStream(mem))
+            .write();
+
+        Iterator<String> iter = NEWLINE
+            .splitAsStream(mem.toString())
+            .iterator();
+
+        Utils
+                .loadLines("partialViewHeader.html")
+                .forEach(expected -> {
+                    String actual = iter.next();
+                    // System.out.println(actual);
+                    assertEquals(expected, actual);
+                });
+
+        /**
+         * Clear PrintStream and place again a HtmlVisitorStringBuilder
+         * for firther uses of this partial view in other unit tests.
+         */
+        HtmlTables
+            .taskListViewHeader
+            .setPrintStream(null);
     }
 }

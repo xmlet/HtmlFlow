@@ -40,7 +40,7 @@ import java.util.List;
  */
 public abstract class HtmlVisitorCache extends ElementVisitor {
     /**
-     * The begin index of a static HTML block in the main sb StringBuilder.
+     * The begin index of a static HTML block.
      */
     private int staticBlockIndex = 0;
     /**
@@ -48,7 +48,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      */
     int depth;
     /**
-     * If the begin tag is closed, or not.
+     * If the begin tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code "<elem"}.
      * On element visit the begin tag is left open to include additional attributes.
      */
     boolean isClosed = true;
@@ -58,10 +58,10 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      */
     private boolean openDynamic = false;
     /**
-     * True when the first visit is finished and the static blocks of HTML
+     * True when the first visit is finished and all static blocks of HTML
      * are cached in cacheBlocksList.
      */
-    boolean isCached = false;
+    private boolean isCached = false;
     /**
      * A cache list of static html blocks.
      */
@@ -72,8 +72,31 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     private int cacheIndex = 0;
 
     /**
+     * If this visitor enables or not dynamic blocks.
+     * If it is not dynamic and there is a dynamic block visit then it should throw
+     * an Exception.
+     */
+    final boolean isDynamic;
+
+    public HtmlVisitorCache(boolean isDynamic) {
+        this.isDynamic = isDynamic;
+    }
+
+    /**
+     * This visitor may be writing to output or not, depending on the kind of HTML
+     * block that it is being visited.
+     * So, it should just write to output immediately only when it is:
+     *   1. in a static block that is not already in cache,
+     * or
+     *   2 in a dynamic block that is never cached and thus must be always freshly
+     *   written to the output.
+     */
+    public boolean isWriting() {
+        return !isCached || openDynamic;
+    }
+    /**
      * While the static blocks are not in cache then it appends elements to
-     * the main StringBuilder sb.
+     * the main StringBuilder or PrintStream.
      * Once already cached then it does nothing.
      * This method appends the String {@code "<elementName"} and it leaves the element
      * open to include additional attributes.
@@ -87,7 +110,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     @Override
     public final void visitElement(Element element) {
         newlineAndIndent();
-        if (!isCached || openDynamic){
+        if (isWriting()){
             beginTag(element.getName()); // "<elementName"
             isClosed = false;
         }
@@ -99,7 +122,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      */
     @Override
     public final void visitParent(Element element) {
-        if (!isCached || openDynamic){
+        if (isWriting()){
             depth--;
             newlineAndIndent();
             endTag(element.getName()); // </elementName>
@@ -108,7 +131,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
 
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
-        if (!isCached || openDynamic){
+        if (isWriting()){
             addAttribute(attributeName, attributeValue);
         }
     }
@@ -116,7 +139,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
         newlineAndIndent();
-        if (!isCached || openDynamic){
+        if (isWriting()){
             write(text.getValue());
         }
     }
@@ -124,7 +147,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
 
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
-        if (!isCached || openDynamic){
+        if (isWriting()){
             if (!isClosed){
                 depth++;
             }
@@ -140,8 +163,10 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      */
     @Override
     public final void visitOpenDynamic(){
-        openDynamic = true;
+        if (!isDynamic)
+            throw new IllegalStateException("Wrong use of dynamic() in a static view!");
 
+        openDynamic = true;
         if (isCached){
             HtmlVisitorStringBuilder.HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
             this.write(block.html);
@@ -168,7 +193,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * for each void element such as area, base, etc.
      */
     void visitParentOnVoidElements(){
-        if (!isCached || openDynamic){
+        if (isWriting()){
             if (!isClosed){
                 write(Tags.FINISH_TAG);
             }
@@ -185,7 +210,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
     void newlineAndIndent(){
-        if (!isCached || openDynamic){
+        if (isWriting()){
             if (isClosed){
                 write(Indentation.tabs(depth)); // \n\t\t\t\...
             } else {
@@ -200,7 +225,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * Writes the {@code ">"} to output.
      */
     void closeBeginTag() {
-        if (!isCached || openDynamic){
+        if (isWriting()){
             if(!isClosed) {
                 write(Tags.FINISH_TAG);
                 isClosed = true;

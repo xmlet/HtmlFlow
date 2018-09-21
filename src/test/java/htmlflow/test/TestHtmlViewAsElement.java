@@ -27,26 +27,30 @@ package htmlflow.test;
 import htmlflow.StaticHtml;
 import junit.framework.Assert;
 import org.junit.Test;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
 
 public class TestHtmlViewAsElement {
 
     @Test
     public void testSelf() {
-        StaticHtml
-            .view(view -> {
-                Html<Element> html = view.html();
-                Assert.assertSame(html, html.self());
-            })
-            .render();
-
+        StaticHtml view = StaticHtml.view();
+        Assert.assertSame(view, view.self());
+        Assert.assertEquals("HtmlView", view.getName());
     }
 
     @Test(expected = IllegalStateException.class)
     public void testWrongRender() {
         StaticHtml
-            .view(System.out, view -> {})
+            .view(System.out)
             .render();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testWrongºuse() {
+        StaticHtml.view().º();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testWrongParentUse() {
+        StaticHtml.view().getParent();
     }
 }

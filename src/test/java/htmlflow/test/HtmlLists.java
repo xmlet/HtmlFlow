@@ -25,6 +25,7 @@
 package htmlflow.test;
 
 import htmlflow.DynamicHtml;
+import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumEnctypeForm;
@@ -64,8 +65,7 @@ public class HtmlLists {
             .º(); //html
     }
 
-    public static final void viewDetails(StaticHtml view) {
-        view
+    public static HtmlView viewDetails = StaticHtml.view()
             .html()
                 .head()
                     .title().text("Task Details").º()
@@ -87,7 +87,6 @@ public class HtmlLists {
                     .º() //div
                 .º() //body
             .º(); //html
-    }
 
     public static final void taskDetailsView(DynamicHtml<Task> view, Task task) {
         view

@@ -24,7 +24,6 @@
 package htmlflow.test;
 
 import htmlflow.DynamicHtml;
-import htmlflow.StaticHtml;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
@@ -32,7 +31,12 @@ import org.junit.Test;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.Body;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Head;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Table;
+import org.xmlet.htmlapifaster.Tr;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
@@ -97,9 +101,7 @@ public class TestTable {
         /*
          * Act
          */
-        String html = StaticHtml
-            .view(HtmlTables::nestedTable)
-            .render();
+        String html = HtmlTables.nestedTable.render();
         /*
          * Assert
          */
@@ -135,10 +137,10 @@ public class TestTable {
         DynamicHtml<Iterable<Task>> view = DynamicHtml.view(
             new PrintStream(mem),
             HtmlTables::taskListViewWithPartials);
-        view.write(dataSource);
+        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
         validateBindingTable(mem.toString());
         mem.reset();
-        view.write(dataSource);
+        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
         validateBindingTable(mem.toString());
     }
 
@@ -151,8 +153,8 @@ public class TestTable {
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
         DynamicHtml<Iterable<Task>> view = DynamicHtml.view(HtmlTables::taskListViewWithPartials);
-        validateBindingTable(view.render(dataSource));
-        validateBindingTable(view.render(dataSource));
+        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
+        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
     }
 
     static void validateBindingTable(String actual){
