@@ -24,7 +24,6 @@
 package htmlflow.test;
 
 import htmlflow.DynamicHtml;
-import htmlflow.StaticHtml;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
@@ -77,7 +76,7 @@ public class TestDivDetails {
     }
 
     @Test
-    public void testDivDetailsWithoutBinding() throws IOException, ParserConfigurationException, SAXException {
+    public void testDivDetailsWithoutBinding() throws IOException {
         //
         // Produces an HTML document
         //
@@ -112,7 +111,7 @@ public class TestDivDetails {
     }
 
     @Test
-    public void testDivDetailsBinding() throws IOException, ParserConfigurationException, SAXException {
+    public void testDivDetailsBinding() {
         expectedTaskViews
                 .keySet()
                 .stream()
@@ -147,8 +146,8 @@ public class TestDivDetails {
     }
 
     private static class TaskHtml {
-        Task t;
-        Stream<String> html;
+        final Task t;
+        final Stream<String> html;
         public TaskHtml(Task t, Stream<String> html) {
             this.t = t;
             this.html = html;

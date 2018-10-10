@@ -51,7 +51,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * If the begin tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code "<elem"}.
      * On element visit the begin tag is left open to include additional attributes.
      */
-    boolean isClosed = true;
+    private boolean isClosed = true;
     /**
      * Signals the begin of a dynamic partial view and thus it should stop
      * collecting the HTML into the cache.
@@ -65,7 +65,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /**
      * A cache list of static html blocks.
      */
-    private List<HtmlVisitorStringBuilder.HtmlBlockInfo> cacheBlocksList = new ArrayList<>();
+    private final List<HtmlVisitorStringBuilder.HtmlBlockInfo> cacheBlocksList = new ArrayList<>();
     /**
      * The current index in cacheBlocksList corresponding to a static HTML block.
      */
@@ -78,7 +78,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      */
     final boolean isDynamic;
 
-    public HtmlVisitorCache(boolean isDynamic) {
+    HtmlVisitorCache(boolean isDynamic) {
         this.isDynamic = isDynamic;
     }
 
@@ -91,7 +91,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      *   2 in a dynamic block that is never cached and thus must be always freshly
      *   written to the output.
      */
-    public boolean isWriting() {
+    public final boolean isWriting() {
         return !isCached || openDynamic;
     }
     /**
@@ -192,7 +192,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * This method is invoked by visitParent specialization methods (at the end of this class)
      * for each void element such as area, base, etc.
      */
-    void visitParentOnVoidElements(){
+    private void visitParentOnVoidElements(){
         if (isWriting()){
             if (!isClosed){
                 write(Tags.FINISH_TAG);
@@ -209,7 +209,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
-    void newlineAndIndent(){
+    private void newlineAndIndent(){
         if (isWriting()){
             if (isClosed){
                 write(Indentation.tabs(depth)); // \n\t\t\t\...
@@ -224,17 +224,15 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /**
      * Writes the {@code ">"} to output.
      */
-    void closeBeginTag() {
-        if (isWriting()){
-            if(!isClosed) {
-                write(Tags.FINISH_TAG);
-                isClosed = true;
-                depth++;
-            }
+    final void closeBeginTag() {
+        if(!isClosed) {
+            write(Tags.FINISH_TAG);
+            isClosed = true;
+            depth++;
         }
     }
 
-    String finished(){
+    final String finished(){
         if (isCached && cacheIndex <= cacheBlocksList.size()){
             HtmlVisitorStringBuilder.HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
             write(block.html);
@@ -255,9 +253,9 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
 
     static class HtmlBlockInfo {
 
-        String html;
-        int currentDepth;
-        boolean isClosed;
+        final String html;
+        final int currentDepth;
+        final boolean isClosed;
 
         HtmlBlockInfo(String html, int currentDepth, boolean isClosed){
             this.html = html;

@@ -67,21 +67,19 @@ public class TestAttributesClassId {
   @Test
   public void testIdAndClassAttribute() {
 
-    Task t1 = new Task("Unit Test", "Test of element name", Priority.High, Status.Progress);
     ByteArrayOutputStream mem = new ByteArrayOutputStream();
-    DynamicHtml
-      .view(new PrintStream(mem), HtmlLists::taskView)
-      .write(t1);
+    HtmlLists
+      .taskView(new PrintStream(mem))
+      .write();
     List<String> actual = htmlWrite(mem).collect(toList());
 
-    String result = actual.stream().collect(joining("\n"));
+    String result = String.join("\n", actual);
     // System.out.println(result);
     assertTrue(result.contains("<div"));
     assertTrue(result.contains("</div>"));
     assertTrue(result.contains(HtmlLists.divClass));
     assertTrue(result.contains(HtmlLists.divId));
-    // !!!!!! Missing feature in HtmlApiFaster !!!!
-    // assertTrue(result.contains("toto=\"tutu\""));
+    assertTrue(result.contains("toto=\"tutu\""));
     assertTrue("should contains <script type=\"text/javascript\" src=\"test.css\">",
               result.contains("<script type=\"text/javascript\" src=\"test.css\">"));
 

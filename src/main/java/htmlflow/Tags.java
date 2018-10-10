@@ -29,7 +29,7 @@ import java.io.PrintStream;
 /**
  * @author Miguel Gamboa, Luís Duare
  */
-public class Tags {
+class Tags {
     private static final char BEGIN_TAG = '<';
     private static final String BEGIN_CLOSE_TAG = "</";
     private static final String BEGIN_COMMENT_TAG = "<!-- ";

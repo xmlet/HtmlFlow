@@ -60,7 +60,7 @@ public class TestTable {
     private static final Pattern NEWLINE = Pattern.compile("\n");
 
     @Test
-    public void testSimpleTableRender() throws ParserConfigurationException, SAXException, IOException{
+    public void testSimpleTableRender() throws IOException{
         /*
          * Arrange
          */
@@ -77,7 +77,7 @@ public class TestTable {
     }
 
     @Test
-    public void testSimpleTableWrite() throws ParserConfigurationException, SAXException, IOException{
+    public void testSimpleTableWrite() throws IOException{
         /*
          * Arrange and Act
          */
@@ -111,7 +111,7 @@ public class TestTable {
     }
 
     @Test
-    public void testTableWithBinding() throws ParserConfigurationException, SAXException, IOException{
+    public void testTableWithBinding() throws IOException{
         /*
          * Act
          */
@@ -127,7 +127,7 @@ public class TestTable {
     }
 
     @Test
-    public void testTableWithPartialsBindingTwiceToPrintStream() throws IOException, ParserConfigurationException, SAXException {
+    public void testTableWithPartialsBindingTwiceToPrintStream() {
         List<Task> dataSource = Arrays.asList(
                 new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
@@ -146,7 +146,7 @@ public class TestTable {
 
 
     @Test
-    public void testTableWithPartialsBindingTwice() throws IOException, ParserConfigurationException, SAXException {
+    public void testTableWithPartialsBindingTwice() {
         List<Task> dataSource = Arrays.asList(
                 new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),

@@ -34,12 +34,14 @@ import org.xmlet.htmlapifaster.EnumRelLinkType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.EnumTypeScript;
 
+import java.io.PrintStream;
+
 public class HtmlLists {
     static final String divClass = "divClass";
     static final String divId = "divId";
 
-    public static final void taskView(DynamicHtml<Task> view, Task task) {
-        view
+    public static HtmlView taskView (PrintStream out) {
+        return StaticHtml.view(out)
             .html()
                 .head()
                     .script()
@@ -53,8 +55,7 @@ public class HtmlLists {
                     .div()
                         .attrId(divId)
                         .attrClass(divClass)
-                        // !!!!!! Missing feature in HtmlApiFaster !!!!
-                        // .addAttr(new BaseAttribute("tutu", "toto"))
+                        .addAttr("toto", "tutu")
                         .form()
                             .attrAction("/action.do")
                             .attrMethod(EnumMethodForm.POST)
@@ -88,7 +89,7 @@ public class HtmlLists {
                 .º() //body
             .º(); //html
 
-    public static final void taskDetailsView(DynamicHtml<Task> view, Task task) {
+    public static void taskDetailsView(DynamicHtml<Task> view, Task task) {
         view
             .html()
                 .head()

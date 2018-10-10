@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 /**
  *  Unit Test to coverage the case where ClassLoader does not find

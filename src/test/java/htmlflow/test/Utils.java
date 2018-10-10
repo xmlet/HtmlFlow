@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -45,7 +46,7 @@ public class Utils {
 
     static Element getRootElement(byte[] input) throws UnsupportedEncodingException {
         W3CDom w3cDom = new W3CDom();
-        Document doc = w3cDom.fromJsoup(Jsoup.parse(new String(input, "UTF-8")));
+        Document doc = w3cDom.fromJsoup(Jsoup.parse(new String(input, StandardCharsets.UTF_8)));
         return doc.getDocumentElement();
     }
 
