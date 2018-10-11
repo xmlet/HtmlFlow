@@ -40,8 +40,8 @@ public class HtmlLists {
     static final String divClass = "divClass";
     static final String divId = "divId";
 
-    public static HtmlView taskView (PrintStream out) {
-        return StaticHtml.view(out)
+    public static HtmlView taskView (StaticHtml view) {
+        return view
             .html()
                 .head()
                     .script()
@@ -51,6 +51,7 @@ public class HtmlLists {
                 .º() // head
                 .body()
                     .div()
+                        .comment("A simple dummy comment")
                     .º() //div
                     .div()
                         .attrId(divId)

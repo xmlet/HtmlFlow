@@ -24,7 +24,21 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.Area;
+import org.xmlet.htmlapifaster.Base;
+import org.xmlet.htmlapifaster.Br;
+import org.xmlet.htmlapifaster.Col;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.ElementVisitor;
+import org.xmlet.htmlapifaster.Embed;
+import org.xmlet.htmlapifaster.Hr;
+import org.xmlet.htmlapifaster.Img;
+import org.xmlet.htmlapifaster.Input;
+import org.xmlet.htmlapifaster.Link;
+import org.xmlet.htmlapifaster.Meta;
+import org.xmlet.htmlapifaster.Param;
+import org.xmlet.htmlapifaster.Source;
+import org.xmlet.htmlapifaster.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,11 +161,8 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
 
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
+        newlineAndIndent();
         if (isWriting()){
-            if (!isClosed){
-                depth++;
-            }
-            newlineAndIndent();
             addComment(text.getValue());
         }
     }
