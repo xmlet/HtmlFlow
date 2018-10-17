@@ -24,7 +24,6 @@
 package htmlflow.test;
 
 import htmlflow.DynamicHtml;
-import htmlflow.StaticHtml;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
@@ -44,6 +43,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,6 +60,7 @@ import static junit.framework.Assert.assertEquals;
  */
 public class TestDivDetails {
 
+    private static final Pattern NEWLINE = Pattern.compile("\n");
     private final Map<Task, Stream<String>> expectedTaskViews;
 
     public TestDivDetails() {
@@ -75,13 +76,11 @@ public class TestDivDetails {
     }
 
     @Test
-    public void testDivDetailsWithoutBinding() throws IOException, ParserConfigurationException, SAXException {
+    public void testDivDetailsWithoutBinding() throws IOException {
         //
         // Produces an HTML document
         //
-        String html = StaticHtml
-            .view(HtmlLists::viewDetails)  // HtmlView for template function viewDetails
-            .render();                     // Get a string with the HTML
+        String html = HtmlLists.viewDetails.render();
 
         /*
         HtmlLists   // 2) print to the standard output
@@ -112,7 +111,7 @@ public class TestDivDetails {
     }
 
     @Test
-    public void testDivDetailsBinding() throws IOException, ParserConfigurationException, SAXException {
+    public void testDivDetailsBinding() {
         expectedTaskViews
                 .keySet()
                 .stream()
@@ -147,8 +146,8 @@ public class TestDivDetails {
     }
 
     private static class TaskHtml {
-        Task t;
-        Stream<String> html;
+        final Task t;
+        final Stream<String> html;
         public TaskHtml(Task t, Stream<String> html) {
             this.t = t;
             this.html = html;
@@ -156,5 +155,34 @@ public class TestDivDetails {
         static TaskHtml of(Task t, Stream<String> html) {
             return new TaskHtml(t, html);
         }
+    }
+
+    @Test
+    public void testWritePartialViewToPrintStream() {
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        HtmlTables
+            .taskListViewHeader
+            .setPrintStream(new PrintStream(mem))
+            .write();
+
+        Iterator<String> iter = NEWLINE
+            .splitAsStream(mem.toString())
+            .iterator();
+
+        Utils
+                .loadLines("partialViewHeader.html")
+                .forEach(expected -> {
+                    String actual = iter.next();
+                    // System.out.println(actual);
+                    assertEquals(expected, actual);
+                });
+
+        /**
+         * Clear PrintStream and place again a HtmlVisitorStringBuilder
+         * for firther uses of this partial view in other unit tests.
+         */
+        HtmlTables
+            .taskListViewHeader
+            .setPrintStream(null);
     }
 }

@@ -68,7 +68,15 @@ public class HtmlTables {
             .º();
     }
 
-    static void taskListViewWithPartials(DynamicHtml<Iterable<Task>> view, Iterable<Task> tasks){
+    /**
+     * An example of a dynamic view with an Iterable<Task> as domain model and
+     * an array with two partial views: a div heading and table row.
+     */
+    static void taskListViewWithPartials(
+        DynamicHtml<Iterable<Task>> view,
+        Iterable<Task> tasks,
+        HtmlView[] partials)
+    {
         view
             .html()
                 .head()
@@ -83,8 +91,8 @@ public class HtmlTables {
                 .º()
                 .body()
                     .attrClass("container")
-                    .dynamic(__ ->
-                        view.addPartial(taskListViewHeader)
+                    .of(__ -> // ignore body argument because we don't need it here
+                        view.addPartial(partials[0]) // taskListViewHeader
                     )
                     .hr().º()
                     .div()
@@ -97,7 +105,7 @@ public class HtmlTables {
                             .º()
                             .tbody()
                                 .dynamic(tbody ->
-                                    tasks.forEach(task -> view.addPartial(taskListRow, task))
+                                    tasks.forEach(task -> view.addPartial(partials[1], task)) // taskListRow
                                 )
                             .º() // tbody
                         .º() // table
@@ -160,8 +168,7 @@ public class HtmlTables {
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    static void nestedTable(StaticHtml view) {
-        view
+    static HtmlView nestedTable = StaticHtml.view()
             .html()
                 .body()
                     .table()
@@ -192,5 +199,4 @@ public class HtmlTables {
                     .º() // table
                 .º() // body
             .º(); // html
-    }
 }

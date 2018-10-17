@@ -32,10 +32,10 @@ import static htmlflow.Tags.FINISH_TAG;
 class Indentation {
 
     private static final int MAX_TABS = 1000;
-    static final char NEWLINE = '\n';
-    static final char TAB = '\t';
-    private static String[] tabs = createTabs(MAX_TABS);
-    private static String[] closedTabs = createClosedTabs(MAX_TABS);
+    private static final char NEWLINE = '\n';
+    private static final char TAB = '\t';
+    private static final String[] tabs = createTabs(MAX_TABS);
+    private static final String[] closedTabs = createClosedTabs(MAX_TABS);
 
     private Indentation(){ }
 

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ public class StaticHtml extends HtmlView<Object> {
 
     private static final String WRONG_USE_OF_RENDER_WITH_MODEL =
              "Wrong use of StaticView! Model object not " +
-             "supported or use a dynamic view instead!";
+             "supported or you should use a dynamic view instead!";
 
     private Consumer<StaticHtml> template;
 
@@ -44,25 +44,43 @@ public class StaticHtml extends HtmlView<Object> {
         return new StaticHtml(out, template);
     }
 
+    public static StaticHtml view(PrintStream out){
+        return new StaticHtml(out);
+    }
+
     public static StaticHtml view(Consumer<StaticHtml> template){
         return new StaticHtml(template);
     }
 
-    public StaticHtml(PrintStream out, Consumer<StaticHtml> template) {
-        super(out);
+    public static StaticHtml view(){
+        return new StaticHtml();
+    }
+
+    private StaticHtml() {
+        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorStringBuilder(false));
+    }
+
+    private StaticHtml(Consumer<StaticHtml>  template) {
+        this();
         this.template = template;
     }
 
-    public StaticHtml(Consumer<StaticHtml>  template) {
+    private StaticHtml(PrintStream out) {
+        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorPrintStream(out, false));
+    }
+
+    private StaticHtml(PrintStream out, Consumer<StaticHtml> template) {
+        this(out);
         this.template = template;
     }
 
     @Override
     public String render() {
-        if(visitor.get() instanceof HtmlVisitorPrintStream)
+        if(getVisitor() instanceof HtmlVisitorPrintStream)
             throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
-        template.accept(this);
-        return visitor.get().finished();
+        if(template != null)
+            template.accept(this);
+        return getVisitor().finished();
 
     }
 
@@ -73,7 +91,9 @@ public class StaticHtml extends HtmlView<Object> {
 
     @Override
     public void write() {
-        template.accept(this);
+        if(template != null)
+            template.accept(this);
+        getVisitor().finished();
     }
 
     @Override

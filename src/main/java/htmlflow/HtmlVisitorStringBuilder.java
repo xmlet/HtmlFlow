@@ -39,6 +39,10 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
      */
     private final StringBuilder sb = new StringBuilder();
 
+    public HtmlVisitorStringBuilder(boolean isDynamic) {
+        super(isDynamic);
+    }
+
     @Override
     protected void beginTag(String elementName) {
         Tags.appendOpenTag(sb, elementName); // "<elementName"

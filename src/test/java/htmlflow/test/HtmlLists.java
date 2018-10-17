@@ -25,6 +25,7 @@
 package htmlflow.test;
 
 import htmlflow.DynamicHtml;
+import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumEnctypeForm;
@@ -33,12 +34,14 @@ import org.xmlet.htmlapifaster.EnumRelLinkType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.EnumTypeScript;
 
+import java.io.PrintStream;
+
 public class HtmlLists {
     static final String divClass = "divClass";
     static final String divId = "divId";
 
-    public static final void taskView(DynamicHtml<Task> view, Task task) {
-        view
+    public static HtmlView taskView (StaticHtml view) {
+        return view
             .html()
                 .head()
                     .script()
@@ -48,12 +51,12 @@ public class HtmlLists {
                 .º() // head
                 .body()
                     .div()
+                        .comment("A simple dummy comment")
                     .º() //div
                     .div()
                         .attrId(divId)
                         .attrClass(divClass)
-                        // !!!!!! Missing feature in HtmlApiFaster !!!!
-                        // .addAttr(new BaseAttribute("tutu", "toto"))
+                        .addAttr("toto", "tutu")
                         .form()
                             .attrAction("/action.do")
                             .attrMethod(EnumMethodForm.POST)
@@ -64,8 +67,7 @@ public class HtmlLists {
             .º(); //html
     }
 
-    public static final void viewDetails(StaticHtml view) {
-        view
+    public static HtmlView viewDetails = StaticHtml.view()
             .html()
                 .head()
                     .title().text("Task Details").º()
@@ -87,9 +89,8 @@ public class HtmlLists {
                     .º() //div
                 .º() //body
             .º(); //html
-    }
 
-    public static final void taskDetailsView(DynamicHtml<Task> view, Task task) {
+    public static void taskDetailsView(DynamicHtml<Task> view, Task task) {
         view
             .html()
                 .head()

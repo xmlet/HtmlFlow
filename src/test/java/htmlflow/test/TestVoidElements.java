@@ -22,36 +22,35 @@
  * SOFTWARE.
  */
 
-package htmlflow.util;
+package htmlflow.test;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import org.junit.Test;
 
-public class PrintStringBuilder extends PrintStream{
+import java.util.Iterator;
 
-    private final StringBuilder sb = new StringBuilder();
+import static htmlflow.test.Utils.NEWLINE;
+import static junit.framework.Assert.assertEquals;
 
-    public PrintStringBuilder(OutputStream out) {
-        super(out);
+public class TestVoidElements {
+
+    @Test
+    public void testStaticViewWithVoidElements() {
+        String actual = HtmlVoidElements.voidElements.render();
+        assertLines("voidElements.html", actual);
     }
 
-    @Override
-    public void print(char c) {
-        super.print(c);
-        sb.append(c);
-    }
-
-    @Override
-    public void print(String s) {
-        super.print(s);
-        sb.append(s);
-    }
-
-    public String substring(int startingIndex) {
-        return sb.substring(startingIndex);
-    }
-
-    public int length() {
-        return sb.length();
+    private static void assertLines(String pathToExpected, String actual) {
+        Iterator<String> iter = NEWLINE
+            .splitAsStream(actual)
+            .map(String::toLowerCase)
+            .iterator();
+        Utils
+            .loadLines(pathToExpected)
+            .map(String::toLowerCase)
+            .forEach(expected -> {
+                String line = iter.next();
+                // System.out.println(line);
+                assertEquals(expected, line);
+            });
     }
 }

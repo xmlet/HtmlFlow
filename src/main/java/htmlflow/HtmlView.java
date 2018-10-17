@@ -29,9 +29,16 @@ import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Tr;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * The root container for HTML elements.
@@ -44,12 +51,12 @@ import java.util.stream.Collectors;
  * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
-public abstract class HtmlView<T> implements HtmlWriter<T> {
+public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, Element> {
 
     final static String WRONG_USE_OF_RENDER_WITH_PRINTSTREAM =
             "Wrong use of render(). " +
-            "Use write() instead to output to PrintStream. " +
-            "To get a String from render() then use view() without a PrintStream ";
+            "Use write() rather than render() to output to PrintStream. " +
+            "To get a String from render() you must use view() without a PrintStream ";
 
 
     private static final String HEADER;
@@ -58,47 +65,94 @@ public abstract class HtmlView<T> implements HtmlWriter<T> {
 
     static {
         try {
-            URL headerUrl = DynamicHtml.class
+            URL headerUrl = HtmlView.class
                     .getClassLoader()
                     .getResource(HEADER_TEMPLATE);
             if(headerUrl == null)
                 throw new FileNotFoundException(HEADER_TEMPLATE);
             InputStream headerStream = headerUrl.openStream();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(headerStream))) {
-                HEADER = reader.lines().collect(Collectors.joining(NEWLINE));
+                HEADER = reader.lines().collect(joining(NEWLINE));
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    protected ThreadLocal<HtmlVisitorCache> visitor;
+    ThreadLocal<HtmlVisitorCache> visitor;
 
-    public HtmlView(PrintStream out) {
-        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorPrintStream(out));
+    public Html<HtmlView> html() {
+        if (this.getVisitor().isWriting())
+            this.getVisitor().write(HEADER);
+        return new Html<>(this);
     }
 
-    public HtmlView() {
-        this.visitor = ThreadLocal.withInitial(HtmlVisitorStringBuilder::new);
+    public Div<HtmlView> div() {
+        return new Div<>(this);
     }
 
-    public Html<Element> html() {
-        HtmlVisitorCache visitor = this.visitor.get();
-
-        if(!visitor.isCached) visitor.write(HEADER);
-        return new Html<>(visitor);
-    }
-
-    public Div<Element> div() {
-        return new Div<>(visitor.get());
-    }
-
-    public Tr<Element> tr() {
-        return new Tr<>(visitor.get());
+    public Tr<HtmlView> tr() {
+        return new Tr<>(this);
     }
 
     @Override
     public HtmlWriter<T> setPrintStream(PrintStream out) {
-        return null;
+        HtmlVisitorCache v = out == null
+            ? new HtmlVisitorStringBuilder(getVisitor().isDynamic)
+            : new HtmlVisitorPrintStream(out, getVisitor().isDynamic);
+        visitor.set(v);
+        return this;
+    }
+
+    @Override
+    public HtmlView self() {
+        return this;
+    }
+
+    @Override
+    public HtmlVisitorCache getVisitor() {
+        return visitor.get();
+    }
+
+    @Override
+    public String getName() {
+        return "HtmlView";
+    }
+
+    @Override
+    public Element º() {
+        throw new IllegalStateException("HtmlView is the root of Html tree and it has not any parent.");
+    }
+
+    @Override
+    public Element getParent() {
+        throw new IllegalStateException("HtmlView is the root of Html tree and it has not any parent.");
+    }
+
+    /**
+     * Adds a partial view to this view.
+     *
+     * @param partial inner view.
+     * @param model the domain object bound to the partial view.
+     * @param <U> the type of the domain model of the partial view.
+     */
+    public final <U> void addPartial(HtmlView<U> partial, U model) {
+        getVisitor().closeBeginTag();
+        partial.getVisitor().depth = getVisitor().depth;
+        if (this.getVisitor().isWriting())
+            getVisitor().write(partial.render(model));
+    }
+
+    /**
+     * Adds a partial view to this view.
+     *
+     * @param partial inner view.
+     * @param <U> the type of the domain model of the partial view.
+     */
+    public final <U> void addPartial(HtmlView<U> partial) {
+        getVisitor().closeBeginTag();
+        partial.getVisitor().depth = getVisitor().depth;
+        if (this.getVisitor().isWriting())
+            getVisitor().write(partial.render());
     }
 }

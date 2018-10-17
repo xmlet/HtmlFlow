@@ -22,36 +22,10 @@
  * SOFTWARE.
  */
 
-package htmlflow.util;
+package htmlflow;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+@FunctionalInterface
+public interface HtmlTemplate<T> {
 
-public class PrintStringBuilder extends PrintStream{
-
-    private final StringBuilder sb = new StringBuilder();
-
-    public PrintStringBuilder(OutputStream out) {
-        super(out);
-    }
-
-    @Override
-    public void print(char c) {
-        super.print(c);
-        sb.append(c);
-    }
-
-    @Override
-    public void print(String s) {
-        super.print(s);
-        sb.append(s);
-    }
-
-    public String substring(int startingIndex) {
-        return sb.substring(startingIndex);
-    }
-
-    public int length() {
-        return sb.length();
-    }
+    void resolve(DynamicHtml<T> view, T model, HtmlView...partials);
 }
