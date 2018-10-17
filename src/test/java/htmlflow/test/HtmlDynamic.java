@@ -27,14 +27,7 @@ package htmlflow.test;
 import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
 import htmlflow.test.model.Stock;
-import org.xmlet.htmlapifaster.EnumMediaMediaType;
-import org.xmlet.htmlapifaster.EnumRelLinkType;
-import org.xmlet.htmlapifaster.EnumTypeContentType;
-import org.xmlet.htmlapifaster.EnumTypeScript;
-import org.xmlet.htmlapifaster.Head;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Link;
-import org.xmlet.htmlapifaster.Meta;
+import org.xmlet.htmlapifaster.*;
 
 
 public class HtmlDynamic {
@@ -47,85 +40,85 @@ public class HtmlDynamic {
         Head<Html<HtmlView>> head = view
             .html()
                 .head()
-                    .title().text("Stock Prices").º();
+                    .title().text("Stock Prices").__();
         Meta<Head<Html<HtmlView>>> meta = head.meta();
         head.getVisitor().visitAttribute("http-equiv", "Content-Type");
-        meta.attrContent("text/html; charset=UTF-8").º();
+        meta.attrContent("text/html; charset=UTF-8").__();
         meta = head.meta();
         head.getVisitor().visitAttribute("http-equiv", "Content-Style-Type");
-        meta.attrContent("text/CSS").º();
+        meta.attrContent("text/CSS").__();
         meta = head.meta();
         head.getVisitor().visitAttribute("http-equiv", "Content-Script-Type");
-        meta.attrContent("text/javascript").º();
+        meta.attrContent("text/javascript").__();
         Link<Head<Html<HtmlView>>> link = head.link();
         head.getVisitor().visitAttribute("rel", "shortcut icon");
-        link.attrHref("/images/favicon.ico").º();
+        link.attrHref("/images/favicon.ico").__();
         head
-                .link().attrRel(EnumRelLinkType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaMediaType.ALL).º()
-                .script().attrType(EnumTypeScript.TEXT_JAVASCRIPT).attrSrc("/js/util.js").º()
-            .º() // head
+                .link().attrRel(EnumRelRelType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaMediaType.ALL).__()
+                .script().attrType(EnumTypeScriptType.TEXT_JAVASCRIPT).attrSrc("/js/util.js").__()
+            .__() // head
             .body()
-                .h1().text("Stock Prices").º()
+                .h1().text("Stock Prices").__()
                 .table()
                     .thead()
                         .tr()
-                            .th().text("#").º()
-                            .th().text("symbol").º()
-                            .th().text("name").º()
-                            .th().text("price").º()
-                            .th().text("change").º()
-                            .th().text("ratio").º()
-                        .º() // tr
-                    .º() // thead
+                            .th().text("#").__()
+                            .th().text("symbol").__()
+                            .th().text("name").__()
+                            .th().text("price").__()
+                            .th().text("change").__()
+                            .th().text("ratio").__()
+                        .__() // tr
+                    .__() // thead
                     .tbody()
                         .dynamic(tbody -> stocks.forEach(stock -> view.addPartial(tableRowView, stock)))
-                    .º() // tbody
-                .º() // table
-            .º() // body
-        .º(); // html
+                    .__() // tbody
+                .__() // table
+            .__() // body
+        .__(); // html
     };
 
     private static void templateStocksWrong(DynamicHtml<Iterable<Stock>> view, Iterable<Stock> stocks) {
         Head<Html<HtmlView>> head = view
             .html()
                 .head()
-                    .title().text("Stock Prices").º();
+                    .title().text("Stock Prices").__();
         Meta<Head<Html<HtmlView>>> meta = head.meta();
         head.getVisitor().visitAttribute("http-equiv", "Content-Type");
-        meta.attrContent("text/html; charset=UTF-8").º();
+        meta.attrContent("text/html; charset=UTF-8").__();
         meta = head.meta();
         head.getVisitor().visitAttribute("http-equiv", "Content-Style-Type");
-        meta.attrContent("text/CSS").º();
+        meta.attrContent("text/CSS").__();
         meta = head.meta();
         head.getVisitor().visitAttribute("http-equiv", "Content-Script-Type");
-        meta.attrContent("text/javascript").º();
+        meta.attrContent("text/javascript").__();
         Link<Head<Html<HtmlView>>> link = head.link();
         head.getVisitor().visitAttribute("rel", "shortcut icon");
-        link.attrHref("/images/favicon.ico").º();
+        link.attrHref("/images/favicon.ico").__();
         head
-                .link().attrRel(EnumRelLinkType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaMediaType.ALL).º()
-                .script().attrType(EnumTypeScript.TEXT_JAVASCRIPT).attrSrc("/js/util.js").º()
-            .º() // head
+                .link().attrRel(EnumRelRelType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaMediaType.ALL).__()
+                .script().attrType(EnumTypeScriptType.TEXT_JAVASCRIPT).attrSrc("/js/util.js").__()
+            .__() // head
             .body()
-                .h1().text("Stock Prices").º()
+                .h1().text("Stock Prices").__()
                 .table()
                     .thead()
                         .tr()
-                            .th().text("#").º()
-                            .th().text("symbol").º()
-                            .th().text("name").º()
-                            .th().text("price").º()
-                            .th().text("change").º()
-                            .th().text("ratio").º()
-                        .º() // tr
-                    .º() // thead
+                            .th().text("#").__()
+                            .th().text("symbol").__()
+                            .th().text("name").__()
+                            .th().text("price").__()
+                            .th().text("change").__()
+                            .th().text("ratio").__()
+                        .__() // tr
+                    .__() // thead
                     .tbody()
                         // !!!!! Here it is the wrong use with of() for the unit test !!!
                         .of(tbody -> stocks.forEach(stock -> view.addPartial(tableRowView, stock)))
-                    .º() // tbody
-                .º() // table
-            .º() // body
-        .º(); // html
+                    .__() // tbody
+                .__() // table
+            .__() // body
+        .__(); // html
     };
 
     static final DynamicHtml<Stock> tableRowView = DynamicHtml.view((view, stock) -> {
@@ -134,16 +127,16 @@ public class HtmlDynamic {
                     .dynamic(tr -> tr.attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd"))
                     .td()
                         .dynamic(td -> td.text(stock.getIndex()))
-                    .º()
+                    .__()
                     .td()
-                        .a().dynamic(a -> a.attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol())).º()
-                    .º()
+                        .a().dynamic(a -> a.attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol())).__()
+                    .__()
                     .td()
-                        .a().dynamic(a -> a.attrHref(stock.getUrl()).text(stock.getName())).º()
-                    .º()
+                        .a().dynamic(a -> a.attrHref(stock.getUrl()).text(stock.getName())).__()
+                    .__()
                     .td()
-                        .strong().dynamic(strong -> strong.text(stock.getPrice())).º()
-                    .º()
+                        .strong().dynamic(strong -> strong.text(stock.getPrice())).__()
+                    .__()
                     .td()
                         .dynamic(td -> {
                         	double change = stock.getChange();
@@ -154,7 +147,7 @@ public class HtmlDynamic {
 
                             td.text(change);
                         })
-                    .º()
+                    .__()
                     .td()
                         .dynamic(td -> {
                         	double ratio = stock.getRatio();
@@ -165,7 +158,7 @@ public class HtmlDynamic {
 
                             td.text(ratio);
                         })
-                    .º()
-                .º();
+                    .__()
+                .__();
     });
 }

@@ -39,7 +39,7 @@ public class TestWrongUseOfViews {
         StaticHtml.view()
             .html()
                 .head()
-                    .title().text("Task Details").º()
+                    .title().text("Task Details").__()
                     .dynamic(head -> {
                         Assert.fail("It should not reach here!");
                     });
@@ -52,7 +52,7 @@ public class TestWrongUseOfViews {
     public void testWrongUseOfRenderWithoutModelInDynamicView(){
         DynamicHtml
             .view((view, model) -> {
-                view.html().head().title().text("Task Details").º();
+                view.html().head().title().text("Task Details").__();
             })
             .render(); // wrong use of render without a model
 
@@ -65,7 +65,7 @@ public class TestWrongUseOfViews {
     public void testWrongUseOfWriteWithoutModelInDynamicView(){
         DynamicHtml
             .view(System.out, (view, model) -> {
-                view.html().head().title().text("Task Details").º();
+                view.html().head().title().text("Task Details").__();
             })
             .write(); // wrong use of write without a model
 
@@ -79,7 +79,7 @@ public class TestWrongUseOfViews {
     public void testWrongUseOfRenderInViewWithPrintStream(){
         DynamicHtml
             .view(System.out, (view, model) -> {
-                view.html().head().title().text("Task Details").º();
+                view.html().head().title().text("Task Details").__();
             })
             .render(); // Cannot use render() on views with a PrintStream
     }
@@ -91,7 +91,7 @@ public class TestWrongUseOfViews {
     public void testWrongUseOfRenderWithModelInViewWithPrintStream(){
         DynamicHtml
             .view(System.out, (view, model) -> {
-                view.html().head().title().text("Task Details").º();
+                view.html().head().title().text("Task Details").__();
             })
             .render(new Object()); // Cannot use render() on views with a PrintStream
     }
@@ -104,7 +104,7 @@ public class TestWrongUseOfViews {
     public void testWrongUseOfRenderWithModelAndPartialsInViewWithPrintStream(){
         DynamicHtml
             .view(System.out, (view, model) -> {
-                view.html().head().title().text("Task Details").º();
+                view.html().head().title().text("Task Details").__();
             })
             .render(new Object(), StaticHtml.view()); // Cannot use render() on views with a PrintStream
     }
@@ -120,9 +120,9 @@ public class TestWrongUseOfViews {
                     .head()
                         .title()
                             .text("Task Details")
-                        .º()
-                    .º()
-                .º()
+                        .__()
+                    .__()
+                .__()
             .render(new Object()); // wrong use of render with a model
 
     }
@@ -138,9 +138,9 @@ public class TestWrongUseOfViews {
                     .head()
                         .title()
                             .text("Task Details")
-                        .º()
-                    .º()
-                .º()
+                        .__()
+                    .__()
+                .__()
             .write(new Object()); // wrong use of write with a model
 
     }

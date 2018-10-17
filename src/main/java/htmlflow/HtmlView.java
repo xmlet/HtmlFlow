@@ -120,7 +120,7 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
     }
 
     @Override
-    public Element º() {
+    public Element __() {
         throw new IllegalStateException("HtmlView is the root of Html tree and it has not any parent.");
     }
 

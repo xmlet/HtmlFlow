@@ -46,7 +46,7 @@ public class TestHtmlViewAsElement {
 
     @Test(expected = IllegalStateException.class)
     public void testWrongºuse() {
-        StaticHtml.view().º();
+        StaticHtml.view().__();
     }
 
     @Test(expected = IllegalStateException.class)

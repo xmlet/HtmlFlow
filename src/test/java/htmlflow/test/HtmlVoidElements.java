@@ -26,11 +26,9 @@ package htmlflow.test;
 
 import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
-import org.xmlet.htmlapifaster.EnumShapeArea;
-import org.xmlet.htmlapifaster.EnumTargetBrowsingContext;
-import org.xmlet.htmlapifaster.EnumTypeInput;
-
-import java.math.BigInteger;
+import org.xmlet.htmlFaster.EnumTargetBrowsingContext;
+import org.xmlet.htmlapifaster.EnumShapeShapeType;
+import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 public class HtmlVoidElements {
     static HtmlView voidElements = StaticHtml.view()
@@ -38,51 +36,51 @@ public class HtmlVoidElements {
             .head()
                 .title()
                     .text("Html View with somid elements")
-                .º()
+                .__()
                 .base()
                     .attrHref("http://www.example.com/page.html")
-                .º()
-            .º()
+                .__()
+            .__()
             .body()
                 .embed()
                     .attrType("video/webm")
                     .attrSrc("/media/stream_of_water_audioless.webm")
                     .attrWidth("300")
                     .attrHeight("200")
-                .º()
+                .__()
                 .input()
-                    .attrType(EnumTypeInput.TEXT)
+                    .attrType(EnumTypeInputType.TEXT)
                     .attrId("display-name")
                     .attrPattern("[A-Za-z\\s]+")
-                    .attrMaxlength(5)
+                    .attrMaxlength(5L)
                     .attrValue("Aa")
-                    .attrRequired("true")
-                .º()
+                    .attrRequired(true)
+                .__()
                 .table()
                     .colgroup()
-                        .col().º()
-                        .col().attrSpan(new BigInteger("2")).attrClass("batman").º()
-                        .col().attrSpan(new BigInteger("2")).attrClass("flash").º()
-                    .º()
-                .º()
+                        .col().__()
+                        .col().attrSpan(2L).attrClass("batman").__()
+                        .col().attrSpan(2L).attrClass("flash").__()
+                    .__()
+                .__()
                 .video()
                     .source()
                         .attrSrc("/media/examples/stream_of_water.webm")
                         .attrType("video/webm")
-                    .º()
-                .º()
+                    .__()
+                .__()
                 .area()
-                    .attrShape(EnumShapeArea.CIRCLE)
+                    .attrShape(EnumShapeShapeType.CIRCLE)
                     .attrCoords("130,136,60")
                     .attrHref("https://developer.mozilla.org/")
-                    .attrTarget(EnumTargetBrowsingContext._BLANK)
+                    .attrTarget(EnumTargetBrowsingContext._BLANK.toString())
                     .attrAlt("MDN")
-                .º()
+                .__()
                 .object()
                     .param()
                         .attrName("dummy")
-                    .º()
-                .º()
-            .º()
-        .º();
+                    .__()
+                .__()
+            .__()
+        .__();
 }

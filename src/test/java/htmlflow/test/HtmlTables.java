@@ -28,7 +28,7 @@ import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapifaster.EnumRelLinkType;
+import org.xmlet.htmlapifaster.EnumRelRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 
 public class HtmlTables {
@@ -38,18 +38,18 @@ public class HtmlTables {
             .html()
                 .head()
                     .title().text("Dummy Table")
-                    .º()// title
-                .º()// head
+                    .__()// title
+                .__()// head
                 .body()
-                    .h1().text("Dummy Table").º()
-                    .hr().º()
+                    .h1().text("Dummy Table").__()
+                    .hr().__()
                     .div()
                         .table()
                             .tr()
-                                .th().text("Id1").º()
-                                .th().text("Id2").º()
-                                .th().text("Id3").º()
-                            .º() //tr
+                                .th().text("Id1").__()
+                                .th().text("Id2").__()
+                                .th().text("Id3").__()
+                            .__() //tr
                             .dynamic(table -> {
                                 for (int[] outputRow : outputRows) {
                                     table.tr()
@@ -57,15 +57,15 @@ public class HtmlTables {
                                              for (int rowValue : outputRow) {
                                                  tr.td()
                                                      .text("" + rowValue)
-                                                 .º();
+                                                 .__();
                                              }
-                                         }).º();
+                                         }).__();
                                 }
                             })
-                        .º()
-                    .º()
-                .º()
-            .º();
+                        .__()
+                    .__()
+                .__()
+            .__();
     }
 
     /**
@@ -82,53 +82,53 @@ public class HtmlTables {
                 .head()
                     .title()
                         .text("Task List")
-                        .º()
+                        .__()
                     .link()
-                        .attrRel(EnumRelLinkType.STYLESHEET)
+                        .attrRel(EnumRelRelType.STYLESHEET)
                         .attrType(EnumTypeContentType.TEXT_CSS)
                         .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-                    .º()
-                .º()
+                    .__()
+                .__()
                 .body()
                     .attrClass("container")
                     .of(__ -> // ignore body argument because we don't need it here
                         view.addPartial(partials[0]) // taskListViewHeader
                     )
-                    .hr().º()
+                    .hr().__()
                     .div()
                         .table()
                             .attrClass("table")
                             .tr()
-                                .th().text("Title").º()
-                                .th().text("Description").º()
-                                .th().text("Priority").º()
-                            .º()
+                                .th().text("Title").__()
+                                .th().text("Description").__()
+                                .th().text("Priority").__()
+                            .__()
                             .tbody()
                                 .dynamic(tbody ->
                                     tasks.forEach(task -> view.addPartial(partials[1], task)) // taskListRow
                                 )
-                            .º() // tbody
-                        .º() // table
-                    .º() // div
-                .º() // body
-            .º(); // html
+                            .__() // tbody
+                        .__() // table
+                    .__() // div
+                .__() // body
+            .__(); // html
     }
 
     static StaticHtml taskListViewHeader = StaticHtml.view(view -> view
         .div()
-            .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").º()
-            .p().text("Html page built with HtmlFlow.").º()
-            .h1().text("Task List").º()
-        .º() // div
+            .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").__()
+            .p().text("Html page built with HtmlFlow.").__()
+            .h1().text("Task List").__()
+        .__() // div
     );
 
     static DynamicHtml<Task> taskListRow = DynamicHtml.view((view, task) -> {
         view
             .tr()
-                .td().dynamic(td -> td.text(task.getTitle())).º()
-                .td().dynamic(td -> td.text(task.getDescription())).º()
-                .td().dynamic(td -> td.text(task.getPriority().toString())).º()
-            .º(); // tr
+                .td().dynamic(td -> td.text(task.getTitle())).__()
+                .td().dynamic(td -> td.text(task.getDescription())).__()
+                .td().dynamic(td -> td.text(task.getPriority().toString())).__()
+            .__(); // tr
     });
 
     public static void taskTableView(DynamicHtml<Iterable<Task>> view, Iterable<Task> tasks){
@@ -136,32 +136,32 @@ public class HtmlTables {
             .html()
                 .head()
                     .title().text("Dummy Table")
-                    .º()
-                .º()
+                    .__()
+                .__()
                 .body()
-                    .h1().text("Dummy Table").º()
-                    .hr().º()
+                    .h1().text("Dummy Table").__()
+                    .hr().__()
                     .div()
                         .table()
                             .tr()
-                                .th().text("Title").º()
-                                .th().text("Description").º()
-                                .th().text("Priority").º()
-                            .º() // tr
+                                .th().text("Title").__()
+                                .th().text("Description").__()
+                                .th().text("Priority").__()
+                            .__() // tr
                             .dynamic(table ->
                                 tasks.forEach(item ->
                                     table
                                         .tr()
-                                            .td().text(item.getTitle()).º()
-                                            .td().text(item.getDescription()).º()
-                                            .td().text(item.getPriority().toString()).º()
-                                        .º() // tr
+                                            .td().text(item.getTitle()).__()
+                                            .td().text(item.getDescription()).__()
+                                            .td().text(item.getPriority().toString()).__()
+                                        .__() // tr
                                 )
                             )
-                        .º()
-                    .º()
-                .º()
-            .º();
+                        .__()
+                    .__()
+                .__()
+            .__();
     }
 
     /**
@@ -175,7 +175,7 @@ public class HtmlTables {
                         .tr()
                             .attrClass("top")
                             .td()
-                                .attrColspan("2")
+                                .attrColspan(2)
                                 .table()
                                     .tr()
                                         .td()
@@ -183,20 +183,20 @@ public class HtmlTables {
                                             .img()
                                                 .attrSrc("logo.png")
                                                 .attrStyle("width:100%; max-width:300px;")
-                                            .º() // img
-                                        .º() // td
-                                    .º() // tr
-                                .º() // table
-                            .º() // td
+                                            .__() // img
+                                        .__() // td
+                                    .__() // tr
+                                .__() // table
+                            .__() // td
                             .td()
                                 .text("Invoice #: 123")
-                                .br().º()
+                                .br().__()
                                 .text("Created: January 1, 2015")
-                                .br().º()
+                                .br().__()
                                 .text("Due: February 1, 2015")
-                            .º() // td
-                        .º() // tr
-                    .º() // table
-                .º() // body
-            .º(); // html
+                            .__() // td
+                        .__() // tr
+                    .__() // table
+                .__() // body
+            .__(); // html
 }

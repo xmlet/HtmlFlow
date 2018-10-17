@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.0.7-SNAPSHOT</version>
+    <version>3.0.8-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlApiFaster</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
