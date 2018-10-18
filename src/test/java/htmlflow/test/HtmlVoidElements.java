@@ -27,7 +27,7 @@ package htmlflow.test;
 import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
 import org.xmlet.htmlFaster.EnumTargetBrowsingContext;
-import org.xmlet.htmlapifaster.EnumShapeShapeType;
+import org.xmlet.htmlapifaster.EnumShapeType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 public class HtmlVoidElements {
@@ -70,7 +70,7 @@ public class HtmlVoidElements {
                     .__()
                 .__()
                 .area()
-                    .attrShape(EnumShapeShapeType.CIRCLE)
+                    .attrShape(EnumShapeType.CIRCLE)
                     .attrCoords("130,136,60")
                     .attrHref("https://developer.mozilla.org/")
                     .attrTarget(EnumTargetBrowsingContext._BLANK.toString())

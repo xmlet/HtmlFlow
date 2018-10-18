@@ -28,7 +28,7 @@ import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapifaster.EnumRelRelType;
+import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 
 public class HtmlTables {
@@ -84,7 +84,7 @@ public class HtmlTables {
                         .text("Task List")
                         .__()
                     .link()
-                        .attrRel(EnumRelRelType.STYLESHEET)
+                        .attrRel(EnumRelType.STYLESHEET)
                         .attrType(EnumTypeContentType.TEXT_CSS)
                         .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
                     .__()

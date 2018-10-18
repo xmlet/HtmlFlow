@@ -29,7 +29,6 @@ import htmlflow.HtmlView;
 import htmlflow.test.model.Stock;
 import org.xmlet.htmlapifaster.*;
 
-
 public class HtmlDynamic {
 
     public static DynamicHtml<Iterable<Stock>> stocksViewOk = DynamicHtml.view(HtmlDynamic::templateStocksOk);
@@ -54,7 +53,7 @@ public class HtmlDynamic {
         head.getVisitor().visitAttribute("rel", "shortcut icon");
         link.attrHref("/images/favicon.ico").__();
         head
-                .link().attrRel(EnumRelRelType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaMediaType.ALL).__()
+                .link().attrRel(EnumRelType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaType.ALL).__()
                 .script().attrType(EnumTypeScriptType.TEXT_JAVASCRIPT).attrSrc("/js/util.js").__()
             .__() // head
             .body()
@@ -96,7 +95,7 @@ public class HtmlDynamic {
         head.getVisitor().visitAttribute("rel", "shortcut icon");
         link.attrHref("/images/favicon.ico").__();
         head
-                .link().attrRel(EnumRelRelType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaMediaType.ALL).__()
+                .link().attrRel(EnumRelType.STYLESHEET).attrType(EnumTypeContentType.TEXT_CSS).attrHref("/CSS/style.CSS").attrMedia(EnumMediaType.ALL).__()
                 .script().attrType(EnumTypeScriptType.TEXT_JAVASCRIPT).attrSrc("/js/util.js").__()
             .__() // head
             .body()

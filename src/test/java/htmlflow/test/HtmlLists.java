@@ -53,8 +53,8 @@ public class HtmlLists {
                         .addAttr("toto", "tutu")
                         .form()
                             .attrAction("/action.do")
-                            .attrMethod(EnumMethodMethodType.POST)
-                            .attrEnctype(EnumEnctypeEnctypeType.APPLICATION_X_WWW_FORM_URLENCODED)
+                            .attrMethod(EnumMethodType.POST)
+                            .attrEnctype(EnumEnctypeType.APPLICATION_X_WWW_FORM_URLENCODED)
                         .__() //form
                     .__() //div
                 .__() //body
@@ -66,7 +66,7 @@ public class HtmlLists {
                 .head()
                     .title().text("Task Details").__()
                     .link()
-                        .attrRel(EnumRelRelType.STYLESHEET)
+                        .attrRel(EnumRelType.STYLESHEET)
                         .attrType(EnumTypeContentType.TEXT_CSS)
                         .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
                     .__() //link
@@ -90,7 +90,7 @@ public class HtmlLists {
                 .head()
                     .title().text("Task Details").__()
                     .link()
-                        .attrRel(EnumRelRelType.STYLESHEET)
+                        .attrRel(EnumRelType.STYLESHEET)
                         .attrType(EnumTypeContentType.TEXT_CSS)
                         .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
                     .__() //link
