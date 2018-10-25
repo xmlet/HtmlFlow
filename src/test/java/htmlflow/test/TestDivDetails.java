@@ -24,20 +24,21 @@
 package htmlflow.test;
 
 import htmlflow.DynamicHtml;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
+import htmlflow.test.views.HtmlLists;
+import htmlflow.test.views.HtmlTables;
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xmlet.htmlapifaster.Body;
 import org.xmlet.htmlapifaster.Head;
 import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Link;
 import org.xmlet.htmlapifaster.Title;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -67,8 +68,8 @@ public class TestDivDetails {
         this.expectedTaskViews =
                 Stream.of(
                         new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-                        new Task(4, "Special dinner", "Have dinner with someone!", Priority.Normal),
-                        new Task(5, "Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+                        new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
+                        new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
                 ).collect(Collectors.toMap(
                         identity(),
                         task -> loadLines(format("task%d.html", task.getId()))
@@ -112,44 +113,50 @@ public class TestDivDetails {
 
     @Test
     public void testDivDetailsBinding() {
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        DynamicHtml<Task> view = DynamicHtml
+            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
+
         expectedTaskViews
                 .keySet()
                 .stream()
                 .map(task -> {
-                    ByteArrayOutputStream mem = new ByteArrayOutputStream();
-                    DynamicHtml
-                        .view(new PrintStream(mem), HtmlLists::taskDetailsView)
-                        .write(task);
+                    mem.reset();
+                    view.write(task);
                     return TaskHtml.of(task, htmlWrite(mem));
                 })
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
-                            .get(taskHtml.t)
-                            .forEach(line -> assertEquals(line, actual.next()));
+                            .get(taskHtml.obj)
+                            .forEach(
+                                line ->
+                                    assertEquals(line,
+                                        actual.next()));
                 });
     }
 
     @Test
     public void testDivDetailsBindingWithRender() {
+        HtmlView<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
         expectedTaskViews
                 .keySet()
                 .stream()
                 .map(task -> TaskHtml.of(task,
-                                htmlRender(DynamicHtml.view(HtmlLists::taskDetailsView), task)))
+                                htmlRender(view, task)))
                 .forEach(taskHtml -> {
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
-                            .get(taskHtml.t)
+                            .get(taskHtml.obj)
                             .forEach(line -> assertEquals(line, actual.next()));
                 });
     }
 
     private static class TaskHtml {
-        final Task t;
+        final Task obj;
         final Stream<String> html;
-        public TaskHtml(Task t, Stream<String> html) {
-            this.t = t;
+        public TaskHtml(Task obj, Stream<String> html) {
+            this.obj = obj;
             this.html = html;
         }
         static TaskHtml of(Task t, Stream<String> html) {
