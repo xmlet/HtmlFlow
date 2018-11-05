@@ -61,7 +61,7 @@ public class HtmlForReadme {
                     .__() //body
                 .__() //html
             .render();
-        System.out.println(html);
+        // System.out.println(html);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class HtmlForReadme {
         // System.out.println(html);
 
         view
-            .setPrintStream(System.out)
+            // .setPrintStream(System.out)
             .write();                       // 2) print to the standard output
 
         view

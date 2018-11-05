@@ -8,7 +8,7 @@
 Use one of its `view()` factory methods to get started with HtmlFlow: 
 
 ```java
-String html= StaticHtml
+String html = StaticHtml
                 .view()
                     .html()
                         .head()
@@ -26,8 +26,8 @@ String html= StaticHtml
 ```
 
 [Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
-built with the `htmlflow.DynamicHtml` support.
-Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find several kinds of complex views with dynamic partial blocks.
+built with the support of `htmlflow.DynamicHtml`.
+Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find more complex views with dynamic partial blocks.
 
 ## Installation
 
@@ -220,7 +220,45 @@ public class App {
 }
 ```
 
+## Partial Views
+
+HtmlFlow also enables the use of partial HTML blocks inside a template function.
+This is useful whenever you want to reuse the same template with different HTML fragments.
+To that end you must create a view with a different kind of template function (i.e. 
+[`HtmlTemplate`](src/main/java/htmlflow/HtmlTemplate.java)), which 
+receives one more `HtmlView[] partials` argument in addition to the arguments `DynamicHtml<U>`
+and `U`.
+Check out one of our use cases of partial views in the template function
+[`taskListViewWithPartials`](https://github.com/xmlet/HtmlFlow/blob/readme-for-release-3/src/test/java/htmlflow/test/views/HtmlTables.java#L75).
+
 ## Changelog
+
+### 3.0 (November, 2018)
+
+* Improved performance. HtmlFlow is on this date the most performant template engine and Java DSL for HTML.
+
+* Replaced the method `º()` by `__()`.
+
+* New static factory methods `view()` of the new classes `DynamicHtml` and `StaticHtml`
+
+* Removed the static factory methods `html()`, `head()` and `div()` from `HtmlView`.
+
+* Html code is emitted on the fly when the methods of `HtmlApi` (e.g. `html()`, `div()`, `h1()`, etc)
+are called.
+
+* Now `HtmlView` is just a container of a template function and an `ElementVisitor`, which establishes 
+the HTML output format.
+
+* All emitted HTML is cached.
+
+* Data binding requires the use of new method `dynamic()` to avoid caching. Otherwise, the context objects are ignored on further renders.
+
+* New method `of()` to enable the use of other methods in the fluent chain.
+
+* New `addPartial()` to enable the reuse of same HTML template function with different HTML fragments.
+
+* Removed the method `binder()`. The role of this method is replaced by the concept of template function which receives the context object `U` that is captured and used whenever is needed, such as in `dynamic()`.
+
 
 ### 2.1 (August, 2018)
 
