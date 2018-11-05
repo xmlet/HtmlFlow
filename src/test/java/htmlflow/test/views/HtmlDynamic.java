@@ -147,6 +147,7 @@ public class HtmlDynamic {
 
     static final DynamicHtml<Stock> tableRowView = DynamicHtml.view((view, stock) -> {
             view
+                .defineRoot()
                 .tr()
                     .dynamic(tr -> tr.attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd"))
                     .td()
