@@ -55,14 +55,14 @@ return their parent (e.g. `.img().attrSrc("...")` returns the `Img` parent objec
 There is also a special method `__()` which returns the parent element.
 This method is responsible for emitting the end tag of an element.
 
-The HTML resulting from HtmlFlow respects all HTML 5 rules (e.g. `h1().div()`
+The HTML resulting from HtmlFlow respects all HTML 5.2 rules (e.g. `h1().div()`
 gives a compilation error because it goes against the content
-allowed by `h1` according to HTML5). So, whenever you type `.` after an element
+allowed by `h1` according to HTML5.2). So, whenever you type `.` after an element
 the intelissense will just suggest the set of allowed elements and attributes.
 
-The HtmlFlow API is according to HTML5 and is generated with the support
+The HtmlFlow API is according to HTML5.2 and is generated with the support
 of an automated framework ([xmlet](https://github.com/xmlet/)) based on an [XSD
-definition of the HTML5](https://github.com/xmlet/HtmlApi/blob/master/src/main/resources/html_5.xsd)
+definition of the HTML5.2](https://github.com/xmlet/HtmlApiFaster/blob/master/src/main/resources/html_5_2.xsd)
 syntax.
 
 Thus, all attributes are strongly typed with enumerated types which restrict
