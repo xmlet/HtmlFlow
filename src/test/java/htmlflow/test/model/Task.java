@@ -31,9 +31,9 @@ import java.util.Date;
 public class Task {
 
     private final int id;
-    private String title;
-    private String description;
-    private Priority priority;
+    private final String title;
+    private final String description;
+    private final Priority priority;
     private Status status;
     private Date creationDate;
     private Date completedDate;

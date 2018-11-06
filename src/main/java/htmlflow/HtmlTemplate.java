@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,35 +22,10 @@
  * SOFTWARE.
  */
 
-package htmlflow.test;
+package htmlflow;
 
-import htmlflow.StaticHtml;
-import junit.framework.Assert;
-import org.junit.Test;
+@FunctionalInterface
+public interface HtmlTemplate<T> {
 
-public class TestHtmlViewAsElement {
-
-    @Test
-    public void testSelf() {
-        StaticHtml view = StaticHtml.view();
-        Assert.assertSame(view, view.self());
-        Assert.assertEquals("HtmlView", view.getName());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testWrongRender() {
-        StaticHtml
-            .view(System.out)
-            .render();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testWrong__use() {
-        StaticHtml.view().__();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testWrongParentUse() {
-        StaticHtml.view().getParent();
-    }
+    void resolve(DynamicHtml<T> view, T model, HtmlView...partials);
 }

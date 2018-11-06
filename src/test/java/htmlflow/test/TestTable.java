@@ -23,22 +23,21 @@
  */
 package htmlflow.test;
 
-import htmlflow.HtmlView;
+import htmlflow.DynamicHtml;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
+import htmlflow.test.views.HtmlTables;
 import org.junit.Test;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xmlet.htmlapi.Body;
-import org.xmlet.htmlapi.Div;
-import org.xmlet.htmlapi.Head;
-import org.xmlet.htmlapi.Html;
-import org.xmlet.htmlapi.Table;
-import org.xmlet.htmlapi.Tr;
+import org.xmlet.htmlapifaster.Body;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Head;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Table;
+import org.xmlet.htmlapifaster.Tr;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -48,10 +47,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.htmlWrite;
-import static java.util.stream.Collectors.toList;
 import static junit.framework.Assert.assertEquals;
 
 /**
@@ -60,48 +56,46 @@ import static junit.framework.Assert.assertEquals;
 public class TestTable {
 
     private static final Logger LOGGER = Logger.getLogger("htmlflow.test");
+    private static final Pattern NEWLINE = Pattern.compile("\n");
 
     @Test
-    public void testSimpleTableRender() throws ParserConfigurationException, SAXException, IOException{
+    public void testSimpleTableRender() throws IOException{
         /*
          * Arrange
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
-        HtmlView<?> view = HtmlTables.simpleTableView(output);
+        DynamicHtml view = DynamicHtml.view(HtmlTables::simpleTableView);
         /*
          * Act
          */
-        String html = view.render();
+        String html = view.render(output);
         /*
          * Assert
          */
         assertSimpleHtmlView(html.getBytes(), output);
     }
+
     @Test
-    public void testSimpleTableWrite() throws ParserConfigurationException, SAXException, IOException{
+    public void testSimpleTableWrite() throws IOException{
         /*
-         * Arrange
+         * Arrange and Act
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
-        HtmlView<?> view = HtmlTables.simpleTableView(output);
-        /*
-         * Act
-         */
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        view
-                .setPrintStream(new PrintStream(mem))
-                .write();
+        DynamicHtml
+            .view(new PrintStream(mem), HtmlTables::simpleTableView)
+            .write(output);
         /*
          * Assert
          */
         assertSimpleHtmlView(mem.toByteArray(), output);
     }
+
     @Test
     public void testNestedTable(){
         /*
          * Arrange
          */
-        Pattern NEWLINE = Pattern.compile("\n");
         Iterator<String> expected = Utils.loadLines("nestedTable.html").iterator();
         /*
          * Act
@@ -113,42 +107,66 @@ public class TestTable {
         NEWLINE
             .splitAsStream(html)
             .forEach(actual -> assertEquals(expected.next(), actual));
-
     }
+
     @Test
-    public void testTableWithBinding() throws ParserConfigurationException, SAXException, IOException{
+    public void testTableWithBinding() throws IOException{
         /*
          * Act
          */
         Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High, Status.Progress);
         Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal, Status.Completed);
         Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High, Status.Deferred);
-        List<Task> output = Arrays.asList(t1, t2, t3);
-        String html = HtmlTables.taskTableView.render(output);
+        List<Task> tasks = Arrays.asList(t1, t2, t3);
+        String html = DynamicHtml.view(HtmlTables::taskTableView).render(tasks);
         /*
          * Assert
          */
-        assertTaskHtmlView(html.getBytes(), output);
+        assertTaskHtmlView(html.getBytes(), tasks);
     }
 
     @Test
-    public void testTableBindingForReadmeTwice() throws IOException, ParserConfigurationException, SAXException {
-        validateBindingTable(HtmlTables.taskListView);
-        validateBindingTable(HtmlTables.taskListView);
-    }
-
-    static void validateBindingTable(HtmlView<Iterable<Task>> taskView){
+    public void testTableWithPartialsBindingTwiceToPrintStream() {
         List<Task> dataSource = Arrays.asList(
                 new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
-        List<String> actual = htmlWrite(taskView, dataSource).collect(toList());
-        Iterator<String> iter = actual.iterator();
-        actual.forEach(System.out::println);
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        DynamicHtml<Iterable<Task>> view = DynamicHtml.view(
+            new PrintStream(mem),
+            HtmlTables::taskListViewWithPartials);
+        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
+        validateBindingTable(mem.toString());
+        mem.reset();
+        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
+        validateBindingTable(mem.toString());
+    }
+
+
+    @Test
+    public void testTableWithPartialsBindingTwice() {
+        List<Task> dataSource = Arrays.asList(
+                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+                new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
+                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+        );
+        DynamicHtml<Iterable<Task>> view = DynamicHtml.view(HtmlTables::taskListViewWithPartials);
+        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
+        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
+    }
+
+    static void validateBindingTable(String actual){
+        Iterator<String> iter = NEWLINE
+            .splitAsStream(actual)
+            .iterator();
         Utils
                 .loadLines("TaskList.html")
-                .forEach(expected -> assertEquals(expected, iter.next()));
+                .forEach(expected -> {
+                    String line = iter.next();
+                    // System.out.println(line);
+                    assertEquals(expected, line);
+                });
 
     }
 

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, Miguel Gamboa (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,30 +22,36 @@
  * SOFTWARE.
  */
 
-package htmlflow;
+package htmlflow.util;
 
-import org.xmlet.htmlapi.Element;
-
+import java.io.OutputStream;
 import java.io.PrintStream;
 
-/**
- * An optimized version of HtmlVisitorBinder which suppresses the binder check
- * on traversal of children elements.
- * This Vistor does not have a model and thus it does not need to check whether
- * the elements have a binder, or not.
- * Since it does not have a model, then it has no object to pass to the binders.
- *
- * @author Miguel Gamboa
- *         created on 17-01-2018
- */
-public class HtmlVisitor extends HtmlVisitorBinder<Object> {
+public class PrintStringBuilder extends PrintStream{
 
-    public HtmlVisitor(PrintStream out) {
-        super(out, null);
+    private final StringBuilder sb = new StringBuilder();
+
+    public PrintStringBuilder(OutputStream out) {
+        super(out);
     }
 
     @Override
-    protected <U extends Element> void visitChildrem(Element<U, ?> elem) {
-        elem.getChildren().forEach(item -> item.accept(this));
+    public void print(char c) {
+        super.print(c);
+        sb.append(c);
+    }
+
+    @Override
+    public void print(String s) {
+        super.print(s);
+        sb.append(s);
+    }
+
+    public String substring(int startingIndex) {
+        return sb.substring(startingIndex);
+    }
+
+    public int length() {
+        return sb.length();
     }
 }

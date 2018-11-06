@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-16, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +24,34 @@
 
 package htmlflow.test;
 
-import htmlflow.StaticHtml;
-import junit.framework.Assert;
+import htmlflow.test.views.HtmlVoidElements;
 import org.junit.Test;
 
-public class TestHtmlViewAsElement {
+import java.util.Iterator;
+
+import static htmlflow.test.Utils.NEWLINE;
+import static junit.framework.Assert.assertEquals;
+
+public class TestVoidElements {
 
     @Test
-    public void testSelf() {
-        StaticHtml view = StaticHtml.view();
-        Assert.assertSame(view, view.self());
-        Assert.assertEquals("HtmlView", view.getName());
+    public void testStaticViewWithVoidElements() {
+        String actual = HtmlVoidElements.voidElements.render();
+        assertLines("voidElements.html", actual);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testWrongRender() {
-        StaticHtml
-            .view(System.out)
-            .render();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testWrong__use() {
-        StaticHtml.view().__();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testWrongParentUse() {
-        StaticHtml.view().getParent();
+    private static void assertLines(String pathToExpected, String actual) {
+        Iterator<String> iter = NEWLINE
+            .splitAsStream(actual)
+            .map(String::toLowerCase)
+            .iterator();
+        Utils
+            .loadLines(pathToExpected)
+            .map(String::toLowerCase)
+            .forEach(expected -> {
+                String line = iter.next();
+                // System.out.println(line);
+                assertEquals(expected, line);
+            });
     }
 }

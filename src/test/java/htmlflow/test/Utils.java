@@ -23,23 +23,15 @@
  */
 package htmlflow.test;
 
+import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
-import htmlflow.HtmlWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -55,21 +47,13 @@ public class Utils {
 
     static Element getRootElement(byte[] input) throws UnsupportedEncodingException {
         W3CDom w3cDom = new W3CDom();
-        Document doc = w3cDom.fromJsoup(Jsoup.parse(new String(input, "UTF-8")));
+        Document doc = w3cDom.fromJsoup(Jsoup.parse(new String(input, StandardCharsets.UTF_8)));
         return doc.getDocumentElement();
     }
 
-    static <T> Stream<String> htmlWrite(HtmlWriter<T> view, T model){
-        try(
-                ByteArrayOutputStream mem = new ByteArrayOutputStream();
-                PrintStream out = new PrintStream(mem))
-        {
-            view.setPrintStream(out).write(model);
-            InputStreamReader actual = new InputStreamReader(new ByteArrayInputStream(mem.toByteArray()));
-            return new BufferedReader(actual).lines();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    static <T> Stream<String> htmlWrite(ByteArrayOutputStream mem){
+        InputStreamReader actual = new InputStreamReader(new ByteArrayInputStream(mem.toByteArray()));
+        return new BufferedReader(actual).lines();
     }
 
     static <T> Stream<String> htmlRender(HtmlView<T> view, T model){
