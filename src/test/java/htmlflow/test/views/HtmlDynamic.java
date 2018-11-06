@@ -148,37 +148,38 @@ public class HtmlDynamic {
     static final DynamicHtml<Stock> tableRowView = DynamicHtml.view((view, stock) -> {
             view
                 .defineRoot()
-                .tr()
-                    .dynamic(tr -> tr.attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd"))
-                    .td()
-                        .dynamic(td -> td.text(stock.getIndex()))
-                    .__()
-                    .td()
-                        .a().dynamic(a -> a.attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol())).__()
-                    .__()
-                    .td()
-                        .a().dynamic(a -> a.attrHref(stock.getUrl()).text(stock.getName())).__()
-                    .__()
-                    .td()
-                        .strong().dynamic(strong -> strong.text(stock.getPrice())).__()
-                    .__()
-                    .td()
-                        .dynamic(td -> {
-                        	double change = stock.getChange();
-                            if (change < 0) {
-                                td.attrClass("minus");
-                            }
-                            td.text(change);
-                        })
-                    .__()
-                    .td()
-                        .dynamic(td -> {
-                        	double ratio = stock.getRatio();
-                            if (ratio < 0) {
-                                td.attrClass("minus");
-                            }
-                            td.text(ratio);
-                        })
+                    .tr()
+                        .dynamic(tr -> tr.attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd"))
+                        .td()
+                            .dynamic(td -> td.text(stock.getIndex()))
+                        .__()
+                        .td()
+                            .a().dynamic(a -> a.attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol())).__()
+                        .__()
+                        .td()
+                            .a().dynamic(a -> a.attrHref(stock.getUrl()).text(stock.getName())).__()
+                        .__()
+                        .td()
+                            .strong().dynamic(strong -> strong.text(stock.getPrice())).__()
+                        .__()
+                        .td()
+                            .dynamic(td -> {
+                                double change = stock.getChange();
+                                if (change < 0) {
+                                    td.attrClass("minus");
+                                }
+                                td.text(change);
+                            })
+                        .__()
+                        .td()
+                            .dynamic(td -> {
+                                double ratio = stock.getRatio();
+                                if (ratio < 0) {
+                                    td.attrClass("minus");
+                                }
+                                td.text(ratio);
+                            })
+                        .__()
                     .__()
                 .__();
     });
