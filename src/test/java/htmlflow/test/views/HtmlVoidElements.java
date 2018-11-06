@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package htmlflow.test;
+package htmlflow.test.views;
 
 import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
@@ -31,7 +31,7 @@ import org.xmlet.htmlapifaster.EnumShapeType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 public class HtmlVoidElements {
-    static HtmlView voidElements = StaticHtml.view()
+    public static HtmlView voidElements = StaticHtml.view()
         .html()
             .head()
                 .title()

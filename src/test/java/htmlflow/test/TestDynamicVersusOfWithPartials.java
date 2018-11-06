@@ -25,6 +25,7 @@
 package htmlflow.test;
 
 import htmlflow.test.model.Stock;
+import htmlflow.test.views.HtmlDynamic;
 import org.junit.Test;
 
 import java.util.Iterator;

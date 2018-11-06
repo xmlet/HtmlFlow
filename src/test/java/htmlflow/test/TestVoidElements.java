@@ -24,6 +24,7 @@
 
 package htmlflow.test;
 
+import htmlflow.test.views.HtmlVoidElements;
 import org.junit.Test;
 
 import java.util.Iterator;

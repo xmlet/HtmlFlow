@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package htmlflow.test;
+package htmlflow.test.views;
 
 import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
@@ -33,7 +33,7 @@ import org.xmlet.htmlapifaster.EnumTypeContentType;
 
 public class HtmlTables {
 
-    static void simpleTableView(DynamicHtml<int[][]> view, int[][] outputRows){
+    public static void simpleTableView(DynamicHtml<int[][]> view, int[][] outputRows){
         view
             .html()
                 .head()
@@ -72,7 +72,7 @@ public class HtmlTables {
      * An example of a dynamic view with an Iterable<Task> as domain model and
      * an array with two partial views: a div heading and table row.
      */
-    static void taskListViewWithPartials(
+    public static void taskListViewWithPartials(
         DynamicHtml<Iterable<Task>> view,
         Iterable<Task> tasks,
         HtmlView[] partials)
@@ -114,7 +114,7 @@ public class HtmlTables {
             .__(); // html
     }
 
-    static StaticHtml taskListViewHeader = StaticHtml.view(view -> view
+    public static StaticHtml taskListViewHeader = StaticHtml.view(view -> view
         .div()
             .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").__()
             .p().text("Html page built with HtmlFlow.").__()
@@ -122,7 +122,7 @@ public class HtmlTables {
         .__() // div
     );
 
-    static DynamicHtml<Task> taskListRow = DynamicHtml.view((view, task) -> {
+    public static DynamicHtml<Task> taskListRow = DynamicHtml.view((view, task) -> {
         view
             .tr()
                 .td().dynamic(td -> td.text(task.getTitle())).__()
@@ -168,7 +168,7 @@ public class HtmlTables {
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    static HtmlView nestedTable = StaticHtml.view()
+    public static HtmlView nestedTable = StaticHtml.view()
             .html()
                 .body()
                     .table()

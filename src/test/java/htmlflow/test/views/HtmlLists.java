@@ -22,17 +22,21 @@
  * SOFTWARE.
  */
 
-package htmlflow.test;
+package htmlflow.test.views;
 
 import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.EnumEnctypeType;
+import org.xmlet.htmlapifaster.EnumMethodType;
+import org.xmlet.htmlapifaster.EnumRelType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
+import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
 public class HtmlLists {
-    static final String divClass = "divClass";
-    static final String divId = "divId";
+    public static final String divClass = "divClass";
+    public static final String divId = "divId";
 
     public static HtmlView taskView (StaticHtml view) {
         return view
@@ -84,28 +88,18 @@ public class HtmlLists {
                 .__() //body
             .__(); //html
 
-    public static void taskDetailsView(DynamicHtml<Task> view, Task task) {
+    public static void taskDetailsTemplate(DynamicHtml<Task> view, Task task) {
         view
             .html()
                 .head()
                     .title().text("Task Details").__()
-                    .link()
-                        .attrRel(EnumRelType.STYLESHEET)
-                        .attrType(EnumTypeContentType.TEXT_CSS)
-                        .attrHref("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-                    .__() //link
                 .__() //head
                 .body()
-                    .attrClass("container")
-                    .h1().text("Task Details").__()
-                    .hr().__()
-                    .div()
-                        .text("Title:").text(task.getTitle())
-                        .br().__()
-                        .text("Description:").text(task.getDescription())
-                        .br().__()
-                        .text("Priority:").text(task.getPriority() + "")
-                    .__() // div
+                    .dynamic(body -> body.text("Title:").text(task.getTitle()))
+                    .br().__()
+                    .dynamic(body -> body.text("Description:").text(task.getDescription()))
+                    .br().__()
+                    .dynamic(body -> body.text("Priority:").text(task.getPriority()))
                 .__() //body
             .__(); // html
     }

@@ -24,10 +24,7 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.Div;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Tr;
+import org.xmlet.htmlapifaster.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -93,6 +90,10 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
 
     public Tr<HtmlView> tr() {
         return new Tr<>(this);
+    }
+
+    public Root<HtmlView> defineRoot(){
+        return new Root<>(this);
     }
 
     @Override
