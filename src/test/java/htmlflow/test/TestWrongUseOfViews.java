@@ -144,5 +144,24 @@ public class TestWrongUseOfViews {
             .write(new Object()); // wrong use of write with a model
 
     }
+    /**
+     * A view with a PrintStream output cannot be set to thread-safety.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testWrongUseOfThreadSafeInViewWithPrintStream(){
+        StaticHtml
+            .view(System.out)
+            .threadSafe();
+    }
+    /**
+     * A thread-safe view cannot be set with a PrintStream.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testWrongUseSetPrintStreamInThreadSafeView(){
+        StaticHtml
+            .view()
+            .threadSafe()
+            .setPrintStream(System.out);
+    }
 
 }

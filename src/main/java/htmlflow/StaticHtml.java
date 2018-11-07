@@ -57,7 +57,7 @@ public class StaticHtml extends HtmlView<Object> {
     }
 
     private StaticHtml() {
-        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorStringBuilder(false));
+        this.setVisitor(() -> new HtmlVisitorStringBuilder(false));
     }
 
     private StaticHtml(Consumer<StaticHtml>  template) {
@@ -66,7 +66,7 @@ public class StaticHtml extends HtmlView<Object> {
     }
 
     private StaticHtml(PrintStream out) {
-        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorPrintStream(out, false));
+        this.setVisitor((() -> new HtmlVisitorPrintStream(out, false)));
     }
 
     private StaticHtml(PrintStream out, Consumer<StaticHtml> template) {
