@@ -50,13 +50,13 @@ import static java.util.stream.Collectors.joining;
  *         created on 29-03-2012
  */
 public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, Element> {
-    final static String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
+    static final String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
             "Cannot use PrintStream output for thread-safe views!";
 
-    final static String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
+    static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
             "Cannot set thread-safety for views with PrintStream output!";
 
-    final static String WRONG_USE_OF_RENDER_WITH_PRINTSTREAM =
+    static final String WRONG_USE_OF_RENDER_WITH_PRINTSTREAM =
             "Wrong use of render(). " +
             "Use write() rather than render() to output to PrintStream. " +
             "To get a String from render() you must use view() without a PrintStream ";
