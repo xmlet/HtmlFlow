@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.joining;
 
@@ -49,6 +50,11 @@ import static java.util.stream.Collectors.joining;
  *         created on 29-03-2012
  */
 public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, Element> {
+    final static String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
+            "Cannot use PrintStream output for thread-safe views!";
+
+    final static String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
+            "Cannot set thread-safety for views with PrintStream output!";
 
     final static String WRONG_USE_OF_RENDER_WITH_PRINTSTREAM =
             "Wrong use of render(). " +
@@ -76,7 +82,10 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
         }
     }
 
-    ThreadLocal<HtmlVisitorCache> visitor;
+    private HtmlVisitorCache visitor;
+    private ThreadLocal<HtmlVisitorCache> threadLocalVisitor;
+    private Supplier<HtmlVisitorCache> visitorSupplier;
+    private boolean threadSafe = false;
 
     public Html<HtmlView> html() {
         if (this.getVisitor().isWriting())
@@ -98,21 +107,50 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
 
     @Override
     public HtmlWriter<T> setPrintStream(PrintStream out) {
-        HtmlVisitorCache v = out == null
-            ? new HtmlVisitorStringBuilder(getVisitor().isDynamic)
-            : new HtmlVisitorPrintStream(out, getVisitor().isDynamic);
-        visitor.set(v);
+        if(threadSafe)
+            throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
+        Supplier<HtmlVisitorCache> v = out == null
+            ? () -> new HtmlVisitorStringBuilder(getVisitor().isDynamic)
+            : () -> new HtmlVisitorPrintStream(out, getVisitor().isDynamic);
+        setVisitor(v);
         return this;
     }
 
     @Override
-    public HtmlView self() {
+    public HtmlView<T> self() {
+        return this;
+    }
+
+    public HtmlView<T> threadSafe(){
+        /**
+         * I don't like this kind of verification.
+         * Yet, we need to keep backward compatibility with views based
+         * on PrintStream output, which are not viable in a multi-thread scenario.
+         */
+        if(getVisitor() instanceof HtmlVisitorPrintStream) {
+            throw new IllegalStateException(WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM);
+        }
+        this.threadSafe = true;
+        setVisitor(visitorSupplier);
         return this;
     }
 
     @Override
     public HtmlVisitorCache getVisitor() {
-        return visitor.get();
+        return threadSafe
+            ? threadLocalVisitor.get()
+            : visitor;
+    }
+
+    public void setVisitor(Supplier<HtmlVisitorCache> visitor) {
+        visitorSupplier = visitor;
+        if(threadSafe) {
+            this.visitor = null;
+            this.threadLocalVisitor = ThreadLocal.withInitial(visitor);
+        } else {
+            this.visitor = visitor.get();
+            this.threadLocalVisitor = null;
+        }
     }
 
     @Override

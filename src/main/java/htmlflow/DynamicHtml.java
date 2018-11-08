@@ -69,22 +69,22 @@ public class DynamicHtml<T> extends HtmlView<T> {
     }
 
     private DynamicHtml(PrintStream out, HtmlTemplate<T> template) {
-        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorPrintStream(out, true));
+        this.setVisitor(() -> new HtmlVisitorPrintStream(out, true));
         this.template = template;
     }
 
     private DynamicHtml(PrintStream out, BiConsumer<DynamicHtml<T>, T> binder) {
-        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorPrintStream(out, true));
+        this.setVisitor(() -> new HtmlVisitorPrintStream(out, true));
         this.binder = binder;
     }
 
     private DynamicHtml(HtmlTemplate<T> template) {
-        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorStringBuilder(true));
+        this.setVisitor(() -> new HtmlVisitorStringBuilder(true));
         this.template = template;
     }
 
     private DynamicHtml(BiConsumer<DynamicHtml<T>, T> binder) {
-        this.visitor = ThreadLocal.withInitial(() -> new HtmlVisitorStringBuilder(true));
+        this.setVisitor(() -> new HtmlVisitorStringBuilder(true));
         this.binder = binder;
     }
 

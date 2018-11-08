@@ -194,9 +194,6 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
             if (!isClosed){
                 write(Tags.FINISH_TAG);
             }
-            else
-                depth--;
-
             isClosed = true;
         }
     }

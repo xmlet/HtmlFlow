@@ -69,7 +69,8 @@ public class TestDivDetails {
                 Stream.of(
                         new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
                         new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
-                        new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
+                        new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High),
+                        new Task(9, "Web Summit 2018", "Sir Tim Berners-Lee", Priority.High)
                 ).collect(Collectors.toMap(
                         identity(),
                         task -> loadLines(format("task%d.html", task.getId()))
@@ -114,7 +115,7 @@ public class TestDivDetails {
     @Test
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        DynamicHtml<Task> view = DynamicHtml
+        HtmlView<Task> view = DynamicHtml
             .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
@@ -138,10 +139,13 @@ public class TestDivDetails {
 
     @Test
     public void testDivDetailsBindingWithRender() {
-        HtmlView<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
+        HtmlView<Task> view = DynamicHtml
+            .view(HtmlLists::taskDetailsTemplate)
+            .threadSafe();
         expectedTaskViews
                 .keySet()
                 .stream()
+                .parallel()
                 .map(task -> TaskHtml.of(task,
                                 htmlRender(view, task)))
                 .forEach(taskHtml -> {
