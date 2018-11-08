@@ -26,6 +26,7 @@ package htmlflow.test;
 
 import htmlflow.test.model.Stock;
 import htmlflow.test.views.HtmlDynamic;
+import htmlflow.test.views.HtmlDynamicStocks;
 import org.junit.Test;
 
 import java.util.Iterator;
@@ -40,14 +41,14 @@ public class TestDynamicVersusOf {
         /*
          * First render with Stock.dummy3Items()
          */
-        String actual = HtmlDynamic
+        String actual = HtmlDynamicStocks
             .stocksViewOk
             .render(Stock.dummy3Items());
         assertLines("stocks3items.html", actual);
         /*
          * Then render with Stock.dummy5Items()
          */
-        actual = HtmlDynamic
+        actual = HtmlDynamicStocks
             .stocksViewOk
             .render(Stock.other3Items());
         assertLines("stocks3others.html", actual);
@@ -58,7 +59,7 @@ public class TestDynamicVersusOf {
         /*
          * First render with Stock.dummy3Items()
          */
-        String actual = HtmlDynamic
+        String actual = HtmlDynamicStocks
             .stocksViewWrong
             .render(Stock.dummy3Items());
         assertLines("stocks3items.html", actual);
@@ -67,7 +68,7 @@ public class TestDynamicVersusOf {
          * again the same previous 3 items that were stored in cache
          * of stocksViewWrong due to its wrong use with of() instead of dynamic.
          */
-        actual = HtmlDynamic
+        actual = HtmlDynamicStocks
             .stocksViewWrong
             .render(Stock.dummy5Items());
         assertLines("stocks3items.html", actual);
