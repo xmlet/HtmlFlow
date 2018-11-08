@@ -97,6 +97,14 @@ public class Stock {
         return items;
     }
 
+    public static List<Stock> other3Items() {
+        List<Stock> items = new ArrayList<Stock>();
+        items.add(new Stock(8, "Dell", "Dell Corp.", "http://www.dell.com/", "DELL", 23.73, -0.42, -1.74));
+        items.add(new Stock(9, "eBay", "eBay Inc.", "http://www.ebay.com", "EBAY", 31.65, -0.8, -2.47));
+        items.add(new Stock(10, "Google", "Google Inc.", "http://www.google.com", "GOOG", 495.84, 7.75, 1.59));
+        return items;
+    }
+
     public static List<Stock> dummy5Items() {
         List<Stock> items = new ArrayList<Stock>();
         items.add(new Stock(7, "Cisco Systems", "Cisco Systems Inc.", "http://www.cisco.com", "CSCO", 26.35, 0.13, 0.5));
