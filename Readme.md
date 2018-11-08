@@ -37,7 +37,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.0</version>
+    <version>3.1</version>
 </dependency>
 ```
 
@@ -232,6 +232,13 @@ Check out one of our use cases of partial views in the template function
 [`taskListViewWithPartials`](https://github.com/xmlet/HtmlFlow/blob/readme-for-release-3/src/test/java/htmlflow/test/views/HtmlTables.java#L75).
 
 ## Changelog
+
+### 3.1 (November, 2018)
+
+Add support for non thread-safe views. Now, in order to use the same view by multiple threads you 
+should call the `threadSafe()` method. Check the unit test 
+[testDivDetailsBindingWithRender](src/test/java/htmlflow/test/TestDivDetails.java#L141)
+that renders 4 different context models in parallel with the same view.  
 
 ### 3.0 (November, 2018)
 
