@@ -37,7 +37,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.1</version>
+    <version>3.2</version>
 </dependency>
 ```
 
@@ -232,6 +232,10 @@ Check out one of our use cases of partial views in the template function
 [`taskListViewWithPartials`](https://github.com/xmlet/HtmlFlow/blob/readme-for-release-3/src/test/java/htmlflow/test/views/HtmlTables.java#L75).
 
 ## Changelog
+
+### 3.2 (November, 2018)
+
+Make views immutable.
 
 ### 3.1 (November, 2018)
 
