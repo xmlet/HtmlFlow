@@ -38,13 +38,6 @@ public class TestHtmlViewAsElement {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testWrongRender() {
-        StaticHtml
-            .view(System.out)
-            .render();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void testWrong__use() {
         StaticHtml.view().__();
     }

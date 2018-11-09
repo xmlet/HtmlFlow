@@ -72,44 +72,6 @@ public class TestWrongUseOfViews {
     }
 
     /**
-     * Views with a PrintStream should use the method write() instead
-     * of render().
-     */
-    @Test(expected = IllegalStateException.class)
-    public void testWrongUseOfRenderInViewWithPrintStream(){
-        DynamicHtml
-            .view(System.out, (view, model) -> {
-                view.html().head().title().text("Task Details").__();
-            })
-            .render(); // Cannot use render() on views with a PrintStream
-    }
-    /**
-     * Views with a PrintStream should use the method write() instead
-     * of render().
-     */
-    @Test(expected = IllegalStateException.class)
-    public void testWrongUseOfRenderWithModelInViewWithPrintStream(){
-        DynamicHtml
-            .view(System.out, (view, model) -> {
-                view.html().head().title().text("Task Details").__();
-            })
-            .render(new Object()); // Cannot use render() on views with a PrintStream
-    }
-
-    /**
-     * Views with a PrintStream should use the method write() instead
-     * of render().
-     */
-    @Test(expected = IllegalStateException.class)
-    public void testWrongUseOfRenderWithModelAndPartialsInViewWithPrintStream(){
-        DynamicHtml
-            .view(System.out, (view, model) -> {
-                view.html().head().title().text("Task Details").__();
-            })
-            .render(new Object(), StaticHtml.view()); // Cannot use render() on views with a PrintStream
-    }
-
-    /**
      * A StaticHtml view cannot use render() with a model.
      */
     @Test(expected = UnsupportedOperationException.class)
