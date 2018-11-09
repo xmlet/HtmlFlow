@@ -26,6 +26,7 @@ package htmlflow;
 
 import java.io.PrintStream;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * Dynamic views can be bound to a domain object.
@@ -44,13 +45,13 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * A template function receives 3 arguments:
      *   the view, the domain object and a varargs array of partial views.
      */
-    private HtmlTemplate<T> template;
+    private final HtmlTemplate<T> template;
     /**
      * Used alternately with the field template.
      * A binder function is responsible for binding the View with a domain object.
      * Thus, it is a function that receives two arguments: the view and the domain object.
      */
-    private BiConsumer<DynamicHtml<T>, T> binder;
+    private final BiConsumer<DynamicHtml<T>, T> binder;
 
     public static <U> DynamicHtml<U> view(PrintStream out, HtmlTemplate<U> template){
         return new DynamicHtml<>(out, template);
@@ -68,61 +69,79 @@ public class DynamicHtml<T> extends HtmlView<T> {
         return new DynamicHtml<>(binder);
     }
 
+    /**
+     * Auxiliary constructor used by clone().
+     */
+    private DynamicHtml(
+        Supplier<HtmlVisitorCache> visitorSupplier,
+        boolean threadSafe,
+        HtmlTemplate<T> template,
+        BiConsumer<DynamicHtml<T>, T> binder)
+    {
+        super(visitorSupplier, threadSafe);
+        this.template = template;
+        this.binder = binder;
+    }
+
     private DynamicHtml(PrintStream out, HtmlTemplate<T> template) {
-        this.setVisitor(() -> new HtmlVisitorPrintStream(out, true));
+        super((() -> new HtmlVisitorPrintStream(out, true)), false);
+        this.binder = null;
         this.template = template;
     }
 
     private DynamicHtml(PrintStream out, BiConsumer<DynamicHtml<T>, T> binder) {
-        this.setVisitor(() -> new HtmlVisitorPrintStream(out, true));
+        super(() -> new HtmlVisitorPrintStream(out, true), false);
         this.binder = binder;
+        this.template = null;
     }
 
     private DynamicHtml(HtmlTemplate<T> template) {
-        this.setVisitor(() -> new HtmlVisitorStringBuilder(true));
+        super(() -> new HtmlVisitorStringBuilder(true), false);
+        this.binder = null;
         this.template = template;
     }
 
     private DynamicHtml(BiConsumer<DynamicHtml<T>, T> binder) {
-        this.setVisitor(() -> new HtmlVisitorStringBuilder(true));
+        super(() -> new HtmlVisitorStringBuilder(true), false);
         this.binder = binder;
+        this.template = null;
     }
 
     @Override
-    public String render() {
-        if(getVisitor() instanceof HtmlVisitorPrintStream)
-            throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
+    public final String render() {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
     @Override
-    public String render(T model) {
-        if(getVisitor() instanceof HtmlVisitorPrintStream)
-            throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
+    public final String render(T model) {
         binder.accept(this, model);
         return getVisitor().finished();
     }
 
-    public String render(T model, HtmlView...partials) {
-        if(getVisitor() instanceof HtmlVisitorPrintStream)
-            throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
+    public final String render(T model, HtmlView...partials) {
         template.resolve(this, model, partials);
         return getVisitor().finished();
     }
 
     @Override
-    public void write() {
+    public final void write() {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
     @Override
-    public void write(T model) {
-        binder.accept(this, model);
-        getVisitor().finished();
+    public final void write(T model) {
+        this.render(model);
     }
 
-    public void write(T model, HtmlView...partials) {
-        template.resolve(this, model, partials);
-        getVisitor().finished();
+    public final void write(T model, HtmlView...partials) {
+        this.render(model, partials);
+    }
+
+    @Override
+    protected final HtmlView<T> clone(
+        Supplier<HtmlVisitorCache> visitorSupplier,
+        boolean threadSafe)
+    {
+        return new DynamicHtml<>(visitorSupplier, threadSafe, template, binder);
     }
 }

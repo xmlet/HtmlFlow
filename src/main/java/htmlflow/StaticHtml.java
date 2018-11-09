@@ -26,6 +26,7 @@ package htmlflow;
 
 import java.io.PrintStream;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Static Html view.
@@ -38,7 +39,7 @@ public class StaticHtml extends HtmlView<Object> {
              "Wrong use of StaticView! Model object not " +
              "supported or you should use a dynamic view instead!";
 
-    private Consumer<StaticHtml> template;
+    private final Consumer<StaticHtml> template;
 
     public static StaticHtml view(PrintStream out, Consumer<StaticHtml> template){
         return new StaticHtml(out, template);
@@ -56,28 +57,38 @@ public class StaticHtml extends HtmlView<Object> {
         return new StaticHtml();
     }
 
+    /**
+     * Auxiliary constructor used by clone().
+     */
+    private StaticHtml(
+        Supplier<HtmlVisitorCache> visitorSupplier,
+        boolean threadSafe,
+        Consumer<StaticHtml> template)
+    {
+        super(visitorSupplier, threadSafe);
+        this.template = template;
+    }
+
     private StaticHtml() {
-        this.setVisitor(() -> new HtmlVisitorStringBuilder(false));
+        this((Consumer<StaticHtml>) null);
     }
 
     private StaticHtml(Consumer<StaticHtml>  template) {
-        this();
+        super(() -> new HtmlVisitorStringBuilder(false), false);
         this.template = template;
     }
 
     private StaticHtml(PrintStream out) {
-        this.setVisitor((() -> new HtmlVisitorPrintStream(out, false)));
+        this(out, null);
     }
 
     private StaticHtml(PrintStream out, Consumer<StaticHtml> template) {
-        this(out);
+        super(() -> new HtmlVisitorPrintStream(out, false), false);
         this.template = template;
     }
 
     @Override
-    public String render() {
-        if(getVisitor() instanceof HtmlVisitorPrintStream)
-            throw new IllegalStateException(WRONG_USE_OF_RENDER_WITH_PRINTSTREAM);
+    public final String render() {
         if(template != null)
             template.accept(this);
         return getVisitor().finished();
@@ -85,19 +96,24 @@ public class StaticHtml extends HtmlView<Object> {
     }
 
     @Override
-    public String render(Object model) {
+    public final String render(Object model) {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
     }
 
     @Override
-    public void write() {
+    public final void write() {
         if(template != null)
             template.accept(this);
         getVisitor().finished();
     }
 
     @Override
-    public void write(Object model) {
+    public final void write(Object model) {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
+    }
+
+    @Override
+    protected final HtmlView<Object> clone(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe) {
+        return new StaticHtml(visitorSupplier, threadSafe, template);
     }
 }
