@@ -56,12 +56,6 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
     static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
             "Cannot set thread-safety for views with PrintStream output!";
 
-    static final String WRONG_USE_OF_RENDER_WITH_PRINTSTREAM =
-            "Wrong use of render(). " +
-            "Use write() rather than render() to output to PrintStream. " +
-            "To get a String from render() you must use view() without a PrintStream ";
-
-
     private static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
     private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
@@ -82,46 +76,57 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
         }
     }
 
-    private HtmlVisitorCache visitor;
-    private ThreadLocal<HtmlVisitorCache> threadLocalVisitor;
-    private Supplier<HtmlVisitorCache> visitorSupplier;
-    private boolean threadSafe = false;
+    private final HtmlVisitorCache visitor;
+    private final ThreadLocal<HtmlVisitorCache> threadLocalVisitor;
+    private final Supplier<HtmlVisitorCache> visitorSupplier;
+    private final boolean threadSafe;
 
-    public Html<HtmlView> html() {
+    public HtmlView(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe) {
+        this.visitorSupplier = visitorSupplier;
+        this.threadSafe = threadSafe;
+        if(threadSafe) {
+            this.visitor = null;
+            this.threadLocalVisitor = ThreadLocal.withInitial(visitorSupplier);
+        } else {
+            this.visitor = visitorSupplier.get();
+            this.threadLocalVisitor = null;
+        }
+    }
+
+    public final Html<HtmlView> html() {
         if (this.getVisitor().isWriting())
             this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
 
-    public Div<HtmlView> div() {
+    public final Div<HtmlView> div() {
         return new Div<>(this);
     }
 
-    public Tr<HtmlView> tr() {
+    public final Tr<HtmlView> tr() {
         return new Tr<>(this);
     }
 
-    public Root<HtmlView> defineRoot(){
+    public final Root<HtmlView> defineRoot(){
         return new Root<>(this);
     }
 
     @Override
-    public HtmlWriter<T> setPrintStream(PrintStream out) {
+    public final HtmlWriter<T> setPrintStream(PrintStream out) {
         if(threadSafe)
             throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
         Supplier<HtmlVisitorCache> v = out == null
             ? () -> new HtmlVisitorStringBuilder(getVisitor().isDynamic)
             : () -> new HtmlVisitorPrintStream(out, getVisitor().isDynamic);
-        setVisitor(v);
-        return this;
+        return clone(v, false);
     }
 
     @Override
-    public HtmlView<T> self() {
+    public final HtmlView<T> self() {
         return this;
     }
 
-    public HtmlView<T> threadSafe(){
+    public final HtmlView<T> threadSafe(){
         /**
          * I don't like this kind of verification.
          * Yet, we need to keep backward compatibility with views based
@@ -130,27 +135,14 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
         if(getVisitor() instanceof HtmlVisitorPrintStream) {
             throw new IllegalStateException(WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM);
         }
-        this.threadSafe = true;
-        setVisitor(visitorSupplier);
-        return this;
+        return clone(visitorSupplier, true);
     }
 
     @Override
-    public HtmlVisitorCache getVisitor() {
+    public final HtmlVisitorCache getVisitor() {
         return threadSafe
             ? threadLocalVisitor.get()
             : visitor;
-    }
-
-    public void setVisitor(Supplier<HtmlVisitorCache> visitor) {
-        visitorSupplier = visitor;
-        if(threadSafe) {
-            this.visitor = null;
-            this.threadLocalVisitor = ThreadLocal.withInitial(visitor);
-        } else {
-            this.visitor = visitor.get();
-            this.threadLocalVisitor = null;
-        }
     }
 
     @Override
@@ -194,4 +186,6 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
         if (this.getVisitor().isWriting())
             getVisitor().write(partial.render());
     }
+
+    protected abstract HtmlView<T> clone(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe);
 }

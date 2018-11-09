@@ -308,10 +308,10 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /*=========================================================================*/
 
     @Override
-    public <Z extends Element> void visitElementRoot(Root<Z> var1) { }
+    public final <Z extends Element> void visitElementRoot(Root<Z> var1) { }
 
     @Override
-    public <Z extends Element> void visitParentRoot(Root<Z> var1) { }
+    public final <Z extends Element> void visitParentRoot(Root<Z> var1) { }
 
     /*=========================================================================*/
     /*------------      Parent Methods for Void Elements   --------------------*/
