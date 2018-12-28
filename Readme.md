@@ -25,9 +25,21 @@ String html = StaticHtml
                 .render();
 ```
 
+Finally HtmlFlow is the **most performant** engine among state of the art template
+engines like Velocity, Thymleaf, Mustache, etc and other DSL libraries for HTML such
+as j2Html and KotlinX Html.
+Check out the performance results in our forks of the most popular benchmarks at
+[xmlet/template-benchmark](https://github.com/xmlet/template-benchmark) and
+[xmlet/spring-comparing-template-engines](https://github.com/xmlet/spring-comparing-template-engines).
+
 [Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
 built with the support of `htmlflow.DynamicHtml`.
 Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find more complex views with dynamic partial blocks.
+
+## References
+
+** Artigo DZone
+** Master thesis Luis Duarte
 
 ## Installation
 
@@ -229,7 +241,7 @@ To that end you must create a view with a different kind of template function (i
 receives one more `HtmlView[] partials` argument in addition to the arguments `DynamicHtml<U>`
 and `U`.
 Check out one of our use cases of partial views in the template function
-[`taskListViewWithPartials`](https://github.com/xmlet/HtmlFlow/blob/readme-for-release-3/src/test/java/htmlflow/test/views/HtmlTables.java#L75).
+[`taskListViewWithPartials`](src/test/java/htmlflow/test/views/HtmlTables.java#L75).
 
 ## Changelog
 
