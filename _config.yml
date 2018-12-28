@@ -3,10 +3,7 @@ title: xmlet/HtmlFlow
 header-img: img/home-bg.jpg
 email: your-email@yourdomain.com
 description: "HtmlFlow web site"
-#baseurl: "/startbootstrap-clean-blog-jekyll"
-#url: "http://yourdomain.com"
-baseurl: ""
-url: "http://htmlflow.github.io/"
+url: "http://xmlet.github.io/HtmlFlow/"
 
 # Build settings
 markdown: kramdown
