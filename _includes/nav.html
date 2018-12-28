@@ -3,7 +3,7 @@
     <div class="inner">
         <h3 class="masthead-brand">
             HtmlFlow
-            <img src="/img/htmlflow-logo.png" alt="" width="72" height="72">
+            <img src="{{ site.baseurl }}/img/htmlflow-logo.png" alt="" width="72" height="72">
         </h3>
         <nav class="nav nav-masthead justify-content-center">
                 {% if page.url == "/" %}
@@ -15,25 +15,25 @@
                 </a>
 
                 {% if page.url == "/install/" %}
-                    <a class="nav-link active"  href="/install">
+                    <a class="nav-link active"  href="{{ site.baseurl }}/install">
                 {% else %}
-                    <a class="nav-link"  href="/install">
+                    <a class="nav-link"  href="{{ site.baseurl }}/install">
                 {% endif %}
                     Install
                 </a>
 
                 {% if page.url == "/features/" %}
-                    <a class="nav-link active"  href="/features">
+                    <a class="nav-link active"  href="{{ site.baseurl }}/features">
                 {% else %}
-                    <a class="nav-link"  href="/features">
+                    <a class="nav-link"  href="{{ site.baseurl }}/features">
                 {% endif %}
                     Features
                 </a>
 
                 {% if page.url == "/news/"%}
-                    <a class="nav-link active"  href="/news">
+                    <a class="nav-link active"  href="{{ site.baseurl }}/news">
                 {% else %}
-                    <a class="nav-link"  href="/news">
+                    <a class="nav-link"  href="{{ site.baseurl }}/news">
                 {% endif %}
                     News
                 </a>
