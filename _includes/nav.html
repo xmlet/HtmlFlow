@@ -7,9 +7,9 @@
         </h3>
         <nav class="nav nav-masthead justify-content-center">
                 {% if page.url == "/" %}
-                    <a class="nav-link active"  href="/">
+                    <a class="nav-link active"  href="{{ site.url }}">
                 {% else %}
-                    <a class="nav-link"  href="/">
+                    <a class="nav-link"  href="{{ site.url }}">
                 {% endif %}
                     Home
                 </a>
