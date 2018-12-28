@@ -1,0 +1,31 @@
+---
+layout: default
+title: "Index"
+description: "HtmlFlow"
+---
+
+<h1 class="cover-heading">
+    Java DSL for HTML
+</h1>
+<p  class="lead">
+    HtmlFlow is a Java HTML builder to write typesafe HTML documents in a fluent style.
+    Use one of its <code>view()</code> factory methods to get started with HtmlFlow.
+</p>
+
+<pre><code class="language-java">
+String html = StaticHtml
+                .view()
+                    .html()
+                        .head()
+                            .title().text("HtmlFlow").__()
+                        .__() //head
+                        .body()
+                            .div().attrClass("container")
+                                .h1().text("My first page with HtmlFlow").__()
+                                .img().attrSrc("https://avatars1.githubusercontent.com/u/35267172").__()
+                                .p().text("Typesafe is awesome! :-)").__()
+                            .__() //div
+                        .__() //body
+                    .__() //html
+                .render();
+</pre></code>

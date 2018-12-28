@@ -1,0 +1,17 @@
+# Site settings
+title: xmlet/HtmlFlow
+header-img: img/home-bg.jpg
+email: your-email@yourdomain.com
+description: "HtmlFlow web site"
+#baseurl: "/startbootstrap-clean-blog-jekyll"
+#url: "http://yourdomain.com"
+baseurl: ""
+url: "http://htmlflow.github.io/"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+paginate: 5
+paginate_path: "/blog/page:num/"
+exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]

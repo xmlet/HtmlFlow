@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include head.html %}
+
+<body>
+    <div class="container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        {% include nav.html %}
+            <main role="main" class="inner cover">
+                {{ content }}
+            </main>
+        {% include footer.html %}
+    </div>
+    <script src="/js/prism.js"></script>
+    <script async defer src="/js/buttons.js"></script>
+</body>
+</html>

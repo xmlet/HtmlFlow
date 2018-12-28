@@ -1,0 +1,52 @@
+<!-- Navigation -->
+<header class="masthead mb-5">
+    <div class="inner">
+        <h3 class="masthead-brand">
+            HtmlFlow
+            <img src="/img/htmlflow-logo.png" alt="" width="72" height="72">
+        </h3>
+        <nav class="nav nav-masthead justify-content-center">
+                {% if page.url == "/" %}
+                    <a class="nav-link active"  href="/">
+                {% else %}
+                    <a class="nav-link"  href="/">
+                {% endif %}
+                    Home
+                </a>
+
+                {% if page.url == "/install/" %}
+                    <a class="nav-link active"  href="/install">
+                {% else %}
+                    <a class="nav-link"  href="/install">
+                {% endif %}
+                    Install
+                </a>
+
+                {% if page.url == "/features/" %}
+                    <a class="nav-link active"  href="/features">
+                {% else %}
+                    <a class="nav-link"  href="/features">
+                {% endif %}
+                    Features
+                </a>
+
+                {% if page.url == "/news/"%}
+                    <a class="nav-link active"  href="/news">
+                {% else %}
+                    <a class="nav-link"  href="/news">
+                {% endif %}
+                    News
+                </a>
+
+            <a class="nav-link" href="#"></a>
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" 
+                href="https://github.com/xmlet/htmlflow" 
+                data-size="large" 
+                data-show-count="true" 
+                aria-label="Star xmlet/htmlflow on GitHub">
+                    Star
+            </a>
+        </nav>
+    </div>
+</header>
