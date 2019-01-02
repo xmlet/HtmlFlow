@@ -3,7 +3,7 @@ title: xmlet/HtmlFlow
 header-img: img/home-bg.jpg
 email: your-email@yourdomain.com
 description: "HtmlFlow web site"
-url: "http://xmlet.github.io/HtmlFlow/"
+url: "https://xmlet.github.io/HtmlFlow/"
 
 # Build settings
 markdown: kramdown
