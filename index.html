@@ -4,9 +4,9 @@ title: "Index"
 description: "HtmlFlow"
 ---
 
-<h1 class="cover-heading">
+<h3 class="cover-heading">
     Java DSL for HTML
-</h1>
+</h3>
 <p  class="lead">
     HtmlFlow is a Java HTML builder to write typesafe HTML documents in a fluent style.
     Use one of its <code>view()</code> factory methods to get started with HtmlFlow.
@@ -22,10 +22,39 @@ String html = StaticHtml
                         .body()
                             .div().attrClass("container")
                                 .h1().text("My first page with HtmlFlow").__()
-                                .img().attrSrc("https://avatars1.githubusercontent.com/u/35267172").__()
+                                .img().attrSrc("https://htmlflow.org/img/htmlflow-gravatar.png").__()
                                 .p().text("Typesafe is awesome! :-)").__()
                             .__() //div
                         .__() //body
                     .__() //html
                 .render();
 </pre></code>
+
+<p>&nbsp</p>
+<p class="lead">
+HtmlFlow is the <strong>most performant</strong> engine among state of the art template
+engines like Velocity, Thymleaf, Mustache, etc and also other DSL libraries for HTML.
+Check out the performance results in our forks of the most popular benchmarks at
+<a href=https://github.com/xmlet/template-benchmark>xmlet/template-benchmark</a>
+and <a href=https://github.com/xmlet/spring-comparing-template-engines>xmlet/spring-comparing-template-engines</a>.
+</p>
+
+<h3>
+    References
+</h3>
+
+<ul class="lead">
+    <li>
+        <a href="https://dzone.com/articles/modern-type-safe-template-engines" target="blank">
+            Modern Type-Safe Template Engines
+        </a>
+        , Luis Duarte and Miguel Gamboa, DZone Nov. 19, 2018
+    </li>
+    <li>
+        <a href="{{ site.url }}/docs/msc-xmlet.pdf" target="blank">
+        Domain Specific Language generation based on a XML Schema
+        </a>
+        , MSc dissertation, Luís Duarte Oct. 2018
+    </li>
+</ul>
+<p>&nbsp</p>
