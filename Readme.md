@@ -391,5 +391,5 @@ HtmlFlow was created by [Miguel Gamboa](http://gamboa.pt/) (aka
 [fmcarvalho](https://github.com/fmcarvalho/)), an assistant professor of
 [Computer Science and
 Engineering](https://www.isel.pt/en/courses/bsc-degree/computer-science-and-engineering)
-of [ISEL](https://www.isel.pt/en), [Polytechnic Institute of
+of [ISEL](https://www.isel.pt/en/), [Polytechnic Institute of
 Lisbon](https://www.ipl.pt/en).
