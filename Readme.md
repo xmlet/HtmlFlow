@@ -4,7 +4,8 @@
 [![Maven Central Version](https://maven-badges.herokuapp.com/maven-central/com.github.xmlet/htmlflow/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
 
-**HtmlFlow** is a Java DSL to write typesafe HTML documents in a fluent style.
+[**HtmlFlow**](https://htmlflow.org/) is a Java DSL to write typesafe HTML
+documents in a fluent style.
 Use one of its `view()` factory methods to get started with HtmlFlow: 
 
 ```java
@@ -28,18 +29,27 @@ String html = StaticHtml
 Finally HtmlFlow is the **most performant** engine among state of the art template
 engines like Velocity, Thymleaf, Mustache, etc and other DSL libraries for HTML such
 as j2Html and KotlinX Html.
-Check out the performance results in our forks of the most popular benchmarks at
-[xmlet/template-benchmark](https://github.com/xmlet/template-benchmark) and
-[xmlet/spring-comparing-template-engines](https://github.com/xmlet/spring-comparing-template-engines).
+Check out the performance results in the most popular benchmarks at
+[spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines)
+and our fork of
+[xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
+You can find more comparison details in DZone article about [Modern Type-Safe
+Template Engines](https://dzone.com/articles/modern-type-safe-template-engines).
 
 [Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
 built with the support of `htmlflow.DynamicHtml`.
 Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find more complex views with dynamic partial blocks.
 
-## References
+## Table of Contents
 
-** Artigo DZone
-** Master thesis Luis Duarte
+* [Installation](#installation)
+* [Get started](#getting-started)
+* [Output approaches](#output-approaches)
+* [Dynamic Views](#dynamic-views)
+* [Partial Views](#partial-views)
+* [Changelog](#changelog)
+* [License](#license)
+* [About](#about)
 
 ## Installation
 
@@ -374,3 +384,12 @@ This also solves the #16 Issue.
 ## License
 
 [MIT](https://github.com/xmlet/HtmlFlow/blob/master/LICENSE)
+
+## About
+
+HtmlFlow was created by [Miguel Gamboa](http://gamboa.pt/) (aka
+[fmcarvalho](https://github.com/fmcarvalho/)), an assistant professor of
+[Computer Science and
+Engineering](https://www.isel.pt/en/courses/bsc-degree/computer-science-and-engineering)
+of [ISEL](https://www.isel.pt/en), [Polytechnic Institute of
+Lisbon](https://www.ipl.pt/en).
