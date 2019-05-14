@@ -38,6 +38,14 @@
                     News
                 </a>
 
+                {% if page.url == "/about/"%}
+                    <a class="nav-link active"  href="{{ site.url }}/about">
+                {% else %}
+                    <a class="nav-link"  href="{{ site.url }}/about">
+                {% endif %}
+                    About
+                </a>
+
             <a class="nav-link" href="#"></a>
             <!-- Place this tag where you want the button to render. -->
             <a class="github-button" 
