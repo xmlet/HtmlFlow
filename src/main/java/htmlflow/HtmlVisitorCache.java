@@ -162,6 +162,8 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     public final void visitOpenDynamic(){
         if (!isDynamic)
             throw new IllegalStateException("Wrong use of dynamic() in a static view!");
+        if (openDynamic )
+            throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
 
         openDynamic = true;
         if (isCached){
