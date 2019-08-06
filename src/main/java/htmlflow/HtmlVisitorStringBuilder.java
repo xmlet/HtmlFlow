@@ -40,7 +40,14 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
     private final StringBuilder sb = new StringBuilder();
 
     public HtmlVisitorStringBuilder(boolean isDynamic) {
-        super(isDynamic);
+        this(isDynamic, true);
+    }
+
+    /**
+     * Set HTML output indentation with true by default.
+     */
+    public HtmlVisitorStringBuilder(boolean isDynamic, boolean isIndented) {
+        super(isDynamic, isIndented);
     }
 
     @Override
@@ -87,6 +94,11 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
         String data = sb.toString();
         sb.setLength(0);
         return data;
+    }
+
+    @Override
+    protected HtmlVisitorCache clone(boolean isIndented) {
+        return new HtmlVisitorStringBuilder(isDynamic, isIndented);
     }
 
 }

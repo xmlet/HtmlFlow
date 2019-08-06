@@ -77,9 +77,14 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * an Exception.
      */
     final boolean isDynamic;
+    /**
+     * It the HTML output should be indented or not.
+     */
+    final boolean isIndented;
 
-    HtmlVisitorCache(boolean isDynamic) {
+    HtmlVisitorCache(boolean isDynamic, boolean isIndented) {
         this.isDynamic = isDynamic;
+        this.isIndented = isIndented;
     }
 
     /**
@@ -208,10 +213,15 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     private void newlineAndIndent(){
         if (isWriting()){
             if (isClosed){
-                write(Indentation.tabs(depth)); // \n\t\t\t\...
+                if(isIndented) {
+                    write(Indentation.tabs(depth)); // \n\t\t\t\...
+                }
             } else {
                 depth++;
-                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+                if(isIndented)
+                    write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+                else
+                    write(Tags.FINISH_TAG);
                 isClosed = true;
             }
         }
@@ -304,6 +314,14 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * Returns the accumulated output and clear it.
      */
     protected abstract String readAndReset();
+
+    /**
+     * Since HtmlVisitorCache is immutable this is the preferred way to create a copy of the
+     * existing HtmlVisitorCache instance with a different isIndented state.
+     *
+     * @param isIndented If thenew visitor should indent HTML output or not.
+     */
+    protected abstract HtmlVisitorCache clone(boolean isIndented);
 
     /*=========================================================================*/
     /*------------            Root Element Methods         --------------------*/
