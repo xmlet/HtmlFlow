@@ -13,12 +13,27 @@ public class TestIndentation {
      * https://github.com/xmlet/HtmlFlow/issues/46
      */
     @Test
-    public void testPreElementsWithoutIndentation() {
+    public void testBodyDivPElementsWithoutIndentation() {
         String html = HtmlWithoutIndentation
             .bodyDivP
             .render();
         String expected = Utils
             .loadLines("htmlWithoutIndentationBodyDivP.html")
+            .collect(joining());
+        assertEquals(expected, html);
+    }
+
+    /**
+     * Check behavior reported on Issue:
+     * https://github.com/xmlet/HtmlFlow/issues/46
+     */
+    @Test
+    public void testBodyPreElementsWithoutIndentation() {
+        String html = HtmlWithoutIndentation
+            .bodyPre
+            .render();
+        String expected = Utils
+            .loadLines("htmlWithoutIndentationBodyPre.html")
             .collect(joining());
         assertEquals(expected, html);
     }

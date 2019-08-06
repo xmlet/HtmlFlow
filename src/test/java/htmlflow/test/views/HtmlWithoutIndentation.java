@@ -18,4 +18,15 @@ public class HtmlWithoutIndentation {
                 .__() // body
             .__(); // html
 
+    public static HtmlView bodyPre = StaticHtml
+        .view()
+            .setIndented(false)
+            .html()
+                .body()
+                    .pre()
+                        .text("Some text")
+                    .__() // pre
+                .__() // body
+            .__(); // html
+
 }
