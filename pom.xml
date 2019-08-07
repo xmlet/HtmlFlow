@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.3</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
@@ -29,7 +29,7 @@
         <connection>scm:git:git@github.com:xmlet/HtmlFlow.git</connection>
         <developerConnection>scm:git:git@github.com:xmlet/HtmlFlow.git</developerConnection>
         <url>git@github.com:xmlet/HtmlFlow.git</url>
-        <tag>HEAD</tag>
+        <tag>htmlflow-3.3</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
