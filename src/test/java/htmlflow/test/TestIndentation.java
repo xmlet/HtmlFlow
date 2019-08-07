@@ -3,6 +3,9 @@ package htmlflow.test;
 import htmlflow.test.views.HtmlWithoutIndentation;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import static java.util.stream.Collectors.joining;
 import static junit.framework.Assert.assertEquals;
 
@@ -21,6 +24,19 @@ public class TestIndentation {
             .loadLines("htmlWithoutIndentationBodyDivP.html")
             .collect(joining());
         assertEquals(expected, html);
+    }
+
+    @Test
+    public void testBodyDivPElementsWithoutIndentationOnPrintStream() {
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        HtmlWithoutIndentation
+            .hotBodyDivP
+            .setPrintStream(new PrintStream(mem))
+            .write();
+        String expected = Utils
+            .loadLines("htmlWithoutIndentationBodyDivP.html")
+            .collect(joining());
+        assertEquals(expected, mem.toString());
     }
 
     /**
