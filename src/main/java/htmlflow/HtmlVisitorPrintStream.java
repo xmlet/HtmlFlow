@@ -46,8 +46,15 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
      */
     private PrintStream current;
 
+    /**
+     * Set HTML output indentation with true by default.
+     */
     public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic) {
-        super(isDynamic);
+        this(out, isDynamic, true);
+    }
+
+    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic, boolean isIndented) {
+        super(isDynamic, isIndented);
         this.out = out;
         this.current = new PrintStringBuilder(out);
     }
@@ -113,5 +120,10 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
          * For anyone who tries to use it will get NullPointerException.
          */
         return null;
+    }
+
+    @Override
+    protected HtmlVisitorCache clone(boolean isIndented) {
+        return new HtmlVisitorPrintStream(out, isDynamic, isIndented);
     }
 }

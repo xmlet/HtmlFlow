@@ -50,7 +50,8 @@ public class HtmlTables {
                                 .th().text("Id2").__()
                                 .th().text("Id3").__()
                             .__() //tr
-                            .dynamic(table -> {
+                            // IF all bound tables have the same number of rows then we may postpone dynamic for each field
+                            .of(table -> {
                                 for (int[] outputRow : outputRows) {
                                     table.tr()
                                          .dynamic(tr -> {

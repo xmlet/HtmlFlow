@@ -44,6 +44,9 @@ import static java.util.stream.Collectors.joining;
  * implementation, which is responsible for printing the tree of elements and
  * attributes.
  *
+ * Instances of HtmlView are immutable. Any change to its properties returns a new
+ * instance of HtmlView.
+ *
  * @param <T> The type of domain object bound to this View.
  *
  * @author Miguel Gamboa, Luís Duare
@@ -111,6 +114,10 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
         return new Root<>(this);
     }
 
+    /**
+     * Returns a new instance of HtmlView with the same properties of this object
+     * but with a new HtmlVisitorCache set with the out PrintStream parameter.
+     */
     @Override
     public final HtmlWriter<T> setPrintStream(PrintStream out) {
         if(threadSafe)
@@ -119,6 +126,15 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
             ? () -> new HtmlVisitorStringBuilder(getVisitor().isDynamic)
             : () -> new HtmlVisitorPrintStream(out, getVisitor().isDynamic);
         return clone(v, false);
+    }
+
+    /**
+     * Returns a new instance of HtmlView with the same properties of this object
+     * but with indented set to the value of isIndented parameter.
+     */
+    public final HtmlView<T> setIndented(boolean isIndented) {
+        return clone(() -> getVisitor()
+            .clone(isIndented), false);
     }
 
     @Override
@@ -187,5 +203,13 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
             getVisitor().write(partial.render());
     }
 
+    /**
+     * Since HtmlView is immutable this is the preferred way to create a copy of the
+     * existing HtmlView instance with a different threadSafe state.
+     *
+     * @param visitorSupplier
+     * @param threadSafe
+     * @return
+     */
     protected abstract HtmlView<T> clone(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe);
 }
