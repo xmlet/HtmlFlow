@@ -59,7 +59,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.2</version>
+    <version>3.3</version>
 </dependency>
 ```
 
@@ -254,6 +254,17 @@ Check out one of our use cases of partial views in the template function
 [`taskListViewWithPartials`](src/test/java/htmlflow/test/views/HtmlTables.java#L75).
 
 ## Changelog
+
+
+### 3.3 (August, 2019)
+
+* Upgrade to Java 11.
+* Upgrade to HtmlApiFasterApi version 1.7.
+* New `HtmlPartials` class in unit testes project with sample use cases to include in a paper for WebIst.
+* Feature: disallow the use of chained calls to `dynamic()` due to unexpected cache behaviors.
+* Feature: add support to disable indentation of HTML output. New `setIndented(boolean)` setter on `HtmlView` and corresponding property in `HtmlVisitorCache`.
+* Fix support to use `pre` elements in `body` as described on issue #46 with the feature to disable pretty print indentation of HTML.
+
 
 ### 3.2 (November, 2018)
 
