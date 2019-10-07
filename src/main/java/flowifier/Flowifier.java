@@ -52,12 +52,9 @@ public class Flowifier {
 
 		private final StringBuilder builder;
 		
-		private boolean endOfClassFileAppended;
-		
 		public HtmlToFlowNodeVisitor() {
 			super();
 			builder = new StringBuilder();
-			endOfClassFileAppended = false;
 			builder.append("import htmlflow.*;\n")
 			       .append("import org.xmlet.htmlapifaster.*;\n\n")
 			       .append("public class Flowified {\n")
@@ -99,17 +96,15 @@ public class Flowifier {
 				builder.append("        ");
 				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
 			    builder.append(".__()").append(" //").append(node.nodeName()).append("\n");
-			}
-		}
-		
-		public String getFlow() {
-			if (!endOfClassFileAppended) {
+			} else if (node instanceof Document) {
 				builder.append("       .render();\n")
 				       .append("       return html;\n")
 			           .append("   }\n")
 			           .append("}\n");
-				endOfClassFileAppended = true;
 			}
+		}
+		
+		public String getFlow() {
 			return builder.toString();
 		}
 		
