@@ -25,6 +25,7 @@ package flowifier;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.stream.IntStream;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
@@ -57,35 +58,37 @@ public class Flowifier {
 			super();
 			builder = new StringBuilder();
 			endOfClassFileAppended = false;
-			builder.append("import htmlflow.*;\n\n")
-			       .append("import org.xmlet.htmlapifaster.*;\n")
+			builder.append("import htmlflow.*;\n")
+			       .append("import org.xmlet.htmlapifaster.*;\n\n")
 			       .append("public class Flowified {\n")
-			       .append("public static String get(){\n")
-			       .append("final String html = StaticHtml.view()\n");
+			       .append("    public static String get(){\n")
+			       .append("        final String html = StaticHtml.view()\n");
 		}
 		
 		@Override
 		public void head(final Node node, final int depth) {
 			if (node instanceof Document || node instanceof DocumentType) {
-			} else if (node instanceof TextNode) {
-				final TextNode textNode = (TextNode) node;
-				builder.append(".text(\"")
-				   .append(textNode.getWholeText().replace("\n", "\\n"))
-				   .append("\")")
-			       .append("\n");
 			} else {
-				builder.append(".")
-			       .append(node.nodeName())
-			       .append("()\n");
-				for (final Attribute attribute : node.attributes().asList()) {
-					final String attrKey = attribute.getKey();
-					final String attrVal = attribute.getValue();
-					builder.append(".attr")
-					       .append(attrKey.substring(0, 1).toUpperCase())
-					       .append(attrKey.substring(1))
-					       .append("(\"")
-					       .append(attrVal)
-					       .append("\")");
+				builder.append("        ");
+				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
+				if (node instanceof TextNode) {
+					final TextNode textNode = (TextNode) node;
+					builder.append(".text(\"")
+					       .append(textNode.getWholeText().replace("\n", "\\n"))
+					       .append("\")")
+						   .append("\n");
+				} else {
+					builder.append(".").append(node.nodeName()).append("()");
+					for (final Attribute attribute : node.attributes().asList()) {
+						final String attrKey = attribute.getKey();
+						final String attrVal = attribute.getValue();
+						builder.append(".attr")
+						       .append(attrKey.substring(0, 1).toUpperCase())
+							   .append(attrKey.substring(1))
+							   .append("(\"").append(attrVal)
+							   .append("\")");
+					}
+					builder.append("\n");
 				}
 			}
 		}
@@ -93,15 +96,17 @@ public class Flowifier {
 		@Override
 		public void tail(final Node node, final int depth) {
 			if (!(node instanceof Document) && !(node instanceof TextNode) && !(node instanceof DocumentType)) {
-			    builder.append(".__()\n");
+				builder.append("        ");
+				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
+			    builder.append(".__()").append(" //").append(node.nodeName()).append("\n");
 			}
 		}
 		
 		public String getFlow() {
 			if (!endOfClassFileAppended) {
-				builder.append(".render();\n")
-				       .append("return html;")
-			           .append("}\n")
+				builder.append("       .render();\n")
+				       .append("       return html;\n")
+			           .append("   }\n")
 			           .append("}\n");
 				endOfClassFileAppended = true;
 			}
