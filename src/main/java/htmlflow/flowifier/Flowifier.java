@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package flowifier;
+package htmlflow.flowifier;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.stream.IntStream;
 
 import org.jsoup.Jsoup;
@@ -36,35 +35,29 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.NodeVisitor;
 
 public class Flowifier {
-
-	private final Class<? extends HtmlToFlowNodeVisitor> htmlToFlowNodeVisitorClass;
 	
 	public Flowifier() {
-		this(HtmlToFlowNodeVisitor.class);
-	}
-	
-	public Flowifier(final Class<? extends HtmlToFlowNodeVisitor> htmlToFlowNodeVisitorClass) {
 		super();
-		this.htmlToFlowNodeVisitorClass = htmlToFlowNodeVisitorClass;
 	}
 	
 	public static class HtmlToFlowNodeVisitor implements NodeVisitor {
 
-		private final StringBuilder builder;
+		private StringBuilder builder;
 		
 		public HtmlToFlowNodeVisitor() {
 			super();
-			builder = new StringBuilder();
-			builder.append("import htmlflow.*;\n")
-			       .append("import org.xmlet.htmlapifaster.*;\n\n")
-			       .append("public class Flowified {\n")
-			       .append("    public static String get(){\n")
-			       .append("        final String html = StaticHtml.view()\n");
 		}
 		
 		@Override
 		public void head(final Node node, final int depth) {
-			if (node instanceof Document || node instanceof DocumentType) {
+			if (node instanceof Document) {
+				builder = new StringBuilder();
+				builder.append("import htmlflow.*;\n")
+			       .append("import org.xmlet.htmlapifaster.*;\n\n")
+			       .append("public class Flowified {\n")
+			       .append("    public static HtmlView get(){\n")
+			       .append("        final HtmlView html = StaticHtml.view()\n");
+			} else if (node instanceof DocumentType) {
 			} else {
 				builder.append("        ");
 				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
@@ -97,25 +90,36 @@ public class Flowifier {
 				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
 			    builder.append(".__()").append(" //").append(node.nodeName()).append("\n");
 			} else if (node instanceof Document) {
-				builder.append("       .render();\n")
-				       .append("       return html;\n")
+				builder.append("       return html;\n")
 			           .append("   }\n")
 			           .append("}\n");
 			}
 		}
 		
 		public String getFlow() {
-			return builder.toString();
+			return builder == null ? null : builder.toString();
 		}
 		
 	} 
 	
-	public String toFlow(final String url) throws IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		final Document doc = Jsoup.connect(url).get();
-		final HtmlToFlowNodeVisitor htmlToFlowNodeVisitor = htmlToFlowNodeVisitorClass.getConstructor().newInstance();
+	public String toFlow(final Document doc, final HtmlToFlowNodeVisitor htmlToFlowNodeVisitor) {
 		doc.root().traverse(htmlToFlowNodeVisitor);
 		final String result = htmlToFlowNodeVisitor.getFlow();
 		return result;
+	}
+	
+	public String toFlow(final Document doc) {
+		return toFlow(doc, new HtmlToFlowNodeVisitor());
+	}
+	
+	public String toFlow(final String url, final HtmlToFlowNodeVisitor htmlToFlowNodeVisitor) throws IOException {
+		final Document doc = Jsoup.connect(url).get();
+		return toFlow(doc, htmlToFlowNodeVisitor);
+	}
+	
+	public String toFlow(final String url) throws IOException {
+		final Document doc = Jsoup.connect(url).get();
+		return toFlow(doc, new HtmlToFlowNodeVisitor());
 	}
 	
 	public static void main(final String[] args) {
