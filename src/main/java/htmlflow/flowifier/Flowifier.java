@@ -24,6 +24,7 @@
 package htmlflow.flowifier;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 import org.jsoup.Jsoup;
@@ -33,6 +34,11 @@ import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.NodeVisitor;
+import org.xmlet.htmlapifaster.EnumContenteditableType;
+import org.xmlet.htmlapifaster.EnumDirType;
+import org.xmlet.htmlapifaster.EnumDraggableType;
+import org.xmlet.htmlapifaster.EnumSpellcheckType;
+import org.xmlet.htmlapifaster.EnumTranslateType;
 
 public class Flowifier {
 	
@@ -50,6 +56,11 @@ public class Flowifier {
 		
 		protected String escape(final String unescaped) {
 			return unescaped == null ? null : unescaped.replace("\n", "\\n").replace("\"", "\\\"");
+		}
+		
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		protected String toEnumAttributeValue(final Class<? extends Enum> enumInterfaceClass, final Attribute attribute) {
+			return enumInterfaceClass.getSimpleName() + "." + Enum.valueOf(enumInterfaceClass, attribute.getValue().toUpperCase(Locale.ENGLISH)).name();
 		}
 		
 		@Override
@@ -76,12 +87,39 @@ public class Flowifier {
 					builder.append(".").append(node.nodeName()).append("()");
 					for (final Attribute attribute : node.attributes().asList()) {
 						final String attrKey = attribute.getKey();
-						final String attrVal = attribute.getValue();
+						final String attrVal;
+						switch(attrKey) {
+						   case "contenteditable": {
+							   attrVal = toEnumAttributeValue(EnumContenteditableType.class, attribute);
+					 		   break;
+						   }
+					 	   case "dir": {
+					 		   attrVal = toEnumAttributeValue(EnumDirType.class, attribute);
+					 		   break;
+					 	   }
+					 	   case "draggable": {
+					 		   attrVal = toEnumAttributeValue(EnumDraggableType.class, attribute);
+					 		   break;
+					 	   }
+					 	   case "spellcheck": {
+					 		   attrVal = toEnumAttributeValue(EnumSpellcheckType.class, attribute);
+					 		   break;
+					 	   }
+					 	   case "translate": {
+					 		   attrVal = toEnumAttributeValue(EnumTranslateType.class, attribute);
+					 		   break;
+					 	   }
+					 	   default: {
+					 		   attrVal = "\"" + escape(attribute.getValue()) + "\"";
+					 		   break;
+					 	   }
+						}
 						builder.append(".attr")
-						       .append(attrKey.substring(0, 1).toUpperCase())
+						       .append(attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
 							   .append(attrKey.substring(1))
-							   .append("(\"").append(escape(attrVal))
-							   .append("\")");
+							   .append("(")
+							   .append(attrVal)
+							   .append(")");
 					}
 					builder.append("\n");
 				}
