@@ -48,23 +48,28 @@ public class Flowifier {
 			super();
 		}
 		
+		protected String escape(final String unescaped) {
+			return unescaped == null ? null : unescaped.replace("\n", "\\n").replace("\"", "\\\"");
+		}
+		
 		@Override
 		public void head(final Node node, final int depth) {
-			if (node instanceof Document) {
+			if (depth == 0) {
 				builder = new StringBuilder();
 				builder.append("import htmlflow.*;\n")
 			       .append("import org.xmlet.htmlapifaster.*;\n\n")
 			       .append("public class Flowified {\n")
 			       .append("    public static HtmlView get(){\n")
 			       .append("        final HtmlView html = StaticHtml.view()\n");
-			} else if (node instanceof DocumentType) {
+			}
+			if (node instanceof Document || node instanceof DocumentType) {
 			} else {
 				builder.append("        ");
 				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
 				if (node instanceof TextNode) {
 					final TextNode textNode = (TextNode) node;
 					builder.append(".text(\"")
-					       .append(textNode.getWholeText().replace("\n", "\\n"))
+					       .append(escape(textNode.getWholeText()))
 					       .append("\")")
 						   .append("\n");
 				} else {
@@ -75,7 +80,7 @@ public class Flowifier {
 						builder.append(".attr")
 						       .append(attrKey.substring(0, 1).toUpperCase())
 							   .append(attrKey.substring(1))
-							   .append("(\"").append(attrVal)
+							   .append("(\"").append(escape(attrVal))
 							   .append("\")");
 					}
 					builder.append("\n");
@@ -89,7 +94,8 @@ public class Flowifier {
 				builder.append("        ");
 				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
 			    builder.append(".__()").append(" //").append(node.nodeName()).append("\n");
-			} else if (node instanceof Document) {
+			}
+			if (depth == 0) {
 				builder.append("       return html;\n")
 			           .append("   }\n")
 			           .append("}\n");
@@ -102,10 +108,14 @@ public class Flowifier {
 		
 	} 
 	
-	public String toFlow(final Document doc, final HtmlToFlowNodeVisitor htmlToFlowNodeVisitor) {
-		doc.root().traverse(htmlToFlowNodeVisitor);
+	public String toFlow(final Node node, final HtmlToFlowNodeVisitor htmlToFlowNodeVisitor) {
+		node.traverse(htmlToFlowNodeVisitor);
 		final String result = htmlToFlowNodeVisitor.getFlow();
 		return result;
+	}
+	
+	public String toFlow(final Document doc, final HtmlToFlowNodeVisitor htmlToFlowNodeVisitor) {
+		return toFlow(doc.root(), htmlToFlowNodeVisitor);
 	}
 	
 	public String toFlow(final Document doc) {
@@ -120,13 +130,5 @@ public class Flowifier {
 	public String toFlow(final String url) throws IOException {
 		final Document doc = Jsoup.connect(url).get();
 		return toFlow(doc, new HtmlToFlowNodeVisitor());
-	}
-	
-	public static void main(final String[] args) {
-		try {
-			System.out.println(new Flowifier().toFlow("http://tuer.sourceforge.net/en/"));
-		} catch (final Throwable t) {
-			t.printStackTrace();
-		}
 	}
 }
