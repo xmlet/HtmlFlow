@@ -24,12 +24,14 @@
 package htmlflow.flowifier;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.DocumentType;
@@ -42,6 +44,8 @@ import org.xmlet.htmlapifaster.EnumDraggableType;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumSpellcheckType;
 import org.xmlet.htmlapifaster.EnumTranslateType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
+import org.xmlet.xsdasmfaster.classes.infrastructure.EnumInterface;
 
 public class Flowifier {
 	
@@ -61,9 +65,14 @@ public class Flowifier {
 			return unescaped == null ? null : unescaped.replace("\n", "\\n").replace("\"", "\\\"");
 		}
 		
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		protected String toEnumAttributeValue(final Class<? extends Enum> enumInterfaceClass, final Attribute attribute) {
-			return enumInterfaceClass.getSimpleName() + "." + Enum.valueOf(enumInterfaceClass, attribute.getValue().toUpperCase(Locale.ENGLISH)).name();
+		@SuppressWarnings("rawtypes")
+		protected String toEnumAttributeValue(final Class<? extends EnumInterface<String>> enumInterfaceClass, final Attribute attribute) {
+			final EnumInterface attrValEnum = Arrays.stream(enumInterfaceClass.getEnumConstants())
+			      .map(EnumInterface.class::cast)
+			      .filter((final EnumInterface enumInterface) -> enumInterface.getValue().equals(attribute.getValue()))
+			      .findFirst()
+			      .orElseThrow(() -> new IllegalArgumentException("Unknown attribute value " + attribute.getValue() + " for the enum " + enumInterfaceClass.getSimpleName()));
+			return enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
 		}
 		
 		@Override
@@ -92,52 +101,75 @@ public class Flowifier {
 					       .append(escape(dataNode.getWholeData()))
 					       .append("\")")
 						   .append("\n");
+				} else if (node instanceof Comment) {
+					final Comment comment = (Comment) node;
+					builder.append(".comment(\"")
+					       .append(escape(comment.getData()))
+					       .append("\")")
+						   .append("\n");
 				} else {
 					builder.append(".").append(node.nodeName()).append("()");
 					for (final Attribute attribute : node.attributes().asList()) {
+						boolean rawKeyValueAttr = false;
 						final String attrKey = attribute.getKey();
-						try {
-							final String attrVal;
-							switch (attrKey) {
-							case "contenteditable": {
-								attrVal = toEnumAttributeValue(EnumContenteditableType.class, attribute);
-								break;
+						if (attrKey.contains("-")) {
+							rawKeyValueAttr = true;
+						} else {
+							try {
+								final String attrVal;
+								switch (attrKey) {
+								case "contenteditable": {
+									attrVal = toEnumAttributeValue(EnumContenteditableType.class, attribute);
+									break;
+								}
+								case "dir": {
+									attrVal = toEnumAttributeValue(EnumDirType.class, attribute);
+									break;
+								}
+								case "draggable": {
+									attrVal = toEnumAttributeValue(EnumDraggableType.class, attribute);
+									break;
+								}
+								case "rel": {
+									attrVal = toEnumAttributeValue(EnumRelType.class, attribute);
+									break;
+								}
+								case "spellcheck": {
+									attrVal = toEnumAttributeValue(EnumSpellcheckType.class, attribute);
+									break;
+								}
+								case "translate": {
+									attrVal = toEnumAttributeValue(EnumTranslateType.class, attribute);
+									break;
+								}
+								case "type": {
+									attrVal = toEnumAttributeValue(EnumTypeContentType.class, attribute);
+									break;
+								}
+								default: {
+									attrVal = "\"" + escape(attribute.getValue()) + "\"";
+									break;
+								}
+								}
+								builder.append(".attr")
+								       .append(attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
+									   .append(attrKey.substring(1))
+									   .append("(")
+									   .append(attrVal)
+									   .append(")");
+							} catch (final IllegalArgumentException iae) {
+								rawKeyValueAttr = true;
+								Logger.getLogger(this.getClass().getCanonicalName()).warning("Attribute " + attrKey + " " + attribute.getValue() + " not conformant with HTML 5");
 							}
-							case "dir": {
-								attrVal = toEnumAttributeValue(EnumDirType.class, attribute);
-								break;
-							}
-							case "draggable": {
-								attrVal = toEnumAttributeValue(EnumDraggableType.class, attribute);
-								break;
-							}
-							case "rel": {
-								attrVal = toEnumAttributeValue(EnumRelType.class, attribute);
-								break;
-							}
-							case "spellcheck": {
-								attrVal = toEnumAttributeValue(EnumSpellcheckType.class, attribute);
-								break;
-							}
-							case "translate": {
-								attrVal = toEnumAttributeValue(EnumTranslateType.class, attribute);
-								break;
-							}
-							default: {
-								attrVal = "\"" + escape(attribute.getValue()) + "\"";
-								break;
-							}
-							}
-							builder.append(".attr")
-							       .append(attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
-								   .append(attrKey.substring(1))
-								   .append("(")
-								   .append(attrVal)
-								   .append(")");
-						} catch (final IllegalArgumentException iae) {
-							Logger.getLogger(this.getClass().getCanonicalName())
-									.warning("Attribute " + attribute.getKey() + " " + attribute.getValue() + " skipped because it is not conformant with HTML 5");
 						}
+						/*if (rawKeyValueAttr) {
+							builder.append(".attr(")
+							       .append("\"")
+							       .append(attrKey)
+							       .append("\",\"")
+							       .append(escape(attribute.getValue()))
+							       .append("\")");
+						}*/
 					}
 					builder.append("\n");
 				}
