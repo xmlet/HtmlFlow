@@ -25,10 +25,12 @@ package htmlflow.flowifier;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Node;
@@ -37,6 +39,7 @@ import org.jsoup.select.NodeVisitor;
 import org.xmlet.htmlapifaster.EnumContenteditableType;
 import org.xmlet.htmlapifaster.EnumDirType;
 import org.xmlet.htmlapifaster.EnumDraggableType;
+import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumSpellcheckType;
 import org.xmlet.htmlapifaster.EnumTranslateType;
 
@@ -83,43 +86,58 @@ public class Flowifier {
 					       .append(escape(textNode.getWholeText()))
 					       .append("\")")
 						   .append("\n");
+				} else if (node instanceof DataNode) {
+					final DataNode dataNode = (DataNode) node;
+					builder.append(".text(\"")
+					       .append(escape(dataNode.getWholeData()))
+					       .append("\")")
+						   .append("\n");
 				} else {
 					builder.append(".").append(node.nodeName()).append("()");
 					for (final Attribute attribute : node.attributes().asList()) {
 						final String attrKey = attribute.getKey();
-						final String attrVal;
-						switch(attrKey) {
-						   case "contenteditable": {
-							   attrVal = toEnumAttributeValue(EnumContenteditableType.class, attribute);
-					 		   break;
-						   }
-					 	   case "dir": {
-					 		   attrVal = toEnumAttributeValue(EnumDirType.class, attribute);
-					 		   break;
-					 	   }
-					 	   case "draggable": {
-					 		   attrVal = toEnumAttributeValue(EnumDraggableType.class, attribute);
-					 		   break;
-					 	   }
-					 	   case "spellcheck": {
-					 		   attrVal = toEnumAttributeValue(EnumSpellcheckType.class, attribute);
-					 		   break;
-					 	   }
-					 	   case "translate": {
-					 		   attrVal = toEnumAttributeValue(EnumTranslateType.class, attribute);
-					 		   break;
-					 	   }
-					 	   default: {
-					 		   attrVal = "\"" + escape(attribute.getValue()) + "\"";
-					 		   break;
-					 	   }
+						try {
+							final String attrVal;
+							switch (attrKey) {
+							case "contenteditable": {
+								attrVal = toEnumAttributeValue(EnumContenteditableType.class, attribute);
+								break;
+							}
+							case "dir": {
+								attrVal = toEnumAttributeValue(EnumDirType.class, attribute);
+								break;
+							}
+							case "draggable": {
+								attrVal = toEnumAttributeValue(EnumDraggableType.class, attribute);
+								break;
+							}
+							case "rel": {
+								attrVal = toEnumAttributeValue(EnumRelType.class, attribute);
+								break;
+							}
+							case "spellcheck": {
+								attrVal = toEnumAttributeValue(EnumSpellcheckType.class, attribute);
+								break;
+							}
+							case "translate": {
+								attrVal = toEnumAttributeValue(EnumTranslateType.class, attribute);
+								break;
+							}
+							default: {
+								attrVal = "\"" + escape(attribute.getValue()) + "\"";
+								break;
+							}
+							}
+							builder.append(".attr")
+							       .append(attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
+								   .append(attrKey.substring(1))
+								   .append("(")
+								   .append(attrVal)
+								   .append(")");
+						} catch (final IllegalArgumentException iae) {
+							Logger.getLogger(this.getClass().getCanonicalName())
+									.warning("Attribute " + attribute.getKey() + " " + attribute.getValue() + " skipped because it is not conformant with HTML 5");
 						}
-						builder.append(".attr")
-						       .append(attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
-							   .append(attrKey.substring(1))
-							   .append("(")
-							   .append(attrVal)
-							   .append(")");
 					}
 					builder.append("\n");
 				}
@@ -128,14 +146,15 @@ public class Flowifier {
 
 		@Override
 		public void tail(final Node node, final int depth) {
-			if (!(node instanceof Document) && !(node instanceof TextNode) && !(node instanceof DocumentType)) {
+			if (!(node instanceof Document) && !(node instanceof DataNode) && !(node instanceof TextNode) && !(node instanceof DocumentType)) {
 				builder.append("        ");
 				IntStream.range(0, depth * 4).forEach((final int index) -> builder.append(' '));
 			    builder.append(".__()").append(" //").append(node.nodeName()).append("\n");
 			}
 			if (depth == 0) {
-				builder.append("       return html;\n")
-			           .append("   }\n")
+				builder.append("            ;\n")
+				       .append("        return html;\n")
+			           .append("    }\n")
 			           .append("}\n");
 			}
 		}
