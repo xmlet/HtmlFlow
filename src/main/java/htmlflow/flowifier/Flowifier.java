@@ -112,12 +112,16 @@ public class Flowifier {
 					for (final Attribute attribute : node.attributes().asList()) {
 						boolean rawKeyValueAttr = false;
 						final String attrKey = attribute.getKey();
-						if (attrKey.contains("-")) {
+						if (attrKey.contains("-") || ("meta".equals(node.nodeName()) && "property".equals(attrKey))) {
 							rawKeyValueAttr = true;
 						} else {
 							try {
 								final String attrVal;
 								switch (attrKey) {
+								case "async": {
+									attrVal = attribute.getKey() == null || attribute.getKey().isEmpty() || attribute.getKey().equalsIgnoreCase("true") ? "Boolean.TRUE" : "Boolean.FALSE";
+									break;
+								}
 								case "contenteditable": {
 									attrVal = toEnumAttributeValue(EnumContenteditableType.class, attribute);
 									break;
@@ -162,14 +166,14 @@ public class Flowifier {
 								Logger.getLogger(this.getClass().getCanonicalName()).warning("Attribute " + attrKey + " " + attribute.getValue() + " not conformant with HTML 5");
 							}
 						}
-						/*if (rawKeyValueAttr) {
-							builder.append(".attr(")
+						if (rawKeyValueAttr) {
+							builder.append(".addAttr(")
 							       .append("\"")
 							       .append(attrKey)
 							       .append("\",\"")
 							       .append(escape(attribute.getValue()))
 							       .append("\")");
-						}*/
+						}
 					}
 					builder.append("\n");
 				}
