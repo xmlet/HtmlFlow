@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Comment;
@@ -59,15 +60,69 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		appendable.append("}\n");
 	}
 	
+	/**
+	 * This method comes from Javapoet
+	 * 
+	 * @param c
+	 * @return
+	 */
+	private String characterLiteralWithoutSingleQuotes(final char c) {
+	    // see https://docs.oracle.com/javase/specs/jls/se7/html/jls-3.html#jls-3.10.6
+	    switch (c) {
+	      case '\b': return "\\b"; /* \u0008: backspace (BS) */
+	      case '\t': return "\\t"; /* \u0009: horizontal tab (HT) */
+	      case '\n': return "\\n"; /* \u000a: linefeed (LF) */
+	      case '\f': return "\\f"; /* \u000c: form feed (FF) */
+	      case '\r': return "\\r"; /* \u000d: carriage return (CR) */
+	      case '\"': return "\"";  /* \u0022: double quote (") */
+	      case '\'': return "\\'"; /* \u0027: single quote (') */
+	      case '\\': return "\\\\";  /* \u005c: backslash (\) */
+	      default:
+	        return Character.isISOControl(c) ? String.format("\\u%04x", (int) c) : Character.toString(c);
+	    }
+	  }
+
+	  /** Returns the string literal representing {@code value}, including wrapping double quotes. 
+	   * 
+	   * This method comes from Javapoet
+	   * */
+	  private String stringLiteralWithDoubleQuotes(final String value, final String indent) {
+	    StringBuilder result = new StringBuilder(value.length() + 2);
+	    result.append('"');
+	    for (int i = 0; i < value.length(); i++) {
+	      char c = value.charAt(i);
+	      // trivial case: single quote must not be escaped
+	      if (c == '\'') {
+	        result.append("'");
+	        continue;
+	      }
+	      // trivial case: double quotes must be escaped
+	      if (c == '\"') {
+	        result.append("\\\"");
+	        continue;
+	      }
+	      // default case: just let character literal do its work
+	      result.append(characterLiteralWithoutSingleQuotes(c));
+	      // need to append indent after linefeed?
+	      if (c == '\n' && i + 1 < value.length()) {
+	        result.append("\"\n").append(indent).append(indent).append("+ \"");
+	      }
+	    }
+	    result.append('"');
+	    return result.toString();
+	  }
+	
 	@Override
 	public String convertJavaStringContentToJavaDeclarableString(final String unescaped) {
-		//FIXME it doesn't escape some strings correctly, for example some JSON-LD content
-		return unescaped == null ? null : "\"" + unescaped.replace("\n", "\\n").replace("\"", "\\\"") + "\"";
+		return unescaped == null ? null : stringLiteralWithDoubleQuotes(unescaped, "");
 	}
 	
 	@Override
 	public boolean isVoidElement(final Node node) {
-		return node instanceof Document || node instanceof DataNode || node instanceof TextNode || node instanceof DocumentType;
+		return node instanceof Document || node instanceof DataNode || node instanceof TextNode || node instanceof DocumentType /*|| 
+				Stream.of("area", "base", "basefont", "bgsound", "br", "col", "command", "embed", "frame", "hr", "image", "img",
+						  "input", "isindex", "keygen", "link", "menuitem", "meta", "nextid", "param", "source", "track", "wbr")
+				.anyMatch((final String voidElementName) -> voidElementName.equalsIgnoreCase(node.nodeName().startsWith("#") ? node.nodeName().substring(1) : node.nodeName()))*/;
 	}
 	
 	@SuppressWarnings("rawtypes")
