@@ -9,7 +9,7 @@ public interface HtmlToJavaHtmlFlowNodeVisitor<T extends Appendable> extends Nod
 
 	void appendHeader() throws IOException;
 	void appendFooter() throws IOException;
-	boolean isVoidElement(Node node);
+	boolean isUnclosable(Node node);
 	String convertJavaStringContentToJavaDeclarableString(String javaStringContent);
 	T getAppendable();
 }

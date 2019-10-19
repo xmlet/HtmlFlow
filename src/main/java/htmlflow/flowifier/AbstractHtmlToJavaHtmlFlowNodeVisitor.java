@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Comment;
@@ -15,13 +14,36 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
+import org.xmlet.htmlapifaster.EnumAutocompleteType;
+import org.xmlet.htmlapifaster.EnumBorderType;
 import org.xmlet.htmlapifaster.EnumContenteditableType;
+import org.xmlet.htmlapifaster.EnumCrossoriginCrossOriginType;
 import org.xmlet.htmlapifaster.EnumDirType;
+import org.xmlet.htmlapifaster.EnumDisplayType;
 import org.xmlet.htmlapifaster.EnumDraggableType;
+import org.xmlet.htmlapifaster.EnumEnctypeType;
+import org.xmlet.htmlapifaster.EnumFormenctypeEnctypeType;
+import org.xmlet.htmlapifaster.EnumFormmethodMethodType;
+import org.xmlet.htmlapifaster.EnumFormtargetBrowsingContext;
+import org.xmlet.htmlapifaster.EnumHttpEquivType;
+import org.xmlet.htmlapifaster.EnumKindType;
+import org.xmlet.htmlapifaster.EnumMediaType;
+import org.xmlet.htmlapifaster.EnumMethodType;
+import org.xmlet.htmlapifaster.EnumOverflowType;
 import org.xmlet.htmlapifaster.EnumRelType;
+import org.xmlet.htmlapifaster.EnumRevType;
+import org.xmlet.htmlapifaster.EnumSandboxType;
+import org.xmlet.htmlapifaster.EnumScopeType;
+import org.xmlet.htmlapifaster.EnumShapeType;
 import org.xmlet.htmlapifaster.EnumSpellcheckType;
 import org.xmlet.htmlapifaster.EnumTranslateType;
+import org.xmlet.htmlapifaster.EnumTypeButtonType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
+import org.xmlet.htmlapifaster.EnumTypeInputType;
+import org.xmlet.htmlapifaster.EnumTypeOlType;
+import org.xmlet.htmlapifaster.EnumTypeScriptType;
+import org.xmlet.htmlapifaster.EnumTypeSimpleContentType;
+import org.xmlet.htmlapifaster.EnumWrapType;
 import org.xmlet.xsdasmfaster.classes.infrastructure.EnumInterface;
 
 public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable> implements HtmlToJavaHtmlFlowNodeVisitor<T> {
@@ -118,11 +140,8 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 	}
 	
 	@Override
-	public boolean isVoidElement(final Node node) {
-		return node instanceof Document || node instanceof DataNode || node instanceof TextNode || node instanceof DocumentType /*|| 
-				Stream.of("area", "base", "basefont", "bgsound", "br", "col", "command", "embed", "frame", "hr", "image", "img",
-						  "input", "isindex", "keygen", "link", "menuitem", "meta", "nextid", "param", "source", "track", "wbr")
-				.anyMatch((final String voidElementName) -> voidElementName.equalsIgnoreCase(node.nodeName().startsWith("#") ? node.nodeName().substring(1) : node.nodeName()))*/;
+	public boolean isUnclosable(final Node node) {
+		return node instanceof Document || node instanceof DataNode || node instanceof Comment || node instanceof TextNode || node instanceof DocumentType;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -135,6 +154,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		return enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void head(final Node node, final int depth) {
 		try {
@@ -164,68 +184,73 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 							.append("\n");
 				} else {
 					appendable.append(".").append(node.nodeName()).append("()");
-					for (final Attribute attribute : node.attributes().asList()) {
-						boolean rawKeyValueAttr = false;
-						final String attrKey = attribute.getKey();
-						// FIXME generalize, detect whether a node has the guessed method, use addAttr as a fallback
-						if (attrKey.contains("-") || ("meta".equals(node.nodeName()) && "property".equals(attrKey))) {
-							rawKeyValueAttr = true;
-						} else {
+					final String nodeClassname = node.nodeName().substring(0, 1).toUpperCase(Locale.ENGLISH) + node.nodeName().substring(1).toLowerCase(Locale.ENGLISH);
+					Class<?> nodeClass = null;
+					try {
+					    nodeClass = Class.forName("org.xmlet.htmlapifaster." + nodeClassname);
+					} catch (final ClassNotFoundException cnfe) {
+						LOGGER.severe("Class not found " + nodeClassname);
+					}
+					if (nodeClass != null) {
+					    for (final Attribute attribute : node.attributes().asList()) {
+							final String attrKey = attribute.getKey();
+							final String attrMethodname = "attr" + attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH) + attrKey.substring(1);
+							String attrVal = null;
 							try {
-								final String attrVal;
-								switch (attrKey) {
-								case "async": {
-									attrVal = attribute.getKey() == null || attribute.getKey().isEmpty()
-											|| attribute.getKey().equalsIgnoreCase("true") ? "Boolean.TRUE"
-													: "Boolean.FALSE";
-									break;
+								nodeClass.getMethod(attrMethodname, String.class);
+								attrVal = convertJavaStringContentToJavaDeclarableString(attribute.getValue());
+							} catch (final NoSuchMethodException nsme) {
+								try {
+								nodeClass.getMethod(attrMethodname, Boolean.class);
+								attrVal = attrKey.isEmpty() || attrKey.equalsIgnoreCase("true") ? "Boolean.TRUE" : "Boolean.FALSE";
+							} catch (final NoSuchMethodException nsme1) {
+								try {
+								nodeClass.getMethod(attrMethodname, Long.class);
+								attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
+								} catch (final NoSuchMethodException nsme2) {
+									try {
+										nodeClass.getMethod(attrMethodname, Integer.class);
+										attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
+								    } catch (final NoSuchMethodException nsme3) {
+											for (final Class<? extends EnumInterface> enumInterfaceSubClass : new Class[] {
+													EnumAutocompleteType.class, EnumBorderType.class,
+													EnumContenteditableType.class, EnumCrossoriginCrossOriginType.class,
+													EnumDirType.class, EnumDisplayType.class, EnumDraggableType.class,
+													EnumEnctypeType.class, EnumFormenctypeEnctypeType.class,
+													EnumFormmethodMethodType.class, EnumFormtargetBrowsingContext.class,
+													EnumHttpEquivType.class, EnumKindType.class, EnumMediaType.class,
+													EnumMethodType.class, EnumOverflowType.class, EnumRelType.class,
+													EnumRevType.class, EnumSandboxType.class, EnumScopeType.class,
+													EnumShapeType.class, EnumSpellcheckType.class,
+													EnumTranslateType.class, EnumTypeButtonType.class,
+													EnumTypeContentType.class, EnumTypeInputType.class,
+													EnumTypeOlType.class, EnumTypeScriptType.class,
+													EnumTypeSimpleContentType.class, EnumWrapType.class }) {
+												try {
+													nodeClass.getMethod(attrMethodname, enumInterfaceSubClass);
+													attrVal = toEnumAttributeValue(
+															(Class<? extends EnumInterface<String>>) enumInterfaceSubClass,
+															attribute);
+													// stops searching, the value has been built with the enum
+													break;
+												} catch (final NoSuchMethodException nsme4) {
+													// go on searching
+												} catch (final IllegalArgumentException iae) {
+													// stops searching, the value will have to be managed without relying on the dedicated build-in enum
+													break;
+												}
+											}
+										}
+								    }
 								}
-								case "contenteditable": {
-									attrVal = toEnumAttributeValue(EnumContenteditableType.class, attribute);
-									break;
-								}
-								case "dir": {
-									attrVal = toEnumAttributeValue(EnumDirType.class, attribute);
-									break;
-								}
-								case "draggable": {
-									attrVal = toEnumAttributeValue(EnumDraggableType.class, attribute);
-									break;
-								}
-								case "rel": {
-									attrVal = toEnumAttributeValue(EnumRelType.class, attribute);
-									break;
-								}
-								case "spellcheck": {
-									attrVal = toEnumAttributeValue(EnumSpellcheckType.class, attribute);
-									break;
-								}
-								case "translate": {
-									attrVal = toEnumAttributeValue(EnumTranslateType.class, attribute);
-									break;
-								}
-								case "type": {
-									attrVal = toEnumAttributeValue(EnumTypeContentType.class, attribute);
-									break;
-								}
-								default: {
-									attrVal = convertJavaStringContentToJavaDeclarableString(attribute.getValue());
-									break;
-								}
-								}
-								appendable.append(".attr").append(attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH))
-										.append(attrKey.substring(1)).append("(").append(attrVal).append(")");
-							} catch (final IllegalArgumentException iae) {
-								rawKeyValueAttr = true;
-								//FIXME this message isn't accurate because we can arrive here just because an attribute is valid in HTML 5 but unknown by the API
-								/*Logger.getLogger(this.getClass().getCanonicalName()).warning("Attribute " + attrKey
-										+ " " + attribute.getValue() + " not conformant with HTML 5");*/
 							}
-						}
-						if (rawKeyValueAttr) {
-							appendable.append(".addAttr(").append("\"").append(attrKey).append("\",")
-									.append(convertJavaStringContentToJavaDeclarableString(attribute.getValue()))
-									.append(")");
+							if (attrVal == null) {
+								appendable.append(".addAttr(").append("\"").append(attrKey).append("\",")
+										.append(convertJavaStringContentToJavaDeclarableString(attribute.getValue()))
+										.append(")");
+							} else {
+								appendable.append(".").append(attrMethodname).append("(").append(attrVal).append(")");
+							}
 						}
 					}
 					appendable.append("\n");
@@ -239,7 +264,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 	@Override
 	public void tail(final Node node, final int depth) {
 		try {
-			if (!isVoidElement(node)) {
+			if (!isUnclosable(node)) {
 				appendable.append("        ");
 				for (int spaceIndex = 0; spaceIndex < depth * 4; spaceIndex++) {
 					appendable.append(' ');
