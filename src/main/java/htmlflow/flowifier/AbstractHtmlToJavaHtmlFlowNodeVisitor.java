@@ -1,11 +1,13 @@
 package htmlflow.flowifier;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Comment;
@@ -57,6 +59,22 @@ import org.xmlet.xsdasmfaster.classes.infrastructure.EnumInterface;
 public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable> implements HtmlToJavaHtmlFlowNodeVisitor<T> {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractHtmlToJavaHtmlFlowNodeVisitor.class.getCanonicalName());
+	
+	@SuppressWarnings("rawtypes")
+	private static final Class[] ENUM_INTERFACE_SUBCLASSES = new Class[] {
+			EnumAutocompleteType.class, EnumBorderType.class,
+			EnumContenteditableType.class, EnumCrossoriginCrossOriginType.class,
+			EnumDirType.class, EnumDisplayType.class, EnumDraggableType.class,
+			EnumEnctypeType.class, EnumFormenctypeEnctypeType.class,
+			EnumFormmethodMethodType.class, EnumFormtargetBrowsingContext.class,
+			EnumHttpEquivType.class, EnumKindType.class, EnumMediaType.class,
+			EnumMethodType.class, EnumOverflowType.class, EnumRelType.class,
+			EnumRevType.class, EnumSandboxType.class, EnumScopeType.class,
+			EnumShapeType.class, EnumSpellcheckType.class,
+			EnumTranslateType.class, EnumTypeButtonType.class,
+			EnumTypeContentType.class, EnumTypeInputType.class,
+			EnumTypeOlType.class, EnumTypeScriptType.class,
+			EnumTypeSimpleContentType.class, EnumWrapType.class };
 	
 	/**
 	 * supplier of the appendable
@@ -179,7 +197,36 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		return enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public Class<?> getClassFromNodeName(final String nodeName) {
+		final String nodeClassname = nodeName.substring(0, 1).toUpperCase(Locale.ENGLISH) + nodeName.substring(1).toLowerCase(Locale.ENGLISH);
+		Class<?> nodeClass;
+		try {
+		    nodeClass = Class.forName("org.xmlet.htmlapifaster." + nodeClassname);
+		} catch (final ClassNotFoundException cnfe) {
+			LOGGER.warning("Class " + nodeClassname + " not found for the node name " + nodeName);
+			nodeClass = null;
+		}
+		return nodeClass;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Method getMethodFromAttribute(Class<?> nodeClass, Attribute attribute) {
+		final String attrKey = attribute.getKey();
+		final String attrMethodName = "attr" + attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH) + attrKey.substring(1);
+		final Method attrMethod = Arrays.stream(nodeClass.getMethods())
+		      .filter((final Method method) -> method.getName().equals(attrMethodName) && 
+		    		                           method.getParameterCount() == 1 && 
+		    		                           Stream.concat(Stream.of(String.class, Boolean.class, Long.class, Integer.class), 
+		    		                        		   Arrays.stream(ENUM_INTERFACE_SUBCLASSES))
+		    		                                 .anyMatch((final Class candidateClass) -> candidateClass.equals(method.getParameterTypes()[0])))
+		      .findFirst()
+		      .orElse(null);
+		return attrMethod;
+	}
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void head(final Node node, final int depth) {
 		try {
@@ -212,78 +259,39 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 							.append("\n");
 				} else {
 					appendable.append(".").append(node.nodeName()).append("()");
-					// looks for the class
-					final String nodeClassname = node.nodeName().substring(0, 1).toUpperCase(Locale.ENGLISH) + node.nodeName().substring(1).toLowerCase(Locale.ENGLISH);
-					Class<?> nodeClass = null;
-					try {
-					    nodeClass = Class.forName("org.xmlet.htmlapifaster." + nodeClassname);
-					} catch (final ClassNotFoundException cnfe) {
-						LOGGER.severe("Class not found " + nodeClassname);
-					}
+					// looks for the class from the node name
+					final Class<?> nodeClass = getClassFromNodeName(node.nodeName());
 					// if the class has been found
 					if (nodeClass != null) {
 					    for (final Attribute attribute : node.attributes().asList()) {
+					    	// uses the class to look for the name of the method for this attribute
+					    	final Method attrMethod = getMethodFromAttribute(nodeClass, attribute);
 							final String attrKey = attribute.getKey();
-							// uses the class to look for the name of the method for this attribute
-							final String attrMethodname = "attr" + attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH) + attrKey.substring(1);
-							String attrVal = null;
-							try {
-								nodeClass.getMethod(attrMethodname, String.class);
+							final String attrVal;
+							if (attrMethod == null) {
+								attrVal = null;
+							} else if (attrMethod.getParameterTypes()[0].equals(String.class)) {
 								attrVal = convertJavaStringContentToJavaDeclarableString(attribute.getValue());
-							} catch (final NoSuchMethodException nsme) {
-								try {
-								nodeClass.getMethod(attrMethodname, Boolean.class);
+							} else if (attrMethod.getParameterTypes()[0].equals(Boolean.class)) {
 								attrVal = attrKey.isEmpty() || attrKey.equalsIgnoreCase("true") ? "Boolean.TRUE" : "Boolean.FALSE";
-							} catch (final NoSuchMethodException nsme1) {
-								try {
-								nodeClass.getMethod(attrMethodname, Long.class);
+							} else if (attrMethod.getParameterTypes()[0].equals(Long.class)) {
 								attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
-								} catch (final NoSuchMethodException nsme2) {
-									try {
-										nodeClass.getMethod(attrMethodname, Integer.class);
-										attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
-								    } catch (final NoSuchMethodException nsme3) {
-											for (final Class<? extends EnumInterface> enumInterfaceSubClass : new Class[] {
-													EnumAutocompleteType.class, EnumBorderType.class,
-													EnumContenteditableType.class, EnumCrossoriginCrossOriginType.class,
-													EnumDirType.class, EnumDisplayType.class, EnumDraggableType.class,
-													EnumEnctypeType.class, EnumFormenctypeEnctypeType.class,
-													EnumFormmethodMethodType.class, EnumFormtargetBrowsingContext.class,
-													EnumHttpEquivType.class, EnumKindType.class, EnumMediaType.class,
-													EnumMethodType.class, EnumOverflowType.class, EnumRelType.class,
-													EnumRevType.class, EnumSandboxType.class, EnumScopeType.class,
-													EnumShapeType.class, EnumSpellcheckType.class,
-													EnumTranslateType.class, EnumTypeButtonType.class,
-													EnumTypeContentType.class, EnumTypeInputType.class,
-													EnumTypeOlType.class, EnumTypeScriptType.class,
-													EnumTypeSimpleContentType.class, EnumWrapType.class }) {
-												try {
-													nodeClass.getMethod(attrMethodname, enumInterfaceSubClass);
-													attrVal = toEnumAttributeValue(
-															(Class<? extends EnumInterface<String>>) enumInterfaceSubClass,
-															attribute);
-													// stops searching, the value has been built with the enum
-													break;
-												} catch (final NoSuchMethodException nsme4) {
-													// goes on searching
-												} catch (final IllegalArgumentException iae) {
-													// stops searching, the value will have to be managed without relying on the dedicated build-in enum
-													break;
-												}
-											}
-										}
-								    }
-								}
+							} else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {
+								attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
+							} else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
+								attrVal = toEnumAttributeValue((Class<? extends EnumInterface<String>>) attrMethod.getParameterTypes()[0], attribute);
+							} else {
+								attrVal = null;
 							}
 							// if the value hasn't been identified as a known value of a typed attribute
-							if (attrVal == null) {
+							if (attrMethod == null || attrVal == null) {
 								// uses the catch-all method addAttr() as no dedicated method exists
 								appendable.append(".addAttr(").append("\"").append(attrKey).append("\",")
 										.append(convertJavaStringContentToJavaDeclarableString(attribute.getValue()))
 										.append(")");
 							} else {
 								// uses the dedicated method
-								appendable.append(".").append(attrMethodname).append("(").append(attrVal).append(")");
+								appendable.append(".").append(attrMethod.getName()).append("(").append(attrVal).append(")");
 							}
 						}
 					}

@@ -1,7 +1,9 @@
 package htmlflow.flowifier;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.NodeVisitor;
 
@@ -47,4 +49,21 @@ public interface HtmlToJavaHtmlFlowNodeVisitor<T extends Appendable> extends Nod
 	 * @return the appendable used to store the Java class
 	 */
 	T getAppendable();
+	
+	/**
+	 * Returns the class of the node whose name is passed if any, otherwise <code>null</code>
+	 * 
+	 * @param nodeName the node name
+	 * @return the class of the node whose name is passed if any, otherwise <code>null</code>
+	 */
+	Class<?> getClassFromNodeName(String nodeName);
+	
+	/**
+	 * Returns the method of the class node that matches with the attribute if any, otherwise <code>null</code>
+	 * 
+	 * @param nodeClass the class of the node
+	 * @param attribute the attribute
+	 * @return the method of the class node that matches with the attribute if any, otherwise <code>null</code>
+	 */
+	Method getMethodFromAttribute(Class<?> nodeClass, Attribute attribute);
 }
