@@ -191,10 +191,16 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		      .filter((final EnumInterface enumInterface) -> enumInterface.getValue().equals(attribute.getValue()))
 		      // takes the first one that matches
 		      .findFirst()
-		      // throws an exception if none matches
-		      .orElseThrow(() -> new IllegalArgumentException("Unknown attribute value " + attribute.getValue() + " for the enum " + enumInterfaceClass.getSimpleName()));
-		// returns a string made of the name of the enum and the value of the enum separated by a dot
-		return enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
+		      // returns null if none matches
+		      .orElse(null);
+		final String enumAttrValue;
+		if (attrValEnum == null) {
+			enumAttrValue = null;
+		} else {
+			// returns a string made of the name of the enum and the value of the enum separated by a dot
+			enumAttrValue = enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
+		}
+		return enumAttrValue;
 	}
 	
 	@Override
