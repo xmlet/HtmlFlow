@@ -86,6 +86,8 @@ public class TestFlowifierWikipedia {
 			final URI classFileUri = classFileObject.toUri();
 			final Path classFilePath = Paths.get(classFileUri);
 			final byte[] classFileContent = Files.readAllBytes(classFilePath);
+			// deletes the class file to keep the workspace clean
+			classFileObject.delete();
 			// gets a mean of loading a class at runtime
 			final ClassLoader classLoader = getClass().getClassLoader();
 			//FIXME create a brand new class loader, loads the classes from the classpath and the generated class into this class loader to get rid of the warning
