@@ -325,8 +325,8 @@ and add it as child of that `HtmlView`.
 * All these features together with the existing `º()` make possible to build a view in a single
 pass, reducing the number of auxiliary variables capturing intermediate elements.
 Now all the views of the examples of this `README.md` are built in static fields assignment.
-More usage examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java) and
-[HtmlLists](src/test/java/htmlflow/test/HtmlLists.java).
+More usage examples in [HtmlTables](src/test/java/htmlflow/test/views/HtmlTables.java) and
+[HtmlLists](src/test/java/htmlflow/test/views/HtmlLists.java).
 
 ### 2.0 (March, 2018)
 
