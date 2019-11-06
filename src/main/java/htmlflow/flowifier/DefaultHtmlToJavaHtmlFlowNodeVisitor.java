@@ -9,7 +9,19 @@ package htmlflow.flowifier;
  */
 public class DefaultHtmlToJavaHtmlFlowNodeVisitor extends AbstractHtmlToJavaHtmlFlowNodeVisitor<StringBuilder> {
 
+	/**
+	 * Constructor with indentation disabled
+	 */
 	public DefaultHtmlToJavaHtmlFlowNodeVisitor() {
-		super(StringBuilder::new);
+		this(false);
+	}
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param indented <code>true</code> if the generated HTML source code is indented, otherwise <code>false</code>
+	 */
+	public DefaultHtmlToJavaHtmlFlowNodeVisitor(final boolean indented) {
+		super(StringBuilder::new, indented);
 	}
 }

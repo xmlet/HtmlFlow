@@ -81,6 +81,8 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 	 */
 	private final Supplier<T> appendableSupplier;
 	
+	private final boolean indented;
+	
 	/**
 	 * appendable used to store the content of the Java class
 	 */
@@ -90,10 +92,12 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 	 * Constructor
 	 * 
 	 * @param appendableSupplier the supplier of the appendable, can create or get an appendable
+	 * @param indented <code>true</code> if the generated HTML source code is indented, otherwise <code>false</code>
 	 */
-	public AbstractHtmlToJavaHtmlFlowNodeVisitor(final Supplier<T> appendableSupplier) {
+	public AbstractHtmlToJavaHtmlFlowNodeVisitor(final Supplier<T> appendableSupplier, final boolean indented) {
 		super();
 		this.appendableSupplier = Objects.requireNonNull(appendableSupplier);
+		this.indented = indented;
 	}
 	
 	@Override
@@ -109,7 +113,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		appendable.append("import org.xmlet.htmlapifaster.*;\n\n");
 		appendable.append("public class Flowified {\n");
 		appendable.append("    public static HtmlView get() {\n");
-		appendable.append("        final HtmlView html = StaticHtml.view()\n");
+		appendable.append("        final HtmlView html = StaticHtml.view().setIndented(").append(Boolean.toString(indented)).append(")\n");
 	}
 	
 	@Override

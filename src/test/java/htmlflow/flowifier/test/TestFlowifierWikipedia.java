@@ -109,7 +109,8 @@ public class TestFlowifierWikipedia {
 			final String originalHtmlSourceCode = doc.root().outerHtml();
 			Logger.getLogger("htmlflow.flowifier.test").info(originalHtmlSourceCode);
 			// compares the original HTML to the generated HTML
-			Assert.assertTrue(originalHtmlSourceCode.replaceAll("\\s", "").equalsIgnoreCase(generatedHtmlSourceCode.replaceAll("\\s", "")));
+			Assert.assertTrue(originalHtmlSourceCode.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").equalsIgnoreCase(
+					          generatedHtmlSourceCode.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "")));
 		}
 	}
 }
