@@ -26,7 +26,7 @@ import junit.framework.Assert;
 import htmlflow.HtmlView;
 import htmlflow.flowifier.Flowifier;
 
-public class TestFlowifierWikipedia {
+public class TestFlowifier {
 
 	/**
      * A file object used to represent source coming from a string.
