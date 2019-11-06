@@ -14,6 +14,7 @@ import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.DocumentType;
+import org.jsoup.nodes.Entities;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.xmlet.htmlapifaster.EnumAutocompleteType;
@@ -255,8 +256,8 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 				if (node instanceof TextNode) {
 					final TextNode textNode = (TextNode) node;
 					appendable.append(".text(")
-							.append(convertJavaStringContentToJavaDeclarableString(textNode.getWholeText())).append(")")
-							.append("\n");
+							.append(convertJavaStringContentToJavaDeclarableString(Entities.escape(textNode.getWholeText()))).append(")")
+							.append("\n");textNode.toString();
 				} else if (node instanceof DataNode) {
 					final DataNode dataNode = (DataNode) node;
 					appendable.append(".text(")
