@@ -43,8 +43,7 @@ public class TestFlowifier {
          * @param code the source code for the compilation unit represented by this file object
          */
         private JavaSourceFromString(String name, String code) {
-            super(URI.create("string:///" + name.replace('.','/') + Kind.SOURCE.extension),
-                  Kind.SOURCE);
+            super(URI.create("string:///" + name.replace('.','/') + Kind.SOURCE.extension), Kind.SOURCE);
             this.code = code;
         }
 
@@ -88,13 +87,24 @@ public class TestFlowifier {
 			final byte[] classFileContent = Files.readAllBytes(classFilePath);
 			// deletes the class file to keep the workspace clean
 			classFileObject.delete();
-			// gets a mean of loading a class at runtime
+			// gets the class loader with the classpath containing the necessary third party dependencies
 			final ClassLoader classLoader = getClass().getClassLoader();
-			//FIXME create a brand new class loader, loads the classes from the classpath and the generated class into this class loader to get rid of the warning
-			final Method defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
-			defineClassMethod.setAccessible(true);
-			// loads the generated class into the current class loader
-			final Class<?> generatedClass = (Class<?>) defineClassMethod.invoke(classLoader, className, classFileContent, Integer.valueOf(0), Integer.valueOf(classFileContent.length));
+			// creates a custom class loader that knows the third party dependencies by using the previous class loader as parent
+			// such a class loader is necessary because it's impossible to modify an existing class loader without getting some warnings
+			final ClassLoader customClassLoader = new ClassLoader(classLoader) {
+				@Override
+                protected Class<?> findClass(final String name) throws ClassNotFoundException {
+					final Class<?> result;
+					if (name.equals(className)) {
+						result = defineClass(name, classFileContent, 0, classFileContent.length);
+					} else {
+						result = super.findClass(name);
+					}
+                    return result;
+                }
+			};
+			// loads the generated class into the custom class loader
+			final Class<?> generatedClass = customClassLoader.loadClass(className);
 			// gets the single declared method
 			final Method getHtmlViewMethod = generatedClass.getMethod("get");
 			// gets the HtmlView instance
