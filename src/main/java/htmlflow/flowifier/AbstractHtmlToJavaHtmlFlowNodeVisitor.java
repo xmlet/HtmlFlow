@@ -282,9 +282,9 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 							if (attrMethod == null) {
 								attrVal = null;
 							} else if (attrMethod.getParameterTypes()[0].equals(String.class)) {
-								attrVal = convertJavaStringContentToJavaDeclarableString(attribute.getValue());
+								attrVal = convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue()));
 							} else if (attrMethod.getParameterTypes()[0].equals(Boolean.class)) {
-								attrVal = attrKey.isEmpty() || attrKey.equalsIgnoreCase("true") ? "Boolean.TRUE" : "Boolean.FALSE";
+								attrVal = attribute.getValue().isEmpty() ? null : attribute.getValue().equalsIgnoreCase("true") ? "Boolean.TRUE" : "Boolean.FALSE";
 							} else if (attrMethod.getParameterTypes()[0].equals(Long.class)) {
 								attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
 							} else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {
@@ -298,7 +298,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 							if (attrMethod == null || attrVal == null) {
 								// uses the catch-all method addAttr() as no dedicated method exists
 								appendable.append(".addAttr(").append("\"").append(attrKey).append("\",")
-										.append(convertJavaStringContentToJavaDeclarableString(attribute.getValue()))
+										.append(convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue())))
 										.append(")");
 							} else {
 								// uses the dedicated method
@@ -312,6 +312,11 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		} catch (final IOException ioe) {
 			LOGGER.warning("Failed to append the Java source code, cause: " + ioe.getMessage());
 		}
+	}
+	
+	private String escapeInAttribute(final String unescaped) {
+		//FIXME ask JSoup's maintainer to expose a public method to escape the value of an attribute
+		return Entities.escape(unescaped).replace("\"", "&quot;");
 	}
 	
 	@Override
