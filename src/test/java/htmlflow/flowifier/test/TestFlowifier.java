@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.tools.JavaCompiler;
@@ -119,8 +120,16 @@ public class TestFlowifier {
 			final String originalHtmlSourceCode = doc.root().outerHtml();
 			Logger.getLogger("htmlflow.flowifier.test").info(originalHtmlSourceCode);
 			// compares the original HTML to the generated HTML
-			Assert.assertTrue(originalHtmlSourceCode.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").equalsIgnoreCase(
-					          generatedHtmlSourceCode.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "")));
+			Iterator<String> actual = Arrays
+					.stream(generatedHtmlSourceCode.split("<"))
+					.iterator();
+				Arrays
+					.stream(originalHtmlSourceCode.split("<"))
+					.forEach(expected -> {
+						Assert.assertEquals(
+							expected.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase(),
+							actual.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase());
+					});
 		}
 	}
 }
