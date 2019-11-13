@@ -52,7 +52,7 @@ import htmlflow.flowifier.Flowifier;
 
 public class TestFlowifier {
 
-	/**
+    /**
      * A file object used to represent source coming from a string.
      */
     private static final class JavaSourceFromString extends SimpleJavaFileObject {
@@ -63,11 +63,16 @@ public class TestFlowifier {
 
         /**
          * Constructs a new JavaSourceFromString.
-         * @param name the name of the compilation unit represented by this file object
-         * @param code the source code for the compilation unit represented by this file object
+         * 
+         * @param name
+         *            the name of the compilation unit represented by this file
+         *            object
+         * @param code
+         *            the source code for the compilation unit represented by
+         *            this file object
          */
         private JavaSourceFromString(String name, String code) {
-            super(URI.create("string:///" + name.replace('.','/') + Kind.SOURCE.extension), Kind.SOURCE);
+            super(URI.create("string:///" + name.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
             this.code = code;
         }
 
@@ -76,83 +81,84 @@ public class TestFlowifier {
             return code;
         }
     }
-	
+
     @Test
     public void testFlowifierTuerSourceforgeHomepage() throws Exception {
-		testFlowifier("http://tuer.sourceforge.net/en/");
-	}
-    
-	@Test
+        testFlowifier("http://tuer.sourceforge.net/en/");
+    }
+
+    @Test
     public void testFlowifierWikipediaHomepage() throws Exception {
-		testFlowifier("https://en.wikipedia.org");
-	}
-	
-	private void testFlowifier(final String url) throws Exception {
-		final Flowifier flowifier = new Flowifier();
-		final String htmlFlowJavaClassSourceCodeWithHtmlViewGetter = flowifier.toFlow(url);
-		// shows the generated Java source code
-		Logger.getLogger("htmlflow.flowifier.test").info(htmlFlowJavaClassSourceCodeWithHtmlViewGetter);
-		// compiles this Java class
-		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, StandardCharsets.UTF_8);
-		final String className = "Flowified";
-		final JavaSourceFromString compilationUnit = new JavaSourceFromString(className, htmlFlowJavaClassSourceCodeWithHtmlViewGetter);
-		final CompilationTask compilerTask = compiler.getTask(null, fileManager, null, 
-				Arrays.asList("-classpath",System.getProperty("java.class.path")), null, 
-				Collections.singletonList(compilationUnit));
-		final boolean compilationSuccessful = compilerTask.call();
-		Assert.assertTrue(compilationSuccessful);
-		if (compilationSuccessful) {
-			// gets the default location of the class files
-			final JavaFileObject classFileObject = fileManager.getJavaFileForOutput(StandardLocation.CLASS_OUTPUT, className, Kind.CLASS, null);
-			// gets the content of the generated class file
-			final URI classFileUri = classFileObject.toUri();
-			final Path classFilePath = Paths.get(classFileUri);
-			final byte[] classFileContent = Files.readAllBytes(classFilePath);
-			// deletes the class file to keep the workspace clean
-			classFileObject.delete();
-			// gets the class loader with the classpath containing the necessary third party dependencies
-			final ClassLoader classLoader = getClass().getClassLoader();
-			// creates a custom class loader that knows the third party dependencies by using the previous class loader as parent
-			// such a class loader is necessary because it's impossible to modify an existing class loader without getting some warnings
-			final ClassLoader customClassLoader = new ClassLoader(classLoader) {
-				@Override
+        testFlowifier("https://en.wikipedia.org");
+    }
+
+    private void testFlowifier(final String url) throws Exception {
+        final Flowifier flowifier = new Flowifier();
+        final String htmlFlowJavaClassSourceCodeWithHtmlViewGetter = flowifier.toFlow(url);
+        // shows the generated Java source code
+        Logger.getLogger("htmlflow.flowifier.test").info(htmlFlowJavaClassSourceCodeWithHtmlViewGetter);
+        // compiles this Java class
+        final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, StandardCharsets.UTF_8);
+        final String className = "Flowified";
+        final JavaSourceFromString compilationUnit = new JavaSourceFromString(className,
+                htmlFlowJavaClassSourceCodeWithHtmlViewGetter);
+        final CompilationTask compilerTask = compiler.getTask(null, fileManager, null,
+                Arrays.asList("-classpath", System.getProperty("java.class.path")), null,
+                Collections.singletonList(compilationUnit));
+        final boolean compilationSuccessful = compilerTask.call();
+        Assert.assertTrue(compilationSuccessful);
+        if (compilationSuccessful) {
+            // gets the default location of the class files
+            final JavaFileObject classFileObject = fileManager.getJavaFileForOutput(StandardLocation.CLASS_OUTPUT,
+                    className, Kind.CLASS, null);
+            // gets the content of the generated class file
+            final URI classFileUri = classFileObject.toUri();
+            final Path classFilePath = Paths.get(classFileUri);
+            final byte[] classFileContent = Files.readAllBytes(classFilePath);
+            // deletes the class file to keep the workspace clean
+            classFileObject.delete();
+            // gets the class loader with the classpath containing the necessary
+            // third party dependencies
+            final ClassLoader classLoader = getClass().getClassLoader();
+            // creates a custom class loader that knows the third party
+            // dependencies by using the previous class loader as parent
+            // such a class loader is necessary because it's impossible to
+            // modify an existing class loader without getting some warnings
+            final ClassLoader customClassLoader = new ClassLoader(classLoader) {
+                @Override
                 protected Class<?> findClass(final String name) throws ClassNotFoundException {
-					final Class<?> result;
-					if (name.equals(className)) {
-						result = defineClass(name, classFileContent, 0, classFileContent.length);
-					} else {
-						result = super.findClass(name);
-					}
+                    final Class<?> result;
+                    if (name.equals(className)) {
+                        result = defineClass(name, classFileContent, 0, classFileContent.length);
+                    } else {
+                        result = super.findClass(name);
+                    }
                     return result;
                 }
-			};
-			// loads the generated class into the custom class loader
-			final Class<?> generatedClass = customClassLoader.loadClass(className);
-			// gets the single declared method
-			final Method getHtmlViewMethod = generatedClass.getMethod("get");
-			// gets the HtmlView instance
-			final HtmlView<?> htmlView = (HtmlView<?>) getHtmlViewMethod.invoke(null);
-			// disables the indentation for testing purposes
-			htmlView.setIndented(false);
-			// gets the HTML source code generated by HtmlFlow
-			final String generatedHtmlSourceCode = htmlView.render();
-			Logger.getLogger("htmlflow.flowifier.test").info(generatedHtmlSourceCode);
-			// gets the original HTML document
-			final Document doc = Jsoup.connect(url).get();
-			final String originalHtmlSourceCode = doc.root().outerHtml();
-			Logger.getLogger("htmlflow.flowifier.test").info(originalHtmlSourceCode);
-			// compares the original HTML to the generated HTML
-			Iterator<String> actual = Arrays
-					.stream(generatedHtmlSourceCode.split("<"))
-					.iterator();
-				Arrays
-					.stream(originalHtmlSourceCode.split("<"))
-					.forEach(expected -> {
-						Assert.assertEquals(
-							expected.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase(),
-							actual.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase());
-					});
-		}
-	}
+            };
+            // loads the generated class into the custom class loader
+            final Class<?> generatedClass = customClassLoader.loadClass(className);
+            // gets the single declared method
+            final Method getHtmlViewMethod = generatedClass.getMethod("get");
+            // gets the HtmlView instance
+            final HtmlView<?> htmlView = (HtmlView<?>) getHtmlViewMethod.invoke(null);
+            // disables the indentation for testing purposes
+            htmlView.setIndented(false);
+            // gets the HTML source code generated by HtmlFlow
+            final String generatedHtmlSourceCode = htmlView.render();
+            Logger.getLogger("htmlflow.flowifier.test").info(generatedHtmlSourceCode);
+            // gets the original HTML document
+            final Document doc = Jsoup.connect(url).get();
+            final String originalHtmlSourceCode = doc.root().outerHtml();
+            Logger.getLogger("htmlflow.flowifier.test").info(originalHtmlSourceCode);
+            // compares the original HTML to the generated HTML
+            Iterator<String> actual = Arrays.stream(generatedHtmlSourceCode.split("<")).iterator();
+            Arrays.stream(originalHtmlSourceCode.split("<")).forEach(expected -> {
+                Assert.assertEquals(
+                        expected.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase(),
+                        actual.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase());
+            });
+        }
+    }
 }
