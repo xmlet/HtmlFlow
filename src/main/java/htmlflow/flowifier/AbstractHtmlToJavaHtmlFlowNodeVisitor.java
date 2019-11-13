@@ -179,21 +179,19 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 	    result.append('"');
 	    for (int i = 0; i < value.length(); i++) {
 	      char c = value.charAt(i);
-	      // trivial case: single quote must not be escaped
 	      if (c == '\'') {
+	    	  // trivial case: single quote must not be escaped
 	        result.append("'");
-	        continue;
-	      }
-	      // trivial case: double quotes must be escaped
-	      if (c == '\"') {
+	      } else if (c == '\"') {
+	    	  // trivial case: double quotes must be escaped
 	        result.append("\\\"");
-	        continue;
-	      }
+	      } else {
 	      // default case: just let character literal do its work
 	      result.append(characterLiteralWithoutSingleQuotes(c));
 	      // need to append indent after linefeed?
 	      if (c == '\n' && i + 1 < value.length()) {
 	        result.append("\"\n").append(indent).append(indent).append("+ \"");
+	      }
 	      }
 	    }
 	    result.append('"');
@@ -249,7 +247,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 	public Method getMethodFromAttribute(Class<?> nodeClass, Attribute attribute) {
 		final String attrKey = attribute.getKey();
 		final String attrMethodName = "attr" + attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH) + attrKey.substring(1);
-		final Method attrMethod = Arrays.stream(nodeClass.getMethods())
+		return Arrays.stream(nodeClass.getMethods())
 		      .filter((final Method method) -> method.getName().equals(attrMethodName) && 
 		    		                           method.getParameterCount() == 1 && 
 		    		                           Stream.concat(Stream.of(String.class, Boolean.class, Long.class, Integer.class), 
@@ -257,7 +255,6 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		    		                                 .anyMatch((final Class candidateClass) -> candidateClass.equals(method.getParameterTypes()[0])))
 		      .findFirst()
 		      .orElse(null);
-		return attrMethod;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -307,7 +304,13 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 							} else if (attrMethod.getParameterTypes()[0].equals(String.class)) {
 								attrVal = convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue()));
 							} else if (attrMethod.getParameterTypes()[0].equals(Boolean.class)) {
-								attrVal = attribute.getValue().isEmpty() ? null : attribute.getValue().equalsIgnoreCase("true") ? "Boolean.TRUE" : "Boolean.FALSE";
+								if (attribute.getValue() == null || attribute.getValue().isEmpty()) {
+									attrVal = null;
+								} else if (attribute.getValue().equalsIgnoreCase("true")) {
+									attrVal = "Boolean.TRUE";
+								} else {
+									attrVal = "Boolean.FALSE";
+								}
 							} else if (attrMethod.getParameterTypes()[0].equals(Long.class)) {
 								attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
 							} else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {

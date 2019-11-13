@@ -54,8 +54,7 @@ public class Flowifier {
 	 */
 	public <T extends Appendable> T toFlow(final Node node, final HtmlToJavaHtmlFlowNodeVisitor<T> htmlToJavaHtmlFlowNodeVisitor) {
 		node.traverse(htmlToJavaHtmlFlowNodeVisitor);
-		final T result = htmlToJavaHtmlFlowNodeVisitor.getAppendable();
-		return result;
+		return htmlToJavaHtmlFlowNodeVisitor.getAppendable();
 	}
 	
 	/**
