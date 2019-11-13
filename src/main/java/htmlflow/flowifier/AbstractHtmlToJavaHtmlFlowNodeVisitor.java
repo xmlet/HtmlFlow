@@ -257,7 +257,6 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 		      .orElse(null);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void head(final Node node, final int depth) {
 		try {
@@ -295,41 +294,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 					// if the class has been found
 					if (nodeClass != null) {
 					    for (final Attribute attribute : node.attributes().asList()) {
-					    	// uses the class to look for the name of the method for this attribute
-					    	final Method attrMethod = getMethodFromAttribute(nodeClass, attribute);
-							final String attrKey = attribute.getKey();
-							final String attrVal;
-							if (attrMethod == null) {
-								attrVal = null;
-							} else if (attrMethod.getParameterTypes()[0].equals(String.class)) {
-								attrVal = convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue()));
-							} else if (attrMethod.getParameterTypes()[0].equals(Boolean.class)) {
-								if (attribute.getValue() == null || attribute.getValue().isEmpty()) {
-									attrVal = null;
-								} else if (attribute.getValue().equalsIgnoreCase("true")) {
-									attrVal = "Boolean.TRUE";
-								} else {
-									attrVal = "Boolean.FALSE";
-								}
-							} else if (attrMethod.getParameterTypes()[0].equals(Long.class)) {
-								attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
-							} else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {
-								attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
-							} else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
-								attrVal = toEnumAttributeValue((Class<? extends EnumInterface<String>>) attrMethod.getParameterTypes()[0], attribute);
-							} else {
-								attrVal = null;
-							}
-							// if the value hasn't been identified as a known value of a typed attribute
-							if (attrMethod == null || attrVal == null) {
-								// uses the catch-all method addAttr() as no dedicated method exists
-								appendable.append(".addAttr(").append("\"").append(attrKey).append("\",")
-										.append(convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue())))
-										.append(")");
-							} else {
-								// uses the dedicated method
-								appendable.append(".").append(attrMethod.getName()).append("(").append(attrVal).append(")");
-							}
+					    	appendAttribute(attribute, nodeClass);
 						}
 					}
 					appendable.append("\n");
@@ -343,6 +308,46 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 	private String escapeInAttribute(final String unescaped) {
 		//FIXME ask JSoup's maintainer to expose a public method to escape the value of an attribute
 		return Entities.escape(unescaped).replace("\"", "&quot;");
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void appendAttribute(final Attribute attribute, final Class<?> nodeClass) throws IOException {
+		// uses the class to look for the name of the method for this attribute
+    	final Method attrMethod = getMethodFromAttribute(nodeClass, attribute);
+		final String attrKey = attribute.getKey();
+		final String attrVal;
+		if (attrMethod == null) {
+			attrVal = null;
+		} else if (attrMethod.getParameterTypes()[0].equals(String.class)) {
+			attrVal = convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue()));
+		} else if (attrMethod.getParameterTypes()[0].equals(Boolean.class)) {
+			if (attribute.getValue() == null || attribute.getValue().isEmpty()) {
+				attrVal = null;
+			} else if (attribute.getValue().equalsIgnoreCase("true")) {
+				attrVal = "Boolean.TRUE";
+			} else {
+				attrVal = "Boolean.FALSE";
+			}
+		} else if (attrMethod.getParameterTypes()[0].equals(Long.class)) {
+			attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
+		} else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {
+			attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
+		} else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
+			attrVal = toEnumAttributeValue((Class<? extends EnumInterface<String>>) attrMethod.getParameterTypes()[0], attribute);
+		} else {
+			attrVal = null;
+		}
+		// if the value hasn't been identified as a known value of a typed attribute
+		if (attrMethod == null || attrVal == null) {
+			// uses the catch-all method addAttr() as no dedicated method exists
+			appendable.append(".addAttr(").append("\"").append(attrKey).append("\",")
+					.append(convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue())))
+					.append(")");
+		} else {
+			// uses the dedicated method
+			appendable.append(".").append(attrMethod.getName()).append("(").append(attrVal).append(")");
+		}
 	}
 	
 	@Override

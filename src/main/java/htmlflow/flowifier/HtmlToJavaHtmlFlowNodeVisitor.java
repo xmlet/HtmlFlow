@@ -53,6 +53,14 @@ public interface HtmlToJavaHtmlFlowNodeVisitor<T extends Appendable> extends Nod
 	 */
 	void appendFooter() throws IOException;
 	/**
+	 * Appends the attribute value and key
+	 * 
+	 * @param attribute the attribute
+	 * @param nodeClass the class of the node
+	 * @throws IOException thrown when something wrong occurs while appending the Java source code
+	 */
+	void appendAttribute(Attribute attribute, Class<?> nodeClass) throws IOException;
+	/**
 	 * Tells whether a JSoup node cannot be closed
 	 * 
 	 * @param node the JSoup node
