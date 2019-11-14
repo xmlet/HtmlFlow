@@ -153,12 +153,13 @@ public class TestFlowifier {
             final String originalHtmlSourceCode = doc.root().outerHtml();
             Logger.getLogger("htmlflow.flowifier.test").info(originalHtmlSourceCode);
             // compares the original HTML to the generated HTML
-            Iterator<String> actual = Arrays.stream(generatedHtmlSourceCode.split("<")).iterator();
-            Arrays.stream(originalHtmlSourceCode.split("<")).forEach(expected -> {
-                Assert.assertEquals(
-                        expected.replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase(),
-                        actual.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase());
-            });
+            final Iterator<String> expected = Arrays.stream(originalHtmlSourceCode.split("<")).iterator();
+            final Iterator<String> actual = Arrays.stream(generatedHtmlSourceCode.split("<")).iterator();
+            while (expected.hasNext() || actual.hasNext()) {
+                final String expectedPart = expected.hasNext() ? expected.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase() : "";
+                final String actualPart = actual.hasNext() ? actual.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase() : "";
+                Assert.assertEquals(expectedPart, actualPart);
+            }
         }
     }
 }
