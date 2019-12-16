@@ -25,6 +25,10 @@ public class HtmlPartials {
     }
 
 
+    /**
+     * This unit test was only a sample for a paper.
+     */
+    @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testPartials() {
         HtmlTemplate<Stream<Track>> tracksTemplate = (view , tracks, partials) -> view

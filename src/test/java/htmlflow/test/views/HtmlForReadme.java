@@ -44,6 +44,10 @@ import java.util.stream.Stream;
 
 public class HtmlForReadme {
 
+    /**
+     * This unit test does not contain any assertion because it is only a sample to use in README.md.
+     */
+    @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample01() {
         String html= StaticHtml
@@ -63,7 +67,10 @@ public class HtmlForReadme {
             .render();
         // System.out.println(html);
     }
-
+    /**
+     * This unit test does not contain any assertion because it is only a sample to use in README.md.
+     */
+    @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample02() throws IOException {
         String html = view.render();        // 1) Get a string with the HTML
@@ -89,6 +96,10 @@ public class HtmlForReadme {
                     .__() //body
                 .__()); // html
 
+    /**
+     * This unit test does not contain any assertion because it is only a sample to use in README.md.
+     */
+    @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample03() throws IOException {
         HtmlView<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
@@ -107,6 +118,10 @@ public class HtmlForReadme {
 
     static HtmlView<Stream<Task>> tasksTableView = DynamicHtml.view(HtmlForReadme::tasksTableTemplate);
 
+    /**
+     * This unit test does not contain any assertion because it is only a sample to use in README.md.
+     */
+    @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample04() throws IOException {
         Stream<Task> tasks = Stream.of(

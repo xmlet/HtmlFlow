@@ -24,7 +24,22 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.Area;
+import org.xmlet.htmlapifaster.Base;
+import org.xmlet.htmlapifaster.Br;
+import org.xmlet.htmlapifaster.Col;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.ElementVisitor;
+import org.xmlet.htmlapifaster.Embed;
+import org.xmlet.htmlapifaster.Hr;
+import org.xmlet.htmlapifaster.Img;
+import org.xmlet.htmlapifaster.Input;
+import org.xmlet.htmlapifaster.Link;
+import org.xmlet.htmlapifaster.Meta;
+import org.xmlet.htmlapifaster.Param;
+import org.xmlet.htmlapifaster.Root;
+import org.xmlet.htmlapifaster.Source;
+import org.xmlet.htmlapifaster.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +80,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /**
      * A cache list of static html blocks.
      */
-    private final List<HtmlVisitorStringBuilder.HtmlBlockInfo> cacheBlocksList = new ArrayList<>();
+    private final List<HtmlBlockInfo> cacheBlocksList = new ArrayList<>();
     /**
      * The current index in cacheBlocksList corresponding to a static HTML block.
      */
@@ -172,14 +187,14 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
 
         openDynamic = true;
         if (isCached){
-            HtmlVisitorStringBuilder.HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
+            HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
             this.write(block.html);
             this.depth = block.currentDepth;
             this.isClosed = block.isClosed;
             ++cacheIndex;
         } else {
             String staticBlock = substring(staticBlockIndex);
-            cacheBlocksList.add(new HtmlVisitorStringBuilder.HtmlBlockInfo(staticBlock, depth, isClosed));
+            cacheBlocksList.add(new HtmlBlockInfo(staticBlock, depth, isClosed));
         }
     }
 
@@ -240,7 +255,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
 
     final String finished(){
         if (isCached && cacheIndex <= cacheBlocksList.size()){
-            HtmlVisitorStringBuilder.HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
+            HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
             write(block.html);
             isClosed = block.isClosed;
             depth = block.currentDepth;
@@ -248,7 +263,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
 
         if (!isCached){
             String staticBlock = substring(staticBlockIndex);
-            cacheBlocksList.add(new HtmlVisitorStringBuilder.HtmlBlockInfo(staticBlock, depth, isClosed));
+            cacheBlocksList.add(new HtmlBlockInfo(staticBlock, depth, isClosed));
             isCached = true;
         }
 
