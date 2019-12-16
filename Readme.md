@@ -33,8 +33,17 @@ Check out the performance results in the most popular benchmarks at
 [spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines)
 and our fork of
 [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
-You can find more comparison details in DZone article about [Modern Type-Safe
-Template Engines](https://dzone.com/articles/modern-type-safe-template-engines).
+
+## References
+
+* 2019, [HoT: Unleash Web Views with Higher-order Templates](https://scholar.google.com/scholar?cluster=972807510162637933),
+[15th WebIst](http://www.webist.org/?y=2019) conference, 2019, Viena -- This paper highlights
+the compositional nature of HtmlFlow to compose templates through higher-order functions. 
+* 2018, [Domain Specific Language generation based on a XML 
+Schema](https://www.slideshare.net/LuisDuarte105/domain-specific-language-generation-based-on-a-xml-schema) -- Slides
+of the MsC thesis presentation of Luís Duarte.
+* 2018, [Modern Type-Safe Template Engines](https://dzone.com/articles/modern-type-safe-template-engines) -- You can find
+more details in this DZone article about performance comparison.
 
 [Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
 built with the support of `htmlflow.DynamicHtml`.
