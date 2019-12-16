@@ -35,7 +35,7 @@ and our fork of
 [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
 
 Since the release 3.4 you can also automatically translate an HTML source to the corresponding HtmlFlow definition through
-the [`Flowifier`]((src/main/java/htmlflow/flowifier/Flowifier.java)) utility methods, such as **`Flowifier.fromHtml(html)`**,
+the [`Flowifier`](src/main/java/htmlflow/flowifier/Flowifier.java) utility methods, such as **`Flowifier.fromHtml(html)`**,
 which produces the above HtmlFlow sample given the following `html` variable:
 `String html = <html><head><title>HtmlFlow</title></head><body><div class="container"><h1>My first page with HtmlFlow</h1><img src="https://avatars1.githubusercontent.com/u/35267172"><p>Typesafe is awesome! :-)</p></div></body></html>`.
 
