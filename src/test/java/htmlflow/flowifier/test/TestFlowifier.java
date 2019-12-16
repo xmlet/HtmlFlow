@@ -23,6 +23,23 @@
  */
 package htmlflow.flowifier.test;
 
+import htmlflow.HtmlView;
+import htmlflow.flowifier.Flowifier;
+import htmlflow.test.Utils;
+import junit.framework.Assert;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.junit.Test;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileObject;
+import javax.tools.JavaFileObject.Kind;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -34,21 +51,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.tools.JavaCompiler;
-import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
-import javax.tools.ToolProvider;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.junit.Test;
-import junit.framework.Assert;
-import htmlflow.HtmlView;
-import htmlflow.flowifier.Flowifier;
+import static junit.framework.Assert.assertEquals;
 
 public class TestFlowifier {
 
@@ -90,6 +93,31 @@ public class TestFlowifier {
     @Test
     public void testFlowifierWikipediaHomepage() throws Exception {
         testFlowifier("https://en.wikipedia.org");
+    }
+
+    @Test
+    public void testSample05ForFlowifier() throws IOException {
+        String src = "<!DOCTYPE html>" +
+            "<html>" +
+            "<head><title>HtmlFlow</title></head>" +
+            "<body>" +
+            "<div class=\"container\">" +
+            "<h1>My first page with HtmlFlow</h1>" +
+            "<img src=\"https://avatars1.githubusercontent.com/u/35267172\">" +
+            "<p>Typesafe is awesome! :-)</p>" +
+            "</div>" +
+            "</body>" +
+            "</html>";
+        String actual = Flowifier.fromHtml(src);
+        Iterator<String> iter = Arrays.asList(actual.split("\n")).iterator();
+        Assert.assertEquals(true, iter.hasNext());
+        Utils
+                .loadLines("htmlflowSample05ForFlowifier.java")
+                .forEach(expected -> {
+                    String line = iter.next();
+                    assertEquals(expected, line);
+                });
+        Assert.assertEquals(false, iter.hasNext());
     }
 
     private void testFlowifier(final String url) throws Exception {

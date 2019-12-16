@@ -23,11 +23,11 @@
  */
 package htmlflow.flowifier;
 
-import java.io.IOException;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
+
+import java.io.IOException;
 
 /**
  * Main class of the flowifier used to convert a whole document or the content
@@ -123,8 +123,8 @@ public class Flowifier {
      * Returns the Java source code of a class that generates the HTML source
      * code of the document at the given URL
      * 
-     * @param the
-     *            URL of the document
+     * @param url
+     *            the URL of the document
      * @return the Java source code of a class that generates the HTML source
      *         code of the document at the given URL
      * @throws IOException
@@ -135,5 +135,19 @@ public class Flowifier {
         final DefaultHtmlToJavaHtmlFlowNodeVisitor visitor = new DefaultHtmlToJavaHtmlFlowNodeVisitor();
         final StringBuilder builder = toFlow(url, visitor);
         return builder.toString();
+    }
+
+    /**
+     * Returns the Java source code of a class that generates the HTML source
+     * code of the given source.
+     *
+     * @param src
+     *            the HTML whose content has to be converted
+     * @return the Java source code of a class that generates the HTML source
+     *         code of the given source.
+     */
+    public static String fromHtml(final String src) {
+        Flowifier flw = new Flowifier();
+        return flw.toFlow(Jsoup.parse(src));
     }
 }

@@ -31,11 +31,7 @@ import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
 
-import java.awt.*;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
