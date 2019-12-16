@@ -64,13 +64,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <argLine>-Xss16m</argLine>
     </properties>
     <build>
         <plugins>
             <plugin>
               <artifactId>maven-surefire-plugin</artifactId>
               <configuration>
-                <argLine>-Xss16m</argLine>
                 <systemProperties>
                   <property>
                     <name>java.util.logging.config.file</name>
@@ -121,7 +121,12 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
-              <version>3.0.1</version>
+              <version>3.1.1</version>
+              <configuration>
+                  <additionalOptions>
+                    <additionalOption>-Xdoclint:none</additionalOption>
+                </additionalOptions>
+              </configuration>
               <executions>
                 <execution>
                   <id>attach-javadocs</id>
@@ -134,7 +139,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.2</version>
+                <version>0.8.4</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
