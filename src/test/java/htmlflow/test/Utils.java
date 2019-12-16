@@ -23,14 +23,21 @@
  */
 package htmlflow.test;
 
-import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -61,7 +68,7 @@ public class Utils {
         return NEWLINE.splitAsStream(html);
     }
 
-    static Stream<String> loadLines(String path) {
+    public static Stream<String> loadLines(String path) {
         try{
             InputStream in = TestDivDetails.class
                     .getClassLoader()

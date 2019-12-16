@@ -80,6 +80,13 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
     }
 
     private final HtmlVisitorCache visitor;
+    /**
+     * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
+     * The given example deals with a static field of ThreadLocal which persists beyond an instance.
+     * In this case the ThreadLocal is hold in an instance field and should stay with all
+     * thread local instances during its entire life cycle.
+     */
+    @java.lang.SuppressWarnings("squid:S5164")
     private final ThreadLocal<HtmlVisitorCache> threadLocalVisitor;
     private final Supplier<HtmlVisitorCache> visitorSupplier;
     private final boolean threadSafe;

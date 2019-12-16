@@ -33,8 +33,23 @@ Check out the performance results in the most popular benchmarks at
 [spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines)
 and our fork of
 [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
-You can find more comparison details in DZone article about [Modern Type-Safe
-Template Engines](https://dzone.com/articles/modern-type-safe-template-engines).
+
+Since the release 3.4 you can also automatically translate an HTML source to the corresponding HtmlFlow definition through
+the [`Flowifier`](src/main/java/htmlflow/flowifier/Flowifier.java) utility methods, such as **`Flowifier.fromHtml(html)`**,
+which produces the above HtmlFlow sample given the following `html` variable:
+`String html = <html><head><title>HtmlFlow</title></head><body><div class="container"><h1>My first page with HtmlFlow</h1><img src="https://avatars1.githubusercontent.com/u/35267172"><p>Typesafe is awesome! :-)</p></div></body></html>`.
+
+
+## References
+
+* 2019, [HoT: Unleash Web Views with Higher-order Templates](https://scholar.google.com/scholar?cluster=972807510162637933),
+[15th WebIst](http://www.webist.org/?y=2019) conference, 2019, Viena - This paper highlights
+the compositional nature of HtmlFlow to compose templates through higher-order functions. 
+* 2018, [Domain Specific Language generation based on a XML 
+Schema](https://www.slideshare.net/LuisDuarte105/domain-specific-language-generation-based-on-a-xml-schema) - Slides
+of the MsC thesis presentation of Luís Duarte.
+* 2018, [Modern Type-Safe Template Engines](https://dzone.com/articles/modern-type-safe-template-engines) - You can find
+more details in this DZone article about performance comparison.
 
 [Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
 built with the support of `htmlflow.DynamicHtml`.
@@ -256,6 +271,10 @@ Check out one of our use cases of partial views in the template function
 ## Changelog
 
 
+### 3.4 (December, 2019)
+
+First release of _Flowifier_ an HTML to HtmlFlow translator, developed by Julien Gouesse. [Issue 43](https://github.com/xmlet/HtmlFlow/issues/43)
+
 ### 3.3 (August, 2019)
 
 * Upgrade to Java 11.
@@ -325,8 +344,8 @@ and add it as child of that `HtmlView`.
 * All these features together with the existing `º()` make possible to build a view in a single
 pass, reducing the number of auxiliary variables capturing intermediate elements.
 Now all the views of the examples of this `README.md` are built in static fields assignment.
-More usage examples in [HtmlTables](src/test/java/htmlflow/test/HtmlTables.java) and
-[HtmlLists](src/test/java/htmlflow/test/HtmlLists.java).
+More usage examples in [HtmlTables](src/test/java/htmlflow/test/views/HtmlTables.java) and
+[HtmlLists](src/test/java/htmlflow/test/views/HtmlLists.java).
 
 ### 2.0 (March, 2018)
 
