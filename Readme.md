@@ -46,7 +46,7 @@ which produces the above HtmlFlow sample given the following `html` variable:
 [15th WebIst](http://www.webist.org/?y=2019) conference, 2019, Viena - This paper highlights
 the compositional nature of HtmlFlow to compose templates through higher-order functions. 
 * 2018, [Domain Specific Language generation based on a XML 
-Schema](https://www.slideshare.net/LuisDuarte105/domain-specific-language-generation-based-on-a-xml-schema) - Slides
+Schema](https://www.slideshare.net/LuisDuarte105/domain-specific-language-generation-based-on-a-xml-schema-208756986) - Slides
 of the MsC thesis presentation of Luís Duarte.
 * 2018, [Modern Type-Safe Template Engines](https://dzone.com/articles/modern-type-safe-template-engines) - You can find
 more details in this DZone article about performance comparison.
