@@ -6,25 +6,55 @@
 
 [**HtmlFlow**](https://htmlflow.org/) is a Java DSL to write typesafe HTML
 documents in a fluent style.
-Use one of its `view()` factory methods to get started with HtmlFlow: 
+Use one of its `view()` factory methods to get started with HtmlFlow, such as the following sample,
+which produces the HTML on the right side.
+Use the utility `Flowifier.fromHtml(html)` to get the HtmlFlow definition from the
+corresponding HTML source code ([`Flowifier`](src/main/java/htmlflow/flowifier/Flowifier.java) since
+the release 3.4).
 
-```java
-String html = StaticHtml
-                .view()
-                    .html()
-                        .head()
-                            .title().text("HtmlFlow").__()
-                        .__() //head
-                        .body()
-                            .div().attrClass("container")
-                                .h1().text("My first page with HtmlFlow").__()
-                                .img().attrSrc("https://avatars1.githubusercontent.com/u/35267172").__()
-                                .p().text("Typesafe is awesome! :-)").__()
-                            .__()
-                        .__() //body
-                    .__() //html
-                .render();
-```
+<table class="table">
+    <tr class="row">
+        <td>
+            <div class="highlight highlight-source-java">
+            <pre>
+StaticHtml
+    .view()
+        .html()
+            .head()
+                .title().text("HtmlFlow").__()
+            .__() //head
+            .body()
+                .div().attrClass("container")
+                    .h1().text("My first page with HtmlFlow").__()
+                    .img().attrSrc("http://bit.ly/2MoHwrU").__()
+                    .p().text("Typesafe is awesome! :-)").__()
+                .__()
+            .__() //body
+        .__() //html
+    .render();
+            </pre>
+            </div>
+        </td>
+        <td>
+            <div class="highlight highlight-text-html-basic">
+            <pre>
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;HtmlFlow&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class=&quot;container&quot;&gt;
+            &lt;h1&gt;My first page with HtmlFlow&lt;/h1&gt;
+            &lt;img src=&quot;http://bit.ly/2MoHwrU&quot;&gt;
+            &lt;p&gt;Typesafe is awesome! :-)&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+            </pre>
+            </div>
+        </td>
+    </tr>
+</table>
 
 Finally HtmlFlow is the **most performant** engine among state of the art template
 engines like Velocity, Thymleaf, Mustache, etc and other DSL libraries for HTML such
@@ -33,12 +63,6 @@ Check out the performance results in the most popular benchmarks at
 [spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines)
 and our fork of
 [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
-
-Since the release 3.4 you can also automatically translate an HTML source to the corresponding HtmlFlow definition through
-the [`Flowifier`](src/main/java/htmlflow/flowifier/Flowifier.java) utility methods, such as **`Flowifier.fromHtml(html)`**,
-which produces the above HtmlFlow sample given the following `html` variable:
-`String html = <html><head><title>HtmlFlow</title></head><body><div class="container"><h1>My first page with HtmlFlow</h1><img src="https://avatars1.githubusercontent.com/u/35267172"><p>Typesafe is awesome! :-)</p></div></body></html>`.
-
 
 ## References
 
