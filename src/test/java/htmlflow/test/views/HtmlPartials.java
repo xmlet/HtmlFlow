@@ -45,7 +45,7 @@ public class HtmlPartials {
 
 
         Stream<Track> tracks = Stream.of(new Track("Space Odyssey"), new Track("Bad"), new Track("Under Pressure"));
-        var tracksView = DynamicHtml.view(tracksTemplate);
+        DynamicHtml<Stream<Track>> tracksView = DynamicHtml.view(tracksTemplate);
         String html = tracksView.render(tracks, footerView(bbView));
         System.out.println(html);
     }

@@ -98,7 +98,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.4</version>
+    <version>3.5</version>
 </dependency>
 ```
 
@@ -294,6 +294,12 @@ Check out one of our use cases of partial views in the template function
 
 ## Changelog
 
+
+### 3.5 (January, 2020)
+
+Downgraded to target Java runtime 1.8. Some applications, such as
+[spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines)
+don't support higher versions.
 
 ### 3.4 (December, 2019)
 
