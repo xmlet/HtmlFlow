@@ -64,6 +64,9 @@ Check out the performance results in the most popular benchmarks at
 and our fork of
 [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
 
+Check the implementation of the sample Spring-based pet clinic with HtmlFlow views [xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic).
+You can found different kinds of dynamic views [there](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
+
 ## References
 
 * 2019, [HoT: Unleash Web Views with Higher-order Templates](https://scholar.google.com/scholar?cluster=972807510162637933),
