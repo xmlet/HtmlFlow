@@ -3,55 +3,67 @@
 [![Build Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.xmlet%3Ahtmlflow)
 [![Maven Central Version](https://maven-badges.herokuapp.com/maven-central/com.github.xmlet/htmlflow/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
+[![Petclinic Sample](https://img.shields.io/badge/petclinic-Spring%20boot%20sample%20with%20HtmlFlow-blue)](https://github.com/xmlet/spring-petclinic)
 
 [**HtmlFlow**](https://htmlflow.org/) is a Java DSL to write typesafe HTML
 documents in a fluent style.
 Use one of its `view()` factory methods to get started with HtmlFlow, such as the following sample,
 which produces the HTML on the right side.
-Use the utility `Flowifier.fromHtml(html)` to get the HtmlFlow definition from the
-corresponding HTML source code ([`Flowifier`](src/main/java/htmlflow/flowifier/Flowifier.java) since
-the release 3.4).
+Use the utility `Flowifier.toFlow(url)` to get the HtmlFlow definition from the
+corresponding HTML source:
 
 <table class="table">
+    <tr>
+        <td colspan="2" align="center">
+            <code>view.render()</code>&nbsp &#8628
+        </td>
+    </tr>
     <tr class="row">
         <td>
-            <div class="highlight highlight-source-java">
-            <pre>
-StaticHtml
-    .view()
-        .html()
-            .head()
-                .title().text("HtmlFlow").__()
-            .__() //head
-            .body()
-                .div().attrClass("container")
-                    .h1().text("My first page with HtmlFlow").__()
-                    .img().attrSrc("http://bit.ly/2MoHwrU").__()
-                    .p().text("Typesafe is awesome! :-)").__()
-                .__()
-            .__() //body
-        .__() //html
-    .render();
-            </pre>
-            </div>
-        </td>
-        <td>
-            <div class="highlight highlight-text-html-basic">
-            <pre>
-&lt;html&gt;
-    &lt;head&gt;
-        &lt;title&gt;HtmlFlow&lt;/title&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-        &lt;div class=&quot;container&quot;&gt;
-            &lt;h1&gt;My first page with HtmlFlow&lt;/h1&gt;
-            &lt;img src=&quot;http://bit.ly/2MoHwrU&quot;&gt;
-            &lt;p&gt;Typesafe is awesome! :-)&lt;/p&gt;
-        &lt;/div&gt;
-    &lt;/body&gt;
-&lt;/html&gt;
-            </pre>
-            </div>
+            
+```java
+HtmlView view = StaticHtml
+  .view()
+    .html()
+      .head()
+        .title().text("HtmlFlow").__()
+      .__() //head
+      .body()
+        .div().attrClass("container")
+          .h1().text("My first page with HtmlFlow").__()
+          .img().attrSrc("http://bit.ly/2MoHwrU").__()
+          .p().text("Typesafe is awesome! :-)").__()
+        .__() //div
+      .__() //body
+    .__(); //html
+```
+
+</td>
+<td>
+
+```html
+
+
+<html>
+    <head>
+        <title>HtmlFlow</title>
+    </head>
+    <body>
+        <div class="container">
+            <h1>My first page with HtmlFlow</h1>
+            <img src="http://bit.ly/2MoHwrU">
+            <p>Typesafe is awesome! :-)</p>
+        </div>
+    </body>
+</html>
+
+```
+
+</td>
+</tr>
+    <tr>
+        <td colspan="2" align="center">
+            &#8632 &nbsp<code>Flowifier.toFlow(url)</code>
         </td>
     </tr>
 </table>
@@ -64,8 +76,8 @@ Check out the performance results in the most popular benchmarks at
 and our fork of
 [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
 
-Check the implementation of the sample Spring-based pet clinic with HtmlFlow views [xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic).
-You can found different kinds of dynamic views [there](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
+Check the implementation of the sample Spring-based petclinic with HtmlFlow views [xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic).
+You can find different kinds of dynamic views [there](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
 
 ## References
 
@@ -80,7 +92,7 @@ more details in this DZone article about performance comparison.
 
 [Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
 built with the support of `htmlflow.DynamicHtml`.
-Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find more complex views with dynamic partial blocks.
+Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find more complex views with dynamic partial blocks or check some examples of [petclinic views](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
 
 ## Table of Contents
 
