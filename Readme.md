@@ -82,7 +82,7 @@ You can find different kinds of dynamic views [there](https://github.com/xmlet/s
 
 ## References
 
-* 2019, [HoT: Unleash Web Views with Higher-order Templates](https://scholar.google.com/scholar?cluster=972807510162637933),
+* 2019, [HoT: Unleash Web Views with Higher-order Templates](https://www.scitepress.org/Link.aspx?doi=10.5220/0008167701180129),
 [15th WebIst](http://www.webist.org/?y=2019) conference, 2019, Viena - This paper highlights
 the compositional nature of HtmlFlow to compose templates through higher-order functions. 
 * 2018, [Domain Specific Language generation based on a XML 
