@@ -32,7 +32,7 @@ the same HTML view to be bound with different object models.
 
 #### Output approaches
 
-Consider the definition of the following view that is late rendered by the function 
+Consider the definition of the following view that is late rendered by the function
 passed to the `view()` method:
 
 <pre><code class="language-java">
@@ -45,9 +45,9 @@ static HtmlView view = StaticHtml.view(v -> v
 </code></pre>
 
 Thus you can get the resulting HTML in three different ways:
-1) get the resulting `String` through its `render()` method or 
-2) directly write to any `Printstream` such as `System.out` or 
-3) any other `PrintStream` chain such as `new PrintStream(new FileOutputStream(path))`. 
+1) get the resulting `String` through its `render()` method or
+2) directly write to any `Printstream` such as `System.out` or
+3) any other `PrintStream` chain such as `new PrintStream(new FileOutputStream(path))`.
 
 **NOTE**: `PrintStream` is not buffered, so you may need to interleave a `BufferedOutputStream`
 object to improve performance.
@@ -81,16 +81,16 @@ Regardless the output approach you will get the same formatted HTML document:
 #### Dynamic Views
 
 A _dynamic view_ is based on a template function `BiConsumer<DynamicHtml<U>, U>`, i.e.
-a `void` function that receives a dynamic view (`DynamicHtml<U>`) and a domain object of type `U` -- 
+a `void` function that receives a dynamic view (`DynamicHtml<U>`) and a domain object of type `U` --
 `(DynamicHtml<U>, U) => void`.
 Given the template function we can build a dynamic view through `DynamicHtml.view(templateFunction)`.
 
-Next we present an example of a view with a template (e.g. `taskDetailsTemplate`) that will be later 
+Next we present an example of a view with a template (e.g. `taskDetailsTemplate`) that will be later
 bound to a domain object `Task`.
 Note the use of the method `dynamic()` inside the `taskDetailsTemplate` whenever we are
 binding properties from the domain object `Task`.
 This is a **mandatory issue** to enable dynamic bind of properties, otherwise those values are
-cached and the domain object `Task` will be ignored on further renders. 
+cached and the domain object `Task` will be ignored on further renders.
 
 <pre><code class="language-java">
 HtmlView&lt;Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
@@ -184,11 +184,127 @@ public class App {
 
 HtmlFlow also enables the use of partial HTML blocks inside a template function.
 This is useful whenever you want to reuse the same template with different HTML fragments.
-To that end you must create a view with a different kind of template function (i.e. 
-[`HtmlTemplate`](src/main/java/htmlflow/HtmlTemplate.java)), which 
-receives one more `HtmlView[] partials` argument in addition to the arguments `DynamicHtml<U>`
-and `U`.
-Check out one of our use cases of partial views in the template function
-[`taskListViewWithPartials`](https://github.com/xmlet/HtmlFlow/blob/readme-for-release-3/src/test/java/htmlflow/test/views/HtmlTables.java#L75).
+
+The partial is constructed just like any template. Consider the following, which create a template, for a div containing a label and an input.
+
+```
+public class InputField {
+  public static class LabelValueModel {
+        final String label;
+        final String id;
+        final Object value;
+
+        private LabelValueModel(String label, String id, Object value) {
+            this.label = label;
+            this.id = id;
+            this.value = value;
+        }
+
+        public static LabelValueModel of(String label, String id,  Object value) {
+            return new LabelValueModel(label, id, value);
+        }
+    }
+
+  public static HtmlView<LV> view = DynamicHtml.view(InputField::template);
+
+  static void template(DynamicHtml<LabelValueModel> view, LabelValueModel model) {
+      view
+          .div()
+              .label()
+              .dynamic(label -> label.text(model.label)).__() //label
+
+              .input()
+                  .dynamic(input -> input
+                      .attrType(EnumTypeInputType.TEXT)
+                      .attrId(model.id)
+                      .attrName(model.id)
+                      .attrValue(model.value.toString())
+                  )
+              .__()
+          .__();
+  }
+}
+```
+Notice that we also introduce a model that is dedicated to this partial.
+This will help us get data in the exact form needed to produce a complete, working and type-safe template.
+
+This partial could be used inside another template.
+
+```
+static void template(DynamicHtml<Pet> view, Pet pet) {
+        view
+          .form().attrMethod(EnumMethodType.POST)
+                .div().attrClass("form-group has-feedback")
+                    .dynamic(div -> view.addPartial(InputField.view, InputField.LV.of("Date", "date", LocalDate.now())))
+                .__() //div
+            .__() //form```
+)
+```
+
+This way of invoking partial is particularly useful when you need to use a smaller part (component) gathered together to produce a bigger template.
+This is the most common usage of partials.
+
+There is another way of using partials, it's to construct a layout. The layout is a normal template, but with a hole to be filed with partials.
+Like we saw earlier, a partial has nothing special by himself. What is interesting is the layout, consider the following template.
+
+
+```
+public class Layout {
+
+    public static DynamicHtml<Object> view = (DynamicHtml<Object>) DynamicHtml.view(Layout::template).threadSafe();
+
+    private static <T> void template(DynamicHtml<T> view, T model, HtmlView[] partials) {
+        view
+            .html()
+                .head()
+                    .meta().addAttr("http-equiv","Content-Type").attrContent("text/html; charset=UTF-8")
+                    .__() //meta
+                    .meta().attrCharset("utf-8")
+                    .__() //meta
+                    .meta().addAttr("http-equiv","X-UA-Compatible").attrContent("IE=edge")
+                    .__() //meta
+                    .meta().attrName("viewport").attrContent("width=device-width, initial-scale=1")
+                    .__() //meta
+                    .link().addAttr("rel","shortcut icon").addAttr("type","image/x-icon").attrHref("/resources/images/favicon.png")
+                    .__() //link
+                    .title()
+                        .text("My awesome templating system")
+                    .__() //title
+                  .__() //head
+                .body()
+                    .nav().attrClass("navbar navbar-default").addAttr("role","navigation")
+                      ..dynamic(__ -> view.addPartial(partials[0]) )
+                    .__() //nav
+                    .div().attrClass("container-fluid")
+                        .div().attrClass("container xd-container")
+                          .dynamic(__ ->  view.addPartial(partials[1], model) )
+                        .__() //div
+                    .__() //div
+                .__() //body
+            .__(); //html
+    }
+}
+```
+
+Notice the third argument to the function `template`, this array of partials is the place where we receive the partials to fill the holes of our layout.
+To use them we called two distinct signatures of `view.addPartial`, one with only the partial, and one with a partial and a model. Depending on the type of
+templated hidden behind `partials[0]`` we would use one signature or the other.
+
+So we have defined our layout, let's use it to create a template with much less clutter.
+
+```
+public class APage {
+
+    public static DynamicHtml<Object> view = (DynamicHtml<Object>) DynamicHtml.view(Layout::template, Object model, new DynamicHtml<Object>[]{Menu::template, APage::template]).threadSafe();
+
+    private static <T> void template(DynamicHtml<T> view, T model, HtmlView[] partials) {
+        view
+            .div().text("Type safty feel so cozy !!")
+    }
+}
+```
+
+Notice the member `view` which call the layout's template, and passing the menu and the page component as an array.
+
 
 <p>&nbsp;</p>
