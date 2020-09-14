@@ -245,7 +245,7 @@ This way of invoking partial is particularly useful when you need to use a small
 This is the most common usage of partials.
 
 There is another way of using partials, it's to construct a layout. The layout is a normal template, but with a hole to be filed with partials.
-Like we saw earlier, a partial has nothing special by himself. What is interesting is the layout, consider the following template.
+Like we saw earlier, a partial has nothing special by itself. What is interesting is the layout, consider the following template.
 
 
 ```
@@ -299,7 +299,7 @@ public class APage {
 
     private static <T> void template(DynamicHtml<T> view, T model, HtmlView[] partials) {
         view
-            .div().text("Type safty feel so cozy !!")
+            .div().text("Type safety feel so cozy !!")
     }
 }
 ```
