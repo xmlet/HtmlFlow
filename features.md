@@ -180,7 +180,7 @@ public class App {
 }
 </code></pre>
 
-## Partial Views
+## Partial and Layout
 
 HtmlFlow also enables the use of partial HTML blocks inside a template function.
 This is useful whenever you want to reuse the same template with different HTML fragments.
