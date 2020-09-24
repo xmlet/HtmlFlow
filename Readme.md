@@ -101,7 +101,7 @@ Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/v
 * [Get started](#getting-started)
 * [Output approaches](#output-approaches)
 * [Dynamic Views](#dynamic-views)
-* [Partial Views](#partial-views)
+* <a href="https://htmlflow.org/features/#partial-and-layout" target="_blank">Partial and Layouts</a>
 * [Changelog](#changelog)
 * [License](#license)
 * [About](#about)
@@ -297,16 +297,9 @@ public class App {
 }
 ```
 
-## Partial Views
+## Partial and Layouts
 
-HtmlFlow also enables the use of partial HTML blocks inside a template function.
-This is useful whenever you want to reuse the same template with different HTML fragments.
-To that end you must create a view with a different kind of template function (i.e. 
-[`HtmlTemplate`](src/main/java/htmlflow/HtmlTemplate.java)), which 
-receives one more `HtmlView[] partials` argument in addition to the arguments `DynamicHtml<U>`
-and `U`.
-Check out one of our use cases of partial views in the template function
-[`taskListViewWithPartials`](src/test/java/htmlflow/test/views/HtmlTables.java#L75).
+In documentation at <a href="https://htmlflow.org/features/#partial-and-layout" target="_blank">htmlflow.org</a>.
 
 ## Changelog
 
