@@ -80,20 +80,6 @@ and our fork of
 Check the implementation of the sample Spring-based petclinic with HtmlFlow views [xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic).
 You can find different kinds of dynamic views [there](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
 
-## References
-
-* 2019, [HoT: Unleash Web Views with Higher-order Templates](https://www.scitepress.org/Link.aspx?doi=10.5220/0008167701180129),
-[15th WebIst](http://www.webist.org/?y=2019) conference, 2019, Viena - This paper highlights
-the compositional nature of HtmlFlow to compose templates through higher-order functions. 
-* 2018, [Domain Specific Language generation based on a XML 
-Schema](https://www.slideshare.net/LuisDuarte105/domain-specific-language-generation-based-on-a-xml-schema-208756986) - Slides
-of the MsC thesis presentation of Luís Duarte.
-* 2018, [Modern Type-Safe Template Engines](https://dzone.com/articles/modern-type-safe-template-engines) - You can find
-more details in this DZone article about performance comparison.
-
-[Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
-built with the support of `htmlflow.DynamicHtml`.
-Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find more complex views with dynamic partial blocks or check some examples of [petclinic views](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
 
 ## Table of Contents
 
@@ -104,6 +90,7 @@ Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/v
 * <a href="https://htmlflow.org/features/#partial-and-layout" target="_blank">Partial and Layouts</a>
 * [Changelog](#changelog)
 * [License](#license)
+* [References](#references)
 * [About](#about)
 
 ## Installation
@@ -453,6 +440,21 @@ This also solves the #16 Issue.
 ## License
 
 [MIT](https://github.com/xmlet/HtmlFlow/blob/master/LICENSE)
+
+## References
+
+* 2019, [HoT: Unleash Web Views with Higher-order Templates](https://www.scitepress.org/Link.aspx?doi=10.5220/0008167701180129),
+[15th WebIst](http://www.webist.org/?y=2019) conference, 2019, Viena - This paper highlights
+the compositional nature of HtmlFlow to compose templates through higher-order functions. 
+* 2018, [Domain Specific Language generation based on a XML 
+Schema](https://www.slideshare.net/LuisDuarte105/domain-specific-language-generation-based-on-a-xml-schema-208756986) - Slides
+of the MsC thesis presentation of Luís Duarte.
+* 2018, [Modern Type-Safe Template Engines](https://dzone.com/articles/modern-type-safe-template-engines) - You can find
+more details in this DZone article about performance comparison.
+
+[Get started](#getting-started) or check out some more examples regarding [_dynamic views_](#dynamic-views)
+built with the support of `htmlflow.DynamicHtml`.
+Under the unit tests package [htmlflow.test.views](src/test/java/htmlflow/test/views) you can also find more complex views with dynamic partial blocks or check some examples of [petclinic views](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
 
 ## About
 
