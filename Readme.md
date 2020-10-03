@@ -81,6 +81,20 @@ Check the implementation of the sample Spring-based petclinic with HtmlFlow view
 You can find different kinds of dynamic views [there](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
 
 
+## Why another templating enginge
+
+Every popular general purpose language has its own template engine. Java being popular for quite some time has several of them.
+Most of the time, template engines have templates that are defined in new external DSL.
+To allow them to produce a view based on the templates files, they generally use the concept of model. A generic map that
+can receive any kind of data.
+
+One of the problems of this technic is that you will end up with a template that won't be type checked. So if you have a typo inside your template, the compiler won't be able to help you before the template is rendered. 
+
+HtmlFlow took a different approach. Templates are expressed in an external DSL, but an internal DSL. You will write normal java code to produce your template. So the full java tool chain is at your disposal when writing template. Templates are essentially normal java functions.
+
+HtmlFlow is not the only template engine that uses this idea. But it's the fastest one.
+Bonus points it also produces only valid HTML document according to HTML 5.2.
+
 ## Table of Contents
 
 * [Installation](#installation)
