@@ -9,6 +9,10 @@ import org.junit.Test;
 
 import java.util.stream.Stream;
 
+/**
+ * These tests do not contain any assertion because they are only a samplefor README.md.
+ */
+@SuppressWarnings("squid:S3577")
 public class HtmlPartials {
 
     static HtmlView bbView = StaticHtml.view().div().text("Dummy bbView").__(); // div
@@ -28,7 +32,7 @@ public class HtmlPartials {
     /**
      * This unit test was only a sample for a paper.
      */
-    @java.lang.SuppressWarnings("squid:S2699")
+    @SuppressWarnings("squid:S2699")
     @Test
     public void testPartials() {
         HtmlTemplate<Stream<Track>> tracksTemplate = (view , tracks, partials) -> view

@@ -38,6 +38,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * These tests do not contain any assertion because they are only a samplefor README.md.
+ */
+@SuppressWarnings("squid:S3577")
 public class HtmlForReadme {
 
     /**
@@ -66,7 +70,7 @@ public class HtmlForReadme {
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
      */
-    @java.lang.SuppressWarnings("squid:S2699")
+    @SuppressWarnings("squid:S2699")
     @Test
     public void testSample02() throws IOException {
         String html = view.render();        // 1) Get a string with the HTML
