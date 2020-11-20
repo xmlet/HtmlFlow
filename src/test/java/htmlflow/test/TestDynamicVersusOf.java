@@ -32,7 +32,7 @@ import org.junit.Test;
 import java.util.Iterator;
 
 import static htmlflow.test.Utils.NEWLINE;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class TestDynamicVersusOf {
 

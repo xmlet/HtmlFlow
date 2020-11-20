@@ -121,7 +121,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
      *            <code>true</code> if the generated HTML source code is
      *            indented, otherwise <code>false</code>
      */
-    public AbstractHtmlToJavaHtmlFlowNodeVisitor(final Supplier<T> appendableSupplier, final boolean indented) {
+    protected AbstractHtmlToJavaHtmlFlowNodeVisitor(final Supplier<T> appendableSupplier, final boolean indented) {
         super();
         this.appendableSupplier = Objects.requireNonNull(appendableSupplier);
         this.indented = indented;

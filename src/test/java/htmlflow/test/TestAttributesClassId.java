@@ -54,7 +54,7 @@ public class TestAttributesClassId {
 
     @Test
     public void testGetElementName() {
-        Div<Body<Html<HtmlView>>> div = StaticHtml.view().html().body().div();
+        Div<Body<Html<HtmlView<Object>>>> div = StaticHtml.view().html().body().div();
         assertEquals(DIV_NAME, div.getName());
     }
 

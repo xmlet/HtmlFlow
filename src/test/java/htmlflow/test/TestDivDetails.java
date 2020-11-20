@@ -53,7 +53,7 @@ import static htmlflow.test.Utils.htmlWrite;
 import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Miguel Gamboa

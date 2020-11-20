@@ -9,8 +9,8 @@ import static htmlflow.test.Utils.NEWLINE;
 import static htmlflow.test.views.HtmlDynamicChainTwiceOnTopgenius.toptracksOkOfWithDynamic;
 import static htmlflow.test.views.HtmlDynamicChainTwiceOnTopgenius.toptracksWrongDynamicTwice;
 import static java.util.stream.Stream.of;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class TestDynamicCases {
 

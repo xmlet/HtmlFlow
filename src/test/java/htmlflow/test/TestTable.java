@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Miguel Gamboa
@@ -64,7 +64,7 @@ public class TestTable {
          * Arrange
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
-        DynamicHtml view = DynamicHtml.view(HtmlTables::simpleTableView);
+        DynamicHtml<int[][]> view = DynamicHtml.view(HtmlTables::simpleTableView);
         /*
          * Act
          */

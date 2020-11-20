@@ -52,7 +52,7 @@ import static java.util.stream.Collectors.joining;
  * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
-public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, Element> {
+public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>, Element<?,?>> {
     static final String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
             "Cannot use PrintStream output for thread-safe views!";
 
@@ -91,7 +91,7 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
     private final Supplier<HtmlVisitorCache> visitorSupplier;
     private final boolean threadSafe;
 
-    public HtmlView(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe) {
+    protected HtmlView(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe) {
         this.visitorSupplier = visitorSupplier;
         this.threadSafe = threadSafe;
         if(threadSafe) {
@@ -103,21 +103,21 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView, El
         }
     }
 
-    public final Html<HtmlView> html() {
+    public final Html<HtmlView<T>> html() {
         if (this.getVisitor().isWriting())
             this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
 
-    public final Div<HtmlView> div() {
+    public final Div<HtmlView<T>> div() {
         return new Div<>(this);
     }
 
-    public final Tr<HtmlView> tr() {
+    public final Tr<HtmlView<T>> tr() {
         return new Tr<>(this);
     }
 
-    public final Root<HtmlView> defineRoot(){
+    public final Root<HtmlView<T>> defineRoot(){
         return new Root<>(this);
     }
 
