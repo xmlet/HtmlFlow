@@ -26,9 +26,9 @@ package htmlflow.flowifier.test;
 import htmlflow.HtmlView;
 import htmlflow.flowifier.Flowifier;
 import htmlflow.test.Utils;
-import junit.framework.Assert;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.tools.JavaCompiler;
@@ -51,7 +51,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class TestFlowifier {
 
@@ -91,8 +91,8 @@ public class TestFlowifier {
     }
 
     @Test
-    public void testFlowifierWikipediaHomepage() throws Exception {
-        testFlowifier("https://en.wikipedia.org");
+    public void testFlowifierOssSonatype() throws Exception {
+        testFlowifier("https://oss.sonatype.org/");
     }
 
     @Test
@@ -181,8 +181,8 @@ public class TestFlowifier {
             final String originalHtmlSourceCode = doc.root().outerHtml();
             Logger.getLogger("htmlflow.flowifier.test").info(originalHtmlSourceCode);
             // compares the original HTML to the generated HTML
-            final Iterator<String> expected = Arrays.stream(originalHtmlSourceCode.split("<")).iterator();
-            final Iterator<String> actual = Arrays.stream(generatedHtmlSourceCode.split("<")).iterator();
+            final Iterator<String> expected = Arrays.stream(originalHtmlSourceCode.split("<")).skip(2).iterator();
+            final Iterator<String> actual = Arrays.stream(generatedHtmlSourceCode.split("<")).skip(2).iterator();
             while (expected.hasNext() || actual.hasNext()) {
                 final String expectedPart = expected.hasNext() ? expected.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase() : "";
                 final String actualPart = actual.hasNext() ? actual.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase() : "";
