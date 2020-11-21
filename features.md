@@ -187,7 +187,7 @@ This is useful whenever you want to reuse the same template with different HTML 
 
 The partial is constructed just like any template. Consider the following, which create a template, for a div containing a label and an input.
 
-```
+```java
 public class InputField {
   public static class LabelValueModel {
         final String label;
@@ -230,7 +230,7 @@ This will help us get data in the exact form needed to produce a complete, worki
 
 This partial could be used inside another template.
 
-```
+```java
 static void template(DynamicHtml<Pet> view, Pet pet) {
         view
           .form().attrMethod(EnumMethodType.POST)
@@ -248,7 +248,7 @@ There is another way of using partials, it's to construct a layout. The layout i
 Like we saw earlier, a partial has nothing special by itself. What is interesting is the layout, consider the following template.
 
 
-```
+```java
 public class Layout {
 
     public static DynamicHtml<Object> view = (DynamicHtml<Object>) DynamicHtml.view(Layout::template).threadSafe();
@@ -292,7 +292,7 @@ templated hidden behind `partials[0]`` we would use one signature or the other.
 
 So we have defined our layout, let's use it to create a template with much less clutter.
 
-```
+```java
 public class APage {
 
     public static DynamicHtml<Object> view = (DynamicHtml<Object>) DynamicHtml.view(Layout::template, Object model, new DynamicHtml<Object>[]{Menu::template, APage::template]).threadSafe();
