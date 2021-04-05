@@ -114,7 +114,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.5</version>
+    <version>3.6</version>
 </dependency>
 ```
 
