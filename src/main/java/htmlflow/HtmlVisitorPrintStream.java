@@ -59,6 +59,19 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
         this.current = new PrintStringBuilder(out);
     }
 
+    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic, boolean isIndented, int depth) {
+        this(out, isDynamic, isIndented);
+        this.depth = depth;
+    }
+
+    /**
+     * Creates a new similar instance with all static bocks cleared.
+     */
+    @Override
+    protected HtmlVisitorCache newbie() {
+        return new HtmlVisitorPrintStream(out, isDynamic, isIndented, depth);
+    }
+
     @Override
     protected void beginTag(String elementName) {
         Tags.printOpenTag(current, elementName); // "<elementName"

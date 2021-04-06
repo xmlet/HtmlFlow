@@ -50,6 +50,19 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
         super(isDynamic, isIndented);
     }
 
+    public HtmlVisitorStringBuilder(boolean isDynamic, boolean isIndented, int depth) {
+        this(isDynamic, isIndented);
+        this.depth = depth;
+    }
+
+    /**
+     * Creates a new similar instance with all static bocks cleared.
+     */
+    @Override
+    protected HtmlVisitorCache newbie() {
+        return new HtmlVisitorStringBuilder(isDynamic, isIndented, depth);
+    }
+
     @Override
     protected void beginTag(String elementName) {
         Tags.appendOpenTag(sb, elementName); // "<elementName"

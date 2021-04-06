@@ -137,11 +137,28 @@ public class DynamicHtml<T> extends HtmlView<T> {
         this.render(model, partials);
     }
 
+    /**
+     * Since HtmlView is immutable this is the preferred way to create a copy of the
+     * existing HtmlView instance with a different threadSafe state.
+     *
+     * @param visitorSupplier
+     * @param threadSafe
+     */
     @Override
     protected final HtmlView<T> clone(
         Supplier<HtmlVisitorCache> visitorSupplier,
         boolean threadSafe)
     {
         return new DynamicHtml<>(visitorSupplier, threadSafe, template, binder);
+    }
+
+    /**
+     * Resulting in a non thread safe view.
+     * Receives an existent visitor.
+     * Usually for a parent view to share its visitor with a partial.
+     */
+    @Override
+    protected HtmlView<T> clone(HtmlVisitorCache visitor) {
+        return new DynamicHtml<>(() -> visitor, false, template, binder);
     }
 }
