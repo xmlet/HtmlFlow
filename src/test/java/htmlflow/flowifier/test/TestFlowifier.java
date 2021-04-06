@@ -96,6 +96,11 @@ public class TestFlowifier {
     }
 
     @Test
+    public void testFlowifierWithEclemmaOrg() throws Exception {
+        testFlowifier("https://www.eclemma.org/");
+    }
+
+    @Test
     public void testSample05ForFlowifier() throws IOException {
         String src = "<!DOCTYPE html>" +
             "<html>" +

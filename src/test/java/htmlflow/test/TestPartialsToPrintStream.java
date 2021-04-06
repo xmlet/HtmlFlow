@@ -6,16 +6,17 @@ import htmlflow.HtmlVisitorCache;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.io.OutputStream.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -126,4 +127,42 @@ public class TestPartialsToPrintStream {
                 .attrStyle("display: none;")
                 .addAttr("data-dna",penguin.getDnaCode());
     });
+
+    /**
+     * Copied from JDK 11
+     */
+    private static OutputStream nullOutputStream() {
+        return new OutputStream() {
+            private volatile boolean closed;
+
+            private void ensureOpen() throws IOException {
+                if (closed) {
+                    throw new IOException("Stream closed");
+                }
+            }
+
+            @Override
+            public void write(int b) throws IOException {
+                ensureOpen();
+            }
+
+            @Override
+            public void write(byte b[], int off, int len) throws IOException {
+                checkFromIndexSize(off, len, b.length, null);
+                ensureOpen();
+            }
+
+            @Override
+            public void close() {
+                closed = true;
+            }
+        };
+    }
+    public static <X extends RuntimeException>
+    int checkFromIndexSize(int fromIndex, int size, int length,
+                           BiFunction<String, List<Integer>, X> oobef) {
+        if ((length | fromIndex | size) < 0 || size > length - fromIndex)
+            throw new IndexOutOfBoundsException();
+        return fromIndex;
+    }
 }
