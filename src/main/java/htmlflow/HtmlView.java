@@ -79,6 +79,12 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
         }
     }
 
+    /**
+     * This field is like an union with the threadLocalVisitor, being used alternatively.
+     * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
+     * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
+     * throw the output and we use the threadLocalVisitor field instead.
+     */
     private final HtmlVisitorCache visitor;
     /**
      * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
@@ -193,8 +199,23 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
     public final <U> void addPartial(HtmlView<U> partial, U model) {
         getVisitor().closeBeginTag();
         partial.getVisitor().depth = getVisitor().depth;
-        if (this.getVisitor().isWriting())
-            getVisitor().write(partial.render(model));
+        if (this.getVisitor().isWriting()) {
+            /**
+             * Next partial.clone() is related with https://github.com/xmlet/HtmlFlow/issues/75
+             * The call to render() returns null or an HTML string depending on whether it has
+             * a HtmlVisitorPrintStream or a HtmlVisitorStringBuilder.
+             * The latter incurs in additional overheads due to internal string buffering and may
+             * throw OutOfMemoryError for large data model.
+             * Thus we can avoid that problem sharing the parent view's visitor with the partial.
+             * Once the visitor is stored in a final field, we must clone the partial view.
+             * Since our views and templates are data-structure less avoiding in memory trees and nodes,
+             * and the HTML document is based on a higher-order function, then our views instances only store
+             * a few instance fields related to the visitor and the template function itself.
+             */
+            HtmlVisitorCache v = getVisitor();
+            String p = partial.clone(v.newbie()).render(model);
+            if(p != null) v.write(p);
+        }
     }
 
     /**
@@ -206,8 +227,15 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
     public final <U> void addPartial(HtmlView<U> partial) {
         getVisitor().closeBeginTag();
         partial.getVisitor().depth = getVisitor().depth;
-        if (this.getVisitor().isWriting())
-            getVisitor().write(partial.render());
+        if (this.getVisitor().isWriting()) {
+            /**
+             * This overloaded addPartial does not have a model object.
+             * Thus we do not expect to incur in the same problem reported on the other addPartial(partial, model).
+             * Moreover partials are HTML fragments that are not expect to incur in more than Kb.
+             */
+            String p = partial.render();
+            if(p != null) getVisitor().write(p);
+        }
     }
 
     /**
@@ -216,7 +244,13 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
      *
      * @param visitorSupplier
      * @param threadSafe
-     * @return
      */
     protected abstract HtmlView<T> clone(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe);
+
+    /**
+     * Resulting in a non thread safe view.
+     * Receives an existent visitor.
+     * Usually for a parent view to share its visitor with a partial.
+     */
+    protected abstract HtmlView<T> clone(HtmlVisitorCache visitor);
 }

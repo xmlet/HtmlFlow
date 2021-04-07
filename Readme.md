@@ -20,7 +20,7 @@ corresponding HTML source:
     </tr>
     <tr class="row">
         <td>
-            
+
 ```java
 HtmlView view = StaticHtml
   .view()
@@ -80,6 +80,19 @@ and our fork of
 Check the implementation of the sample Spring-based petclinic with HtmlFlow views [xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic).
 You can find different kinds of dynamic views [there](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
 
+## Why another templating engine ?
+
+Every general purpose language has its own template engine. Java has sevral.
+Most of the time, template engines have templates that are defined in new external DSL.
+To allow them to produce a view based on the templates files, they generally use the concept of model. A generic map that
+can receive any kind of data.
+
+One of the problems of this technic is that you will end up with a template that won't be type checked. So if you have a typo inside your template, the compiler won't be able to help you before the template is rendered.
+
+HtmlFlow took a different approach. Templates are expressed in an internal DSL. You will write normal java code to produce your template. So the full java tool chain is at your disposal when writing template. Templates are essentially normal java functions.
+
+HtmlFlow is not the only template engine that uses this idea. But it's the fastest one.
+Bonus points it also produces only valid HTML document according to HTML 5.2.
 
 ## Table of Contents
 
@@ -101,7 +114,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.5</version>
+    <version>3.7</version>
 </dependency>
 ```
 
@@ -136,7 +149,7 @@ the same HTML view to be bound with different object models.
 
 ## Output approaches
 
-Consider the definition of the following view that is late rendered by the function 
+Consider the definition of the following view that is late rendered by the function
 passed to the `view()` method:
 
 ```java
@@ -149,9 +162,9 @@ static HtmlView view = StaticHtml.view(v -> v
 ```
 
 Thus you can get the resulting HTML in three different ways:
-1) get the resulting `String` through its `render()` method or 
-2) directly write to any `Printstream` such as `System.out` or 
-3) any other `PrintStream` chain such as `new PrintStream(new FileOutputStream(path))`. 
+1) get the resulting `String` through its `render()` method or
+2) directly write to any `Printstream` such as `System.out` or
+3) any other `PrintStream` chain such as `new PrintStream(new FileOutputStream(path))`.
 
 **NOTE**: `PrintStream` is not buffered, so you may need to interleave a `BufferedOutputStream`
 object to improve performance.
@@ -180,21 +193,21 @@ Regardless the output approach you will get the same formatted HTML document:
         </p>
     </body>
 </html>
-``` 
+```
 
 ## Dynamic Views
 
 A _dynamic view_ is based on a template function `BiConsumer<DynamicHtml<U>, U>`, i.e.
-a `void` function that receives a dynamic view (`DynamicHtml<U>`) and a domain object of type `U` -- 
+a `void` function that receives a dynamic view (`DynamicHtml<U>`) and a domain object of type `U` --
 `(DynamicHtml<U>, U) => void`.
 Given the template function we can build a dynamic view through `DynamicHtml.view(templateFunction)`.
 
-Next we present an example of a view with a template (e.g. `taskDetailsTemplate`) that will be later 
+Next we present an example of a view with a template (e.g. `taskDetailsTemplate`) that will be later
 bound to a domain object `Task`.
 Note the use of the method `dynamic()` inside the `taskDetailsTemplate` whenever we are
 binding properties from the domain object `Task`.
 This is a **mandatory issue** to enable dynamic bind of properties, otherwise those values are
-cached and the domain object `Task` will be ignored on further renders. 
+cached and the domain object `Task` will be ignored on further renders.
 
 ``` java
 HtmlView<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
@@ -290,6 +303,18 @@ In documentation at <a href="https://htmlflow.org/features/#partial-and-layout" 
 
 ## Changelog
 
+### 3.7 (April, 2021)
+
+When parent template is initialized with a `PrintStream`, any internal use of
+`addPartial()` should use implicitly that `PrintStream` regardless the output
+approach defined on the partial view instantiation.
+
+This feature implies a couple of new internal methods including a `newby()` in
+`HtmlVisitor` that creates a new instance of same type and keeping indentation.
+
+### 3.6 (November, 2020)
+
+Fix code Smells on Generics and other uses cases. Update Junit release to suppress reported vulnerability. https://github.com/xmlet/HtmlFlow/pull/68
 
 ### 3.5 (January, 2020)
 
@@ -317,14 +342,15 @@ Make views immutable.
 
 ### 3.1 (November, 2018)
 
-Add support for non thread-safe views. Now, in order to use the same view by multiple threads you 
-should call the `threadSafe()` method. Check the unit test 
+Add support for non thread-safe views. Now, in order to use the same view by multiple threads you
+should call the `threadSafe()` method. Check the unit test
 [testDivDetailsBindingWithRender](src/test/java/htmlflow/test/TestDivDetails.java#L141)
 that renders 4 different context models in parallel with the same view.  
 
 ### 3.0 (November, 2018)
 
-* Improved performance. HtmlFlow is on this date the most performant template engine and Java DSL for HTML.
+* Improved performance. HtmlFlow is on this date the most performant template
+  engine and Java DSL for HTML.
 
 * Replaced the method `º()` by `__()`.
 
@@ -335,18 +361,21 @@ that renders 4 different context models in parallel with the same view.
 * Html code is emitted on the fly when the methods of `HtmlApi` (e.g. `html()`, `div()`, `h1()`, etc)
 are called.
 
-* Now `HtmlView` is just a container of a template function and an `ElementVisitor`, which establishes 
+* Now `HtmlView` is just a container of a template function and an `ElementVisitor`, which establishes
 the HTML output format.
 
 * All emitted HTML is cached.
 
-* Data binding requires the use of new method `dynamic()` to avoid caching. Otherwise, the context objects are ignored on further renders.
+* Data binding requires the use of new method `dynamic()` to avoid caching.
+  Otherwise, the context objects are ignored on further renders.
 
 * New method `of()` to enable the use of other methods in the fluent chain.
 
 * New `addPartial()` to enable the reuse of same HTML template function with different HTML fragments.
 
-* Removed the method `binder()`. The role of this method is replaced by the concept of template function which receives the context object `U` that is captured and used whenever is needed, such as in `dynamic()`.
+* Removed the method `binder()`. The role of this method is replaced by the
+  concept of template function which receives the context object `U` that is
+  captured and used whenever is needed, such as in `dynamic()`.
 
 
 ### 2.1 (August, 2018)
@@ -359,7 +388,7 @@ This `render()` uses internally a `StringBuilder` and shows better performance
 than the `write()` approach.
 
 * To allow `HtmlView` being a parent element of `Html` we made `HtmlView<T>` extend
-`AbstractElement<HtmlView<T>, Element>` and turn it compatible with `Element`. 
+`AbstractElement<HtmlView<T>, Element>` and turn it compatible with `Element`.
 Yet, it does not support `accept(ElementVisitor visitor)` nor `cloneElem()`.
 
 * Fix `Html root` field definition in `HtmlView` to include the generic parent as `Html<HtmlView>`
@@ -376,13 +405,13 @@ More usage examples in [HtmlTables](src/test/java/htmlflow/test/views/HtmlTables
 ### 2.0 (March, 2018)
 
 HtmlFlow version 2.0 has full support for all existing HTML5 elements and
-attributes. 
+attributes.
 Moreover all attributes are strongly typed with enumerated types which
-restrict accepted values. 
+restrict accepted values.
 Now HtmlFlow API is constructed with the support of an automated
-framework [xmlet](https://github.com/xmlet/) based on an 
+framework [xmlet](https://github.com/xmlet/) based on an
 [XSD definition of the HTML5](https://github.com/xmlet/HtmlApi/blob/master/src/main/resources/html_5.xsd)
-syntax and rules. 
+syntax and rules.
 Thus we remove the package `htmlflow.attributes` and `htmlflow.elements`,
 which have been replaced by the types defined in `org.xmlet.htmlapi` library.
 This new approach forces HtmlFlow API to keep consistency along all methods use.
@@ -397,18 +426,18 @@ to the `text()` method (such as, `.p().text("my text")` or
 * All fluent methods now return the created element.
 Whenever we need to proceed with the parent element we may chain an
 invocation to `.º()`. For example, formerly when we wrote `.div().br().p()`
-now we have to write `.div().br().º().p()`. 
+now we have to write `.div().br().º().p()`.
 Moreover the statement `.div().br().p()` not even compiles, because HTML
 does not allow a paragraph inside a break line element, so we will get a
-compilation error. 
+compilation error.
 
 * Except for `.text()` which does not create an element but a text node
-instead, the rest of fluent methods return the created element. 
+instead, the rest of fluent methods return the created element.
 For `.text()` it returns the element containing the text node (the `this`).
 
 * The new method `º()` returns the parent of an element. This method is
 strongly typed so it returns exactly an instance of `T` where `T` is the
-concrete class which extends `Element`. 
+concrete class which extends `Element`.
 This is an important issue to respect the HTML structure and rules.
 
 * Indentation. Now every element or text node is printed in a new line.
@@ -425,8 +454,8 @@ See the `htmlflow.HtmlVisitor` implementation as a guideline.
 
 ### 1.2 (September 22, 2017)
 
-* Refactor unit tests to increase code coverage and to load the expected HTML output from the resources. 
-* Include HtmlFlow in [SonarCloud.io](https://sonarcloud.io/dashboard?id=com.github.fmcarvalho%3Ahtmlflow) to analyze code quality. 
+* Refactor unit tests to increase code coverage and to load the expected HTML output from the resources.
+* Include HtmlFlow in [SonarCloud.io](https://sonarcloud.io/dashboard?id=com.github.fmcarvalho%3Ahtmlflow) to analyze code quality.
 * Fix of [Issue 14](https://github.com/xmlet/HtmlFlow/issues/24) -- _Header.txt can't be loaded from resources_.
 
 ### 1.1 (March 23, 2017)

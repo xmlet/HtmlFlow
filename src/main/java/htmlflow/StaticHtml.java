@@ -112,8 +112,25 @@ public class StaticHtml extends HtmlView<Object> {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
     }
 
+    /**
+     * Since HtmlView is immutable this is the preferred way to create a copy of the
+     * existing HtmlView instance with a different threadSafe state.
+     *
+     * @param visitorSupplier
+     * @param threadSafe
+     */
     @Override
     protected final HtmlView<Object> clone(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe) {
         return new StaticHtml(visitorSupplier, threadSafe, template);
+    }
+
+    /**
+     * Resulting in a non thread safe view.
+     * Receives an existent visitor.
+     * Usually for a parent view to share its visitor with a partial.
+     */
+    @Override
+    protected HtmlView<Object> clone(HtmlVisitorCache visitor) {
+        return new StaticHtml(() -> visitor, false, template);
     }
 }

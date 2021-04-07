@@ -91,8 +91,13 @@ public class TestFlowifier {
     }
 
     @Test
-    public void testFlowifierOssSonatype() throws Exception {
-        testFlowifier("https://oss.sonatype.org/");
+    public void testFlowifierWithJavasyncOrg() throws Exception {
+        testFlowifier("https://javasync.org");
+    }
+
+    @Test
+    public void testFlowifierWithEclemmaOrg() throws Exception {
+        testFlowifier("https://www.eclemma.org/");
     }
 
     @Test
@@ -181,8 +186,16 @@ public class TestFlowifier {
             final String originalHtmlSourceCode = doc.root().outerHtml();
             Logger.getLogger("htmlflow.flowifier.test").info(originalHtmlSourceCode);
             // compares the original HTML to the generated HTML
-            final Iterator<String> expected = Arrays.stream(originalHtmlSourceCode.split("<")).skip(2).iterator();
-            final Iterator<String> actual = Arrays.stream(generatedHtmlSourceCode.split("<")).skip(2).iterator();
+            final Iterator<String> expected = Arrays
+                .stream(originalHtmlSourceCode.split("<"))
+                .skip(2)
+                .flatMap(l -> Arrays.stream(l.split(";")))
+                .iterator();
+            final Iterator<String> actual = Arrays
+                .stream(generatedHtmlSourceCode.split("<"))
+                .skip(2)
+                .flatMap(l -> Arrays.stream(l.split(";")))
+                .iterator();
             while (expected.hasNext() || actual.hasNext()) {
                 final String expectedPart = expected.hasNext() ? expected.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase() : "";
                 final String actualPart = actual.hasNext() ? actual.next().replaceAll("\\s", "").replaceAll("\\h", "").replaceAll("\\v", "").toLowerCase() : "";
