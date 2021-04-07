@@ -114,7 +114,7 @@ First, in order to include it to your Maven project, simply add this dependency:
 <dependency>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>3.6</version>
+    <version>3.7</version>
 </dependency>
 ```
 
@@ -303,6 +303,18 @@ In documentation at <a href="https://htmlflow.org/features/#partial-and-layout" 
 
 ## Changelog
 
+### 3.7 (April, 2021)
+
+When parent template is initialized with a `PrintStream`, any internal use of
+`addPartial()` should use implicitly that `PrintStream` regardless the output
+approach defined on the partial view instantiation.
+
+This feature implies a couple of new internal methods including a `newby()` in
+`HtmlVisitor` that creates a new instance of same type and keeping indentation.
+
+### 3.6 (November, 2020)
+
+Fix code Smells on Generics and other uses cases. Update Junit release to suppress reported vulnerability. https://github.com/xmlet/HtmlFlow/pull/68
 
 ### 3.5 (January, 2020)
 
@@ -337,7 +349,8 @@ that renders 4 different context models in parallel with the same view.
 
 ### 3.0 (November, 2018)
 
-* Improved performance. HtmlFlow is on this date the most performant template engine and Java DSL for HTML.
+* Improved performance. HtmlFlow is on this date the most performant template
+  engine and Java DSL for HTML.
 
 * Replaced the method `º()` by `__()`.
 
@@ -353,13 +366,16 @@ the HTML output format.
 
 * All emitted HTML is cached.
 
-* Data binding requires the use of new method `dynamic()` to avoid caching. Otherwise, the context objects are ignored on further renders.
+* Data binding requires the use of new method `dynamic()` to avoid caching.
+  Otherwise, the context objects are ignored on further renders.
 
 * New method `of()` to enable the use of other methods in the fluent chain.
 
 * New `addPartial()` to enable the reuse of same HTML template function with different HTML fragments.
 
-* Removed the method `binder()`. The role of this method is replaced by the concept of template function which receives the context object `U` that is captured and used whenever is needed, such as in `dynamic()`.
+* Removed the method `binder()`. The role of this method is replaced by the
+  concept of template function which receives the context object `U` that is
+  captured and used whenever is needed, such as in `dynamic()`.
 
 
 ### 2.1 (August, 2018)
