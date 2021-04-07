@@ -103,6 +103,11 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     }
 
     /**
+     * Creates a new similar instance with all static bocks cleared.
+     */
+    protected abstract HtmlVisitorCache newbie();
+
+    /**
      * This visitor may be writing to output or not, depending on the kind of HTML
      * block that it is being visited.
      * So, it should just write to output immediately only when it is:
