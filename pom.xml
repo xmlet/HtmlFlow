@@ -54,6 +54,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.reactivex.rxjava3</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>3.0.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <!-- jsoup HTML parser library @ https://jsoup.org/ -->
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
