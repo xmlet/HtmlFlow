@@ -87,7 +87,7 @@ Java has [several](https://en.wikipedia.org/wiki/Comparison_of_web_template_engi
 Most of the time, template engines have templates that are defined in new
 _external DSL_.
 To allow them to produce a _view_ based on the templates files, they generally use
-the concept of _model_.
+the concept of [_model_](https://en.wikipedia.org/wiki/Data_model).
 
 One of the problems of this technic is that you will end up with a template that
 won't be type checked.
@@ -97,7 +97,7 @@ you before the template is rendered.
 HtmlFlow took a different approach. Templates are expressed in an _internal DSL_.
 You will write normal Java code to produce your template. 
 So the full Java tool chain is at your disposal for templating. 
-Put is simply, HtmlFlow templates are essentially plain Java functions.
+Put it simply, HtmlFlow templates are essentially plain Java functions.
 
 HtmlFlow is not the only one using this approach. But it's the fastest one.
 Bonus points it also produces only valid HTML document according to HTML 5.2.
