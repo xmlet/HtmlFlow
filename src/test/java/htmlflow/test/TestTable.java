@@ -174,9 +174,9 @@ public class TestTable {
         org.w3c.dom.Element elem = Utils.getRootElement(html);
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(0).getNodeName());
-        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(2).getNodeName());
-        Node div = childNodes.item(2).getChildNodes().item(5);
+        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(1).getNodeName());
+        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(3).getNodeName());
+        Node div = childNodes.item(3).getChildNodes().item(5);
         assertEquals(Div.class.getSimpleName().toLowerCase(), div.getNodeName());
         Node table = div.getChildNodes().item(1);
         assertEquals(Table.class.getSimpleName().toLowerCase(), table.getNodeName());
@@ -207,9 +207,9 @@ public class TestTable {
         org.w3c.dom.Element elem = Utils.getRootElement(html);
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(0).getNodeName());
-        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(2).getNodeName());
-        Node div = childNodes.item(2).getChildNodes().item(5);
+        assertEquals(Head.class.getSimpleName().toLowerCase(), childNodes.item(1).getNodeName());
+        assertEquals(Body.class.getSimpleName().toLowerCase(), childNodes.item(3).getNodeName());
+        Node div = childNodes.item(3).getChildNodes().item(5);
         assertEquals(Div.class.getSimpleName().toLowerCase(), div.getNodeName());
         Node table = div.getChildNodes().item(1);
         assertEquals(Table.class.getSimpleName().toLowerCase(), table.getNodeName());
