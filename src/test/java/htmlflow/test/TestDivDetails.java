@@ -98,9 +98,9 @@ public class TestDivDetails {
         Element elem = Utils.getRootElement(html.getBytes());
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
-        Node head = childNodes.item(0);
+        Node head = childNodes.item(1);
         assertEquals(Head.class.getSimpleName().toLowerCase(), head.getNodeName());
-        Node body = childNodes.item(2);
+        Node body = childNodes.item(3);
         assertEquals(Body.class.getSimpleName().toLowerCase(), body.getNodeName());
         Node bodyClassAttr = body.getAttributes().getNamedItem("class");
         assertEquals("container", bodyClassAttr.getNodeValue());
