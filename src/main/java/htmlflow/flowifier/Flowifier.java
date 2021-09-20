@@ -134,7 +134,9 @@ public class Flowifier {
     public String toFlow(final String url) throws IOException {
         final DefaultHtmlToJavaHtmlFlowNodeVisitor visitor = new DefaultHtmlToJavaHtmlFlowNodeVisitor();
         final StringBuilder builder = toFlow(url, visitor);
-        return builder.toString();
+        return builder
+            .toString()
+            .replace(".text(\"\\n\")", "");
     }
 
     /**
