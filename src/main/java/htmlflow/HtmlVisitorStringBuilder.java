@@ -24,6 +24,10 @@
 
 package htmlflow;
 
+import htmlflow.async.AsyncNode;
+
+import static java.lang.String.valueOf;
+
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
  * library) which uses an internal StringBuilder to collect information
@@ -38,7 +42,7 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
      * resulting string with the Html content.
      */
     private final StringBuilder sb = new StringBuilder();
-
+    
     public HtmlVisitorStringBuilder(boolean isDynamic) {
         this(isDynamic, true);
     }
@@ -107,6 +111,17 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
         String data = sb.toString();
         sb.setLength(0);
         return data;
+    }
+    
+    //TODO review this
+    @Override
+    protected <T> String readNext(AsyncNode<T> node) {
+        if (node.isCancelled()) {
+            // there is scenario yet where we have the cancellation of observables
+            // but this is here for possible future iterations
+            return "";
+        }
+        return sb.substring(node.beginAsyncNodeIndex, node.asyncNodeIndex);
     }
 
     @Override

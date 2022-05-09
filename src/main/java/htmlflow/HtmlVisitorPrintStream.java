@@ -24,9 +24,11 @@
 
 package htmlflow;
 
+import htmlflow.async.AsyncNode;
 import htmlflow.util.PrintStringBuilder;
 
 import java.io.PrintStream;
+import java.util.function.Consumer;
 
 /**
  * @author Miguel Gamboa, Luís Duare
@@ -134,7 +136,14 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
          */
         return null;
     }
-
+    
+    @Override
+    protected <T> String readNext(AsyncNode<T> node) {
+        // since the print stream is writing directly
+        // there is no use for this method for that case
+        throw new IllegalStateException("Cannot use renderAsync with the PrintStream");
+    }
+    
     @Override
     protected HtmlVisitorCache clone(boolean isIndented) {
         return new HtmlVisitorPrintStream(out, isDynamic, isIndented);

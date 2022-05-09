@@ -24,6 +24,8 @@
 
 package htmlflow;
 
+import io.reactivex.rxjava3.core.Observable;
+
 import java.io.PrintStream;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -121,6 +123,11 @@ public class DynamicHtml<T> extends HtmlView<T> {
     public final String render(T model, HtmlView...partials) {
         template.resolve(this, model, partials);
         return getVisitor().finished();
+    }
+    
+    public final Observable<String> renderAsync(T model) {
+        binder.accept(this, model);
+        return getVisitor().finishedAsync();
     }
 
     @Override

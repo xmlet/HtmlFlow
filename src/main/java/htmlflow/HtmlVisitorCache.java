@@ -24,6 +24,10 @@
 
 package htmlflow;
 
+import htmlflow.async.AsyncNode;
+import htmlflow.async.subscribers.ObservableSubscriber;
+import htmlflow.async.subscribers.PreviousAsyncObservableSubscriber;
+import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -42,7 +46,10 @@ import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster
@@ -276,6 +283,12 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
         cacheIndex = 0;
         return result;
     }
+    
+    //TODO review this
+    final Observable<String> finishedAsync(){
+        return Observable.fromIterable(actions)
+                .map(this::readNext);
+    }
 
     static class HtmlBlockInfo {
 
@@ -334,6 +347,8 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * Returns the accumulated output and clear it.
      */
     protected abstract String readAndReset();
+    
+    protected abstract <T> String readNext(AsyncNode<T> node);
 
     /**
      * Since HtmlVisitorCache is immutable this is the preferred way to create a copy of the
@@ -416,5 +431,93 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     public final <Z extends Element>  void visitParentBase(Base<Z> element) {
         visitParentOnVoidElements ();
     }
-
+    
+    private final LinkedList<AsyncNode> actions = new LinkedList<>();
+    private AsyncNode curr = null;
+    
+    protected LinkedList<AsyncNode> getActions() {
+        return actions;
+    }
+    
+    protected AsyncNode getCurr() {
+        return curr.clone();
+    }
+    
+    @Override
+    public <E extends Element, T, O extends Observable<T>> void visitAsync(Supplier<E> supplier, Consumer<E> consumer, O obs) {
+        
+        Runnable asyncAction = () -> consumer.accept(supplier.get());
+        
+        final AsyncNode<T> node = new AsyncNode<>(null, null, asyncAction, obs);
+        
+        if (curr == null) {
+            curr = node;
+            setCurrStateAsRunning();
+        } else {
+            final AsyncNode last = actions.getLast();
+            last.next = node;
+            if (last.isDone()) {
+                advanceToNextAsyncAction();
+            } else {
+                last.observable.subscribe(new PreviousAsyncObservableSubscriber<>(this::advanceToNextAsyncAction));
+            }
+        }
+        actions.addLast(node);
+    }
+    
+    private void advanceToNextAsyncAction() {
+        curr.asyncNodeIndex = size();
+        curr = curr.next;
+        setCurrStateAsRunning();
+    }
+    
+    private void setCurrStateAsRunning() {
+        curr.state = AsyncNode.State.RUNNING;
+        curr.beginAsyncNodeIndex = size();
+        curr.asyncAction.run();
+        if (curr.childNode != null) {
+            curr.childNode.onAsyncAction.trigger(curr.state);
+        }
+    }
+    
+    @Override
+    public <E extends Element> void visitThen(Supplier<E> elem) {
+        
+        AsyncNode last = actions.getLast();
+        final AsyncNode.ChildNode<E> childNode = new AsyncNode.ChildNode<>(elem, state -> readParentState(state, last, elem));
+        
+        if (last.childNode == null) {
+            last.childNode = childNode;
+        }
+        
+        if (actions.size() == 1) {
+            last.observable.subscribe(new ObservableSubscriber<>(this::setCurrStateAsDone, elem, last));
+        } else {
+           readParentState(last.state, last, elem);
+        }
+    }
+    
+    private <E extends Element> void readParentState(AsyncNode.State state, AsyncNode last, Supplier<E> elem) {
+        switch (state){
+            case DONE:
+                break;
+            case WAITING:
+                this.setCurrStateAsRunning();
+                break;
+            case RUNNING:
+                last.observable.subscribe(new ObservableSubscriber<>(this::setCurrStateAsDone, elem, last));
+                break;
+            default:
+                throw new IndexOutOfBoundsException();
+        }
+    }
+    
+    private <E extends Element> void setCurrStateAsDone(Supplier<E> elem, AsyncNode node) {
+        // so if we have .async(x, (thead,x) -> {...}, x -> x.__())
+        // calling .get() on the supplier we will trigger the .then() function to be applied to x -> x.__()
+        // we can only call the .get() when the observable is done
+        node.state = AsyncNode.State.DONE;
+        elem.get();
+        node.asyncNodeIndex = size();
+    }
 }
