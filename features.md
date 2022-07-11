@@ -205,7 +205,7 @@ public class InputField {
         }
     }
 
-  public static HtmlView<LV> view = DynamicHtml.view(InputField::template);
+  public static HtmlView<LabelValueModel> view = DynamicHtml.view(InputField::template);
 
   static void template(DynamicHtml<LabelValueModel> view, LabelValueModel model) {
       view
@@ -232,13 +232,15 @@ This partial could be used inside another template.
 
 ```java
 static void template(DynamicHtml<Pet> view, Pet pet) {
-        view
-          .form().attrMethod(EnumMethodType.POST)
-                .div().attrClass("form-group has-feedback")
-                    .dynamic(div -> view.addPartial(InputField.view, InputField.LV.of("Date", "date", LocalDate.now())))
-                .__() //div
-            .__() //form```
-)
+    view
+      .div()
+        .form().attrMethod(EnumMethodType.POST)
+          .div().attrClass("form-group has-feedback")
+            .dynamic(div -> view.addPartial(InputField.view, InputField.LabelValueModel.of("Date", "date", LocalDate.now())))
+          .__() // div
+        .__() // form
+      .__() // div
+}
 ```
 
 This way of invoking partial is particularly useful when you need to use a smaller part (component) gathered together to produce a bigger template.
