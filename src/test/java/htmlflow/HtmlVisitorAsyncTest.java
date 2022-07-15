@@ -1,6 +1,5 @@
 package htmlflow;
 
-import htmlflow.HtmlVisitorStringBuilder;
 import htmlflow.async.AsyncNode;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.internal.operators.observable.ObservableDelay;
@@ -11,25 +10,33 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.xmlet.htmlapifaster.Body;
 import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Table;
 
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyChar;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class HtmlVisitorCacheTest {
+@ExtendWith(MockitoExtension.class)
+class HtmlVisitorAsyncTest {
     
     @Nested
     @DisplayName("When user uses async methods")
@@ -37,11 +44,16 @@ class HtmlVisitorCacheTest {
     
         private Table<Body<Html<Element>>> baseElem;
     
-        private HtmlVisitorStringBuilder visitor;
+        @Mock
+        private PrintStream out;
+        
+        private HtmlVisitorAsync visitor;
     
         @BeforeEach
         void init() {
-            visitor = new HtmlVisitorStringBuilder(false);
+            visitor = new HtmlVisitorAsync(out,false);
+            doNothing().when(out).print(anyString());
+            doNothing().when(out).print(anyChar());
             baseElem = new Html<>(visitor)
                     .body()
                     .table();
@@ -52,7 +64,7 @@ class HtmlVisitorCacheTest {
     
             Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
     
-            Consumer<Table<Body<Html<Element>>>> action = (table) -> table.thead().text("text");
+            BiConsumer<Table<Body<Html<Element>>>, Observable<String>> action = (table, obs) -> table.thead().text("text");
     
             final Observable<String> observable = Observable.fromArray("1", "2", "3");
     
@@ -68,8 +80,8 @@ class HtmlVisitorCacheTest {
         void given_supplier_action_and_observable_when_n_call_to_visitAsync_then_add_node_and_wait() {
             
             Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
-            
-            Consumer<Table<Body<Html<Element>>>> action = (table) -> table.thead().text("text");
+    
+            BiConsumer<Table<Body<Html<Element>>>, Observable<String>> action = (table, obs) -> table.thead().text("text");
     
             final Observable<String> observable = Observable.create(emitter -> {
                 emitter.onNext("1");
@@ -103,8 +115,8 @@ class HtmlVisitorCacheTest {
             AtomicBoolean isSubscribed = new AtomicBoolean(false);
             
             Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
-            
-            Consumer<Table<Body<Html<Element>>>> action = (table) -> table.thead().text("text");
+    
+            BiConsumer<Table<Body<Html<Element>>>, Observable<String>> action = (table, obs) -> table.thead().text("text");
         
             final Observable<String> observable = Observable.<String>create(emitter -> {
                 emitter.onNext("1");
@@ -131,7 +143,7 @@ class HtmlVisitorCacheTest {
             final Div<Body<Html<Element>>> newElem = baseElem.thead().__()
                     .__().div().text("new field");
     
-            Consumer<Div<Body<Html<Element>>>> divAction = (div) -> div.text("new action");
+            BiConsumer<Div<Body<Html<Element>>>, Observable<String>> divAction = (div, obs) -> div.text("new action");
     
             String nextAsyncActionExpected = "\n<html>\n" +
                     "\t<body>\n" +
@@ -165,7 +177,7 @@ class HtmlVisitorCacheTest {
     
             Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
     
-            Consumer<Table<Body<Html<Element>>>> action = (table) -> table.thead().text("text");
+            BiConsumer<Table<Body<Html<Element>>>, Observable<String>> action = (table, obs) -> table.thead().text("text");
     
             final Observable<String> observable = Observable.<String>create(emitter -> {
                 emitter.onNext("1");
@@ -191,9 +203,9 @@ class HtmlVisitorCacheTest {
         void given_new_elem_and_second_then_call_when_call_visitThen_set_child_node_and_read_state_when_ready() {
     
             Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
-        
-            Consumer<Table<Body<Html<Element>>>> action = (table) -> table.thead().text("text");
-            Consumer<Div<Body<Html<Element>>>> secondAction = (div) -> div.text("text");
+    
+            BiConsumer<Table<Body<Html<Element>>>, Observable<String>> action = (table, obs) -> table.thead().text("text");
+            BiConsumer<Div<Body<Html<Element>>>, Observable<String>> secondAction = (div, obs) -> div.text("text");
         
             final Observable<String> observable = Observable.create(emitter -> {
                 emitter.onNext("1");

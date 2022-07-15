@@ -2,115 +2,118 @@ package htmlflow.test;
 
 import htmlflow.DynamicHtml;
 import htmlflow.test.model.AsyncModel;
+import htmlflow.util.ObservablePrintStream;
 import io.reactivex.rxjava3.core.Observable;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.xmlet.htmlapifaster.Thead;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.Thenable;
 
-import java.awt.*;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.io.ByteArrayOutputStream;
+import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Math.toIntExact;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TestAsyncView {
     
     @Test
-    void given_async_work_when_create_view_then_returns_thenable_and_prints_correct_html() throws IOException {
+    void given_async_work_when_create_view_then_returns_thenable_and_prints_correct_html() throws ExecutionException, InterruptedException {
         
         Observable<String> titles = Observable
-                .fromArray("542", "22", "3333", "42", "541241");
+                .fromArray("Nr", "Name");
         
-        Observable<Long> items = Observable
-                .intervalRange(1, 5, 0, 10, TimeUnit.MILLISECONDS);
+        Observable<Student> studentObservable = Observable
+                .intervalRange(1, 5, 0, 10, TimeUnit.MILLISECONDS)
+                .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
         
-        final AsyncModel<String, Long> asyncModel = new AsyncModel<>(titles, items);
-        DynamicHtml<AsyncModel<String, Long>> view = DynamicHtml.view(TestAsyncView::testAsyncModel);
-        
-        Path path = Paths.get("asyncTest.html");
-        
-        // waits for completion
-        titles.blockingSubscribe();
-        items.blockingSubscribe();
-        
-        final String render = view.render(asyncModel);
-        
-        Files.write(path, render.getBytes(StandardCharsets.UTF_8));;
-        Desktop.getDesktop().browse(path.toUri());
-    }
+        final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titles, studentObservable);
     
-    @Test
-    void given_async_work_when_create_view_and_render_async_then_can_iterate_observable() {
-    
-        Observable<String> titles = Observable
-                .fromArray("542", "22", "3333", "42", "541241");
-    
-        Observable<Long> items = Observable
-                .intervalRange(1, 5, 0, 10, TimeUnit.MILLISECONDS);
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
-        final AsyncModel<String, Long> asyncModel = new AsyncModel<>(titles, items);
-        DynamicHtml<AsyncModel<String, Long>> view = DynamicHtml.view(TestAsyncView::testAsyncModel);
-    
-        Path path = Paths.get("asyncTest.html");
-    
-        List<byte[]> htmlBytes = new ArrayList<>();
+        DynamicHtml<AsyncModel<String, Student>> view = DynamicHtml.viewAsync(mem, TestAsyncView::testAsyncModel);
         
-        view.renderAsync(asyncModel)
-                .subscribe(s -> htmlBytes.add(s.getBytes(StandardCharsets.UTF_8)), (th) -> {}, () -> {
-            try {
-                htmlBytes.forEach(bytes -> {
-                    try {
-                        Files.write(path, bytes);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+        final Future<Void> writeAsync = view.writeAsync(asyncModel);
+        
+        writeAsync.get();
+    
+        Iterator<String> actual = Utils
+                .NEWLINE
+                .splitAsStream(mem.toString())
+                .iterator();
+        Utils
+                .loadLines("asyncTest.html")
+                .forEach(expected -> {
+                    final String next = actual.next();
+                    System.out.println(next);
+                    assertEquals(expected, next);
                 });
-                Desktop.getDesktop().browse(path.toUri());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        
-        titles.blockingSubscribe();
-        items.blockingSubscribe();
+        assertFalse(actual.hasNext());
     }
     
-    static void testAsyncModel(DynamicHtml<AsyncModel<String, Long>> view, AsyncModel<String, Long> model) {
-        view.html()
-                .head()
-                .title()
-                .text("This is test for the async")
-                .__()
-                .__()
+    static void testAsyncModel(DynamicHtml<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
+        final Thenable<Element> thenable = view.html()
                 .body()
                 .div()
                 .p()
-                .text("Creating table from reactive models")
+                .text("Students from a school board")
                 .__()
                 .__()
                 .div()
                 .table()
                 .thead()
-                .async(model.items,
-                        (thead) -> model.items.subscribe(nr -> thead.tr().text(nr).__()),
-                        Thead::__)
-                .then(table -> table.__().table().thead())
+                .tr()
                 .async(model.titles,
-                        (thead) -> model.titles.subscribe(s -> thead.tr().text(s).__()),
-                        Thead::__)
-                .then(table -> table.__()
+                        (tr, titlesObs) -> titlesObs.subscribe(nr -> tr.th().text(nr).__()))
+                .then(tr -> tr.__().__().tbody())
+                .async(model.items,
+                        (tbody, studentObs) -> studentObs.subscribe(student -> tbody.tr()
+                                .th()
+                                .text(student.nr)
+                                .__()
+                                .td()
+                                .text(student.name)
+                                .__()
+                                .__()))
+                .then(tr -> tr.__()
                         .__()
-                        .div().p().text("This is after the tables")
+                        .__()
+                        .div()
+                        .p()
+                        .text("Best students in school")
                         .__()
                         .__()
                         .__()
                         .__());
+        
+        assertNotNull(thenable);
+    }
+    
+    private String randomNameGenerator(int nr) {
+        String[] names = new String[]{"Pedro", "Manuel", "Maria", "Clara", "Rafael"};
+        return names[nr - 1];
+    }
+    
+    private static class Student {
+        private final long nr;
+        private final String name;
+        
+        private Student(long nr, String name) {
+            this.nr = nr;
+            this.name = name;
+        }
+        
+        @Override
+        public String toString() {
+            return String.format("Student nr " + nr + " with name " + name);
+        }
     }
 }

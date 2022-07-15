@@ -12,10 +12,6 @@ public class AsyncNode<T> implements Cloneable{
     public Observable<T> observable;
     public volatile State state = State.WAITING;
     
-    //TODO review this variables
-    public int asyncNodeIndex = 0;
-    public int beginAsyncNodeIndex = 0;
-    
     public AsyncNode(AsyncNode next, ChildNode childNode, Runnable asyncAction, Observable<T> observable) {
         this.next = next;
         this.childNode = childNode;

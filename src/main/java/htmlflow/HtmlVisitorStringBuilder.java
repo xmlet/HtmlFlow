@@ -24,9 +24,11 @@
 
 package htmlflow;
 
-import htmlflow.async.AsyncNode;
+import io.reactivex.rxjava3.core.Observable;
+import org.xmlet.htmlapifaster.Element;
 
-import static java.lang.String.valueOf;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -37,6 +39,7 @@ import static java.lang.String.valueOf;
  *         created on 17-01-2018
  */
 public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
+    private static final String SHOULD_BE_USED_WITH_THE_ASYNC_VERSION = "Should be used with the async version!";
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
@@ -112,21 +115,19 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
         sb.setLength(0);
         return data;
     }
-    
-    //TODO review this
-    @Override
-    protected <T> String readNext(AsyncNode<T> node) {
-        if (node.isCancelled()) {
-            // there is scenario yet where we have the cancellation of observables
-            // but this is here for possible future iterations
-            return "";
-        }
-        return sb.substring(node.beginAsyncNodeIndex, node.asyncNodeIndex);
-    }
 
     @Override
     protected HtmlVisitorCache clone(boolean isIndented) {
         return new HtmlVisitorStringBuilder(isDynamic, isIndented);
     }
-
+    
+    @Override
+    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> biConsumer, Observable<T> observable) {
+        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    }
+    
+    @Override
+    public <E extends Element> void visitThen(Supplier<E> supplier) {
+        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    }
 }
