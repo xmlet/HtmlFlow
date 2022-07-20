@@ -151,9 +151,9 @@ static void tasksTableTemplate(DynamicHtml&lt;Stream&lt;Task>> view, Stream&lt;T
                         .dynamic(tbody ->
                             tasks.forEach(task -> tbody
                                 .tr()
-                                    .td().dynamic(td -> td.text(task.getTitle())).__()
-                                    .td().dynamic(td -> td.text(task.getDescription())).__()
-                                    .td().dynamic(td -> td.text(task.getPriority().toString())).__()
+                                    .td().of(td -> td.text(task.getTitle())).__()
+                                    .td().of(td -> td.text(task.getDescription())).__()
+                                    .td().of(td -> td.text(task.getPriority().toString())).__()
                                 .__() // tr
                             ) // forEach
                         ) // dynamic
