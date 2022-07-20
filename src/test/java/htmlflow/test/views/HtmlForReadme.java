@@ -32,6 +32,7 @@ import htmlflow.test.model.Task;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -131,7 +132,8 @@ public class HtmlForReadme {
         );
 
         Path path = Paths.get("tasksTable.html");
-        // Files.write(path, tasksTableView.render(tasks).getBytes());
+        byte[] html = tasksTableView.render(tasks).getBytes();
+        // Files.write(path, html);
         // Desktop.getDesktop().browse(path.toUri());
     }
 
@@ -155,9 +157,9 @@ public class HtmlForReadme {
                             .dynamic(tbody ->
                                 tasks.forEach(task -> tbody
                                     .tr()
-                                        .td().dynamic(td -> td.text(task.getTitle())).__()
-                                        .td().dynamic(td -> td.text(task.getDescription())).__()
-                                        .td().dynamic(td -> td.text(task.getPriority().toString())).__()
+                                        .td().of(td -> td.text(task.getTitle())).__()
+                                        .td().of(td -> td.text(task.getDescription())).__()
+                                        .td().of(td -> td.text(task.getPriority().toString())).__()
                                     .__() // tr
                                 ) // forEach
                             ) // dynamic
