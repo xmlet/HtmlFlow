@@ -126,7 +126,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
         return asyncHtmlGenerationTasks;
     }
     
-    protected AsyncNode getCurr() {
+    public AsyncNode getCurr() {
         return curr.clone();
     }
     

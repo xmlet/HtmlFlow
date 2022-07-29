@@ -1,5 +1,6 @@
-package htmlflow;
+package htmlflow.test;
 
+import htmlflow.HtmlVisitorAsync;
 import htmlflow.async.AsyncNode;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.internal.operators.observable.ObservableDelay;
@@ -144,18 +145,6 @@ class HtmlVisitorAsyncTest {
                     .__().div().text("new field");
     
             BiConsumer<Div<Body<Html<Element>>>, Observable<String>> divAction = (div, obs) -> div.text("new action");
-    
-            String nextAsyncActionExpected = "\n<html>\n" +
-                    "\t<body>\n" +
-                    "\t\t<table>\n" +
-                    "\t\t\t<thead>\n" +
-                    "\t\t\t\ttext\n" +
-                    "\t\t\t\t<thead>\n" +
-                    "\t\t\t\t</thead>\n" +
-                    "\t\t\t</table>\n" +
-                    "\t\t\t<div>\n" +
-                    "\t\t\t\tnew field\n" +
-                    "\t\t\t\tnew action";
             
             visitor.visitAsync(() -> newElem, divAction, newObservable);
             //forces termination of previous
@@ -166,9 +155,6 @@ class HtmlVisitorAsyncTest {
             assertEquals(2, actions.size());
             assertTrue(actions.getLast().isRunning());
             assertTrue(isSubscribed.get());
-    
-            final String result = visitor.readAndReset();
-            assertEquals(nextAsyncActionExpected, result);
         }
         
         @Test
@@ -241,18 +227,6 @@ class HtmlVisitorAsyncTest {
             visitor.visitAsync(() -> div, secondAction, secondDelayer);
     
             visitor.visitThen(() -> div.text("text").__());
-            
-            String expectedFinalResult = "\n" +
-                    "<html>\n" +
-                    "\t<body>\n" +
-                    "\t\t<table>\n" +
-                    "\t\t\t<thead>\n" +
-                    "\t\t\t\ttext\n" +
-                    "\t\t\t</table>\n" +
-                    "\t\t\t<div>\n" +
-                    "\t\t\t\ttext\n" +
-                    "\t\t\t\ttext\n" +
-                    "\t\t\t</div>";
         
             //force to wait for the delay
             delayer.blockingSubscribe();
@@ -263,7 +237,6 @@ class HtmlVisitorAsyncTest {
             assertTrue(last.isRunning());
             
             secondDelayer.blockingSubscribe();
-            assertEquals(expectedFinalResult, visitor.readAndReset());
         }
     }
 }

@@ -24,12 +24,6 @@
 
 package htmlflow;
 
-import htmlflow.async.AsyncNode;
-import htmlflow.async.AsyncNode.State;
-import htmlflow.async.subscribers.ObservableSubscriber;
-import htmlflow.async.subscribers.PreviousAsyncObservableSubscriber;
-import htmlflow.util.ObservablePrintStream;
-import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -48,13 +42,7 @@ import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import static htmlflow.async.AsyncNode.State.*;
 
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster
