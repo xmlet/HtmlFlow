@@ -5,14 +5,12 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.LinkedList;
 
 public class ObservablePrintStream extends PrintStream {
     
     private final PublishSubject<String> subject;
     private final Observable<String> htmlEmitter;
     
-    //concurrency issues?
     private StringBuilder bufferTags = new StringBuilder();
     
     public ObservablePrintStream(OutputStream out) {
@@ -27,11 +25,10 @@ public class ObservablePrintStream extends PrintStream {
     
     private void resetBuffer() {
         this.bufferTags = new StringBuilder();
-        System.out.println("Observable has ended, resetting buffer");
     }
     
     private void sendOutBuffer() {
-        System.out.println("Someone has subscribed to this observable");
+    
     }
     
     @Override

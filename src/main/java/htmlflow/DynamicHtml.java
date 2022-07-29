@@ -24,20 +24,11 @@
 
 package htmlflow;
 
-import htmlflow.async.AsyncNode;
-import htmlflow.async.HtmlFutureWrite;
 import htmlflow.util.ObservablePrintStream;
-import io.reactivex.rxjava3.core.Observable;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -85,7 +76,7 @@ public class DynamicHtml<T> extends HtmlView<T> {
     }
     
     public static <U> DynamicHtml<U> viewAsync(OutputStream out, BiConsumer<DynamicHtml<U>, U> binder) {
-        return new DynamicHtml(new ObservablePrintStream(out), binder);
+        return new DynamicHtml<>(new ObservablePrintStream(out), binder);
     }
 
     /**
@@ -158,13 +149,16 @@ public class DynamicHtml<T> extends HtmlView<T> {
         this.render(model);
     }
     
-    public final Future<Void> writeAsync(T model) {
+    public final CompletableFuture<Void> writeAsync(T model) {
         final HtmlVisitorCache visitor = this.getVisitor();
         
         if (!(visitor instanceof HtmlVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
         }
-        return new HtmlFutureWrite<>((HtmlVisitorAsync) visitor, this.binder, this, model);
+        
+        HtmlVisitorAsync visitorAsync = (HtmlVisitorAsync) visitor;
+        binder.accept(this, model);
+        return visitorAsync.finishedAsync();
     }
 
     public final void write(T model, HtmlView...partials) {

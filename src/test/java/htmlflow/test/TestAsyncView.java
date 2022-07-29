@@ -2,9 +2,7 @@ package htmlflow.test;
 
 import htmlflow.DynamicHtml;
 import htmlflow.test.model.AsyncModel;
-import htmlflow.util.ObservablePrintStream;
 import io.reactivex.rxjava3.core.Observable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -13,8 +11,8 @@ import org.xmlet.htmlapifaster.async.Thenable;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.toIntExact;
@@ -41,7 +39,7 @@ class TestAsyncView {
         
         DynamicHtml<AsyncModel<String, Student>> view = DynamicHtml.viewAsync(mem, TestAsyncView::testAsyncModel);
         
-        final Future<Void> writeAsync = view.writeAsync(asyncModel);
+        final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
         
         writeAsync.get();
     

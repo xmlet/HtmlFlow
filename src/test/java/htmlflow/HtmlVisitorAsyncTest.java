@@ -70,7 +70,7 @@ class HtmlVisitorAsyncTest {
     
             visitor.visitAsync(elem, action, observable);
     
-            final LinkedList<AsyncNode> actions = visitor.getActions();
+            final LinkedList<AsyncNode> actions = visitor.getAsyncHtmlGenerationTasks();
             
             assertEquals(1, actions.size());
             assertTrue(visitor.getCurr().isRunning());
@@ -100,7 +100,7 @@ class HtmlVisitorAsyncTest {
             
             visitor.visitAsync(elem, action, observable);
         
-            final LinkedList<AsyncNode> actions = visitor.getActions();
+            final LinkedList<AsyncNode> actions = visitor.getAsyncHtmlGenerationTasks();
         
             assertEquals(2, actions.size());
             assertTrue(visitor.getCurr().isRunning());
@@ -161,7 +161,7 @@ class HtmlVisitorAsyncTest {
             //forces termination of previous
             observable.blockingSubscribe();
             
-            final LinkedList<AsyncNode> actions = visitor.getActions();
+            final LinkedList<AsyncNode> actions = visitor.getAsyncHtmlGenerationTasks();
         
             assertEquals(2, actions.size());
             assertTrue(actions.getLast().isRunning());
@@ -193,7 +193,7 @@ class HtmlVisitorAsyncTest {
     
             visitor.visitThen(() -> baseElem.__().div());
     
-            final AsyncNode last = visitor.getActions().getLast();
+            final AsyncNode last = visitor.getAsyncHtmlGenerationTasks().getLast();
     
             assertTrue(isSubscribed.get());
             assertNotNull(last.childNode);
@@ -257,7 +257,7 @@ class HtmlVisitorAsyncTest {
             //force to wait for the delay
             delayer.blockingSubscribe();
             
-            final AsyncNode last = visitor.getActions().getLast();
+            final AsyncNode last = visitor.getAsyncHtmlGenerationTasks().getLast();
         
             assertNotNull(last.childNode);
             assertTrue(last.isRunning());
