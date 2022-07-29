@@ -70,7 +70,6 @@ import org.xmlet.htmlapifaster.EnumTypeOlType;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
 import org.xmlet.htmlapifaster.EnumTypeSimpleContentType;
 import org.xmlet.htmlapifaster.EnumWrapType;
-import org.xmlet.xsdasmfaster.classes.infrastructure.EnumInterface;
 
 /**
  * Defines most of the implementation for a typical visitor of a JSoup node that
@@ -225,7 +224,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
     }
 
     @SuppressWarnings("rawtypes")
-    private String toEnumAttributeValue(final Class<? extends EnumInterface<String>> enumInterfaceClass,
+   /* private String toEnumAttributeValue(final Class<? extends EnumInterface<String>> enumInterfaceClass,
             final Attribute attribute) {
         // gets all possible values of this enum
         final EnumInterface attrValEnum = Arrays.stream(enumInterfaceClass.getEnumConstants())
@@ -246,7 +245,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             enumAttrValue = enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
         }
         return enumAttrValue;
-    }
+    }*/
 
     @Override
     public Class<?> getClassFromNodeName(final String nodeName) {
@@ -357,10 +356,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
         } else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {
             attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
-        } else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
+        } /*else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
             attrVal = toEnumAttributeValue((Class<? extends EnumInterface<String>>) attrMethod.getParameterTypes()[0],
                     attribute);
-        } else {
+        } */else {
             attrVal = null;
         }
         // if the value hasn't been identified as a known value of a typed

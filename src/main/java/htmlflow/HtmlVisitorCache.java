@@ -334,7 +334,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * Returns the accumulated output and clear it.
      */
     protected abstract String readAndReset();
-
+    
     /**
      * Since HtmlVisitorCache is immutable this is the preferred way to create a copy of the
      * existing HtmlVisitorCache instance with a different isIndented state.
@@ -416,5 +416,4 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     public final <Z extends Element>  void visitParentBase(Base<Z> element) {
         visitParentOnVoidElements ();
     }
-
 }

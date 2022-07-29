@@ -24,7 +24,11 @@
 
 package htmlflow;
 
+import htmlflow.util.ObservablePrintStream;
+
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -40,6 +44,8 @@ public class DynamicHtml<T> extends HtmlView<T> {
     private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
              "Wrong use of DynamicView! You should provide a " +
              "model parameter or use a static view instead!";
+    private static final String WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR =
+            "Wrong use of DynamicView writeAsync! You should use the viewAsync creation instead!";
     /**
      * Used alternately with the field binder.
      * A template function receives 3 arguments:
@@ -68,6 +74,10 @@ public class DynamicHtml<T> extends HtmlView<T> {
     public static <U> DynamicHtml<U> view(BiConsumer<DynamicHtml<U>, U> binder) {
         return new DynamicHtml<>(binder);
     }
+    
+    public static <U> DynamicHtml<U> viewAsync(OutputStream out, BiConsumer<DynamicHtml<U>, U> binder) {
+        return new DynamicHtml<>(new ObservablePrintStream(out), binder);
+    }
 
     /**
      * Auxiliary constructor used by clone().
@@ -91,6 +101,12 @@ public class DynamicHtml<T> extends HtmlView<T> {
 
     private DynamicHtml(PrintStream out, BiConsumer<DynamicHtml<T>, T> binder) {
         super(() -> new HtmlVisitorPrintStream(out, true), false);
+        this.binder = binder;
+        this.template = null;
+    }
+    
+    private DynamicHtml(ObservablePrintStream out, BiConsumer<DynamicHtml<T>, T> binder) {
+        super(() -> new HtmlVisitorAsync(out, true), false);
         this.binder = binder;
         this.template = null;
     }
@@ -131,6 +147,18 @@ public class DynamicHtml<T> extends HtmlView<T> {
     @Override
     public final void write(T model) {
         this.render(model);
+    }
+    
+    public final CompletableFuture<Void> writeAsync(T model) {
+        final HtmlVisitorCache visitor = this.getVisitor();
+        
+        if (!(visitor instanceof HtmlVisitorAsync)) {
+            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
+        }
+        
+        HtmlVisitorAsync visitorAsync = (HtmlVisitorAsync) visitor;
+        binder.accept(this, model);
+        return visitorAsync.finishedAsync();
     }
 
     public final void write(T model, HtmlView...partials) {

@@ -25,14 +25,19 @@
 package htmlflow;
 
 import htmlflow.util.PrintStringBuilder;
+import io.reactivex.rxjava3.core.Observable;
+import org.xmlet.htmlapifaster.Element;
 
 import java.io.PrintStream;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
 public class HtmlVisitorPrintStream extends HtmlVisitorCache {
+    private static final String SHOULD_BE_USED_WITH_THE_ASYNC_VERSION = "Should be used with the async version!";
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
@@ -134,9 +139,19 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
          */
         return null;
     }
-
+    
     @Override
     protected HtmlVisitorCache clone(boolean isIndented) {
         return new HtmlVisitorPrintStream(out, isDynamic, isIndented);
+    }
+    
+    @Override
+    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> biConsumer, Observable<T> observable) {
+        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    }
+    
+    @Override
+    public <E extends Element> void visitThen(Supplier<E> supplier) {
+        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
     }
 }

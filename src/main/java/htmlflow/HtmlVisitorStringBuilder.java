@@ -24,6 +24,12 @@
 
 package htmlflow;
 
+import io.reactivex.rxjava3.core.Observable;
+import org.xmlet.htmlapifaster.Element;
+
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
  * library) which uses an internal StringBuilder to collect information
@@ -33,12 +39,13 @@ package htmlflow;
  *         created on 17-01-2018
  */
 public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
+    private static final String SHOULD_BE_USED_WITH_THE_ASYNC_VERSION = "Should be used with the async version!";
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
      */
     private final StringBuilder sb = new StringBuilder();
-
+    
     public HtmlVisitorStringBuilder(boolean isDynamic) {
         this(isDynamic, true);
     }
@@ -113,5 +120,14 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
     protected HtmlVisitorCache clone(boolean isIndented) {
         return new HtmlVisitorStringBuilder(isDynamic, isIndented);
     }
-
+    
+    @Override
+    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> biConsumer, Observable<T> observable) {
+        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    }
+    
+    @Override
+    public <E extends Element> void visitThen(Supplier<E> supplier) {
+        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    }
 }
