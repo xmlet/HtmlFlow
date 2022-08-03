@@ -100,11 +100,12 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      * @see htmlflow.async.AsyncNode.State
      */
     public CompletableFuture<Void> finishedAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            while (!asyncHtmlGenerationTasks.stream().allMatch(AsyncNode::isDone));
-            
-            return null;
-        });
+        CompletableFuture<Void> currCf = curr.cf;
+        for(AsyncNode node = curr.next; node != null; node = node.next) {
+            final AsyncNode myNode = node;
+            currCf = currCf.thenCompose(prev -> myNode.cf);
+        }
+        return currCf;
     }
     
     @Override
@@ -113,26 +114,25 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     }
     
     /**
-     * List of all the async asyncHtmlGenerationTasks that were scheduled for this Html generation.
+     * The last AsyncNode.
      */
-    private final LinkedList<AsyncNode> asyncHtmlGenerationTasks = new LinkedList<>();
+    private AsyncNode lastAsyncNode = null;
     
     /**
      * The current node represent the async action that is being processed at a certain point in time.
      */
     private AsyncNode curr = null;
-    
-    public LinkedList<AsyncNode> getAsyncHtmlGenerationTasks() {
-        return asyncHtmlGenerationTasks;
+
+    public AsyncNode getLastAsyncNode() {
+        return lastAsyncNode.clone();
     }
-    
+
     public AsyncNode getCurr() {
         return curr.clone();
     }
     
     /**
      * VisitAsync is responsible to handle the logic for when the user calls {@code async} for a certain Element.
-     * The entire logic of this method falls on using the LinkedList of nodes {@link #asyncHtmlGenerationTasks}.
      * <p/>
      * At the start we always wrap the call to the consumer, which is the logic for creating the Html tags from the Observable type, inside a
      * runnable, which will start running once we know that we can start emitting the Html.
@@ -178,7 +178,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
             curr = node;
             setCurrStateAsRunning();
         } else {
-            final AsyncNode last = asyncHtmlGenerationTasks.getLast();
+            final AsyncNode last = lastAsyncNode;
             last.next = node;
             if (last.isDone()) {
                 advanceToNextAsyncAction();
@@ -186,7 +186,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
                 last.observable.subscribe(new PreviousAsyncObservableSubscriber<>(this::advanceToNextAsyncAction));
             }
         }
-        asyncHtmlGenerationTasks.addLast(node);
+        lastAsyncNode = node;
     }
     
     private void advanceToNextAsyncAction() {
@@ -199,10 +199,10 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      * was created.
      */
     private void setCurrStateAsRunning() {
-        curr.state = RUNNING;
+        curr.setRunning();
         curr.asyncAction.run();
         if (curr.childNode != null) {
-            curr.childNode.onAsyncAction.trigger(curr.state);
+            curr.childNode.onAsyncAction.trigger(curr.getState());
         }
     }
     
@@ -239,13 +239,13 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     @Override
     public <E extends Element> void visitThen(Supplier<E> elem) {
         
-        AsyncNode last = asyncHtmlGenerationTasks.getLast();
-    
+        AsyncNode last = lastAsyncNode;
+
         if (last.childNode == null) {
             last.childNode = new AsyncNode.ChildNode<>(elem, state -> readParentState(state, last, elem));
         }
         
-        this.readParentState(last.state, last, elem);
+        this.readParentState(last.getState(), last, elem);
     }
     
     private <E extends Element> void readParentState(AsyncNode.State state, AsyncNode last, Supplier<E> elem) {
@@ -272,6 +272,6 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      */
     private <E extends Element> void setCurrStateAsDone(Supplier<E> elem, AsyncNode parentNode) {
         elem.get();
-        parentNode.state = DONE;
+        parentNode.setDone();
     }
 }

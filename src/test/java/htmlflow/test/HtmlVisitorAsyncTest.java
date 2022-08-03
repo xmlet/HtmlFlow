@@ -21,6 +21,7 @@ import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Table;
 
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,7 +50,7 @@ class HtmlVisitorAsyncTest {
         private PrintStream out;
         
         private HtmlVisitorAsync visitor;
-    
+
         @BeforeEach
         void init() {
             visitor = new HtmlVisitorAsync(out,false);
@@ -71,9 +72,7 @@ class HtmlVisitorAsyncTest {
     
             visitor.visitAsync(elem, action, observable);
     
-            final LinkedList<AsyncNode> actions = visitor.getAsyncHtmlGenerationTasks();
-            
-            assertEquals(1, actions.size());
+            assertNull(visitor.getCurr().next);
             assertTrue(visitor.getCurr().isRunning());
         }
     
@@ -101,12 +100,10 @@ class HtmlVisitorAsyncTest {
             
             visitor.visitAsync(elem, action, observable);
         
-            final LinkedList<AsyncNode> actions = visitor.getAsyncHtmlGenerationTasks();
-        
-            assertEquals(2, actions.size());
+            assertNull(visitor.getCurr().next.next); // size == 2
             assertTrue(visitor.getCurr().isRunning());
-            assertTrue(actions.getLast().isWaiting());
-            assertNull(actions.getLast().next);
+            assertTrue(visitor.getLastAsyncNode().isWaiting());
+            assertNull(visitor.getLastAsyncNode().next);
             
         }
     
@@ -150,10 +147,8 @@ class HtmlVisitorAsyncTest {
             //forces termination of previous
             observable.blockingSubscribe();
             
-            final LinkedList<AsyncNode> actions = visitor.getAsyncHtmlGenerationTasks();
-        
-            assertEquals(2, actions.size());
-            assertTrue(actions.getLast().isRunning());
+            assertNull(visitor.getCurr().next); // Current == Last ?
+            assertTrue(visitor.getLastAsyncNode().isRunning());
             assertTrue(isSubscribed.get());
         }
         
@@ -179,7 +174,7 @@ class HtmlVisitorAsyncTest {
     
             visitor.visitThen(() -> baseElem.__().div());
     
-            final AsyncNode last = visitor.getAsyncHtmlGenerationTasks().getLast();
+            final AsyncNode last = visitor.getLastAsyncNode();
     
             assertTrue(isSubscribed.get());
             assertNotNull(last.childNode);
@@ -231,7 +226,7 @@ class HtmlVisitorAsyncTest {
             //force to wait for the delay
             delayer.blockingSubscribe();
             
-            final AsyncNode last = visitor.getAsyncHtmlGenerationTasks().getLast();
+            final AsyncNode last = visitor.getLastAsyncNode();
         
             assertNotNull(last.childNode);
             assertTrue(last.isRunning());

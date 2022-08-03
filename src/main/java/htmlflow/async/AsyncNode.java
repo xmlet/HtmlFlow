@@ -3,6 +3,7 @@ package htmlflow.async;
 import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class AsyncNode<T> implements Cloneable{
@@ -10,7 +11,8 @@ public class AsyncNode<T> implements Cloneable{
     public AsyncNode next;
     public ChildNode childNode;
     public Observable<T> observable;
-    public volatile State state = State.WAITING;
+    private State state = State.WAITING;
+    public final CompletableFuture<Void> cf = new CompletableFuture<>();
     
     public AsyncNode(AsyncNode next, ChildNode childNode, Runnable asyncAction, Observable<T> observable) {
         this.next = next;
@@ -20,7 +22,7 @@ public class AsyncNode<T> implements Cloneable{
     }
     
     public boolean isDone() {
-        return this.state.isDone();
+        return this.state.isDone() && cf.isDone();
     }
     
     public boolean isRunning() {
@@ -41,7 +43,20 @@ public class AsyncNode<T> implements Cloneable{
         node.state = this.state;
         return node;
     }
-    
+
+    public State getState() {
+        return this.state;
+    }
+
+    public void setDone() {
+        this.state = State.DONE;
+        this.cf.complete(null);
+    }
+
+    public void setRunning() {
+        this.state = State.RUNNING;
+    }
+
     public static class ChildNode<E extends Element> {
         public Supplier<E> elem;
         public OnAsyncAction onAsyncAction;
