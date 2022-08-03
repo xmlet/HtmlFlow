@@ -7,12 +7,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class AsyncNode<T> implements Cloneable{
-    public Runnable asyncAction;
+    public final Runnable asyncAction;
     public AsyncNode next;
     public ChildNode childNode;
-    public Observable<T> observable;
-    private State state = State.WAITING;
-    public final CompletableFuture<Void> cf = new CompletableFuture<>();
+    public final Observable<T> observable;
+    public CompletableFuture<Void> cf;
     
     public AsyncNode(AsyncNode next, ChildNode childNode, Runnable asyncAction, Observable<T> observable) {
         this.next = next;
@@ -22,39 +21,30 @@ public class AsyncNode<T> implements Cloneable{
     }
     
     public boolean isDone() {
-        return this.state.isDone() && cf.isDone();
+        return cf != null && cf.isDone();
     }
     
     public boolean isRunning() {
-        return this.state.isRunning();
+        return cf != null;
     }
-    
-    public boolean isCancelled() {
-        return this.state.isCancelled();
-    }
-    
+
     public boolean isWaiting() {
-        return this.state.isWaiting();
+        return cf == null;
     }
     
     @Override
     public AsyncNode<T> clone() {
         final AsyncNode<T> node = new AsyncNode<>(this.next, this.childNode, this.asyncAction, this.observable);
-        node.state = this.state;
+        node.cf = this.cf;
         return node;
     }
 
-    public State getState() {
-        return this.state;
-    }
-
     public void setDone() {
-        this.state = State.DONE;
         this.cf.complete(null);
     }
 
     public void setRunning() {
-        this.state = State.RUNNING;
+        this.cf = new CompletableFuture<>();
     }
 
     public static class ChildNode<E extends Element> {
@@ -69,29 +59,7 @@ public class AsyncNode<T> implements Cloneable{
     }
     
     public interface OnAsyncAction {
-        void trigger(State state);
+        void trigger(AsyncNode node);
     }
-    
-    public enum State {
-        WAITING,
-        RUNNING,
-        CANCELLED,
-        DONE;
-    
-        public boolean isDone() {
-            return this == DONE;
-        }
-    
-        public boolean isRunning() {
-            return this == RUNNING;
-        }
-    
-        public boolean isCancelled() {
-            return this == CANCELLED;
-        }
-        
-        public boolean isWaiting() {
-            return this == WAITING;
-        }
-    }
+
 }
