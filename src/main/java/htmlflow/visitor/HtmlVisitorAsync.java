@@ -1,4 +1,4 @@
-package htmlflow;
+package htmlflow.visitor;
 
 import htmlflow.async.AsyncNode;
 import htmlflow.async.subscribers.ObservableSubscriber;

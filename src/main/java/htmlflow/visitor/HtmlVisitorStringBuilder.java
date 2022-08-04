@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package htmlflow;
+package htmlflow.visitor;
 
 import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;

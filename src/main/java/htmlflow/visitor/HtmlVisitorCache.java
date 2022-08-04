@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package htmlflow;
+package htmlflow.visitor;
 
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;

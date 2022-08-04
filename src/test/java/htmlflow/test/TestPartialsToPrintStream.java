@@ -25,7 +25,7 @@ package htmlflow.test;
 
 import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
-import htmlflow.HtmlVisitorCache;
+import htmlflow.visitor.HtmlVisitorCache;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;

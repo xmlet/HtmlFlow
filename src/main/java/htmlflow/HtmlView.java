@@ -24,6 +24,9 @@
 
 package htmlflow;
 
+import htmlflow.visitor.HtmlVisitorCache;
+import htmlflow.visitor.HtmlVisitorPrintStream;
+import htmlflow.visitor.HtmlVisitorStringBuilder;
 import org.xmlet.htmlapifaster.*;
 
 import java.io.BufferedReader;

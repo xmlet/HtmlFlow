@@ -25,6 +25,10 @@
 package htmlflow;
 
 import htmlflow.util.ObservablePrintStream;
+import htmlflow.visitor.HtmlVisitorAsync;
+import htmlflow.visitor.HtmlVisitorCache;
+import htmlflow.visitor.HtmlVisitorPrintStream;
+import htmlflow.visitor.HtmlVisitorStringBuilder;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
