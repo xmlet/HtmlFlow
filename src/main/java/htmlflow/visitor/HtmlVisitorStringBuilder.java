@@ -66,7 +66,7 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
      * Creates a new similar instance with all static bocks cleared.
      */
     @Override
-    protected HtmlVisitorCache newbie() {
+    public HtmlVisitorCache newbie() {
         return new HtmlVisitorStringBuilder(isDynamic, isIndented, depth);
     }
 
@@ -91,7 +91,7 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
     }
 
     @Override
-    protected void write(String text) {
+    public void write(String text) {
         sb.append(text);
     }
     @Override
@@ -117,7 +117,7 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
     }
 
     @Override
-    protected HtmlVisitorCache clone(boolean isIndented) {
+    public HtmlVisitorCache clone(boolean isIndented) {
         return new HtmlVisitorStringBuilder(isDynamic, isIndented);
     }
     

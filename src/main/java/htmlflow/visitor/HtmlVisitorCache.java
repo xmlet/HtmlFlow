@@ -61,7 +61,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /**
      * keep track of current indentation.
      */
-    int depth;
+    protected int depth;
     /**
      * If the begin tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code "<elem"}.
      * On element visit the begin tag is left open to include additional attributes.
@@ -91,7 +91,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      * If it is not dynamic and there is a dynamic block visit then it should throw
      * an Exception.
      */
-    final boolean isDynamic;
+    public final boolean isDynamic;
     /**
      * It the HTML output should be indented or not.
      */
@@ -103,9 +103,22 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     }
 
     /**
+     * keep track of current indentation.
+     */
+    public int getDepth() {
+        return depth;
+    }
+    /**
+     * Set current indentation.
+     */
+    public void  setDepth(int v) {
+        depth = v;
+    }
+
+    /**
      * Creates a new similar instance with all static bocks cleared.
      */
-    protected abstract HtmlVisitorCache newbie();
+    public abstract HtmlVisitorCache newbie();
 
     /**
      * This visitor may be writing to output or not, depending on the kind of HTML
@@ -250,7 +263,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /**
      * Writes the {@code ">"} to output.
      */
-    final void closeBeginTag() {
+    public final void closeBeginTag() {
         if(!isClosed) {
             write(Tags.FINISH_TAG);
             isClosed = true;
@@ -258,7 +271,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
         }
     }
 
-    final String finished(){
+    public final String finished(){
         if (isCached && cacheIndex <= cacheBlocksList.size()){
             HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
             write(block.html);
@@ -313,7 +326,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
     /**
      * Writes the string text directly to the output.
      */
-    protected abstract void write(String text);
+    public abstract void write(String text);
 
     /**
      * Writes the char c directly to the output.
@@ -341,7 +354,7 @@ public abstract class HtmlVisitorCache extends ElementVisitor {
      *
      * @param isIndented If thenew visitor should indent HTML output or not.
      */
-    protected abstract HtmlVisitorCache clone(boolean isIndented);
+    public abstract HtmlVisitorCache clone(boolean isIndented);
 
     /*=========================================================================*/
     /*------------            Root Element Methods         --------------------*/

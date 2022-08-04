@@ -73,7 +73,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
      * Creates a new similar instance with all static bocks cleared.
      */
     @Override
-    protected HtmlVisitorCache newbie() {
+    public HtmlVisitorCache newbie() {
         return new HtmlVisitorPrintStream(out, isDynamic, isIndented, depth);
     }
 
@@ -98,7 +98,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
     }
 
     @Override
-    protected void write(String text) {
+    public void write(String text) {
         current.print(text);
     }
     @Override
@@ -141,7 +141,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
     }
     
     @Override
-    protected HtmlVisitorCache clone(boolean isIndented) {
+    public HtmlVisitorCache clone(boolean isIndented) {
         return new HtmlVisitorPrintStream(out, isDynamic, isIndented);
     }
     

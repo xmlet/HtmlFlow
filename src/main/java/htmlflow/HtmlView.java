@@ -201,7 +201,7 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
      */
     public final <U> void addPartial(HtmlView<U> partial, U model) {
         getVisitor().closeBeginTag();
-        partial.getVisitor().depth = getVisitor().depth;
+        partial.getVisitor().setDepth(getVisitor().getDepth());
         if (this.getVisitor().isWriting()) {
             /**
              * Next partial.clone() is related with https://github.com/xmlet/HtmlFlow/issues/75
@@ -229,7 +229,7 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
      */
     public final <U> void addPartial(HtmlView<U> partial) {
         getVisitor().closeBeginTag();
-        partial.getVisitor().depth = getVisitor().depth;
+        partial.getVisitor().setDepth(getVisitor().getDepth());
         if (this.getVisitor().isWriting()) {
             /**
              * This overloaded addPartial does not have a model object.

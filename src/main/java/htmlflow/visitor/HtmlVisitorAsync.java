@@ -39,7 +39,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     
     
     @Override
-    protected HtmlVisitorCache newbie() {
+    public HtmlVisitorCache newbie() {
         return new HtmlVisitorAsync(out, isDynamic, isIndented, depth);
     }
     
@@ -64,7 +64,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     }
     
     @Override
-    protected void write(String text) {
+    public void write(String text) {
         out.print(text);
     }
     
@@ -105,7 +105,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     }
     
     @Override
-    protected HtmlVisitorCache clone(boolean isIndented) {
+    public HtmlVisitorCache clone(boolean isIndented) {
         return new HtmlVisitorAsync(out, isDynamic, isIndented);
     }
     
