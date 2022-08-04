@@ -70,12 +70,13 @@ import org.xmlet.htmlapifaster.EnumTypeOlType;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
 import org.xmlet.htmlapifaster.EnumTypeSimpleContentType;
 import org.xmlet.htmlapifaster.EnumWrapType;
+import org.xmlet.xsdasmfaster.classes.infrastructure.EnumInterface;
 
 /**
  * Defines most of the implementation for a typical visitor of a JSoup node that
  * converts the HTML source code into a Java class except the storage managed by
  * the appendable
- * 
+ *
  * @author Julien Gouesse
  *
  * @param <T>
@@ -83,10 +84,10 @@ import org.xmlet.htmlapifaster.EnumWrapType;
  */
 public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable>
         implements HtmlToJavaHtmlFlowNodeVisitor<T> {
-
+    
     private static final Logger LOGGER = Logger
             .getLogger(AbstractHtmlToJavaHtmlFlowNodeVisitor.class.getCanonicalName());
-
+    
     @SuppressWarnings("rawtypes")
     private static final Class[] ENUM_INTERFACE_SUBCLASSES = new Class[] { EnumAutocompleteType.class,
             EnumBorderType.class, EnumContenteditableType.class, EnumCrossoriginCrossOriginType.class,
@@ -97,22 +98,22 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             EnumShapeType.class, EnumSpellcheckType.class, EnumTranslateType.class, EnumTypeButtonType.class,
             EnumTypeContentType.class, EnumTypeInputType.class, EnumTypeOlType.class, EnumTypeScriptType.class,
             EnumTypeSimpleContentType.class, EnumWrapType.class };
-
+    
     /**
      * supplier of the appendable
      */
     private final Supplier<T> appendableSupplier;
-
+    
     private final boolean indented;
-
+    
     /**
      * appendable used to store the content of the Java class
      */
     private T appendable;
-
+    
     /**
      * Constructor
-     * 
+     *
      * @param appendableSupplier
      *            the supplier of the appendable, can create or get an
      *            appendable
@@ -125,12 +126,12 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         this.appendableSupplier = Objects.requireNonNull(appendableSupplier);
         this.indented = indented;
     }
-
+    
     @Override
     public final T getAppendable() {
         return appendable;
     }
-
+    
     @Override
     public void appendHeader() throws IOException {
         // creates or gets an appendable
@@ -142,7 +143,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         appendable.append("        final HtmlView html = StaticHtml.view().setIndented(")
                 .append(Boolean.toString(indented)).append(")\n");
     }
-
+    
     @Override
     public void appendFooter() throws IOException {
         appendable.append("            ;\n");
@@ -150,10 +151,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         appendable.append("    }\n");
         appendable.append("}\n");
     }
-
+    
     /**
      * This method comes from Javapoet
-     * 
+     *
      * @param c
      * @return
      */
@@ -211,7 +212,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         result.append('"');
         return result.toString();
     }
-
+    
     @Override
     public String convertJavaStringContentToJavaDeclarableString(final String unescaped) {
         return unescaped == null ? null : stringLiteralWithDoubleQuotes(unescaped, "");
@@ -224,8 +225,8 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
     }
 
     @SuppressWarnings("rawtypes")
-   /* private String toEnumAttributeValue(final Class<? extends EnumInterface<String>> enumInterfaceClass,
-            final Attribute attribute) {
+    private String toEnumAttributeValue(final Class<? extends EnumInterface<String>> enumInterfaceClass,
+                                        final Attribute attribute) {
         // gets all possible values of this enum
         final EnumInterface attrValEnum = Arrays.stream(enumInterfaceClass.getEnumConstants())
                 .map(EnumInterface.class::cast)
@@ -245,8 +246,8 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             enumAttrValue = enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
         }
         return enumAttrValue;
-    }*/
-
+    }
+    
     @Override
     public Class<?> getClassFromNodeName(final String nodeName) {
         final String nodeClassname = nodeName.substring(0, 1).toUpperCase(Locale.ENGLISH)
@@ -260,7 +261,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         }
         return nodeClass;
     }
-
+    
     @SuppressWarnings("rawtypes")
     @Override
     public Method getMethodFromAttribute(Class<?> nodeClass, Attribute attribute) {
@@ -268,15 +269,15 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         final String attrMethodName = "attr" + attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH)
                 + attrKey.substring(1);
         return Arrays.stream(nodeClass.getMethods()).filter((final Method method) -> method.getName()
-                .equals(attrMethodName)
-                && method.getParameterCount() == 1
-                && Stream
+                        .equals(attrMethodName)
+                        && method.getParameterCount() == 1
+                        && Stream
                         .concat(Stream.of(String.class, Boolean.class, Long.class, Integer.class),
                                 Arrays.stream(ENUM_INTERFACE_SUBCLASSES))
                         .anyMatch((final Class candidateClass) -> candidateClass.equals(method.getParameterTypes()[0])))
                 .findFirst().orElse(null);
     }
-
+    
     @Override
     public void head(final Node node, final int depth) {
         try {
@@ -296,7 +297,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
                 if (node instanceof TextNode) {
                     final TextNode textNode = (TextNode) node;
                     appendable.append(".text(").append(
-                            convertJavaStringContentToJavaDeclarableString(Entities.escape(textNode.getWholeText())))
+                                    convertJavaStringContentToJavaDeclarableString(Entities.escape(textNode.getWholeText())))
                             .append(")").append("\n");
                     textNode.toString();
                 } else if (node instanceof DataNode) {
@@ -326,13 +327,13 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             LOGGER.warning("Failed to append the Java source code, cause: " + ioe.getMessage());
         }
     }
-
+    
     private String escapeInAttribute(final String unescaped) {
         // FIXME ask JSoup's maintainer to expose a public method to escape the
         // value of an attribute
         return Entities.escape(unescaped).replace("\"", "&quot;");
     }
-
+    
     @Override
     @SuppressWarnings("unchecked")
     public void appendAttribute(final Attribute attribute, final Class<?> nodeClass) throws IOException {
@@ -356,10 +357,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
         } else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {
             attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
-        } /*else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
+        } else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
             attrVal = toEnumAttributeValue((Class<? extends EnumInterface<String>>) attrMethod.getParameterTypes()[0],
                     attribute);
-        } */else {
+        } else {
             attrVal = null;
         }
         // if the value hasn't been identified as a known value of a typed
@@ -374,7 +375,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             appendable.append(".").append(attrMethod.getName()).append("(").append(attrVal).append(")");
         }
     }
-
+    
     @Override
     public void tail(final Node node, final int depth) {
         try {

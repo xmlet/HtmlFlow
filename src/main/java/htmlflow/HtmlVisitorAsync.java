@@ -7,17 +7,12 @@ import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;
 
 import java.io.PrintStream;
-import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static htmlflow.async.AsyncNode.State.DONE;
-import static htmlflow.async.AsyncNode.State.RUNNING;
-
 /**
  * Async version of an HtmlVisitorCache.
- *
  * This visitor only handles async models.
  */
 public class HtmlVisitorAsync extends HtmlVisitorCache {
@@ -96,15 +91,16 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     
     /**
      *
-     * @return A {@link CompletableFuture} which completes upon the last async action achieves {@link htmlflow.async.AsyncNode.State#DONE} state.
-     * @see htmlflow.async.AsyncNode.State
+     * @return A {@link CompletableFuture} which completes upon the last async action achieves {@link AsyncNode#isDone()} state.
+     * @see htmlflow.async.AsyncNode
      */
     public CompletableFuture<Void> finishedAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            while (!asyncHtmlGenerationTasks.stream().allMatch(AsyncNode::isDone));
-            
-            return null;
-        });
+        CompletableFuture<Void> currCf = curr.cf;
+        for(AsyncNode node = curr.next; node != null; node = node.next) {
+            final AsyncNode myNode = node;
+            currCf = currCf.thenCompose(prev -> myNode.cf);
+        }
+        return currCf;
     }
     
     @Override
@@ -112,19 +108,19 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
         return new HtmlVisitorAsync(out, isDynamic, isIndented);
     }
     
-    /**
-     * List of all the async asyncHtmlGenerationTasks that were scheduled for this Html generation.
-     */
-    private final LinkedList<AsyncNode> asyncHtmlGenerationTasks = new LinkedList<>();
+    public AsyncNode getLastAsyncNode() {
+        return lastAsyncNode.clone();
+    }
     
     /**
      * The current node represent the async action that is being processed at a certain point in time.
      */
     private AsyncNode curr = null;
     
-    public LinkedList<AsyncNode> getAsyncHtmlGenerationTasks() {
-        return asyncHtmlGenerationTasks;
-    }
+    /**
+     * The last AsyncNode.
+     */
+    private AsyncNode lastAsyncNode = null;
     
     public AsyncNode getCurr() {
         return curr.clone();
@@ -132,13 +128,12 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     
     /**
      * VisitAsync is responsible to handle the logic for when the user calls {@code async} for a certain Element.
-     * The entire logic of this method falls on using the LinkedList of nodes {@link #asyncHtmlGenerationTasks}.
      * <p/>
      * At the start we always wrap the call to the consumer, which is the logic for creating the Html tags from the Observable type, inside a
      * runnable, which will start running once we know that we can start emitting the Html.
      * <p/>
      * This Runnable is then used to create a Node. A Node represents an async action that was submitted by the user. The node always start at the
-     * {@link htmlflow.async.AsyncNode.State#WAITING} state.
+     * {@link AsyncNode#isWaiting()} state.
      * These nodes are always added to the LinkedList of nodes.
      * <p/>
      * Then we have two flows for processing async tasks:
@@ -148,7 +143,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      * </ul>
      * <p/>
      * Case 1 is very straightforward, we just set the {@link #curr} node to the newly created node and start the async action by putting it in
-     * {@link htmlflow.async.AsyncNode.State#RUNNING} state.
+     * {@link AsyncNode#isRunning()} state.
      * <p/>
      * For case 2, the first thing we do is to associate the new node (N node) to the N-1 async action.
      * <p/>
@@ -165,7 +160,6 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      *
      * @see Runnable
      * @see AsyncNode
-     * @see AsyncNode.State
      */
     @Override
     public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> consumer, Observable<T> obs) {
@@ -178,7 +172,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
             curr = node;
             setCurrStateAsRunning();
         } else {
-            final AsyncNode last = asyncHtmlGenerationTasks.getLast();
+            final AsyncNode last = lastAsyncNode;
             last.next = node;
             if (last.isDone()) {
                 advanceToNextAsyncAction();
@@ -186,7 +180,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
                 last.observable.subscribe(new PreviousAsyncObservableSubscriber<>(this::advanceToNextAsyncAction));
             }
         }
-        asyncHtmlGenerationTasks.addLast(node);
+        lastAsyncNode = node;
     }
     
     private void advanceToNextAsyncAction() {
@@ -199,10 +193,10 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      * was created.
      */
     private void setCurrStateAsRunning() {
-        curr.state = RUNNING;
+        curr.setRunning();
         curr.asyncAction.run();
         if (curr.childNode != null) {
-            curr.childNode.onAsyncAction.trigger(curr.state);
+            curr.childNode.onAsyncAction.trigger(curr);
         }
     }
     
@@ -220,14 +214,14 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      * After that we proceed to read the parent state, where,
      * <ul>
      *     <li>
-     *         If the state is {@link AsyncNode.State#DONE} we can call the {@link Supplier} which will trigger the execution of the
+     *         If the state is {@link AsyncNode#isDone()} we can call the {@link Supplier} which will trigger the execution of the
      *         {@link java.util.function.Function} inside the {@code .then()}
      *     </li>
      *     <li>
-     *         If the state is {@link AsyncNode.State#WAITING} we don't do anything as the respective parent has not yet started emitting.
+     *         If the state is {@link AsyncNode#isWaiting()} we don't do anything as the respective parent has not yet started emitting.
      *     </li>
      *     <li>
-     *         If the state {@link AsyncNode.State#RUNNING} we subscribe to the {@link Observable} of the parent and after it completes we set the
+     *         If the state {@link AsyncNode#isRunning()} we subscribe to the {@link Observable} of the parent and after it completes we set the
      *         parent state as done and proceed to call the {@link Supplier}
      *     </li>
      * </ul>
@@ -239,32 +233,31 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     @Override
     public <E extends Element> void visitThen(Supplier<E> elem) {
         
-        AsyncNode last = asyncHtmlGenerationTasks.getLast();
+        AsyncNode last = lastAsyncNode;
     
         if (last.childNode == null) {
-            last.childNode = new AsyncNode.ChildNode<>(elem, state -> readParentState(state, last, elem));
+            last.childNode = new AsyncNode.ChildNode<>(elem, curr -> readParentState(curr, last, elem));
         }
         
-        this.readParentState(last.state, last, elem);
+        this.readParentState(last, last, elem);
     }
     
-    private <E extends Element> void readParentState(AsyncNode.State state, AsyncNode last, Supplier<E> elem) {
-        switch (state){
-            case DONE:
-                elem.get();
-                break;
-            case WAITING:
-                break;
-            case RUNNING:
-                last.observable.subscribe(new ObservableSubscriber<>(this::setCurrStateAsDone, elem, last));
-                break;
-            default:
-                throw new IndexOutOfBoundsException();
+    private <E extends Element> void readParentState(AsyncNode curr, AsyncNode last, Supplier<E> elem) {
+        if(curr.isDone()) {
+            elem.get();
         }
+        else if(curr.isRunning()) {
+            last.observable.subscribe(new ObservableSubscriber<>(this::setCurrStateAsDone, elem, last));
+        }
+        else if(curr.isWaiting()) {
+            // no action needed
+        }
+        else
+            throw new IndexOutOfBoundsException();
     }
     
     /**
-     * Executes the call to the Supplier and sets the parent state as {@link htmlflow.async.AsyncNode.State#DONE}.
+     * Executes the call to the Supplier and sets the parent state as {@link AsyncNode#isDone()}.
      *
      * @param elem The Supplier containing the execution of the {@code .then()}
      * @param parentNode The parent node
@@ -272,6 +265,6 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      */
     private <E extends Element> void setCurrStateAsDone(Supplier<E> elem, AsyncNode parentNode) {
         elem.get();
-        parentNode.state = DONE;
+        parentNode.setDone();
     }
 }
