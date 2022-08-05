@@ -10,6 +10,7 @@ import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.Thenable;
 
 import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -37,7 +38,7 @@ class TestAsyncView {
     
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
-        DynamicHtml<AsyncModel<String, Student>> view = DynamicHtml.viewAsync(mem, TestAsyncView::testAsyncModel);
+        DynamicHtml<AsyncModel<String, Student>> view = DynamicHtml.viewAsync(new PrintStream(mem), TestAsyncView::testAsyncModel);
         
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
         

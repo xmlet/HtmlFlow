@@ -24,9 +24,6 @@
 
 package htmlflow;
 
-import htmlflow.util.ObservablePrintStream;
-
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -75,8 +72,8 @@ public class DynamicHtml<T> extends HtmlView<T> {
         return new DynamicHtml<>(binder);
     }
     
-    public static <U> DynamicHtml<U> viewAsync(OutputStream out, BiConsumer<DynamicHtml<U>, U> binder) {
-        return new DynamicHtml<>(new ObservablePrintStream(out), binder);
+    public static <U> DynamicHtml<U> viewAsync(PrintStream out, BiConsumer<DynamicHtml<U>, U> binder) {
+        return new DynamicHtml<>(() -> new HtmlVisitorAsync(out, true), false, null, binder);
     }
 
     /**
@@ -101,12 +98,6 @@ public class DynamicHtml<T> extends HtmlView<T> {
 
     private DynamicHtml(PrintStream out, BiConsumer<DynamicHtml<T>, T> binder) {
         super(() -> new HtmlVisitorPrintStream(out, true), false);
-        this.binder = binder;
-        this.template = null;
-    }
-    
-    private DynamicHtml(ObservablePrintStream out, BiConsumer<DynamicHtml<T>, T> binder) {
-        super(() -> new HtmlVisitorAsync(out, true), false);
         this.binder = binder;
         this.template = null;
     }
