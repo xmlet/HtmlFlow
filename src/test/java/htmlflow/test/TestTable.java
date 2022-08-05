@@ -136,10 +136,10 @@ public class TestTable {
         DynamicHtml<Iterable<Task>> view = DynamicHtml.view(
             new PrintStream(mem),
             HtmlTables::taskListViewWithPartials);
-        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
+        view.write(dataSource, HtmlTables.taskListRow);
         validateBindingTable(mem.toString());
         mem.reset();
-        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
+        view.write(dataSource, HtmlTables.taskListRow);
         validateBindingTable(mem.toString());
     }
 
@@ -152,8 +152,8 @@ public class TestTable {
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
         DynamicHtml<Iterable<Task>> view = DynamicHtml.view(HtmlTables::taskListViewWithPartials);
-        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
-        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
+        validateBindingTable(view.render(dataSource, HtmlTables.taskListRow));
+        validateBindingTable(view.render(dataSource, HtmlTables.taskListRow));
     }
 
     static void validateBindingTable(String actual){

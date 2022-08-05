@@ -2,7 +2,7 @@ package htmlflow.test.views;
 
 import htmlflow.DynamicHtml;
 import htmlflow.HtmlTemplate;
-import htmlflow.HtmlView;
+import htmlflow.AbstractHtmlWriter;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Track;
 import org.junit.Test;
@@ -15,9 +15,9 @@ import java.util.stream.Stream;
 @SuppressWarnings("squid:S3577")
 public class HtmlPartials {
 
-    static HtmlView bbView = StaticHtml.view().div().text("Dummy bbView").__(); // div
+    static AbstractHtmlWriter bbView = StaticHtml.view().div().text("Dummy bbView").__(); // div
 
-    static HtmlView footerView(HtmlView banner) {
+    static AbstractHtmlWriter footerView(AbstractHtmlWriter banner) {
         StaticHtml view = StaticHtml.view();
         return view
                 .div()

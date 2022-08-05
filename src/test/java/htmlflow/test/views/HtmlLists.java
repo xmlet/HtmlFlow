@@ -25,7 +25,7 @@
 package htmlflow.test.views;
 
 import htmlflow.DynamicHtml;
-import htmlflow.HtmlView;
+import htmlflow.AbstractHtmlWriter;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumEnctypeType;
@@ -34,12 +34,14 @@ import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
+import java.io.PrintStream;
+
 public class HtmlLists {
     public static final String divClass = "divClass";
     public static final String divId = "divId";
 
-    public static HtmlView taskView (StaticHtml view) {
-        return view
+    public static AbstractHtmlWriter taskView (PrintStream out) {
+        return StaticHtml.view(out)
             .html()
                 .head()
                     .script()
@@ -65,7 +67,7 @@ public class HtmlLists {
             .__(); //html
     }
 
-    public static HtmlView viewDetails = StaticHtml.view()
+    public static AbstractHtmlWriter viewDetails = StaticHtml.view()
             .html()
                 .head()
                     .title().text("Task Details").__()

@@ -1,10 +1,10 @@
 package htmlflow.test.views;
 
-import htmlflow.HtmlView;
+import htmlflow.AbstractHtmlWriter;
 import htmlflow.StaticHtml;
 
 public class HtmlCustomElements {
-    public static HtmlView customElements = StaticHtml
+    public static AbstractHtmlWriter customElements = StaticHtml
             .view()
                 .html()
                     .head()

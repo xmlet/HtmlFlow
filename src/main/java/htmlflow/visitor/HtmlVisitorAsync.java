@@ -23,24 +23,24 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
      */
     private final PrintStream out;
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic) {
-        this(out, isDynamic, true);
+    public HtmlVisitorAsync(PrintStream out) {
+        this(out, true);
     }
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic, boolean isIndented) {
-        super(isDynamic, isIndented);
+    public HtmlVisitorAsync(PrintStream out, boolean isIndented) {
+        super(isIndented);
         this.out = out;
     }
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic, boolean isIndented, int depth) {
-        this(out, isDynamic, isIndented);
+    public HtmlVisitorAsync(PrintStream out, boolean isIndented, int depth) {
+        this(out, isIndented);
         this.depth = depth;
     }
     
     
     @Override
     public HtmlVisitorCache newbie() {
-        return new HtmlVisitorAsync(out, isDynamic, isIndented, depth);
+        return new HtmlVisitorAsync(out, isIndented, depth);
     }
     
     @Override
@@ -106,7 +106,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     
     @Override
     public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorAsync(out, isDynamic, isIndented);
+        return new HtmlVisitorAsync(out, isIndented);
     }
     
     /**

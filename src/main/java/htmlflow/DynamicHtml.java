@@ -25,10 +25,10 @@
 package htmlflow;
 
 import htmlflow.util.ObservablePrintStream;
+import htmlflow.visitor.HtmlVisitor;
 import htmlflow.visitor.HtmlVisitorAsync;
-import htmlflow.visitor.HtmlVisitorCache;
-import htmlflow.visitor.HtmlVisitorPrintStream;
-import htmlflow.visitor.HtmlVisitorStringBuilder;
+import htmlflow.visitor.HtmlVisitorPrintStreamDynamic;
+import htmlflow.visitor.HtmlVisitorStringBuilderDynamic;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -43,7 +43,7 @@ import java.util.function.Supplier;
  *
  * @author Miguel Gamboa, Luís Duare
  */
-public class DynamicHtml<T> extends HtmlView<T> {
+public class DynamicHtml<T> extends AbstractHtmlWriter<T> {
 
     private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
              "Wrong use of DynamicView! You should provide a " +
@@ -87,7 +87,7 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * Auxiliary constructor used by clone().
      */
     private DynamicHtml(
-        Supplier<HtmlVisitorCache> visitorSupplier,
+        Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe,
         HtmlTemplate<T> template,
         BiConsumer<DynamicHtml<T>, T> binder)
@@ -98,13 +98,13 @@ public class DynamicHtml<T> extends HtmlView<T> {
     }
 
     private DynamicHtml(PrintStream out, HtmlTemplate<T> template) {
-        super((() -> new HtmlVisitorPrintStream(out, true)), false);
+        super((() -> new HtmlVisitorPrintStreamDynamic(out, true)), false);
         this.binder = null;
         this.template = template;
     }
 
     private DynamicHtml(PrintStream out, BiConsumer<DynamicHtml<T>, T> binder) {
-        super(() -> new HtmlVisitorPrintStream(out, true), false);
+        super(() -> new HtmlVisitorPrintStreamDynamic(out, true), false);
         this.binder = binder;
         this.template = null;
     }
@@ -116,15 +116,20 @@ public class DynamicHtml<T> extends HtmlView<T> {
     }
 
     private DynamicHtml(HtmlTemplate<T> template) {
-        super(() -> new HtmlVisitorStringBuilder(true), false);
+        super(() -> new HtmlVisitorStringBuilderDynamic(true), false);
         this.binder = null;
         this.template = template;
     }
 
     private DynamicHtml(BiConsumer<DynamicHtml<T>, T> binder) {
-        super(() -> new HtmlVisitorStringBuilder(true), false);
+        super(() -> new HtmlVisitorStringBuilderDynamic(true), false);
         this.binder = binder;
         this.template = null;
+    }
+
+    @Override
+    public String getName() {
+        return "HtmlView";
     }
 
     @Override
@@ -138,7 +143,7 @@ public class DynamicHtml<T> extends HtmlView<T> {
         return getVisitor().finished();
     }
 
-    public final String render(T model, HtmlView...partials) {
+    public final String render(T model, AbstractHtmlWriter...partials) {
         template.resolve(this, model, partials);
         return getVisitor().finished();
     }
@@ -154,7 +159,7 @@ public class DynamicHtml<T> extends HtmlView<T> {
     }
     
     public final CompletableFuture<Void> writeAsync(T model) {
-        final HtmlVisitorCache visitor = this.getVisitor();
+        final HtmlVisitor visitor = this.getVisitor();
         
         if (!(visitor instanceof HtmlVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
@@ -165,7 +170,7 @@ public class DynamicHtml<T> extends HtmlView<T> {
         return visitorAsync.finishedAsync();
     }
 
-    public final void write(T model, HtmlView...partials) {
+    public final void write(T model, AbstractHtmlWriter...partials) {
         this.render(model, partials);
     }
 
@@ -177,8 +182,8 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * @param threadSafe
      */
     @Override
-    protected final HtmlView<T> clone(
-        Supplier<HtmlVisitorCache> visitorSupplier,
+    protected final AbstractHtmlWriter<T> clone(
+        Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe)
     {
         return new DynamicHtml<>(visitorSupplier, threadSafe, template, binder);
@@ -190,7 +195,7 @@ public class DynamicHtml<T> extends HtmlView<T> {
      * Usually for a parent view to share its visitor with a partial.
      */
     @Override
-    protected HtmlView<T> clone(HtmlVisitorCache visitor) {
+    protected AbstractHtmlWriter<T> clone(HtmlVisitor visitor) {
         return new DynamicHtml<>(() -> visitor, false, template, binder);
     }
 }

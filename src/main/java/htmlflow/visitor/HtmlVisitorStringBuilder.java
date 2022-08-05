@@ -1,133 +1,77 @@
-/*
- * MIT License
- *
- * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package htmlflow.visitor;
 
-import io.reactivex.rxjava3.core.Observable;
-import org.xmlet.htmlapifaster.Element;
-
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
-/**
- * This is the implementation of the ElementVisitor (from HtmlApiFaster
- * library) which uses an internal StringBuilder to collect information
- * about visited Html elements of a HtmlView.
- *
- * @author Miguel Gamboa, Luís Duare
- *         created on 17-01-2018
- */
-public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
-    private static final String SHOULD_BE_USED_WITH_THE_ASYNC_VERSION = "Should be used with the async version!";
+public class HtmlVisitorStringBuilder extends HtmlVisitor {
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
      */
-    private final StringBuilder sb = new StringBuilder();
-    
-    public HtmlVisitorStringBuilder(boolean isDynamic) {
-        this(isDynamic, true);
+    protected final StringBuilder sb = new StringBuilder();
+
+    public HtmlVisitorStringBuilder(boolean isIndented) {
+        super(isIndented);
     }
 
-    /**
-     * Set HTML output indentation with true by default.
-     */
-    public HtmlVisitorStringBuilder(boolean isDynamic, boolean isIndented) {
-        super(isDynamic, isIndented);
-    }
-
-    public HtmlVisitorStringBuilder(boolean isDynamic, boolean isIndented, int depth) {
-        this(isDynamic, isIndented);
+    public HtmlVisitorStringBuilder(boolean isIndented, int depth) {
+        super(isIndented);
         this.depth = depth;
     }
 
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     */
     @Override
-    public HtmlVisitorCache newbie() {
-        return new HtmlVisitorStringBuilder(isDynamic, isIndented, depth);
+    public final HtmlVisitor newbie() {
+        return new HtmlVisitorStringBuilder(isIndented, depth);
     }
 
     @Override
-    protected void beginTag(String elementName) {
-        Tags.appendOpenTag(sb, elementName); // "<elementName"
-    }
-
-    @Override
-    protected void endTag(String elementName) {
-        Tags.appendCloseTag(sb, elementName); // </elementName>
-    }
-
-    @Override
-    protected void addAttribute(String attributeName, String attributeValue) {
-        Tags.appendAttribute(sb, attributeName, attributeValue);
-    }
-
-    @Override
-    protected void addComment(String comment) {
-        Tags.appendComment(sb, comment);
-    }
-
-    @Override
-    public void write(String text) {
-        sb.append(text);
-    }
-    @Override
-    protected void write(char c) {
-        sb.append(c);
-    }
-
-    @Override
-    protected String substring(int staticBlockIndex) {
-        return sb.substring(staticBlockIndex);
-    }
-
-    @Override
-    protected int size() {
-        return sb.length();
-    }
-
-    @Override
-    protected String readAndReset() {
+    public final String finished() {
         String data = sb.toString();
-        sb.setLength(0);
         return data;
     }
 
     @Override
-    public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorStringBuilder(isDynamic, isIndented);
+    protected final void beginTag(String elementName) {
+        Tags.appendOpenTag(sb, elementName); // "<elementName"
     }
-    
+
     @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> biConsumer, Observable<T> observable) {
-        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    protected final void endTag(String elementName) {
+        Tags.appendCloseTag(sb, elementName); // </elementName>
     }
-    
+
     @Override
-    public <E extends Element> void visitThen(Supplier<E> supplier) {
-        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    protected final void addAttribute(String attributeName, String attributeValue) {
+        Tags.appendAttribute(sb, attributeName, attributeValue);
+    }
+
+    @Override
+    protected final void addComment(String comment) {
+        Tags.appendComment(sb, comment);
+    }
+
+    @Override
+    public final void write(String text) {
+        sb.append(text);
+    }
+    @Override
+    protected final void write(char c) {
+        sb.append(c);
+    }
+
+    /**
+     * Since this Visitor immediately emits on each element visit then it is always writing.
+     * @return
+     */
+    @Override
+    public final boolean isWriting() {
+        return true;
+    }
+
+    @Override
+    protected final int size() {
+        return sb.length();
+    }
+
+    @Override
+    public final HtmlVisitor clone(boolean isIndented) {
+        return new HtmlVisitorStringBuilder(isIndented);
     }
 }

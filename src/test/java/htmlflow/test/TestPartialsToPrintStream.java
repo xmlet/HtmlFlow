@@ -23,9 +23,9 @@
  */
 package htmlflow.test;
 
+import htmlflow.AbstractHtmlWriter;
 import htmlflow.DynamicHtml;
-import htmlflow.HtmlView;
-import htmlflow.visitor.HtmlVisitorCache;
+import htmlflow.visitor.HtmlVisitor;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -98,7 +98,7 @@ public class TestPartialsToPrintStream {
         /**
          * Assert
          */
-        HtmlVisitorCache visitor = view.getVisitor();
+        HtmlVisitor visitor = view.getVisitor();
         Field blocksField = visitor.getClass().getSuperclass().getDeclaredField("cacheBlocksList");
         blocksField.setAccessible(true);
         List blocks = (List) blocksField.get(visitor);
@@ -143,7 +143,7 @@ public class TestPartialsToPrintStream {
               .__(); //html
     }
 
-    private final HtmlView<Penguin> penguimPartialView = DynamicHtml.view((view, penguin) -> {
+    private final AbstractHtmlWriter<Penguin> penguimPartialView = DynamicHtml.view((view, penguin) -> {
         view
             .div()
                 .attrId("data-penguin-" + penguin.getName())

@@ -24,12 +24,11 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlVisitorCache;
-import htmlflow.visitor.HtmlVisitorPrintStream;
+import htmlflow.visitor.HtmlVisitor;
+import htmlflow.visitor.HtmlVisitorPrintStreamDynamic;
 import htmlflow.visitor.HtmlVisitorStringBuilder;
 
 import java.io.PrintStream;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -37,24 +36,20 @@ import java.util.function.Supplier;
  *
  * @author Miguel Gamboa, Luís Duare
  */
-public class StaticHtml extends HtmlView<Object> {
+public class StaticHtml extends AbstractHtmlWriter<Object> {
 
     private static final String WRONG_USE_OF_RENDER_WITH_MODEL =
              "Wrong use of StaticView! Model object not " +
              "supported or you should use a dynamic view instead!";
+    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER =
+            "Use render() instead of write(). This HtmlDoc has already a " +
+            "HtmlVisitorStringBuilder that collects emitted HTML.";
 
-    private final Consumer<StaticHtml> template;
 
-    public static StaticHtml view(PrintStream out, Consumer<StaticHtml> template){
-        return new StaticHtml(out, template);
-    }
+    private final PrintStream out;
 
     public static StaticHtml view(PrintStream out){
-        return new StaticHtml(out);
-    }
-
-    public static StaticHtml view(Consumer<StaticHtml> template){
-        return new StaticHtml(template);
+        return out == null ? view() : new StaticHtml(out);
     }
 
     public static StaticHtml view(){
@@ -65,38 +60,27 @@ public class StaticHtml extends HtmlView<Object> {
      * Auxiliary constructor used by clone().
      */
     private StaticHtml(
-        Supplier<HtmlVisitorCache> visitorSupplier,
+        Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe,
-        Consumer<StaticHtml> template)
+        PrintStream out)
     {
         super(visitorSupplier, threadSafe);
-        this.template = template;
+        this.out = out;
     }
 
     private StaticHtml() {
-        this((Consumer<StaticHtml>) null);
-    }
-
-    private StaticHtml(Consumer<StaticHtml>  template) {
-        super(() -> new HtmlVisitorStringBuilder(false), false);
-        this.template = template;
+        super(() -> new HtmlVisitorStringBuilder(true), false);
+        this.out = null;
     }
 
     private StaticHtml(PrintStream out) {
-        this(out, null);
-    }
-
-    private StaticHtml(PrintStream out, Consumer<StaticHtml> template) {
-        super(() -> new HtmlVisitorPrintStream(out, false), false);
-        this.template = template;
+        super(() -> new HtmlVisitorPrintStreamDynamic(out, true), false);
+        this.out = out;
     }
 
     @Override
     public final String render() {
-        if(template != null)
-            template.accept(this);
         return getVisitor().finished();
-
     }
 
     @Override
@@ -106,9 +90,7 @@ public class StaticHtml extends HtmlView<Object> {
 
     @Override
     public final void write() {
-        if(template != null)
-            template.accept(this);
-        getVisitor().finished();
+        throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER);
     }
 
     @Override
@@ -124,8 +106,8 @@ public class StaticHtml extends HtmlView<Object> {
      * @param threadSafe
      */
     @Override
-    protected final HtmlView<Object> clone(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe) {
-        return new StaticHtml(visitorSupplier, threadSafe, template);
+    protected final AbstractHtmlWriter<Object> clone(Supplier<HtmlVisitor> visitorSupplier, boolean threadSafe) {
+        return new StaticHtml(visitorSupplier, threadSafe, out);
     }
 
     /**
@@ -134,7 +116,12 @@ public class StaticHtml extends HtmlView<Object> {
      * Usually for a parent view to share its visitor with a partial.
      */
     @Override
-    protected HtmlView<Object> clone(HtmlVisitorCache visitor) {
-        return new StaticHtml(() -> visitor, false, template);
+    protected AbstractHtmlWriter<Object> clone(HtmlVisitor visitor) {
+        return new StaticHtml(() -> visitor, false, out);
+    }
+
+    @Override
+    public String getName() {
+        return "HtmlDoc";
     }
 }

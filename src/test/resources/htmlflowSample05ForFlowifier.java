@@ -1,9 +1,8 @@
 import htmlflow.*;
-import org.xmlet.htmlapifaster.*;
 
 public class Flowified {
-    public static HtmlView get() {
-        final HtmlView html = StaticHtml.view().setIndented(false)
+    public static AbstractHtmlWriter get() {
+        final AbstractHtmlWriter html = StaticHtml.view().setIndented(false)
             .html()
                 .head()
                     .title()

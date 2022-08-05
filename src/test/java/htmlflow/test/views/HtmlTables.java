@@ -25,11 +25,14 @@
 package htmlflow.test.views;
 
 import htmlflow.DynamicHtml;
-import htmlflow.HtmlView;
+import htmlflow.AbstractHtmlWriter;
+import htmlflow.HtmlWriter;
 import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
+
+import java.io.PrintStream;
 
 public class HtmlTables {
 
@@ -76,7 +79,7 @@ public class HtmlTables {
     public static void taskListViewWithPartials(
         DynamicHtml<Iterable<Task>> view,
         Iterable<Task> tasks,
-        HtmlView[] partials)
+        AbstractHtmlWriter[] partials)
     {
         view
             .html()
@@ -93,7 +96,7 @@ public class HtmlTables {
                 .body()
                     .attrClass("container")
                     .of(__ -> // ignore body argument because we don't need it here
-                        view.addPartial(partials[0]) // taskListViewHeader
+                        HtmlTables.taskListViewHeader(view)
                     )
                     .hr().__()
                     .div()
@@ -106,7 +109,7 @@ public class HtmlTables {
                             .__()
                             .tbody()
                                 .dynamic(tbody ->
-                                    tasks.forEach(task -> view.addPartial(partials[1], task)) // taskListRow
+                                    tasks.forEach(task -> view.addPartial(partials[0], task)) // taskListRow
                                 )
                             .__() // tbody
                         .__() // table
@@ -115,13 +118,14 @@ public class HtmlTables {
             .__(); // html
     }
 
-    public static StaticHtml taskListViewHeader = StaticHtml.view(view -> view
-        .div()
-            .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").__()
-            .p().text("Html page built with HtmlFlow.").__()
-            .h1().text("Task List").__()
-        .__() // div
-    );
+    public static AbstractHtmlWriter<?> taskListViewHeader(AbstractHtmlWriter<?> view) {
+        return view
+            .div()
+                .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").__()
+                .p().text("Html page built with HtmlFlow.").__()
+                .h1().text("Task List").__()
+            .__(); // div
+    }
 
     public static DynamicHtml<Task> taskListRow = DynamicHtml.view((view, task) -> {
         view
@@ -169,7 +173,7 @@ public class HtmlTables {
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    public static HtmlView nestedTable = StaticHtml.view()
+    public static AbstractHtmlWriter nestedTable = StaticHtml.view()
             .html()
                 .body()
                     .table()

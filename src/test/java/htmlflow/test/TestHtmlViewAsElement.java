@@ -34,7 +34,7 @@ public class TestHtmlViewAsElement {
     public void testSelf() {
         StaticHtml view = StaticHtml.view();
         Assert.assertSame(view, view.self());
-        Assert.assertEquals("HtmlView", view.getName());
+        Assert.assertEquals("HtmlDoc", view.getName());
     }
 
     @Test(expected = IllegalStateException.class)

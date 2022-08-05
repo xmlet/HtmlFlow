@@ -25,19 +25,14 @@
 package htmlflow.visitor;
 
 import htmlflow.util.PrintStringBuilder;
-import io.reactivex.rxjava3.core.Observable;
-import org.xmlet.htmlapifaster.Element;
 
 import java.io.PrintStream;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 /**
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlVisitorPrintStream extends HtmlVisitorCache {
-    private static final String SHOULD_BE_USED_WITH_THE_ASYNC_VERSION = "Should be used with the async version!";
+public class HtmlVisitorPrintStreamDynamic extends HtmlVisitorCache {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
@@ -54,18 +49,18 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
     /**
      * Set HTML output indentation with true by default.
      */
-    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic) {
-        this(out, isDynamic, true);
+    public HtmlVisitorPrintStreamDynamic(PrintStream out) {
+        this(out, true);
     }
 
-    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic, boolean isIndented) {
-        super(isDynamic, isIndented);
+    public HtmlVisitorPrintStreamDynamic(PrintStream out, boolean isIndented) {
+        super(isIndented);
         this.out = out;
         this.current = new PrintStringBuilder(out);
     }
 
-    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic, boolean isIndented, int depth) {
-        this(out, isDynamic, isIndented);
+    public HtmlVisitorPrintStreamDynamic(PrintStream out, boolean isIndented, int depth) {
+        this(out, isIndented);
         this.depth = depth;
     }
 
@@ -74,7 +69,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
      */
     @Override
     public HtmlVisitorCache newbie() {
-        return new HtmlVisitorPrintStream(out, isDynamic, isIndented, depth);
+        return new HtmlVisitorPrintStreamDynamic(out, isIndented, depth);
     }
 
     @Override
@@ -142,16 +137,6 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
     
     @Override
     public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorPrintStream(out, isDynamic, isIndented);
-    }
-    
-    @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> biConsumer, Observable<T> observable) {
-        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
-    }
-    
-    @Override
-    public <E extends Element> void visitThen(Supplier<E> supplier) {
-        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+        return new HtmlVisitorPrintStreamDynamic(out, isIndented);
     }
 }
