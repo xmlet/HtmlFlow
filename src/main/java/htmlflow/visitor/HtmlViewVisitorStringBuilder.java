@@ -24,11 +24,7 @@
 
 package htmlflow.visitor;
 
-import io.reactivex.rxjava3.core.Observable;
-import org.xmlet.htmlapifaster.Element;
-
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.io.PrintStream;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -38,27 +34,26 @@ import java.util.function.Supplier;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
-    private static final String SHOULD_BE_USED_WITH_THE_ASYNC_VERSION = "Should be used with the async version!";
+public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor {
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
      */
     private final StringBuilder sb = new StringBuilder();
     
-    public HtmlVisitorStringBuilder(boolean isDynamic) {
-        this(isDynamic, true);
-    }
-
     /**
      * Set HTML output indentation with true by default.
      */
-    public HtmlVisitorStringBuilder(boolean isDynamic, boolean isIndented) {
-        super(isDynamic, isIndented);
+    public HtmlViewVisitorStringBuilder() {
+        super(true);
     }
 
-    public HtmlVisitorStringBuilder(boolean isDynamic, boolean isIndented, int depth) {
-        this(isDynamic, isIndented);
+    public HtmlViewVisitorStringBuilder(boolean isIndented) {
+        super(isIndented);
+    }
+
+    public HtmlViewVisitorStringBuilder(boolean isIndented, int depth) {
+        this(isIndented);
         this.depth = depth;
     }
 
@@ -66,8 +61,8 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
      * Creates a new similar instance with all static bocks cleared.
      */
     @Override
-    public HtmlVisitorCache newbie() {
-        return new HtmlVisitorStringBuilder(isDynamic, isIndented, depth);
+    public HtmlViewVisitor newbie() {
+        return new HtmlViewVisitorStringBuilder(isIndented, depth);
     }
 
     @Override
@@ -117,17 +112,9 @@ public class HtmlVisitorStringBuilder extends HtmlVisitorCache {
     }
 
     @Override
-    public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorStringBuilder(isDynamic, isIndented);
-    }
-    
-    @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> biConsumer, Observable<T> observable) {
-        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
-    }
-    
-    @Override
-    public <E extends Element> void visitThen(Supplier<E> supplier) {
-        throw new UnsupportedOperationException(SHOULD_BE_USED_WITH_THE_ASYNC_VERSION);
+    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
+        if(out != null)
+            throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
+        return new HtmlViewVisitorStringBuilder(isIndented);
     }
 }

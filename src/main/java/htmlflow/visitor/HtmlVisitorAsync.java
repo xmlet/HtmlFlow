@@ -16,31 +16,31 @@ import java.util.function.Supplier;
  *
  * This visitor only handles async models.
  */
-public class HtmlVisitorAsync extends HtmlVisitorCache {
+public class HtmlVisitorAsync extends HtmlViewVisitor {
     
     /**
      * The PrintStream destination of the HTML content produced by the visitor
      */
     private final PrintStream out;
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic) {
-        this(out, isDynamic, true);
+    public HtmlVisitorAsync(PrintStream out) {
+        this(out, true);
     }
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic, boolean isIndented) {
-        super(isDynamic, isIndented);
+    public HtmlVisitorAsync(PrintStream out, boolean isIndented) {
+        super(isIndented);
         this.out = out;
     }
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic, boolean isIndented, int depth) {
-        this(out, isDynamic, isIndented);
+    public HtmlVisitorAsync(PrintStream out, boolean isIndented, int depth) {
+        this(out, isIndented);
         this.depth = depth;
     }
     
     
     @Override
-    public HtmlVisitorCache newbie() {
-        return new HtmlVisitorAsync(out, isDynamic, isIndented, depth);
+    public HtmlViewVisitor newbie() {
+        return new HtmlVisitorAsync(out, isIndented, depth);
     }
     
     @Override
@@ -105,8 +105,8 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     }
     
     @Override
-    public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorAsync(out, isDynamic, isIndented);
+    public HtmlViewVisitor clone(PrintStream other, boolean isIndented) {
+        return new HtmlVisitorAsync(other, isIndented);
     }
     
     /**

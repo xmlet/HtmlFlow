@@ -53,9 +53,7 @@ public class TestIndentation {
     public void testBodyDivPElementsWithoutIndentationOnPrintStream() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlWithoutIndentation
-            .hotBodyDivP
-            .setPrintStream(new PrintStream(mem))
-            .write();
+            .hotBodyDivP(new PrintStream(mem));
         String expected = Utils
             .loadLines("htmlWithoutIndentationBodyDivP.html")
             .collect(joining());

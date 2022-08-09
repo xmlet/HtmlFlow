@@ -1,6 +1,7 @@
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Track;
 import org.xmlet.htmlapifaster.EnumRelType;
 
@@ -8,13 +9,13 @@ import java.util.stream.Stream;
 
 public class HtmlDynamicChainTwiceOnTopgenius {
 
-    public static final DynamicHtml<Stream<Track>> toptracksWrongDynamicTwice = DynamicHtml
+    public static final HtmlView<Stream<Track>> toptracksWrongDynamicTwice = HtmlFlow
         .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice);
 
-    public static final DynamicHtml<Stream<Track>> toptracksOkOfWithDynamic = DynamicHtml
+    public static final HtmlView<Stream<Track>> toptracksOkOfWithDynamic = HtmlFlow
         .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateOfAndDynamic);
 
-    static void toptracksTemplateDynamicTwice(DynamicHtml<Stream<Track>> view, Stream<Track> tracks) {
+    static void toptracksTemplateDynamicTwice(HtmlView<Stream<Track>> view, Stream<Track> tracks) {
         view
             .html()
                 .head()
@@ -57,7 +58,7 @@ public class HtmlDynamicChainTwiceOnTopgenius {
                 .__()
             .__();
     }
-    static void toptracksTemplateOfAndDynamic(DynamicHtml<Stream<Track>> view, Stream<Track> tracks) {
+    static void toptracksTemplateOfAndDynamic(HtmlView<Stream<Track>> view, Stream<Track> tracks) {
         view
             .html()
                 .head()

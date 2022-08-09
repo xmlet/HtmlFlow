@@ -23,8 +23,10 @@
  */
 package htmlflow.test;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import htmlflow.test.views.HtmlLists;
@@ -115,7 +117,7 @@ public class TestDivDetails {
     @Test
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlView<Task> view = DynamicHtml
+        HtmlPage<Task> view = HtmlFlow
             .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
@@ -139,7 +141,7 @@ public class TestDivDetails {
 
     @Test
     public void testDivDetailsBindingWithRender() {
-        HtmlView<Task> view = DynamicHtml
+        HtmlPage<Task> view = HtmlFlow
             .view(HtmlLists::taskDetailsTemplate)
             .threadSafe();
         expectedTaskViews
@@ -172,9 +174,7 @@ public class TestDivDetails {
     public void testWritePartialViewToPrintStream() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlTables
-            .taskListViewHeader
-            .setPrintStream(new PrintStream(mem))
-            .write();
+            .taskListViewHeader(HtmlFlow.doc(new PrintStream(mem)));
 
         Iterator<String> iter = NEWLINE
             .splitAsStream(mem.toString())
@@ -184,16 +184,8 @@ public class TestDivDetails {
                 .loadLines("partialViewHeader.html")
                 .forEach(expected -> {
                     String actual = iter.next();
-                    // System.out.println(actual);
+                    System.out.println(actual);
                     assertEquals(expected, actual);
                 });
-
-        /**
-         * Clear PrintStream and place again a HtmlVisitorStringBuilder
-         * for firther uses of this partial view in other unit tests.
-         */
-        HtmlTables
-            .taskListViewHeader
-            .setPrintStream(null);
     }
 }

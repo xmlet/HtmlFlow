@@ -24,7 +24,8 @@
 
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Stock;
 import org.xmlet.htmlapifaster.EnumHttpEquivType;
 import org.xmlet.htmlapifaster.EnumMediaType;
@@ -34,11 +35,11 @@ import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
 public class HtmlDynamicStocks {
 
-    public static DynamicHtml<Iterable<Stock>> stocksViewOk = DynamicHtml.view(HtmlDynamicStocks::templateStocksOk);
+    public static HtmlView<Iterable<Stock>> stocksViewOk = HtmlFlow.view(HtmlDynamicStocks::templateStocksOk);
 
-    public static DynamicHtml<Iterable<Stock>> stocksViewWrong = DynamicHtml.view(HtmlDynamicStocks::templateStocksWrong);
+    public static HtmlView<Iterable<Stock>> stocksViewWrong = HtmlFlow.view(HtmlDynamicStocks::templateStocksWrong);
 
-    private static void templateStocksOk(DynamicHtml<Iterable<Stock>> view, Iterable<Stock> stocks) {
+    private static void templateStocksOk(HtmlView<Iterable<Stock>> view, Iterable<Stock> stocks) {
         view
             .html()
                 .head()
@@ -125,7 +126,7 @@ public class HtmlDynamicStocks {
             .__(); // html
     };
 
-    private static void templateStocksWrong(DynamicHtml<Iterable<Stock>> view, Iterable<Stock> stocks) {
+    private static void templateStocksWrong(HtmlView<Iterable<Stock>> view, Iterable<Stock> stocks) {
         view
             .html()
                 .head()
