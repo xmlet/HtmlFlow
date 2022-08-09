@@ -1,14 +1,15 @@
 package htmlflow.test.views;
 
-import htmlflow.AbstractHtmlWriter;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 
 import java.io.PrintStream;
 
 public class HtmlWithoutIndentation {
 
-    public static AbstractHtmlWriter bodyDivP = StaticHtml
-        .view()
+    public static HtmlPage bodyDivP = HtmlFlow
+        .doc()
             .setIndented(false)
             .html()
                 .body()
@@ -20,8 +21,8 @@ public class HtmlWithoutIndentation {
                 .__() // body
             .__(); // html
 
-    public static AbstractHtmlWriter bodyPre = StaticHtml
-        .view()
+    public static HtmlPage bodyPre = HtmlFlow
+        .doc()
             .setIndented(false)
             .html()
                 .body()
@@ -31,8 +32,8 @@ public class HtmlWithoutIndentation {
                 .__() // body
             .__(); // html
 
-    public static AbstractHtmlWriter hotBodyDivP(PrintStream out) {
-        return StaticHtml.view(out)
+    public static HtmlPage hotBodyDivP(PrintStream out) {
+        return HtmlFlow.doc(out)
             .setIndented(false)
             .html()
                 .body()

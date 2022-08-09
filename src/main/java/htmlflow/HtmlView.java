@@ -24,68 +24,29 @@
 
 package htmlflow;
 
+import htmlflow.util.ObservablePrintStream;
 import htmlflow.visitor.HtmlVisitor;
-import htmlflow.visitor.HtmlVisitorPrintStreamDynamic;
-import htmlflow.visitor.HtmlVisitorStringBuilderDynamic;
-import org.xmlet.htmlapifaster.Div;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Root;
-import org.xmlet.htmlapifaster.Tr;
+import htmlflow.visitor.HtmlVisitorAsync;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.UncheckedIOException;
-import java.net.URL;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.joining;
-
 /**
- * The root container for HTML elements.
- * It it responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
- * implementation, which is responsible for printing the tree of elements and
- * attributes.
- *
- * Instances of AbstractHtmlWriter are immutable. Any change to its properties returns a new
- * instance of AbstractHtmlWriter.
+ * Dynamic views can be bound to a domain object.
  *
  * @param <T> The type of domain object bound to this View.
  *
  * @author Miguel Gamboa, Luís Duare
- *         created on 29-03-2012
  */
-public abstract class AbstractHtmlWriter<T> implements HtmlWriter<T>, Element<AbstractHtmlWriter<T>, Element<?,?>> {
-    static final String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
-            "Cannot use PrintStream output for thread-safe views!";
+public class HtmlView<T> extends HtmlPage<T> {
 
-    static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
-            "Cannot set thread-safety for views with PrintStream output!";
-
-    private static final String HEADER;
-    private static final String NEWLINE = System.getProperty("line.separator");
-    private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
-
-    static {
-        try {
-            URL headerUrl = AbstractHtmlWriter.class
-                    .getClassLoader()
-                    .getResource(HEADER_TEMPLATE);
-            if(headerUrl == null)
-                throw new FileNotFoundException(HEADER_TEMPLATE);
-            InputStream headerStream = headerUrl.openStream();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(headerStream))) {
-                HEADER = reader.lines().collect(joining(NEWLINE));
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
+    private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
+             "Wrong use of DynamicView! You should provide a " +
+             "model parameter or use a static view instead!";
+    private static final String WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR =
+            "Wrong use of DynamicView writeAsync! You should use the viewAsync creation instead!";
     /**
      * This field is like an union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
@@ -104,9 +65,41 @@ public abstract class AbstractHtmlWriter<T> implements HtmlWriter<T>, Element<Ab
     private final Supplier<HtmlVisitor> visitorSupplier;
     private final boolean threadSafe;
 
-    protected AbstractHtmlWriter(Supplier<HtmlVisitor> visitorSupplier, boolean threadSafe) {
+    /**
+     * Used alternately with the field binder.
+     * A template function receives 3 arguments:
+     *   the view, the domain object and a varargs array of partial views.
+     */
+    private final HtmlTemplate<T> template;
+    /**
+     * Used alternately with the field template.
+     * A binder function is responsible for binding the View with a domain object.
+     * Thus, it is a function that receives two arguments: the view and the domain object.
+     */
+    private final BiConsumer<HtmlView<T>, T> binder;
+
+    /**
+     * To check whether this view is emitting to PrintStream, or not.
+     * Notice since the PrintStream maybe shared by different views processing
+     * we cannot ensure thread safety, because concurrent threads maybe emitting
+     * different HTML to the same PrintStream.
+     */
+    private final PrintStream out;
+    /**
+     * Auxiliary constructor used by clone().
+     */
+    HtmlView(
+        PrintStream out,
+        Supplier<HtmlVisitor> visitorSupplier,
+        boolean threadSafe,
+        HtmlTemplate<T> template,
+        BiConsumer<HtmlView<T>, T> binder)
+    {
+        this.out = out;
         this.visitorSupplier = visitorSupplier;
         this.threadSafe = threadSafe;
+        this.template = template;
+        this.binder = binder;
         if(threadSafe) {
             this.visitor = null;
             this.threadLocalVisitor = ThreadLocal.withInitial(visitorSupplier);
@@ -116,22 +109,8 @@ public abstract class AbstractHtmlWriter<T> implements HtmlWriter<T>, Element<Ab
         }
     }
 
-    public final Html<AbstractHtmlWriter<T>> html() {
-        if (this.getVisitor().isWriting())
-            this.getVisitor().write(HEADER);
-        return new Html<>(this);
-    }
-
-    public final Div<AbstractHtmlWriter<T>> div() {
-        return new Div<>(this);
-    }
-
-    public final Tr<AbstractHtmlWriter<T>> tr() {
-        return new Tr<>(this);
-    }
-
-    public final Root<AbstractHtmlWriter<T>> defineRoot(){
-        return new Root<>(this);
+    HtmlView(ObservablePrintStream out, BiConsumer<HtmlView<T>, T> binder) {
+        this(out, () -> new HtmlVisitorAsync(out, true), false, null, binder);
     }
 
     /**
@@ -142,32 +121,16 @@ public abstract class AbstractHtmlWriter<T> implements HtmlWriter<T>, Element<Ab
     public final HtmlWriter<T> setPrintStream(PrintStream out) {
         if(threadSafe)
             throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
-        Supplier<HtmlVisitor> v = out == null
-            ? () -> new HtmlVisitorStringBuilderDynamic(true)
-            : () -> new HtmlVisitorPrintStreamDynamic(out, true);
-        return clone(v, false);
+        HtmlVisitor v = getVisitor();
+        return clone(() -> v.clone(out, v.isIndented()), false);
     }
 
-    /**
-     * Returns a new instance of AbstractHtmlWriter with the same properties of this object
-     * but with indented set to the value of isIndented parameter.
-     */
-    public final AbstractHtmlWriter<T> setIndented(boolean isIndented) {
-        return clone(() -> getVisitor().clone(isIndented), false);
-    }
-
-    @Override
-    public final AbstractHtmlWriter<T> self() {
-        return this;
-    }
-
-    public final AbstractHtmlWriter<T> threadSafe(){
+    public final HtmlPage<T> threadSafe(){
         /**
-         * I don't like this kind of verification.
-         * Yet, we need to keep backward compatibility with views based
-         * on PrintStream output, which are not viable in a multi-thread scenario.
+         * PrintStream output is not viable in a multi-thread scenario,
+         * because different Visitor instances may share the same PrintStream.
          */
-        if(getVisitor() instanceof HtmlVisitorPrintStreamDynamic) {
+        if(out != null) {
             throw new IllegalStateException(WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM);
         }
         return clone(visitorSupplier, true);
@@ -181,23 +144,60 @@ public abstract class AbstractHtmlWriter<T> implements HtmlWriter<T>, Element<Ab
     }
 
     @Override
-    public Element __() {
-        throw new IllegalStateException(getName() + " is the root of Html tree and it has not any parent.");
+    public String getName() {
+        return "HtmlView";
     }
 
     @Override
-    public Element getParent() {
-        throw new IllegalStateException(getName() + " is the root of Html tree and it has not any parent.");
+    public final String render() {
+        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
-    /**
+    @Override
+    public final String render(T model) {
+        binder.accept(this, model);
+        return getVisitor().finished();
+    }
+
+    public final String render(T model, HtmlView...partials) {
+        template.resolve(this, model, partials);
+        return getVisitor().finished();
+    }
+
+    @Override
+    public final void write() {
+        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
+    }
+
+    @Override
+    public final void write(T model) {
+        this.render(model);
+    }
+    
+    public final CompletableFuture<Void> writeAsync(T model) {
+        final HtmlVisitor visitor = this.getVisitor();
+        
+        if (!(visitor instanceof HtmlVisitorAsync)) {
+            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
+        }
+        
+        HtmlVisitorAsync visitorAsync = (HtmlVisitorAsync) visitor;
+        binder.accept(this, model);
+        return visitorAsync.finishedAsync();
+    }
+
+    public final void write(T model, HtmlView...partials) {
+        this.render(model, partials);
+    }
+
+        /**
      * Adds a partial view to this view.
      *
      * @param partial inner view.
      * @param model the domain object bound to the partial view.
      * @param <U> the type of the domain model of the partial view.
      */
-    public final <U> void addPartial(AbstractHtmlWriter<U> partial, U model) {
+    public final <U> void addPartial(HtmlView<U> partial, U model) {
         getVisitor().closeBeginTag();
         partial.getVisitor().setDepth(getVisitor().getDepth());
         if (this.getVisitor().isWriting()) {
@@ -225,7 +225,7 @@ public abstract class AbstractHtmlWriter<T> implements HtmlWriter<T>, Element<Ab
      * @param partial inner view.
      * @param <U> the type of the domain model of the partial view.
      */
-    public final <U> void addPartial(AbstractHtmlWriter<U> partial) {
+    public final <U> void addPartial(HtmlPage<U> partial) {
         getVisitor().closeBeginTag();
         partial.getVisitor().setDepth(getVisitor().getDepth());
         if (this.getVisitor().isWriting()) {
@@ -234,24 +234,40 @@ public abstract class AbstractHtmlWriter<T> implements HtmlWriter<T>, Element<Ab
              * Thus we do not expect to incur in the same problem reported on the other addPartial(partial, model).
              * Moreover partials are HTML fragments that are not expect to incur in more than Kb.
              */
-            String p = partial.render();
+            String p = partial.render(null);
             if(p != null) getVisitor().write(p);
         }
     }
 
     /**
-     * Since AbstractHtmlWriter is immutable this is the preferred way to create a copy of the
-     * existing AbstractHtmlWriter instance with a different threadSafe state.
+     * Since HtmlView is immutable this is the preferred way to create a copy of the
+     * existing HtmlView instance with a different threadSafe state.
      *
      * @param visitorSupplier
      * @param threadSafe
      */
-    protected abstract AbstractHtmlWriter<T> clone(Supplier<HtmlVisitor> visitorSupplier, boolean threadSafe);
+    protected final HtmlPage<T> clone(
+        Supplier<HtmlVisitor> visitorSupplier,
+        boolean threadSafe)
+    {
+        return new HtmlView<>(out, visitorSupplier, threadSafe, template, binder);
+    }
 
     /**
      * Resulting in a non thread safe view.
      * Receives an existent visitor.
      * Usually for a parent view to share its visitor with a partial.
      */
-    protected abstract AbstractHtmlWriter<T> clone(HtmlVisitor visitor);
+    protected HtmlPage<T> clone(HtmlVisitor visitor) {
+        return new HtmlView<>(out, () -> visitor, false, template, binder);
+    }
+
+    /**
+     * Returns a new instance of HtmlFlow with the same properties of this object
+     * but with indented set to the value of isIndented parameter.
+     */
+    @Override
+    public final HtmlPage<T> setIndented(boolean isIndented) {
+        return clone(() -> getVisitor().clone(out, isIndented), false);
+    }
 }

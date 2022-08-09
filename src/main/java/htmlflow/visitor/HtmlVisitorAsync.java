@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  *
  * This visitor only handles async models.
  */
-public class HtmlVisitorAsync extends HtmlVisitorCache {
+public class HtmlVisitorAsync extends HtmlViewVisitor {
     
     /**
      * The PrintStream destination of the HTML content produced by the visitor
@@ -39,7 +39,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     
     
     @Override
-    public HtmlVisitorCache newbie() {
+    public HtmlViewVisitor newbie() {
         return new HtmlVisitorAsync(out, isIndented, depth);
     }
     
@@ -105,8 +105,8 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     }
     
     @Override
-    public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorAsync(out, isIndented);
+    public HtmlViewVisitor clone(PrintStream other, boolean isIndented) {
+        return new HtmlVisitorAsync(other, isIndented);
     }
     
     /**

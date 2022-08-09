@@ -24,8 +24,9 @@
 
 package htmlflow.test;
 
-import htmlflow.DynamicHtml;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
+import htmlflow.HtmlDoc;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class TestWrongUseOfViews {
      */
     @Test(expected = IllegalStateException.class)
     public void testWrongUseOfDynamicInStaticHtml(){
-        StaticHtml.view()
+        HtmlFlow.doc()
             .html()
                 .head()
                     .title().text("Task Details").__()
@@ -50,7 +51,7 @@ public class TestWrongUseOfViews {
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testWrongUseOfRenderWithoutModelInDynamicView(){
-        DynamicHtml
+        HtmlFlow
             .view((view, model) -> {
                 view.html().head().title().text("Task Details").__();
             })
@@ -63,7 +64,7 @@ public class TestWrongUseOfViews {
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testWrongUseOfWriteWithoutModelInDynamicView(){
-        DynamicHtml
+        HtmlFlow
             .view(System.out, (view, model) -> {
                 view.html().head().title().text("Task Details").__();
             })
@@ -76,8 +77,8 @@ public class TestWrongUseOfViews {
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testWrongUseOfRenderWithModelInStaticView(){
-        StaticHtml
-            .view()
+        HtmlFlow
+            .doc()
                 .html()
                     .head()
                         .title()
@@ -94,8 +95,8 @@ public class TestWrongUseOfViews {
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testWrongUseOfWriteWithModelInStaticView(){
-        StaticHtml
-            .view(System.out)
+        HtmlFlow
+            .doc(System.out)
                 .html()
                     .head()
                         .title()
@@ -107,23 +108,13 @@ public class TestWrongUseOfViews {
 
     }
     /**
-     * A view with a PrintStream output cannot be set to thread-safety.
+     * A HtmlDoc cannot be set to thread-safety.
      */
     @Test(expected = IllegalStateException.class)
     public void testWrongUseOfThreadSafeInViewWithPrintStream(){
-        StaticHtml
-            .view(System.out)
+        HtmlFlow
+            .doc(System.out)
             .threadSafe();
-    }
-    /**
-     * A thread-safe view cannot be set with a PrintStream.
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testWrongUseSetPrintStreamInThreadSafeView(){
-        StaticHtml
-            .view()
-            .threadSafe()
-            .setPrintStream(System.out);
     }
 
 }

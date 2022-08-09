@@ -24,9 +24,10 @@
 
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
-import htmlflow.AbstractHtmlWriter;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
@@ -50,8 +51,8 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample01() {
-        String html= StaticHtml
-            .view()
+        String html= HtmlFlow
+            .doc()
                 .html()
                     .head()
                         .title().text("HtmlFlow").__()
@@ -89,7 +90,7 @@ public class HtmlForReadme {
     }
 
 
-    static AbstractHtmlWriter view = DynamicHtml.view((view, model) -> view
+    static HtmlPage view = HtmlFlow.view((view, model) -> view
                 .html()
                     .body()
                         .p().text("Typesafe is awesome! :-)").__()
@@ -103,7 +104,7 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample03() throws IOException {
-        AbstractHtmlWriter<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
+        HtmlPage<Task> view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
 
         List<Task> tasks = Arrays.asList(
             new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
@@ -117,7 +118,7 @@ public class HtmlForReadme {
         }
     }
 
-    static AbstractHtmlWriter<Stream<Task>> tasksTableView = DynamicHtml.view(HtmlForReadme::tasksTableTemplate);
+    static HtmlPage<Stream<Task>> tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -137,7 +138,7 @@ public class HtmlForReadme {
         // Desktop.getDesktop().browse(path.toUri());
     }
 
-    static void tasksTableTemplate(DynamicHtml<Stream<Task>> view, Stream<Task> tasks) {
+    static void tasksTableTemplate(HtmlView<Stream<Task>> view, Stream<Task> tasks) {
         view
             .html()
                 .head()

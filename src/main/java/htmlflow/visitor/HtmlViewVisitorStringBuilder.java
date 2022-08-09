@@ -24,6 +24,8 @@
 
 package htmlflow.visitor;
 
+import java.io.PrintStream;
+
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
  * library) which uses an internal StringBuilder to collect information
@@ -32,7 +34,7 @@ package htmlflow.visitor;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlVisitorStringBuilderDynamic extends HtmlVisitorCache {
+public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor {
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
@@ -42,15 +44,15 @@ public class HtmlVisitorStringBuilderDynamic extends HtmlVisitorCache {
     /**
      * Set HTML output indentation with true by default.
      */
-    public HtmlVisitorStringBuilderDynamic() {
+    public HtmlViewVisitorStringBuilder() {
         super(true);
     }
 
-    public HtmlVisitorStringBuilderDynamic(boolean isIndented) {
+    public HtmlViewVisitorStringBuilder(boolean isIndented) {
         super(isIndented);
     }
 
-    public HtmlVisitorStringBuilderDynamic(boolean isIndented, int depth) {
+    public HtmlViewVisitorStringBuilder(boolean isIndented, int depth) {
         this(isIndented);
         this.depth = depth;
     }
@@ -59,8 +61,8 @@ public class HtmlVisitorStringBuilderDynamic extends HtmlVisitorCache {
      * Creates a new similar instance with all static bocks cleared.
      */
     @Override
-    public HtmlVisitorCache newbie() {
-        return new HtmlVisitorStringBuilderDynamic(isIndented, depth);
+    public HtmlViewVisitor newbie() {
+        return new HtmlViewVisitorStringBuilder(isIndented, depth);
     }
 
     @Override
@@ -110,7 +112,9 @@ public class HtmlVisitorStringBuilderDynamic extends HtmlVisitorCache {
     }
 
     @Override
-    public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorStringBuilderDynamic(isIndented);
+    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
+        if(out != null)
+            throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
+        return new HtmlViewVisitorStringBuilder(isIndented);
     }
 }

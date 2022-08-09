@@ -23,9 +23,10 @@
  */
 package htmlflow.test;
 
-import htmlflow.DynamicHtml;
-import htmlflow.AbstractHtmlWriter;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import htmlflow.test.views.HtmlLists;
@@ -116,7 +117,7 @@ public class TestDivDetails {
     @Test
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        AbstractHtmlWriter<Task> view = DynamicHtml
+        HtmlPage<Task> view = HtmlFlow
             .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
@@ -140,7 +141,7 @@ public class TestDivDetails {
 
     @Test
     public void testDivDetailsBindingWithRender() {
-        AbstractHtmlWriter<Task> view = DynamicHtml
+        HtmlPage<Task> view = HtmlFlow
             .view(HtmlLists::taskDetailsTemplate)
             .threadSafe();
         expectedTaskViews
@@ -173,7 +174,7 @@ public class TestDivDetails {
     public void testWritePartialViewToPrintStream() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlTables
-            .taskListViewHeader(StaticHtml.view(new PrintStream(mem)));
+            .taskListViewHeader(HtmlFlow.doc(new PrintStream(mem)));
 
         Iterator<String> iter = NEWLINE
             .splitAsStream(mem.toString())

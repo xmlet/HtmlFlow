@@ -39,7 +39,7 @@ import java.util.List;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public abstract class HtmlVisitorCache extends HtmlVisitor {
+public abstract class HtmlViewVisitor extends HtmlVisitor {
     /**
      * The begin index of a static HTML block.
      */
@@ -63,7 +63,7 @@ public abstract class HtmlVisitorCache extends HtmlVisitor {
      */
     private int cacheIndex = 0;
 
-    HtmlVisitorCache(boolean isIndented) {
+    HtmlViewVisitor(boolean isIndented) {
         super(isIndented);
     }
 

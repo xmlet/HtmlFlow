@@ -23,8 +23,8 @@
  */
 package htmlflow.test;
 
-import htmlflow.AbstractHtmlWriter;
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import htmlflow.visitor.HtmlVisitor;
 import org.junit.Test;
 
@@ -60,7 +60,7 @@ public class TestPartialsToPrintStream {
         /**
          * Act
          */
-        DynamicHtml
+        HtmlFlow
             .view(new PrintStream(mem), this::template)
             .write(Stream.of(penguins));
         /**
@@ -93,7 +93,7 @@ public class TestPartialsToPrintStream {
          * Act
          */
         // Discards all bytes through the PrintStream.
-        DynamicHtml<Stream<Penguin>> view = DynamicHtml.view(new PrintStream(nullOutputStream()), this::template);
+        HtmlView<Stream<Penguin>> view = HtmlFlow.view(new PrintStream(nullOutputStream()), this::template);
         view.write(penguins);
         /**
          * Assert
@@ -128,7 +128,7 @@ public class TestPartialsToPrintStream {
         public String getDnaCode() { return dnaCode; }
     }
 
-    private void template(DynamicHtml<Stream<Penguin>> view, Stream<Penguin> model) {
+    private void template(HtmlView<Stream<Penguin>> view, Stream<Penguin> model) {
         view.html()
                 .head()
                     .title().text("MyPenguinExample").__()
@@ -143,7 +143,7 @@ public class TestPartialsToPrintStream {
               .__(); //html
     }
 
-    private final AbstractHtmlWriter<Penguin> penguimPartialView = DynamicHtml.view((view, penguin) -> {
+    private final HtmlView<Penguin> penguimPartialView = HtmlFlow.view((view, penguin) -> {
         view
             .div()
                 .attrId("data-penguin-" + penguin.getName())

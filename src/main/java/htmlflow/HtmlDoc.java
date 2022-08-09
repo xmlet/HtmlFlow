@@ -25,57 +25,36 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlVisitor;
-import htmlflow.visitor.HtmlVisitorPrintStreamDynamic;
-import htmlflow.visitor.HtmlVisitorStringBuilder;
 
 import java.io.PrintStream;
-import java.util.function.Supplier;
 
 /**
  * Static Html view.
  *
  * @author Miguel Gamboa, Luís Duare
  */
-public class StaticHtml extends AbstractHtmlWriter<Object> {
+public class HtmlDoc extends HtmlPage<Object> {
 
     private static final String WRONG_USE_OF_RENDER_WITH_MODEL =
              "Wrong use of StaticView! Model object not " +
              "supported or you should use a dynamic view instead!";
+
     private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER =
             "Use render() instead of write(). This HtmlDoc has already a " +
             "HtmlVisitorStringBuilder that collects emitted HTML.";
 
+    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM =
+            "Do not call write() on HtmlDoc with a PrintStream because HTML" +
+            "fragments have been already emitted on each element call." +
+            "Use write() only for reusable dynamic HtmlView.";
+
 
     private final PrintStream out;
+    private final HtmlVisitor visitor;
 
-    public static StaticHtml view(PrintStream out){
-        return out == null ? view() : new StaticHtml(out);
-    }
-
-    public static StaticHtml view(){
-        return new StaticHtml();
-    }
-
-    /**
-     * Auxiliary constructor used by clone().
-     */
-    private StaticHtml(
-        Supplier<HtmlVisitor> visitorSupplier,
-        boolean threadSafe,
-        PrintStream out)
-    {
-        super(visitorSupplier, threadSafe);
+    HtmlDoc(PrintStream out, HtmlVisitor visitor) {
         this.out = out;
-    }
-
-    private StaticHtml() {
-        super(() -> new HtmlVisitorStringBuilder(true), false);
-        this.out = null;
-    }
-
-    private StaticHtml(PrintStream out) {
-        super(() -> new HtmlVisitorPrintStreamDynamic(out, true), false);
-        this.out = out;
+        this.visitor = visitor;
     }
 
     @Override
@@ -90,7 +69,11 @@ public class StaticHtml extends AbstractHtmlWriter<Object> {
 
     @Override
     public final void write() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER);
+        if(out == null)
+            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER);
+        else
+            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM);
+
     }
 
     @Override
@@ -98,30 +81,29 @@ public class StaticHtml extends AbstractHtmlWriter<Object> {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
     }
 
-    /**
-     * Since HtmlView is immutable this is the preferred way to create a copy of the
-     * existing HtmlView instance with a different threadSafe state.
-     *
-     * @param visitorSupplier
-     * @param threadSafe
-     */
     @Override
-    protected final AbstractHtmlWriter<Object> clone(Supplier<HtmlVisitor> visitorSupplier, boolean threadSafe) {
-        return new StaticHtml(visitorSupplier, threadSafe, out);
-    }
-
-    /**
-     * Resulting in a non thread safe view.
-     * Receives an existent visitor.
-     * Usually for a parent view to share its visitor with a partial.
-     */
-    @Override
-    protected AbstractHtmlWriter<Object> clone(HtmlVisitor visitor) {
-        return new StaticHtml(() -> visitor, false, out);
+    public HtmlWriter<Object> setPrintStream(PrintStream out) {
+        return null;
     }
 
     @Override
     public String getName() {
         return "HtmlDoc";
+    }
+
+    @Override
+    public HtmlPage<Object> setIndented(boolean isIndented) {
+        return new HtmlDoc(out, getVisitor().clone(out, isIndented));
+    }
+
+    @Override
+    public HtmlPage<Object> threadSafe() {
+        throw new IllegalStateException("HtmlDoc is not reusable and does not keep internal static blocks!" +
+         "Thus it does not require thread safety!");
+    }
+
+    @Override
+    public HtmlVisitor getVisitor() {
+        return visitor;
     }
 }

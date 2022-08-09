@@ -42,6 +42,7 @@ import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
+import java.io.PrintStream;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -77,6 +78,10 @@ public abstract class HtmlVisitor extends ElementVisitor {
      */
     public void  setDepth(int v) {
         depth = v;
+    }
+
+    public boolean isIndented() {
+        return isIndented;
     }
 
     HtmlVisitor(boolean isIndented) {
@@ -242,7 +247,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
      *
      * @param isIndented If thenew visitor should indent HTML output or not.
      */
-    public abstract HtmlVisitor clone(boolean isIndented);
+    public abstract HtmlVisitor clone(PrintStream out, boolean isIndented);
     /**
      * Creates a new similar instance with all static bocks cleared.
      */

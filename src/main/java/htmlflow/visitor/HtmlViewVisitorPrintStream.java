@@ -32,7 +32,7 @@ import java.io.PrintStream;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlVisitorPrintStreamDynamic extends HtmlVisitorCache {
+public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
@@ -49,17 +49,17 @@ public class HtmlVisitorPrintStreamDynamic extends HtmlVisitorCache {
     /**
      * Set HTML output indentation with true by default.
      */
-    public HtmlVisitorPrintStreamDynamic(PrintStream out) {
+    public HtmlViewVisitorPrintStream(PrintStream out) {
         this(out, true);
     }
 
-    public HtmlVisitorPrintStreamDynamic(PrintStream out, boolean isIndented) {
+    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented) {
         super(isIndented);
         this.out = out;
         this.current = new PrintStringBuilder(out);
     }
 
-    public HtmlVisitorPrintStreamDynamic(PrintStream out, boolean isIndented, int depth) {
+    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, int depth) {
         this(out, isIndented);
         this.depth = depth;
     }
@@ -68,8 +68,8 @@ public class HtmlVisitorPrintStreamDynamic extends HtmlVisitorCache {
      * Creates a new similar instance with all static bocks cleared.
      */
     @Override
-    public HtmlVisitorCache newbie() {
-        return new HtmlVisitorPrintStreamDynamic(out, isIndented, depth);
+    public HtmlViewVisitor newbie() {
+        return new HtmlViewVisitorPrintStream(out, isIndented, depth);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class HtmlVisitorPrintStreamDynamic extends HtmlVisitorCache {
     }
     
     @Override
-    public HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorPrintStreamDynamic(out, isIndented);
+    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
+        return new HtmlViewVisitorPrintStream(out, isIndented);
     }
 }

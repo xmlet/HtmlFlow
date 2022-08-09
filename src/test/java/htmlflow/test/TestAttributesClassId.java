@@ -26,8 +26,9 @@
  */
 package htmlflow.test;
 
-import htmlflow.AbstractHtmlWriter;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import htmlflow.test.views.HtmlLists;
 import org.junit.Test;
 import org.xmlet.htmlapifaster.Body;
@@ -54,7 +55,7 @@ public class TestAttributesClassId {
 
     @Test
     public void testGetElementName() {
-        Div<Body<Html<AbstractHtmlWriter<Object>>>> div = StaticHtml.view().html().body().div();
+        Div<Body<Html<HtmlPage<Object>>>> div = HtmlFlow.doc().html().body().div();
         assertEquals(DIV_NAME, div.getName());
     }
 

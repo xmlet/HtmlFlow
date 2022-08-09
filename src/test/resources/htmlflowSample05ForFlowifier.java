@@ -1,8 +1,8 @@
 import htmlflow.*;
 
 public class Flowified {
-    public static AbstractHtmlWriter get() {
-        final AbstractHtmlWriter html = StaticHtml.view().setIndented(false)
+    public static HtmlPage get() {
+        final HtmlPage html = HtmlDoc.view().setIndented(false)
             .html()
                 .head()
                     .title()

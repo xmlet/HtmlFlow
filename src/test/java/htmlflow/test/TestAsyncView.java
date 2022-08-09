@@ -1,6 +1,7 @@
 package htmlflow.test;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import htmlflow.test.model.AsyncModel;
 import io.reactivex.rxjava3.core.Observable;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -37,7 +38,7 @@ class TestAsyncView {
     
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
-        DynamicHtml<AsyncModel<String, Student>> view = DynamicHtml.viewAsync(mem, TestAsyncView::testAsyncModel);
+        HtmlView<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(mem, TestAsyncView::testAsyncModel);
         
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
         
@@ -57,7 +58,7 @@ class TestAsyncView {
         assertFalse(actual.hasNext());
     }
     
-    static void testAsyncModel(DynamicHtml<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
+    static void testAsyncModel(HtmlView<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
         final Thenable<Element> thenable = view.html()
                 .body()
                 .div()

@@ -1,12 +1,13 @@
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import htmlflow.HtmlTemplate;
-import htmlflow.AbstractHtmlWriter;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlPage;
 import htmlflow.test.model.Track;
 import org.junit.Test;
 
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -15,17 +16,19 @@ import java.util.stream.Stream;
 @SuppressWarnings("squid:S3577")
 public class HtmlPartials {
 
-    static AbstractHtmlWriter bbView = StaticHtml.view().div().text("Dummy bbView").__(); // div
+    static void bbView(HtmlPage view) {
+        view.div().text("Dummy bbView").__(); // div
+    }
 
-    static AbstractHtmlWriter footerView(AbstractHtmlWriter banner) {
-        StaticHtml view = StaticHtml.view();
-        return view
-                .div()
-                    .of(__ -> view.addPartial(banner))
-                    .p()
-                        .text("Created with HtmFlow")
-                    .__() // p
-                .__(); //
+    static HtmlView footerView(Consumer<HtmlPage> banner) {
+        return HtmlFlow.view((view, model) -> view
+            .div()
+                .of(__ -> banner.accept(view))
+                .p()
+                    .text("Created with HtmFlow")
+                .__() // p
+            .__() // div
+        ); //
     }
 
 
@@ -49,8 +52,8 @@ public class HtmlPartials {
 
 
         Stream<Track> tracks = Stream.of(new Track("Space Odyssey"), new Track("Bad"), new Track("Under Pressure"));
-        DynamicHtml<Stream<Track>> tracksView = DynamicHtml.view(tracksTemplate);
-        String html = tracksView.render(tracks, footerView(bbView));
+        HtmlView<Stream<Track>> tracksView = HtmlFlow.view(tracksTemplate);
+        String html = tracksView.render(tracks, footerView(HtmlPartials::bbView));
         System.out.println(html);
     }
 }

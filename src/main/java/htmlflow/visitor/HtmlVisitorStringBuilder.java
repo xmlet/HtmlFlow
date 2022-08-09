@@ -1,5 +1,7 @@
 package htmlflow.visitor;
 
+import java.io.PrintStream;
+
 public class HtmlVisitorStringBuilder extends HtmlVisitor {
     /**
      * The main StringBuilder. Read by the finished() to return the
@@ -71,7 +73,9 @@ public class HtmlVisitorStringBuilder extends HtmlVisitor {
     }
 
     @Override
-    public final HtmlVisitor clone(boolean isIndented) {
+    public final HtmlVisitor clone(PrintStream out, boolean isIndented) {
+        if(out != null)
+            throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
         return new HtmlVisitorStringBuilder(isIndented);
     }
 }

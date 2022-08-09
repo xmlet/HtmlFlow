@@ -24,19 +24,17 @@
 
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
-import htmlflow.AbstractHtmlWriter;
-import htmlflow.HtmlWriter;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlDoc;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 
-import java.io.PrintStream;
-
 public class HtmlTables {
 
-    public static void simpleTableView(DynamicHtml<int[][]> view, int[][] outputRows){
+    public static void simpleTableView(HtmlView<int[][]> view, int[][] outputRows){
         view
             .html()
                 .head()
@@ -77,9 +75,9 @@ public class HtmlTables {
      * an array with two partial views: a div heading and table row.
      */
     public static void taskListViewWithPartials(
-        DynamicHtml<Iterable<Task>> view,
+        HtmlView<Iterable<Task>> view,
         Iterable<Task> tasks,
-        AbstractHtmlWriter[] partials)
+        HtmlView[] partials)
     {
         view
             .html()
@@ -118,7 +116,7 @@ public class HtmlTables {
             .__(); // html
     }
 
-    public static AbstractHtmlWriter<?> taskListViewHeader(AbstractHtmlWriter<?> view) {
+    public static HtmlPage<?> taskListViewHeader(HtmlPage<?> view) {
         return view
             .div()
                 .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").__()
@@ -127,7 +125,7 @@ public class HtmlTables {
             .__(); // div
     }
 
-    public static DynamicHtml<Task> taskListRow = DynamicHtml.view((view, task) -> {
+    public static HtmlView<Task> taskListRow = HtmlFlow.view((view, task) -> {
         view
             .tr()
                 .td().dynamic(td -> td.text(task.getTitle())).__()
@@ -136,7 +134,7 @@ public class HtmlTables {
             .__(); // tr
     });
 
-    public static void taskTableView(DynamicHtml<Iterable<Task>> view, Iterable<Task> tasks){
+    public static void taskTableView(HtmlView<Iterable<Task>> view, Iterable<Task> tasks){
         view
             .html()
                 .head()
@@ -173,7 +171,7 @@ public class HtmlTables {
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    public static AbstractHtmlWriter nestedTable = StaticHtml.view()
+    public static HtmlPage nestedTable = HtmlFlow.doc()
             .html()
                 .body()
                     .table()

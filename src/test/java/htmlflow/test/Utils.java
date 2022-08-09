@@ -23,7 +23,7 @@
  */
 package htmlflow.test;
 
-import htmlflow.AbstractHtmlWriter;
+import htmlflow.HtmlPage;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
@@ -63,7 +63,7 @@ public class Utils {
         return new BufferedReader(actual).lines();
     }
 
-    static <T> Stream<String> htmlRender(AbstractHtmlWriter<T> view, T model){
+    static <T> Stream<String> htmlRender(HtmlPage<T> view, T model){
         String html = view.render(model);
         return NEWLINE.splitAsStream(html);
     }
