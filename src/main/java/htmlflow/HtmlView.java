@@ -25,8 +25,9 @@
 package htmlflow;
 
 import htmlflow.util.ObservablePrintStream;
-import htmlflow.visitor.HtmlVisitor;
+import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlVisitorAsync;
+import org.xmlet.htmlapifaster.Html;
 
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
@@ -53,7 +54,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
      * throw the output and we use the threadLocalVisitor field instead.
      */
-    private final HtmlVisitor visitor;
+    private final HtmlViewVisitor visitor;
     /**
      * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
      * The given example deals with a static field of ThreadLocal which persists beyond an instance.
@@ -61,8 +62,8 @@ public class HtmlView<T> extends HtmlPage<T> {
      * thread local instances during its entire life cycle.
      */
     @java.lang.SuppressWarnings("squid:S5164")
-    private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
-    private final Supplier<HtmlVisitor> visitorSupplier;
+    private final ThreadLocal<HtmlViewVisitor> threadLocalVisitor;
+    private final Supplier<HtmlViewVisitor> visitorSupplier;
     private final boolean threadSafe;
 
     /**
@@ -90,7 +91,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      */
     HtmlView(
         PrintStream out,
-        Supplier<HtmlVisitor> visitorSupplier,
+        Supplier<HtmlViewVisitor> visitorSupplier,
         boolean threadSafe,
         HtmlTemplate<T> template,
         BiConsumer<HtmlView<T>, T> binder)
@@ -113,6 +114,12 @@ public class HtmlView<T> extends HtmlPage<T> {
         this(out, () -> new HtmlVisitorAsync(out, true), false, null, binder);
     }
 
+    public final Html<HtmlPage<T>> html() {
+        if (this.getVisitor().isWriting())
+            this.getVisitor().write(HEADER);
+        return new Html<>(this);
+    }
+
     /**
      * Returns a new instance of AbstractHtmlWriter with the same properties of this object
      * but with a new HtmlVisitorCache set with the out PrintStream parameter.
@@ -121,8 +128,8 @@ public class HtmlView<T> extends HtmlPage<T> {
     public final HtmlWriter<T> setPrintStream(PrintStream out) {
         if(threadSafe)
             throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
-        HtmlVisitor v = getVisitor();
-        return clone(() -> v.clone(out, v.isIndented()), false);
+        HtmlViewVisitor v = getVisitor();
+        return clone(() -> v.clone(out, v.isIndented), false);
     }
 
     public final HtmlPage<T> threadSafe(){
@@ -137,7 +144,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     }
 
     @Override
-    public HtmlVisitor getVisitor() {
+    public HtmlViewVisitor getVisitor() {
         return threadSafe
             ? threadLocalVisitor.get()
             : visitor;
@@ -175,7 +182,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     }
     
     public final CompletableFuture<Void> writeAsync(T model) {
-        final HtmlVisitor visitor = this.getVisitor();
+        final HtmlViewVisitor visitor = this.getVisitor();
         
         if (!(visitor instanceof HtmlVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
@@ -213,7 +220,7 @@ public class HtmlView<T> extends HtmlPage<T> {
              * and the HTML document is based on a higher-order function, then our views instances only store
              * a few instance fields related to the visitor and the template function itself.
              */
-            HtmlVisitor v = getVisitor();
+            HtmlViewVisitor v = getVisitor();
             String p = partial.clone(v.newbie()).render(model);
             if(p != null) v.write(p);
         }
@@ -225,7 +232,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * @param partial inner view.
      * @param <U> the type of the domain model of the partial view.
      */
-    public final <U> void addPartial(HtmlPage<U> partial) {
+    public final <U> void addPartial(HtmlView<U> partial) {
         getVisitor().closeBeginTag();
         partial.getVisitor().setDepth(getVisitor().getDepth());
         if (this.getVisitor().isWriting()) {
@@ -247,7 +254,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * @param threadSafe
      */
     protected final HtmlPage<T> clone(
-        Supplier<HtmlVisitor> visitorSupplier,
+        Supplier<HtmlViewVisitor> visitorSupplier,
         boolean threadSafe)
     {
         return new HtmlView<>(out, visitorSupplier, threadSafe, template, binder);
@@ -258,7 +265,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * Receives an existent visitor.
      * Usually for a parent view to share its visitor with a partial.
      */
-    protected HtmlPage<T> clone(HtmlVisitor visitor) {
+    protected HtmlPage<T> clone(HtmlViewVisitor visitor) {
         return new HtmlView<>(out, () -> visitor, false, template, binder);
     }
 

@@ -62,7 +62,7 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
     static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
             "Cannot set thread-safety for views with PrintStream output!";
 
-    private static final String HEADER;
+    public  static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
     private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
 
@@ -82,11 +82,7 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
         }
     }
 
-    public final Html<HtmlPage<T>> html() {
-        if (this.getVisitor().isWriting())
-            this.getVisitor().write(HEADER);
-        return new Html<>(this);
-    }
+    public abstract Html<HtmlPage<T>> html();
 
     public final Div<HtmlPage<T>> div() {
         return new Div<>(this);
@@ -112,13 +108,6 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
     }
 
     public abstract HtmlPage<T> threadSafe();
-
-    /**
-     * Change return type from ElementVisitor to specific HtmlFlow visitor
-     * implemented by HtmlVisitor.
-     */
-    @Override
-    public abstract HtmlVisitor getVisitor();
 
     @Override
     public Element __() {

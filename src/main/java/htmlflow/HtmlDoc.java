@@ -25,6 +25,7 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlVisitor;
+import org.xmlet.htmlapifaster.Html;
 
 import java.io.PrintStream;
 
@@ -55,6 +56,12 @@ public class HtmlDoc extends HtmlPage<Object> {
     HtmlDoc(PrintStream out, HtmlVisitor visitor) {
         this.out = out;
         this.visitor = visitor;
+    }
+
+    public final Html<HtmlPage<Object>> html() {
+        if (this.getVisitor().isWriting())
+            this.getVisitor().write(HEADER);
+        return new Html<>(this);
     }
 
     @Override

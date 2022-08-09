@@ -41,15 +41,9 @@ public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor {
      */
     private final StringBuilder sb = new StringBuilder();
     
-    /**
-     * Set HTML output indentation with true by default.
-     */
-    public HtmlViewVisitorStringBuilder() {
-        super(true);
-    }
 
     public HtmlViewVisitorStringBuilder(boolean isIndented) {
-        super(isIndented);
+        super(true, isIndented);
     }
 
     public HtmlViewVisitorStringBuilder(boolean isIndented, int depth) {
