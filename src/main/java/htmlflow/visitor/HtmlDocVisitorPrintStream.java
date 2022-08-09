@@ -2,26 +2,26 @@ package htmlflow.visitor;
 
 import java.io.PrintStream;
 
-public class HtmlVisitorPrintStream extends HtmlVisitor {
+public class HtmlDocVisitorPrintStream extends HtmlDocVisitor {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
      */
     private final PrintStream out;
 
-    public HtmlVisitorPrintStream(PrintStream out, boolean isIndented) {
+    public HtmlDocVisitorPrintStream(PrintStream out, boolean isIndented) {
         this(out, isIndented, 0);
     }
 
-    public HtmlVisitorPrintStream(PrintStream out, boolean isIndented, int depth) {
+    public HtmlDocVisitorPrintStream(PrintStream out, boolean isIndented, int depth) {
         super(isIndented);
         this.out = out;
         this.depth = depth;
     }
 
     @Override
-    public final HtmlVisitor newbie() {
-        return new HtmlVisitorPrintStream(out, isIndented, depth);
+    public final HtmlDocVisitor newbie() {
+        return new HtmlDocVisitorPrintStream(out, isIndented, depth);
     }
 
     @Override
@@ -76,9 +76,9 @@ public class HtmlVisitorPrintStream extends HtmlVisitor {
     }
 
     @Override
-    public final HtmlVisitor clone(PrintStream out, boolean isIndented) {
+    public final HtmlDocVisitor clone(PrintStream out, boolean isIndented) {
         if(out == null)
             throw new IllegalArgumentException("Out PrintStream cannot be null!");
-        return new HtmlVisitorPrintStream(out, isIndented);
+        return new HtmlDocVisitorPrintStream(out, isIndented);
     }
 }

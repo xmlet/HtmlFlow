@@ -24,10 +24,10 @@
 package htmlflow;
 
 import htmlflow.util.ObservablePrintStream;
+import htmlflow.visitor.HtmlDocVisitorPrintStream;
+import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
-import htmlflow.visitor.HtmlVisitorPrintStream;
-import htmlflow.visitor.HtmlVisitorStringBuilder;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -37,14 +37,13 @@ public class HtmlFlow {
 
     public static HtmlDoc doc(PrintStream out){
         return out == null
-            ? new HtmlDoc(null, new HtmlVisitorStringBuilder(true))
-            : new HtmlDoc(out, new HtmlVisitorPrintStream(out, true));
+            ? new HtmlDoc(null, new HtmlDocVisitorStringBuilder(true))
+            : new HtmlDoc(out, new HtmlDocVisitorPrintStream(out, true));
     }
 
     public static HtmlDoc doc(){
         return doc(null);
     }
-
 
     public static <U> HtmlView<U> view(PrintStream out, HtmlTemplate<U> template){
         return new HtmlView<>(out, (() -> new HtmlViewVisitorPrintStream(out, true)), false, template, null);

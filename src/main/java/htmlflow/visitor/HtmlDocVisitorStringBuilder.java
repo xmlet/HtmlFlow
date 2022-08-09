@@ -2,25 +2,25 @@ package htmlflow.visitor;
 
 import java.io.PrintStream;
 
-public class HtmlVisitorStringBuilder extends HtmlVisitor {
+public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor {
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
      */
     protected final StringBuilder sb = new StringBuilder();
 
-    public HtmlVisitorStringBuilder(boolean isIndented) {
+    public HtmlDocVisitorStringBuilder(boolean isIndented) {
         super(isIndented);
     }
 
-    public HtmlVisitorStringBuilder(boolean isIndented, int depth) {
+    public HtmlDocVisitorStringBuilder(boolean isIndented, int depth) {
         super(isIndented);
         this.depth = depth;
     }
 
     @Override
-    public final HtmlVisitor newbie() {
-        return new HtmlVisitorStringBuilder(isIndented, depth);
+    public final HtmlDocVisitor newbie() {
+        return new HtmlDocVisitorStringBuilder(isIndented, depth);
     }
 
     @Override
@@ -73,9 +73,9 @@ public class HtmlVisitorStringBuilder extends HtmlVisitor {
     }
 
     @Override
-    public final HtmlVisitor clone(PrintStream out, boolean isIndented) {
+    public final HtmlDocVisitor clone(PrintStream out, boolean isIndented) {
         if(out != null)
             throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
-        return new HtmlVisitorStringBuilder(isIndented);
+        return new HtmlDocVisitorStringBuilder(isIndented);
     }
 }

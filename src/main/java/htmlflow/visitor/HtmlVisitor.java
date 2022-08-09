@@ -89,72 +89,6 @@ public abstract class HtmlVisitor extends ElementVisitor {
     }
 
     /**
-     * This method appends the String {@code "<elementName"} and it leaves the element
-     * open to include additional attributes.
-     * Before that it may close the parent begin tag with {@code ">"} if it is
-     * still opened (!isClosed).
-     * The newlineAndIndent() is responsible for this job to check whether the parent element
-     * is still opened or not.
-     *
-     * @param element
-     */
-    @Override
-    public void visitElement(Element element) {
-        newlineAndIndent();
-        beginTag(element.getName()); // "<elementName"
-        isClosed = false;
-    }
-
-    /**
-     * Writes the end tag for elementName: {@code "</elementName>."}.
-     * This visit occurs when the __() is invoked.
-     */
-    @Override
-    public void visitParent(Element element) {
-        depth--;
-        newlineAndIndent();
-        endTag(element.getName()); // </elementName>
-    }
-
-    @Override
-    public void visitAttribute(String attributeName, String attributeValue) {
-        addAttribute(attributeName, attributeValue);
-    }
-
-    @Override
-    public <R> void visitText(Text<? extends Element, R> text) {
-        newlineAndIndent();
-        write(text.getValue());
-    }
-
-
-    @Override
-    public <R> void visitComment(Text<? extends Element, R> text) {
-        newlineAndIndent();
-        addComment(text.getValue());
-    }
-
-    @Override
-    public void visitOpenDynamic(){
-        throw new IllegalStateException("Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view.");
-    }
-
-    @Override
-    public void visitCloseDynamic(){
-        throw new IllegalStateException("Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view.");
-    }
-
-    @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> element, BiConsumer<E, Observable<T>> asyncAction, Observable<T> obs) {
-        throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
-    }
-
-    @Override
-    public <E extends Element> void visitThen(Supplier<E> elem) {
-        throw new IllegalStateException("Wrong use of then() in a static view! Use HtmlView to produce an async view.");
-    }
-
-    /**
      * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
      * This method is invoked by visitParent specialization methods (at the end of this class)
      * for each void element such as area, base, etc.
@@ -171,7 +105,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
-    private void newlineAndIndent(){
+    protected final void newlineAndIndent(){
         if (isClosed){
             if(isIndented) {
                 write(Indentation.tabs(depth)); // \n\t\t\t\...

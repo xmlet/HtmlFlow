@@ -24,11 +24,14 @@
 
 package htmlflow.visitor;
 
+import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster
@@ -95,7 +98,9 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     @Override
     public final void visitElement(Element element) {
         if (isWriting()){
-            super.visitElement(element);
+            newlineAndIndent();
+            beginTag(element.getName()); // "<elementName"
+            isClosed = false;
         }
     }
 
@@ -106,21 +111,24 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     @Override
     public final void visitParent(Element element) {
         if (isWriting()){
-            super.visitParent(element);
+            depth--;
+            newlineAndIndent();
+            endTag(element.getName()); // </elementName>
         }
     }
 
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
         if (isWriting()){
-            super.visitAttribute(attributeName, attributeValue);
+            addAttribute(attributeName, attributeValue);
         }
     }
 
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
         if (isWriting()){
-            super.visitText(text);
+            newlineAndIndent();
+            write(text.getValue());
         }
     }
 
@@ -128,7 +136,8 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
         if (isWriting()){
-            super.visitComment(text);
+            newlineAndIndent();
+            addComment(text.getValue());
         }
     }
 
@@ -161,6 +170,16 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
         if (!isCached){
             staticBlockIndex = size();
         }
+    }
+
+    @Override
+    public <E extends Element, T> void visitAsync(Supplier<E> element, BiConsumer<E, Observable<T>> asyncAction, Observable<T> obs) {
+        throw new IllegalStateException("Wrong use of async() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
+    }
+
+    @Override
+    public <E extends Element> void visitThen(Supplier<E> elem) {
+        throw new IllegalStateException("Wrong use of then() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
     }
 
     public final String finished(){
