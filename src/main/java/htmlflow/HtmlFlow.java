@@ -26,6 +26,7 @@ package htmlflow;
 import htmlflow.util.ObservablePrintStream;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
+import htmlflow.visitor.HtmlVisitorPrintStream;
 import htmlflow.visitor.HtmlVisitorStringBuilder;
 
 import java.io.OutputStream;
@@ -37,7 +38,7 @@ public class HtmlFlow {
     public static HtmlDoc doc(PrintStream out){
         return out == null
             ? new HtmlDoc(null, new HtmlVisitorStringBuilder(true))
-            : new HtmlDoc(out, new HtmlViewVisitorPrintStream(out, true));
+            : new HtmlDoc(out, new HtmlVisitorPrintStream(out, true));
     }
 
     public static HtmlDoc doc(){
