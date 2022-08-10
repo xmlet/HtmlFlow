@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestReactiveView {
 
+    @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testAddPartialAndCheckParentPrintStream() {
         /**

@@ -20,8 +20,7 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor {
 
     @Override
     public final String finished() {
-        String data = sb.toString();
-        return data;
+        return sb.toString();
     }
 
     @Override

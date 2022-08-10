@@ -33,6 +33,9 @@ import java.util.function.BiConsumer;
 
 public class HtmlFlow {
 
+    private HtmlFlow() {
+    }
+
     public static HtmlDoc doc(PrintStream out){
         return out == null
             ? new HtmlDoc(null, new HtmlDocVisitorStringBuilder(true))

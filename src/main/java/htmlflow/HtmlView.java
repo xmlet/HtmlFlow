@@ -43,8 +43,6 @@ public class HtmlView<T> extends HtmlPage<T> {
     private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
              "Wrong use of DynamicView! You should provide a " +
              "model parameter or use a static view instead!";
-    private static final String WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR =
-            "Wrong use of DynamicView writeAsync! You should use the viewAsync creation instead!";
     /**
      * This field is like an union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.

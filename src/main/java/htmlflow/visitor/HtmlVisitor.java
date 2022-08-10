@@ -24,7 +24,6 @@
 
 package htmlflow.visitor;
 
-import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -40,11 +39,8 @@ import org.xmlet.htmlapifaster.Meta;
 import org.xmlet.htmlapifaster.Param;
 import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
-import org.xmlet.htmlapifaster.Text;
 
 import java.io.PrintStream;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -113,8 +109,6 @@ public abstract class HtmlVisitor extends ElementVisitor {
      * Writes {@code "<!--s-->"}
      */
     protected abstract void addComment(String s);
-
-
     /**
      * The number of characters written until this moment.
      */
@@ -124,6 +118,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
      * Returns the accumulated output and clear it.
      */
     public abstract String finished();
+
     /**
      * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
      * existing HtmlVisitor instance with a different isIndented state.

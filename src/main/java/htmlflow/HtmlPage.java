@@ -24,7 +24,6 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;

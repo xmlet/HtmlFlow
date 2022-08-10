@@ -25,24 +25,9 @@
 package htmlflow.visitor;
 
 import io.reactivex.rxjava3.core.Observable;
-import org.xmlet.htmlapifaster.Area;
-import org.xmlet.htmlapifaster.Base;
-import org.xmlet.htmlapifaster.Br;
-import org.xmlet.htmlapifaster.Col;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.ElementVisitor;
-import org.xmlet.htmlapifaster.Embed;
-import org.xmlet.htmlapifaster.Hr;
-import org.xmlet.htmlapifaster.Img;
-import org.xmlet.htmlapifaster.Input;
-import org.xmlet.htmlapifaster.Link;
-import org.xmlet.htmlapifaster.Meta;
-import org.xmlet.htmlapifaster.Param;
-import org.xmlet.htmlapifaster.Root;
-import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
-import java.io.PrintStream;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -63,6 +48,8 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
      * Adds a new line and indentation.
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     * REMARK intentionally duplicating this method in other HtmlVisitor implementations,
+     * to improve performance.
      */
     protected final void newlineAndIndent(){
         if (isClosed){

@@ -76,9 +76,17 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      * Adds a new line and indentation.
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     * REMARK intentionally duplicating this method in other HtmlVisitor implementations,
+     * to improve performance.
      */
     private final void newlineAndIndent(){
-        if (isWriting()){
+        /*
+         * DO NOT REFACTOR this if (isWriting()).
+         * Trying remove if (isWriting()) of newlineAndIndent() and
+         * move it to call sites:  if (isWriting()){ newwlineAndIndent(); ... }
+         * DEGRADES performance.
+         */
+        if (isWriting()){ // Keep it. DO NOT REFACTOR this if (isWriting()).
             if (isClosed){
                 if(isIndented) {
                     write(Indentation.tabs(depth)); // \n\t\t\t\...
