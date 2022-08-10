@@ -54,7 +54,7 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
     }
 
     public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented) {
-        super(true, isIndented);
+        super(isIndented);
         this.out = out;
         this.current = new PrintStringBuilder(out);
     }

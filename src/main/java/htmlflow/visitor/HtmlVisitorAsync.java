@@ -28,7 +28,7 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
     }
     
     public HtmlVisitorAsync(PrintStream out, boolean isIndented) {
-        super(true, isIndented);
+        super(isIndented);
         this.out = out;
     }
     

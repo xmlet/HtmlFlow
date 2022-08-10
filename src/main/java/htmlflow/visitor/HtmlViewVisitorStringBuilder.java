@@ -43,7 +43,7 @@ public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor {
     
 
     public HtmlViewVisitorStringBuilder(boolean isIndented) {
-        super(true, isIndented);
+        super(isIndented);
     }
 
     public HtmlViewVisitorStringBuilder(boolean isIndented, int depth) {

@@ -92,18 +92,11 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
     private int cacheIndex = 0;
 
     /**
-     * If this visitor enables or not dynamic blocks.
-     * If it is not dynamic and there is a dynamic block visit then it should throw
-     * an Exception.
-     */
-    public final boolean isDynamic;
-    /**
      * It the HTML output should be indented or not.
      */
     public final boolean isIndented;
 
-    HtmlViewVisitor(boolean isDynamic, boolean isIndented) {
-        this.isDynamic = isDynamic;
+    HtmlViewVisitor(boolean isIndented) {
         this.isIndented = isIndented;
     }
 
@@ -203,11 +196,8 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
      */
     @Override
     public final void visitOpenDynamic(){
-        if (!isDynamic)
-            throw new IllegalStateException("Wrong use of dynamic() in a static view!");
         if (openDynamic )
             throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
-
         openDynamic = true;
         if (isCached){
             HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
