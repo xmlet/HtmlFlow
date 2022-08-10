@@ -78,17 +78,19 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
     protected final void newlineAndIndent(){
-        if (isClosed){
-            if(isIndented) {
-                write(Indentation.tabs(depth)); // \n\t\t\t\...
+        if (isWriting()){
+            if (isClosed){
+                if(isIndented) {
+                    write(Indentation.tabs(depth)); // \n\t\t\t\...
+                }
+            } else {
+                depth++;
+                if(isIndented)
+                    write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+                else
+                    write(Tags.FINISH_TAG);
+                isClosed = true;
             }
-        } else {
-            depth++;
-            if(isIndented)
-                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
-            else
-                write(Tags.FINISH_TAG);
-            isClosed = true;
         }
     }
     /**
@@ -128,8 +130,8 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      */
     @Override
     public final void visitElement(Element element) {
+        newlineAndIndent();
         if (isWriting()){
-            newlineAndIndent();
             beginTag(element.getName()); // "<elementName"
             isClosed = false;
         }
@@ -169,8 +171,8 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
 
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
+        newlineAndIndent();
         if (isWriting()){
-            newlineAndIndent();
             write(text.getValue());
         }
     }
@@ -178,8 +180,8 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
 
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
+        newlineAndIndent();
         if (isWriting()){
-            newlineAndIndent();
             addComment(text.getValue());
         }
     }
