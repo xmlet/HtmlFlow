@@ -19,11 +19,6 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor {
     }
 
     @Override
-    public final HtmlDocVisitor newbie() {
-        return new HtmlDocVisitorStringBuilder(isIndented, depth);
-    }
-
-    @Override
     public final String finished() {
         String data = sb.toString();
         return data;

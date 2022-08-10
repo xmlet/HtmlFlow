@@ -20,11 +20,6 @@ public class HtmlDocVisitorPrintStream extends HtmlDocVisitor {
     }
 
     @Override
-    public final HtmlDocVisitor newbie() {
-        return new HtmlDocVisitorPrintStream(out, isIndented, depth);
-    }
-
-    @Override
     public final String finished() {
         throw new UnsupportedOperationException("Do not call finished() on HtmlVisitorPrintStream because" +
             "HTML fragments have been already emitted on each element call.");

@@ -179,10 +179,6 @@ public abstract class HtmlVisitor extends ElementVisitor {
      * @param isIndented If thenew visitor should indent HTML output or not.
      */
     public abstract HtmlVisitor clone(PrintStream out, boolean isIndented);
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     */
-    public abstract HtmlVisitor newbie();
 
     /*=========================================================================*/
     /*------------            Root Element Methods         --------------------*/
