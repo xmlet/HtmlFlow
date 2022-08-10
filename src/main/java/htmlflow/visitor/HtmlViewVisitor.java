@@ -25,21 +25,7 @@
 package htmlflow.visitor;
 
 import io.reactivex.rxjava3.core.Observable;
-import org.xmlet.htmlapifaster.Area;
-import org.xmlet.htmlapifaster.Base;
-import org.xmlet.htmlapifaster.Br;
-import org.xmlet.htmlapifaster.Col;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.ElementVisitor;
-import org.xmlet.htmlapifaster.Embed;
-import org.xmlet.htmlapifaster.Hr;
-import org.xmlet.htmlapifaster.Img;
-import org.xmlet.htmlapifaster.Input;
-import org.xmlet.htmlapifaster.Link;
-import org.xmlet.htmlapifaster.Meta;
-import org.xmlet.htmlapifaster.Param;
-import org.xmlet.htmlapifaster.Root;
-import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
 import java.io.PrintStream;
@@ -58,20 +44,11 @@ import java.util.function.Supplier;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public abstract class HtmlViewVisitor extends ElementVisitor {
+public abstract class HtmlViewVisitor extends HtmlVisitor {
     /**
      * The begin index of a static HTML block.
      */
     private int staticBlockIndex = 0;
-    /**
-     * keep track of current indentation.
-     */
-    protected int depth;
-    /**
-     * If the begin tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code "<elem"}.
-     * On element visit the begin tag is left open to include additional attributes.
-     */
-    private boolean isClosed = true;
     /**
      * Signals the begin of a dynamic partial view and thus it should stop
      * collecting the HTML into the cache.
@@ -91,32 +68,9 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
      */
     private int cacheIndex = 0;
 
-    /**
-     * It the HTML output should be indented or not.
-     */
-    public final boolean isIndented;
-
     HtmlViewVisitor(boolean isIndented) {
-        this.isIndented = isIndented;
+        super(isIndented);
     }
-
-    /**
-     * keep track of current indentation.
-     */
-    public int getDepth() {
-        return depth;
-    }
-    /**
-     * Set current indentation.
-     */
-    public void  setDepth(int v) {
-        depth = v;
-    }
-
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     */
-    public abstract HtmlViewVisitor newbie();
 
     /**
      * This visitor may be writing to output or not, depending on the kind of HTML
@@ -145,8 +99,8 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
      */
     @Override
     public final void visitElement(Element element) {
-        newlineAndIndent();
         if (isWriting()){
+            newlineAndIndent();
             beginTag(element.getName()); // "<elementName"
             isClosed = false;
         }
@@ -174,8 +128,8 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
 
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
-        newlineAndIndent();
         if (isWriting()){
+            newlineAndIndent();
             write(text.getValue());
         }
     }
@@ -183,8 +137,8 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
 
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
-        newlineAndIndent();
         if (isWriting()){
+            newlineAndIndent();
             addComment(text.getValue());
         }
     }
@@ -218,54 +172,7 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
             staticBlockIndex = size();
         }
     }
-
-    /**
-     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
-     * This method is invoked by visitParent specialization methods (at the end of this class)
-     * for each void element such as area, base, etc.
-     */
-    private void visitParentOnVoidElements(){
-        if (isWriting()){
-            if (!isClosed){
-                write(Tags.FINISH_TAG);
-            }
-            isClosed = true;
-        }
-    }
-
-    /**
-     * Adds a new line and indentation.
-     * Checks whether the parent element is still opened or not (!isClosed).
-     * If it is open then it closes the parent begin tag with ">" (!isClosed).
-     */
-    private void newlineAndIndent(){
-        if (isWriting()){
-            if (isClosed){
-                if(isIndented) {
-                    write(Indentation.tabs(depth)); // \n\t\t\t\...
-                }
-            } else {
-                depth++;
-                if(isIndented)
-                    write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
-                else
-                    write(Tags.FINISH_TAG);
-                isClosed = true;
-            }
-        }
-    }
-
-    /**
-     * Writes the {@code ">"} to output.
-     */
-    public final void closeBeginTag() {
-        if(!isClosed) {
-            write(Tags.FINISH_TAG);
-            isClosed = true;
-            depth++;
-        }
-    }
-
+    @Override
     public final String finished(){
         if (isCached && cacheIndex <= cacheBlocksList.size()){
             HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
@@ -284,6 +191,15 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
         cacheIndex = 0;
         return result;
     }
+    @Override
+    public <E extends Element, T> void visitAsync(Supplier<E> element, BiConsumer<E, Observable<T>> asyncAction, Observable<T> obs) {
+        throw new IllegalStateException("Wrong use of async() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
+    }
+
+    @Override
+    public <E extends Element> void visitThen(Supplier<E> elem) {
+        throw new IllegalStateException("Wrong use of then() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
+    }
 
     static class HtmlBlockInfo {
 
@@ -301,140 +217,24 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
     /**
-     * Write {@code "<elementName"}.
-     */
-    protected abstract void beginTag(String elementName);
-
-    /**
-     * Writes {@code "</elementName>"}.
-     */
-    protected abstract void endTag(String elementName);
-
-    /**
-     * Writes {@code "attributeName=attributeValue"}
-     */
-    protected abstract void addAttribute(String attributeName, String attributeValue);
-
-    /**
-     * Writes {@code "<!--s-->"}
-     */
-    protected abstract void addComment(String s);
-
-    /**
-     * Writes the string text directly to the output.
-     */
-    public abstract void write(String text);
-
-    /**
-     * Writes the char c directly to the output.
-     */
-    protected abstract void write(char c);
-
-    /**
      * Returns a substring with the HTML content from the index staticBlockIndex
      */
     protected abstract String substring(int staticBlockIndex);
-
-    /**
-     * The number of characters written until this moment.
-     */
-    protected abstract int size();
-
     /**
      * Returns the accumulated output and clear it.
      */
     protected abstract String readAndReset();
-
     /**
-     * Since HtmlVisitorCache is immutable this is the preferred way to create a copy of the
-     * existing HtmlVisitorCache instance with a different isIndented state.
+     * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
+     * existing HtmlVisitor instance with a different isIndented state.
      *
      * @param isIndented If thenew visitor should indent HTML output or not.
      */
     public abstract HtmlViewVisitor clone(PrintStream out, boolean isIndented);
-
-    /*=========================================================================*/
-    /*------------            Root Element Methods         --------------------*/
-    /*=========================================================================*/
-
-    @Override
-    public final <Z extends Element> void visitElementRoot(Root<Z> var1) { }
-
-    @Override
-    public final <Z extends Element> void visitParentRoot(Root<Z> var1) { }
-
-    /*=========================================================================*/
-    /*------------      Parent Methods for Void Elements   --------------------*/
-    /*=========================================================================*/
-
-    @Override
-    public final <Z extends Element> void visitParentHr(Hr<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentEmbed(Embed<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentInput(Input<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentMeta(Meta<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentBr(Br<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentCol(Col<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentSource(Source<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentImg(Img<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentArea(Area<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentLink(Link<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentParam(Param<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-    @Override
-    public final <Z extends Element>  void visitParentBase(Base<Z> element) {
-        visitParentOnVoidElements ();
-    }
-
-     @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> element, BiConsumer<E, Observable<T>> asyncAction, Observable<T> obs) {
-        throw new IllegalStateException("Wrong use of async() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
-    }
-
-    @Override
-    public <E extends Element> void visitThen(Supplier<E> elem) {
-        throw new IllegalStateException("Wrong use of then() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
-    }
+    /**
+     * Creates a new similar instance with all static bocks cleared.
+     * Used when visiting partial views.
+     */
+    public abstract HtmlViewVisitor newbie();
 
 }

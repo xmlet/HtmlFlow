@@ -66,22 +66,18 @@ public abstract class HtmlVisitor extends ElementVisitor {
     /**
      * It the HTML output should be indented or not.
      */
-    final boolean isIndented;
+    public final boolean isIndented;
     /**
      * keep track of current indentation.
      */
-    public int getDepth() {
+    public final int getDepth() {
         return depth;
     }
     /**
      * Set current indentation.
      */
-    public void  setDepth(int v) {
+    public final void setDepth(int v) {
         depth = v;
-    }
-
-    public boolean isIndented() {
-        return isIndented;
     }
 
     HtmlVisitor(boolean isIndented) {
