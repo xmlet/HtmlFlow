@@ -77,7 +77,7 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
-    protected final void newlineAndIndent(){
+    private final void newlineAndIndent(){
         if (isWriting()){
             if (isClosed){
                 if(isIndented) {

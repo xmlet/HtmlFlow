@@ -23,13 +23,11 @@
  */
 package htmlflow;
 
-import htmlflow.util.ObservablePrintStream;
 import htmlflow.visitor.HtmlDocVisitorPrintStream;
 import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.function.BiConsumer;
 
@@ -59,9 +57,5 @@ public class HtmlFlow {
 
     public static <U> HtmlView<U> view(BiConsumer<HtmlView<U>, U> binder) {
         return new HtmlView<>(null, (() -> new HtmlViewVisitorStringBuilder(true)), false, null, binder);
-    }
-
-    public static <U> HtmlView<U> viewAsync(OutputStream out, BiConsumer<HtmlView<U>, U> binder) {
-        return new HtmlView<>(new ObservablePrintStream(out), binder);
     }
 }

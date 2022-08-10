@@ -138,8 +138,8 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         appendable.append("import htmlflow.*;\n");
         appendable.append("import org.xmlet.htmlapifaster.*;\n\n");
         appendable.append("public class Flowified {\n");
-        appendable.append("    public static HtmlView get() {\n");
-        appendable.append("        final HtmlView html = StaticHtml.view().setIndented(")
+        appendable.append("    public static HtmlPage get() {\n");
+        appendable.append("        final HtmlPage html = HtmlFlow.doc().setIndented(")
                 .append(Boolean.toString(indented)).append(")\n");
     }
 

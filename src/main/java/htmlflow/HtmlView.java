@@ -24,13 +24,10 @@
 
 package htmlflow;
 
-import htmlflow.util.ObservablePrintStream;
 import htmlflow.visitor.HtmlViewVisitor;
-import htmlflow.visitor.HtmlVisitorAsync;
 import org.xmlet.htmlapifaster.Html;
 
 import java.io.PrintStream;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -110,10 +107,6 @@ public class HtmlView<T> extends HtmlPage<T> {
         }
     }
 
-    HtmlView(ObservablePrintStream out, BiConsumer<HtmlView<T>, T> binder) {
-        this(out, () -> new HtmlVisitorAsync(out, true), false, null, binder);
-    }
-
     public final Html<HtmlPage<T>> html() {
         if (this.getVisitor().isWriting())
             this.getVisitor().write(HEADER);
@@ -179,18 +172,6 @@ public class HtmlView<T> extends HtmlPage<T> {
     @Override
     public final void write(T model) {
         this.render(model);
-    }
-    
-    public final CompletableFuture<Void> writeAsync(T model) {
-        final HtmlViewVisitor visitor = this.getVisitor();
-        
-        if (!(visitor instanceof HtmlVisitorAsync)) {
-            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
-        }
-        
-        HtmlVisitorAsync visitorAsync = (HtmlVisitorAsync) visitor;
-        binder.accept(this, model);
-        return visitorAsync.finishedAsync();
     }
 
     public final void write(T model, HtmlView...partials) {
