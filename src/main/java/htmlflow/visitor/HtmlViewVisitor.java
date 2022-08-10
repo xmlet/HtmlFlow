@@ -73,6 +73,35 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     }
 
     /**
+     * Adds a new line and indentation.
+     * Checks whether the parent element is still opened or not (!isClosed).
+     * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     */
+    protected final void newlineAndIndent(){
+        if (isClosed){
+            if(isIndented) {
+                write(Indentation.tabs(depth)); // \n\t\t\t\...
+            }
+        } else {
+            depth++;
+            if(isIndented)
+                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+            else
+                write(Tags.FINISH_TAG);
+            isClosed = true;
+        }
+    }
+    /**
+     * Writes the {@code ">"} to output.
+     */
+    public final void closeBeginTag() {
+        if(!isClosed) {
+            write(Tags.FINISH_TAG);
+            isClosed = true;
+            depth++;
+        }
+    }
+    /**
      * This visitor may be writing to output or not, depending on the kind of HTML
      * block that it is being visited.
      * So, it should just write to output immediately only when it is:
@@ -117,6 +146,18 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
             newlineAndIndent();
             endTag(element.getName()); // </elementName>
         }
+    }
+    /**
+     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
+     * This method is invoked by visitParent specialization methods (at the end of this class)
+     * for each void element such as area, base, etc.
+     */
+    @Override
+    protected final void visitParentOnVoidElements(){
+        if (!isClosed){
+            write(Tags.FINISH_TAG);
+        }
+        isClosed = true;
     }
 
     @Override
@@ -217,6 +258,14 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
     /**
+     * Writes the string text directly to the output.
+     */
+    public abstract void write(String text);
+    /**
+     * Writes the char c directly to the output.
+     */
+    protected abstract void write(char c);
+    /**
      * Returns a substring with the HTML content from the index staticBlockIndex
      */
     protected abstract String substring(int staticBlockIndex);
@@ -236,5 +285,4 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      * Used when visiting partial views.
      */
     public abstract HtmlViewVisitor newbie();
-
 }

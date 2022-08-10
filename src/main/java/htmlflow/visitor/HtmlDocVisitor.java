@@ -60,6 +60,26 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     }
 
     /**
+     * Adds a new line and indentation.
+     * Checks whether the parent element is still opened or not (!isClosed).
+     * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     */
+    protected final void newlineAndIndent(){
+        if (isClosed){
+            if(isIndented) {
+                write(Indentation.tabs(depth)); // \n\t\t\t\...
+            }
+        } else {
+            depth++;
+            if(isIndented)
+                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+            else
+                write(Tags.FINISH_TAG);
+            isClosed = true;
+        }
+    }
+
+    /**
      * This method appends the String {@code "<elementName"} and it leaves the element
      * open to include additional attributes.
      * Before that it may close the parent begin tag with {@code ">"} if it is
@@ -85,6 +105,17 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
         depth--;
         newlineAndIndent();
         endTag(element.getName()); // </elementName>
+    }
+    /**
+     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
+     * This method is invoked by visitParent specialization methods (at the end of this class)
+     * for each void element such as area, base, etc.
+     */
+    protected final void visitParentOnVoidElements(){
+        if (!isClosed){
+            write(Tags.FINISH_TAG);
+        }
+        isClosed = true;
     }
 
     @Override
@@ -124,4 +155,16 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     public final <E extends Element> void visitThen(Supplier<E> elem) {
         throw new IllegalStateException("Wrong use of then() in a static view! Use HtmlView to produce an async view.");
     }
+    /*=========================================================================*/
+    /*------------            Abstract HOOK Methods         -------------------*/
+    /*=========================================================================*/
+    /**
+     * Writes the string text directly to the output.
+     */
+    public abstract void write(String text);
+
+    /**
+     * Writes the char c directly to the output.
+     */
+    protected abstract void write(char c);
 }

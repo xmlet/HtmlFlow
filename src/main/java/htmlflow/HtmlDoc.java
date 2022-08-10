@@ -24,6 +24,7 @@
 
 package htmlflow;
 
+import htmlflow.visitor.HtmlDocVisitor;
 import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Html;
 
@@ -59,7 +60,7 @@ public class HtmlDoc extends HtmlPage<Object> {
     }
 
     public final Html<HtmlPage<Object>> html() {
-        this.getVisitor().write(HEADER);
+        ((HtmlDocVisitor) this.getVisitor()).write(HEADER);
         return new Html<>(this);
     }
 

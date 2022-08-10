@@ -89,43 +89,8 @@ public abstract class HtmlVisitor extends ElementVisitor {
      * This method is invoked by visitParent specialization methods (at the end of this class)
      * for each void element such as area, base, etc.
      */
-    protected final void visitParentOnVoidElements(){
-        if (!isClosed){
-            write(Tags.FINISH_TAG);
-        }
-        isClosed = true;
-    }
+    protected abstract void visitParentOnVoidElements();
 
-    /**
-     * Adds a new line and indentation.
-     * Checks whether the parent element is still opened or not (!isClosed).
-     * If it is open then it closes the parent begin tag with ">" (!isClosed).
-     */
-    protected final void newlineAndIndent(){
-        if (isClosed){
-            if(isIndented) {
-                write(Indentation.tabs(depth)); // \n\t\t\t\...
-            }
-        } else {
-            depth++;
-            if(isIndented)
-                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
-            else
-                write(Tags.FINISH_TAG);
-            isClosed = true;
-        }
-    }
-
-    /**
-     * Writes the {@code ">"} to output.
-     */
-    public final void closeBeginTag() {
-        if(!isClosed) {
-            write(Tags.FINISH_TAG);
-            isClosed = true;
-            depth++;
-        }
-    }
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
@@ -149,15 +114,6 @@ public abstract class HtmlVisitor extends ElementVisitor {
      */
     protected abstract void addComment(String s);
 
-    /**
-     * Writes the string text directly to the output.
-     */
-    public abstract void write(String text);
-
-    /**
-     * Writes the char c directly to the output.
-     */
-    protected abstract void write(char c);
 
     /**
      * The number of characters written until this moment.
