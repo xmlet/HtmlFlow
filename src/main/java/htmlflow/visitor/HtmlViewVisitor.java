@@ -307,7 +307,9 @@ public abstract class HtmlViewVisitor extends ElementVisitor {
             this.isClosed = isClosed;
         }
     }
-
+    /*=========================================================================*/
+    /*------------            Abstract HOOK Methods         -------------------*/
+    /*=========================================================================*/
     /**
      * Write {@code "<elementName"}.
      */

@@ -59,8 +59,7 @@ public class HtmlDoc extends HtmlPage<Object> {
     }
 
     public final Html<HtmlPage<Object>> html() {
-        if (this.getVisitor().isWriting())
-            this.getVisitor().write(HEADER);
+        this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
 

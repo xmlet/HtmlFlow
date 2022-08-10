@@ -130,12 +130,9 @@ public abstract class HtmlVisitor extends ElementVisitor {
             depth++;
         }
     }
-    /**
-     * This visitor may be writing to output or not, depending on the visitor's
-     * strategy and the kind of HTML block that it is being visited.
-     */
-    public abstract boolean isWriting();
-
+    /*=========================================================================*/
+    /*------------            Abstract HOOK Methods         -------------------*/
+    /*=========================================================================*/
     /**
      * Write {@code "<elementName"}.
      */

@@ -58,15 +58,6 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor {
         sb.append(c);
     }
 
-    /**
-     * Since this Visitor immediately emits on each element visit then it is always writing.
-     * @return
-     */
-    @Override
-    public final boolean isWriting() {
-        return true;
-    }
-
     @Override
     protected final int size() {
         return sb.length();
