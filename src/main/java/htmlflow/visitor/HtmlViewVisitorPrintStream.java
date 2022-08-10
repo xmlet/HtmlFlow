@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package htmlflow;
+package htmlflow.visitor;
 
 import htmlflow.util.PrintStringBuilder;
 
@@ -32,7 +32,7 @@ import java.io.PrintStream;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlVisitorPrintStream extends HtmlVisitorCache {
+public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
@@ -40,7 +40,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
     private final PrintStream out;
     /**
      * This is a PrintStringBuilder which collects all content into
-     * an internal StringBuilder, which is read by the cache.
+     * an internal StringBuilder.
      * When first visit finishes we exchange current to the value of
      * field out, which is a PrintStream.
      */
@@ -49,18 +49,18 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
     /**
      * Set HTML output indentation with true by default.
      */
-    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic) {
-        this(out, isDynamic, true);
+    public HtmlViewVisitorPrintStream(PrintStream out) {
+        this(out, true);
     }
 
-    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic, boolean isIndented) {
-        super(isDynamic, isIndented);
+    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented) {
+        super(isIndented);
         this.out = out;
         this.current = new PrintStringBuilder(out);
     }
 
-    public HtmlVisitorPrintStream(PrintStream out, boolean isDynamic, boolean isIndented, int depth) {
-        this(out, isDynamic, isIndented);
+    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, int depth) {
+        this(out, isIndented);
         this.depth = depth;
     }
 
@@ -68,8 +68,8 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
      * Creates a new similar instance with all static bocks cleared.
      */
     @Override
-    protected HtmlVisitorCache newbie() {
-        return new HtmlVisitorPrintStream(out, isDynamic, isIndented, depth);
+    public HtmlViewVisitor newbie() {
+        return new HtmlViewVisitorPrintStream(out, isIndented, depth);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
     }
 
     @Override
-    protected void write(String text) {
+    public void write(String text) {
         current.print(text);
     }
     @Override
@@ -106,8 +106,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
         /**
          * REMARK: we need to keep current field of type PrintStream because after
          * the first visit we exchange it to the value of field out, which is a PrintStream.
-         * After that, the cache is finished and we are sure that substring() is no
-         * longer invoked.
+         * After that, we are sure that substring() is no longer invoked.
          */
         return ((PrintStringBuilder) current).substring(staticBlockIndex);
     }
@@ -117,8 +116,7 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
         /**
          * REMARK: we need to keep current field of type PrintStream because after
          * the first visit we exchange it to the value of field out, which is a PrintStream.
-         * After that, the cache is finished and we are sure that size() is no
-         * longer invoked.
+         * After that, we are sure that size() is no longer invoked.
          */
         return ((PrintStringBuilder) current).length();
     }
@@ -134,9 +132,9 @@ public class HtmlVisitorPrintStream extends HtmlVisitorCache {
          */
         return null;
     }
-
+    
     @Override
-    protected HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorPrintStream(out, isDynamic, isIndented);
+    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
+        return new HtmlViewVisitorPrintStream(out, isIndented);
     }
 }

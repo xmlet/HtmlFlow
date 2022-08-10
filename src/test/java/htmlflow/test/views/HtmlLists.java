@@ -24,9 +24,10 @@
 
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumEnctypeType;
 import org.xmlet.htmlapifaster.EnumMethodType;
@@ -34,12 +35,14 @@ import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
+import java.io.PrintStream;
+
 public class HtmlLists {
     public static final String divClass = "divClass";
     public static final String divId = "divId";
 
-    public static HtmlView taskView (StaticHtml view) {
-        return view
+    public static HtmlPage taskView (PrintStream out) {
+        return HtmlFlow.doc(out)
             .html()
                 .head()
                     .script()
@@ -65,7 +68,7 @@ public class HtmlLists {
             .__(); //html
     }
 
-    public static HtmlView viewDetails = StaticHtml.view()
+    public static HtmlPage viewDetails = HtmlFlow.doc()
             .html()
                 .head()
                     .title().text("Task Details").__()
@@ -88,7 +91,7 @@ public class HtmlLists {
                 .__() //body
             .__(); //html
 
-    public static void taskDetailsTemplate(DynamicHtml<Task> view, Task task) {
+    public static void taskDetailsTemplate(HtmlView<Task> view, Task task) {
         view
             .html()
                 .head()

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>htmlflow</OriginalElement>
+  <nodes>
+    <node x="100.0" y="0.0">org.xmlet.htmlapifaster.Element</node>
+    <node x="0.0" y="216.0">htmlflow.HtmlView</node>
+    <node x="481.0" y="0.0">htmlflow.HtmlVisitorPrintStream</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="htmlflow.HtmlView" target="org.xmlet.htmlapifaster.Element">
+      <point x="0.0" y="-200.0" />
+      <point x="0.0" y="83.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.766144253454668" x="450.00000000000045" y="492.30561115632497" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
