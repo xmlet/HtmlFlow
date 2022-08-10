@@ -99,7 +99,7 @@ public class TestPartialsToPrintStream {
          * Assert
          */
         HtmlViewVisitor visitor = view.getVisitor();
-        Field blocksField = visitor.getClass().getSuperclass().getDeclaredField("cacheBlocksList");
+        Field blocksField = visitor.getClass().getSuperclass().getDeclaredField("staticBlocksList");
         blocksField.setAccessible(true);
         List blocks = (List) blocksField.get(visitor);
         assertEquals(2, blocks.size());

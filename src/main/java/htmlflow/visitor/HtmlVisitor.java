@@ -125,10 +125,10 @@ public abstract class HtmlVisitor extends ElementVisitor {
      */
     public abstract String finished();
     /**
-     * Since HtmlVisitorCache is immutable this is the preferred way to create a copy of the
-     * existing HtmlVisitorCache instance with a different isIndented state.
+     * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
+     * existing HtmlVisitor instance with a different isIndented state.
      *
-     * @param isIndented If thenew visitor should indent HTML output or not.
+     * @param isIndented If the new visitor should indent HTML output or not.
      */
     public abstract HtmlVisitor clone(PrintStream out, boolean isIndented);
 

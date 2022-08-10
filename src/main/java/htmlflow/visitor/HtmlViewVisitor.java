@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster
  * library) which collects information about visited Html elements of a HtmlView.
- * The HTML static content is collected into an internal cached cacheBlocksList.
+ * The HTML static content is collected into an internal staticBlocksList.
  * Static content is interleaved with dynamic content.
  *
  * @author Miguel Gamboa, Luís Duare
@@ -51,22 +51,22 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     private int staticBlockIndex = 0;
     /**
      * Signals the begin of a dynamic partial view and thus it should stop
-     * collecting the HTML into the cache.
+     * collecting the HTML into the staticBlocksList.
      */
     private boolean openDynamic = false;
     /**
      * True when the first visit is finished and all static blocks of HTML
-     * are cached in cacheBlocksList.
+     * are in staticBlocksList.
      */
-    private boolean isCached = false;
+    private boolean isStaticPartResolved = false;
     /**
-     * A cache list of static html blocks.
+     * A list of static html blocks.
      */
-    private final List<HtmlBlockInfo> cacheBlocksList = new ArrayList<>();
+    private final List<HtmlBlockInfo> staticBlocksList = new ArrayList<>();
     /**
-     * The current index in cacheBlocksList corresponding to a static HTML block.
+     * The current index in staticBlocksList corresponding to a static HTML block.
      */
-    private int cacheIndex = 0;
+    private int staticBlocksIndex = 0;
 
     HtmlViewVisitor(boolean isIndented) {
         super(isIndented);
@@ -107,18 +107,18 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      * This visitor may be writing to output or not, depending on the kind of HTML
      * block that it is being visited.
      * So, it should just write to output immediately only when it is:
-     *   1. in a static block that is not already in cache,
+     *   1. in a static block that is not already in staticBlocksList,
      * or
-     *   2 in a dynamic block that is never cached and thus must be always freshly
-     *   written to the output.
+     *   2 in a dynamic block that is never stored in staticBlocksList and
+     *   thus must be always freshly written to the output.
      */
     public final boolean isWriting() {
-        return !isCached || openDynamic;
+        return !isStaticPartResolved || openDynamic;
     }
     /**
-     * While the static blocks are not in cache then it appends elements to
+     * While the static blocks are not in staticBlocksList then it appends elements to
      * the main StringBuilder or PrintStream.
-     * Once already cached then it does nothing.
+     * Once already in staticBlocksList then it does nothing.
      * This method appends the String {@code "<elementName"} and it leaves the element
      * open to include additional attributes.
      * Before that it may close the parent begin tag with {@code ">"} if it is
@@ -187,51 +187,51 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     }
 
     /**
-     * Copies from or to cacheBlocksList depending on whether the content is in cache or not.
-     * Copying from cacheBlocksList will write through write() method.
-     * Copying to cacheBlocksList will read from substring().
+     * Copies from or to staticBlocksList depending on whether the content is already stored, or not.
+     * Copying from staticBlocksList will write through write() method.
+     * Copying to staticBlocksList will read from substring().
      */
     @Override
     public final void visitOpenDynamic(){
         if (openDynamic )
             throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
         openDynamic = true;
-        if (isCached){
-            HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
+        if (isStaticPartResolved){
+            HtmlBlockInfo block = staticBlocksList.get(staticBlocksIndex);
             this.write(block.html);
             this.depth = block.currentDepth;
             this.isClosed = block.isClosed;
-            ++cacheIndex;
+            ++staticBlocksIndex;
         } else {
             String staticBlock = substring(staticBlockIndex);
-            cacheBlocksList.add(new HtmlBlockInfo(staticBlock, depth, isClosed));
+            staticBlocksList.add(new HtmlBlockInfo(staticBlock, depth, isClosed));
         }
     }
 
     @Override
     public final void visitCloseDynamic(){
         openDynamic = false;
-        if (!isCached){
+        if (!isStaticPartResolved){
             staticBlockIndex = size();
         }
     }
     @Override
     public final String finished(){
-        if (isCached && cacheIndex <= cacheBlocksList.size()){
-            HtmlBlockInfo block = cacheBlocksList.get(cacheIndex);
+        if (isStaticPartResolved && staticBlocksIndex <= staticBlocksList.size()){
+            HtmlBlockInfo block = staticBlocksList.get(staticBlocksIndex);
             write(block.html);
             isClosed = block.isClosed;
             depth = block.currentDepth;
         }
 
-        if (!isCached){
+        if (!isStaticPartResolved){
             String staticBlock = substring(staticBlockIndex);
-            cacheBlocksList.add(new HtmlBlockInfo(staticBlock, depth, isClosed));
-            isCached = true;
+            staticBlocksList.add(new HtmlBlockInfo(staticBlock, depth, isClosed));
+            isStaticPartResolved = true;
         }
 
         String result = readAndReset();
-        cacheIndex = 0;
+        staticBlocksIndex = 0;
         return result;
     }
     @Override

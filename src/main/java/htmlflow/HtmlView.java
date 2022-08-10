@@ -115,7 +115,7 @@ public class HtmlView<T> extends HtmlPage<T> {
 
     /**
      * Returns a new instance of AbstractHtmlWriter with the same properties of this object
-     * but with a new HtmlVisitorCache set with the out PrintStream parameter.
+     * but with a new HtmlVisitor set with the out PrintStream parameter.
      */
     @Override
     public final HtmlWriter<T> setPrintStream(PrintStream out) {

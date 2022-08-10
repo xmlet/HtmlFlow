@@ -40,7 +40,7 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
     private final PrintStream out;
     /**
      * This is a PrintStringBuilder which collects all content into
-     * an internal StringBuilder, which is read by the cache.
+     * an internal StringBuilder.
      * When first visit finishes we exchange current to the value of
      * field out, which is a PrintStream.
      */
@@ -106,8 +106,7 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
         /**
          * REMARK: we need to keep current field of type PrintStream because after
          * the first visit we exchange it to the value of field out, which is a PrintStream.
-         * After that, the cache is finished and we are sure that substring() is no
-         * longer invoked.
+         * After that, we are sure that substring() is no longer invoked.
          */
         return ((PrintStringBuilder) current).substring(staticBlockIndex);
     }
@@ -117,8 +116,7 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
         /**
          * REMARK: we need to keep current field of type PrintStream because after
          * the first visit we exchange it to the value of field out, which is a PrintStream.
-         * After that, the cache is finished and we are sure that size() is no
-         * longer invoked.
+         * After that, we are sure that size() is no longer invoked.
          */
         return ((PrintStringBuilder) current).length();
     }
