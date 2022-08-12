@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 public class HtmlView<T> extends HtmlPage<T> {
 
     private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
-             "Wrong use of DynamicView! You should provide a " +
+             "Wrong use of HtmlView! You should provide a " +
              "model parameter or use a static view instead!";
     /**
      * This field is like an union with the threadLocalVisitor, being used alternatively.

@@ -1,6 +1,6 @@
 package htmlflow.test;
 
-import htmlflow.HtmlVisitorAsync;
+import htmlflow.visitor.HtmlVisitorAsync;
 import htmlflow.async.AsyncNode;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.internal.operators.observable.ObservableDelay;
@@ -21,8 +21,6 @@ import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Table;
 
 import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;

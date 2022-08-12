@@ -27,6 +27,7 @@ import htmlflow.visitor.HtmlDocVisitorPrintStream;
 import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
+import htmlflow.visitor.HtmlVisitorAsync;
 
 import java.io.PrintStream;
 import java.util.function.BiConsumer;
@@ -60,5 +61,9 @@ public class HtmlFlow {
 
     public static <U> HtmlView<U> view(BiConsumer<HtmlView<U>, U> binder) {
         return new HtmlView<>(null, (() -> new HtmlViewVisitorStringBuilder(true)), false, null, binder);
+    }
+    
+    public static <U> HtmlViewAsync<U> viewAsync(PrintStream out, BiConsumer<HtmlViewAsync<U>, U> binder) {
+        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false, binder);
     }
 }

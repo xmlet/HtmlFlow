@@ -1,4 +1,4 @@
-package htmlflow;
+package htmlflow.visitor;
 
 import htmlflow.async.AsyncNode;
 import htmlflow.async.subscribers.ObservableSubscriber;
@@ -15,31 +15,31 @@ import java.util.function.Supplier;
  * Async version of an HtmlVisitorCache.
  * This visitor only handles async models.
  */
-public class HtmlVisitorAsync extends HtmlVisitorCache {
+public class HtmlVisitorAsync extends HtmlViewVisitor {
     
     /**
      * The PrintStream destination of the HTML content produced by the visitor
      */
     private final PrintStream out;
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic) {
-        this(out, isDynamic, true);
+    public HtmlVisitorAsync(PrintStream out) {
+        this(out, true);
     }
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic, boolean isIndented) {
-        super(isDynamic, isIndented);
+    public HtmlVisitorAsync(PrintStream out, boolean isIndented) {
+        super(isIndented);
         this.out = out;
     }
     
-    public HtmlVisitorAsync(PrintStream out, boolean isDynamic, boolean isIndented, int depth) {
-        this(out, isDynamic, isIndented);
+    public HtmlVisitorAsync(PrintStream out, boolean isIndented, int depth) {
+        this(out, isIndented);
         this.depth = depth;
     }
     
     
     @Override
-    protected HtmlVisitorCache newbie() {
-        return new HtmlVisitorAsync(out, isDynamic, isIndented, depth);
+    public HtmlViewVisitor newbie() {
+        return new HtmlVisitorAsync(out, isIndented, depth);
     }
     
     @Override
@@ -63,7 +63,7 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     }
     
     @Override
-    protected void write(String text) {
+    public void write(String text) {
         out.print(text);
     }
     
@@ -104,8 +104,8 @@ public class HtmlVisitorAsync extends HtmlVisitorCache {
     }
     
     @Override
-    protected HtmlVisitorCache clone(boolean isIndented) {
-        return new HtmlVisitorAsync(out, isDynamic, isIndented);
+    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
+        return new HtmlVisitorAsync(out, isIndented);
     }
     
     public AsyncNode getLastAsyncNode() {
