@@ -66,13 +66,13 @@ public class HtmlView<T> extends HtmlPage<T> {
      * A template function receives 3 arguments:
      *   the view, the domain object and a varargs array of partial views.
      */
-    private final HtmlTemplate<T> template;
+    protected final HtmlTemplate<T> template;
     /**
      * Used alternately with the field template.
      * A binder function is responsible for binding the View with a domain object.
      * Thus, it is a function that receives two arguments: the view and the domain object.
      */
-    private final BiConsumer<HtmlView<T>, T> binder;
+    protected final BiConsumer<HtmlView<T>, T> binder;
 
     /**
      * To check whether this view is emitting to PrintStream, or not.
@@ -147,32 +147,32 @@ public class HtmlView<T> extends HtmlPage<T> {
     }
 
     @Override
-    public final String render() {
+    public String render() {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
     @Override
-    public final String render(T model) {
+    public String render(T model) {
         binder.accept(this, model);
         return getVisitor().finished();
     }
 
-    public final String render(T model, HtmlView...partials) {
+    public String render(T model, HtmlView...partials) {
         template.resolve(this, model, partials);
         return getVisitor().finished();
     }
 
     @Override
-    public final void write() {
+    public void write() {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
     @Override
-    public final void write(T model) {
+    public void write(T model) {
         this.render(model);
     }
 
-    public final void write(T model, HtmlView...partials) {
+    public void write(T model, HtmlView...partials) {
         this.render(model, partials);
     }
 

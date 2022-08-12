@@ -22,9 +22,6 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
      */
     private final PrintStream out;
     
-    public HtmlVisitorAsync(PrintStream out) {
-        this(out, true);
-    }
     
     public HtmlVisitorAsync(PrintStream out, boolean isIndented) {
         super(isIndented);
@@ -74,19 +71,17 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
     
     @Override
     protected String substring(int staticBlockIndex) {
-        
-        return "";
+        throw new UnsupportedOperationException();
     }
     
     @Override
     protected int size() {
-        return 0;
+        throw new UnsupportedOperationException();
     }
     
     @Override
     protected String readAndReset() {
-        
-        return null;
+        throw new UnsupportedOperationException();
     }
     
     /**

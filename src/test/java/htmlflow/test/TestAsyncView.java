@@ -1,6 +1,7 @@
 package htmlflow.test;
 
 import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import htmlflow.HtmlViewAsync;
 import htmlflow.test.model.AsyncModel;
 import io.reactivex.rxjava3.core.Observable;
@@ -60,7 +61,7 @@ class TestAsyncView {
         assertFalse(actual.hasNext());
     }
     
-    static void testAsyncModel(HtmlViewAsync<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
+    static void testAsyncModel(HtmlView<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
         final Thenable<Element> thenable = view.html()
                 .body()
                 .div()

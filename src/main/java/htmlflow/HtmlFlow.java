@@ -63,7 +63,7 @@ public class HtmlFlow {
         return new HtmlView<>(null, (() -> new HtmlViewVisitorStringBuilder(true)), false, null, binder);
     }
     
-    public static <U> HtmlViewAsync<U> viewAsync(PrintStream out, BiConsumer<HtmlViewAsync<U>, U> binder) {
-        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false, binder);
+    public static <U> HtmlViewAsync<U> viewAsync(PrintStream out, BiConsumer<HtmlView<U>, U> binder) {
+        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false, null, binder);
     }
 }
