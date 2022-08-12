@@ -64,7 +64,7 @@ public class TestDynamicVersusOfWithPartials {
         assertLines("stocks3items.html", actual);
         /*
          * Then render with Stock.dummy5Items() but it will return
-         * again the same previous 3 items that were stored in cache
+         * again the same previous 3 items that were stored in staticBlocksList
          * of stocksViewWrong due to its wrong use with of() instead of dynamic.
          */
         actual = HtmlDynamic

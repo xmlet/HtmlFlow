@@ -23,7 +23,8 @@
  */
  package htmlflow.test;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import io.reactivex.rxjava3.core.Observable;
 import org.junit.Test;
 
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestReactiveView {
 
+    @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testAddPartialAndCheckParentPrintStream() {
         /**
@@ -44,7 +46,7 @@ public class TestReactiveView {
         Observable<Long> nrs = Observable
             .intervalRange(1, 5, 0, 10, TimeUnit.MILLISECONDS)
             .doOnComplete(() -> cf.complete(null));
-        DynamicHtml<Observable<Long>> view = DynamicHtml.view(System.out, TestReactiveView::RxViewWithListingFromObservable);
+        HtmlView<Observable<Long>> view = HtmlFlow.view(System.out, TestReactiveView::RxViewWithListingFromObservable);
         /**
          * Act
          */
@@ -52,7 +54,7 @@ public class TestReactiveView {
         cf.join();       // Wait for nrs emit completion
     }
 
-    private static void RxViewWithListingFromObservable(DynamicHtml<Observable<Long>> view, Observable<Long> model) {
+    private static void RxViewWithListingFromObservable(HtmlView<Observable<Long>> view, Observable<Long> model) {
         view
             .html()
                 .head().title().text("Reactive Test").__().__()

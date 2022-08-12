@@ -46,7 +46,7 @@ public class TestResourceNotFound {
     public void testHtmlViewHeaderNotFound()
         throws ClassNotFoundException, IllegalAccessException, NoSuchFieldException {
         ClassLoaderGw gw = new ClassLoaderGw();
-        Class<?> klassView = gw.loadClass("htmlflow.HtmlView");
+        Class<?> klassView = gw.loadClass("htmlflow.HtmlPage");
         Field f = klassView.getDeclaredField("HEADER");
         f.setAccessible(true);
         Object header = f.get(null);

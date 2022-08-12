@@ -24,9 +24,10 @@
 
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
@@ -50,8 +51,8 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample01() {
-        String html= StaticHtml
-            .view()
+        String html= HtmlFlow
+            .doc()
                 .html()
                     .head()
                         .title().text("HtmlFlow").__()
@@ -73,28 +74,29 @@ public class HtmlForReadme {
     @SuppressWarnings("squid:S2699")
     @Test
     public void testSample02() throws IOException {
-        String html = view.render();        // 1) Get a string with the HTML
+        String html = view.render(null);        // 1) Get a string with the HTML
 
         // System.out.println(html);
 
         view
             // .setPrintStream(System.out)
-            .write();                       // 2) print to the standard output
+            .write(null);                       // 2) print to the standard output
 
         view
             // .setPrintStream(new PrintStream(new FileOutputStream("details.html")))
-            .write();                       // 3) write to details.html file
+            .write(null);                       // 3) write to details.html file
 
         // Desktop.getDesktop().browse(URI.create("details.html"));
     }
 
 
-    static HtmlView view = StaticHtml.view(v -> v
+    static HtmlPage view = HtmlFlow.view((view, model) -> view
                 .html()
                     .body()
                         .p().text("Typesafe is awesome! :-)").__()
                     .__() //body
-                .__()); // html
+                .__() // html
+    );
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -102,7 +104,7 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample03() throws IOException {
-        HtmlView<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
+        HtmlPage<Task> view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
 
         List<Task> tasks = Arrays.asList(
             new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
@@ -116,7 +118,7 @@ public class HtmlForReadme {
         }
     }
 
-    static HtmlView<Stream<Task>> tasksTableView = DynamicHtml.view(HtmlForReadme::tasksTableTemplate);
+    static HtmlPage<Stream<Task>> tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -131,11 +133,12 @@ public class HtmlForReadme {
         );
 
         Path path = Paths.get("tasksTable.html");
-        // Files.write(path, tasksTableView.render(tasks).getBytes());
+        byte[] html = tasksTableView.render(tasks).getBytes();
+        // Files.write(path, html);
         // Desktop.getDesktop().browse(path.toUri());
     }
 
-    static void tasksTableTemplate(DynamicHtml<Stream<Task>> view, Stream<Task> tasks) {
+    static void tasksTableTemplate(HtmlView<Stream<Task>> view, Stream<Task> tasks) {
         view
             .html()
                 .head()
@@ -155,9 +158,9 @@ public class HtmlForReadme {
                             .dynamic(tbody ->
                                 tasks.forEach(task -> tbody
                                     .tr()
-                                        .td().dynamic(td -> td.text(task.getTitle())).__()
-                                        .td().dynamic(td -> td.text(task.getDescription())).__()
-                                        .td().dynamic(td -> td.text(task.getPriority().toString())).__()
+                                        .td().of(td -> td.text(task.getTitle())).__()
+                                        .td().of(td -> td.text(task.getDescription())).__()
+                                        .td().of(td -> td.text(task.getPriority().toString())).__()
                                     .__() // tr
                                 ) // forEach
                             ) // dynamic

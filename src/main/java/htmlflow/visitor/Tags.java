@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package htmlflow;
+package htmlflow.visitor;
 
 import java.io.PrintStream;
 

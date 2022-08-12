@@ -24,68 +24,32 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.*;
+import htmlflow.visitor.HtmlViewVisitor;
+import org.xmlet.htmlapifaster.Html;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.UncheckedIOException;
-import java.net.URL;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.joining;
-
 /**
- * The root container for HTML elements.
- * It it responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
- * implementation, which is responsible for printing the tree of elements and
- * attributes.
- *
- * Instances of HtmlView are immutable. Any change to its properties returns a new
- * instance of HtmlView.
+ * Dynamic views can be bound to a domain object.
  *
  * @param <T> The type of domain object bound to this View.
  *
  * @author Miguel Gamboa, Luís Duare
- *         created on 29-03-2012
  */
-public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>, Element<?,?>> {
-    static final String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
-            "Cannot use PrintStream output for thread-safe views!";
+public class HtmlView<T> extends HtmlPage<T> {
 
-    static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
-            "Cannot set thread-safety for views with PrintStream output!";
-
-    private static final String HEADER;
-    private static final String NEWLINE = System.getProperty("line.separator");
-    private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
-
-    static {
-        try {
-            URL headerUrl = HtmlView.class
-                    .getClassLoader()
-                    .getResource(HEADER_TEMPLATE);
-            if(headerUrl == null)
-                throw new FileNotFoundException(HEADER_TEMPLATE);
-            InputStream headerStream = headerUrl.openStream();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(headerStream))) {
-                HEADER = reader.lines().collect(joining(NEWLINE));
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
+    private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
+             "Wrong use of DynamicView! You should provide a " +
+             "model parameter or use a static view instead!";
     /**
      * This field is like an union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
      * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
      * throw the output and we use the threadLocalVisitor field instead.
      */
-    private final HtmlVisitorCache visitor;
+    private final HtmlViewVisitor visitor;
     /**
      * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
      * The given example deals with a static field of ThreadLocal which persists beyond an instance.
@@ -93,13 +57,45 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
      * thread local instances during its entire life cycle.
      */
     @java.lang.SuppressWarnings("squid:S5164")
-    private final ThreadLocal<HtmlVisitorCache> threadLocalVisitor;
-    private final Supplier<HtmlVisitorCache> visitorSupplier;
+    private final ThreadLocal<HtmlViewVisitor> threadLocalVisitor;
+    private final Supplier<HtmlViewVisitor> visitorSupplier;
     private final boolean threadSafe;
 
-    protected HtmlView(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe) {
+    /**
+     * Used alternately with the field binder.
+     * A template function receives 3 arguments:
+     *   the view, the domain object and a varargs array of partial views.
+     */
+    private final HtmlTemplate<T> template;
+    /**
+     * Used alternately with the field template.
+     * A binder function is responsible for binding the View with a domain object.
+     * Thus, it is a function that receives two arguments: the view and the domain object.
+     */
+    private final BiConsumer<HtmlView<T>, T> binder;
+
+    /**
+     * To check whether this view is emitting to PrintStream, or not.
+     * Notice since the PrintStream maybe shared by different views processing
+     * we cannot ensure thread safety, because concurrent threads maybe emitting
+     * different HTML to the same PrintStream.
+     */
+    private final PrintStream out;
+    /**
+     * Auxiliary constructor used by clone().
+     */
+    HtmlView(
+        PrintStream out,
+        Supplier<HtmlViewVisitor> visitorSupplier,
+        boolean threadSafe,
+        HtmlTemplate<T> template,
+        BiConsumer<HtmlView<T>, T> binder)
+    {
+        this.out = out;
         this.visitorSupplier = visitorSupplier;
         this.threadSafe = threadSafe;
+        this.template = template;
+        this.binder = binder;
         if(threadSafe) {
             this.visitor = null;
             this.threadLocalVisitor = ThreadLocal.withInitial(visitorSupplier);
@@ -109,66 +105,37 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
         }
     }
 
-    public final Html<HtmlView<T>> html() {
+    public final Html<HtmlPage<T>> html() {
         if (this.getVisitor().isWriting())
             this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
 
-    public final Div<HtmlView<T>> div() {
-        return new Div<>(this);
-    }
-
-    public final Tr<HtmlView<T>> tr() {
-        return new Tr<>(this);
-    }
-
-    public final Root<HtmlView<T>> defineRoot(){
-        return new Root<>(this);
-    }
-
     /**
-     * Returns a new instance of HtmlView with the same properties of this object
-     * but with a new HtmlVisitorCache set with the out PrintStream parameter.
+     * Returns a new instance of AbstractHtmlWriter with the same properties of this object
+     * but with a new HtmlVisitor set with the out PrintStream parameter.
      */
     @Override
     public final HtmlWriter<T> setPrintStream(PrintStream out) {
         if(threadSafe)
             throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
-        Supplier<HtmlVisitorCache> v = out == null
-            ? () -> new HtmlVisitorStringBuilder(getVisitor().isDynamic)
-            : () -> new HtmlVisitorPrintStream(out, getVisitor().isDynamic);
-        return clone(v, false);
+        HtmlViewVisitor v = getVisitor();
+        return clone(() -> v.clone(out, v.isIndented), false);
     }
 
-    /**
-     * Returns a new instance of HtmlView with the same properties of this object
-     * but with indented set to the value of isIndented parameter.
-     */
-    public final HtmlView<T> setIndented(boolean isIndented) {
-        return clone(() -> getVisitor()
-            .clone(isIndented), false);
-    }
-
-    @Override
-    public final HtmlView<T> self() {
-        return this;
-    }
-
-    public final HtmlView<T> threadSafe(){
+    public final HtmlPage<T> threadSafe(){
         /**
-         * I don't like this kind of verification.
-         * Yet, we need to keep backward compatibility with views based
-         * on PrintStream output, which are not viable in a multi-thread scenario.
+         * PrintStream output is not viable in a multi-thread scenario,
+         * because different Visitor instances may share the same PrintStream.
          */
-        if(getVisitor() instanceof HtmlVisitorPrintStream) {
+        if(out != null) {
             throw new IllegalStateException(WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM);
         }
         return clone(visitorSupplier, true);
     }
 
     @Override
-    public final HtmlVisitorCache getVisitor() {
+    public HtmlViewVisitor getVisitor() {
         return threadSafe
             ? threadLocalVisitor.get()
             : visitor;
@@ -180,16 +147,36 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
     }
 
     @Override
-    public Element __() {
-        throw new IllegalStateException("HtmlView is the root of Html tree and it has not any parent.");
+    public final String render() {
+        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
     @Override
-    public Element getParent() {
-        throw new IllegalStateException("HtmlView is the root of Html tree and it has not any parent.");
+    public final String render(T model) {
+        binder.accept(this, model);
+        return getVisitor().finished();
     }
 
-    /**
+    public final String render(T model, HtmlView...partials) {
+        template.resolve(this, model, partials);
+        return getVisitor().finished();
+    }
+
+    @Override
+    public final void write() {
+        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
+    }
+
+    @Override
+    public final void write(T model) {
+        this.render(model);
+    }
+
+    public final void write(T model, HtmlView...partials) {
+        this.render(model, partials);
+    }
+
+        /**
      * Adds a partial view to this view.
      *
      * @param partial inner view.
@@ -198,7 +185,7 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
      */
     public final <U> void addPartial(HtmlView<U> partial, U model) {
         getVisitor().closeBeginTag();
-        partial.getVisitor().depth = getVisitor().depth;
+        partial.getVisitor().setDepth(getVisitor().getDepth());
         if (this.getVisitor().isWriting()) {
             /**
              * Next partial.clone() is related with https://github.com/xmlet/HtmlFlow/issues/75
@@ -212,7 +199,7 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
              * and the HTML document is based on a higher-order function, then our views instances only store
              * a few instance fields related to the visitor and the template function itself.
              */
-            HtmlVisitorCache v = getVisitor();
+            HtmlViewVisitor v = getVisitor();
             String p = partial.clone(v.newbie()).render(model);
             if(p != null) v.write(p);
         }
@@ -226,14 +213,14 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
      */
     public final <U> void addPartial(HtmlView<U> partial) {
         getVisitor().closeBeginTag();
-        partial.getVisitor().depth = getVisitor().depth;
+        partial.getVisitor().setDepth(getVisitor().getDepth());
         if (this.getVisitor().isWriting()) {
             /**
              * This overloaded addPartial does not have a model object.
              * Thus we do not expect to incur in the same problem reported on the other addPartial(partial, model).
              * Moreover partials are HTML fragments that are not expect to incur in more than Kb.
              */
-            String p = partial.render();
+            String p = partial.render(null);
             if(p != null) getVisitor().write(p);
         }
     }
@@ -245,12 +232,28 @@ public abstract class HtmlView<T> implements HtmlWriter<T>, Element<HtmlView<T>,
      * @param visitorSupplier
      * @param threadSafe
      */
-    protected abstract HtmlView<T> clone(Supplier<HtmlVisitorCache> visitorSupplier, boolean threadSafe);
+    protected final HtmlPage<T> clone(
+        Supplier<HtmlViewVisitor> visitorSupplier,
+        boolean threadSafe)
+    {
+        return new HtmlView<>(out, visitorSupplier, threadSafe, template, binder);
+    }
 
     /**
      * Resulting in a non thread safe view.
      * Receives an existent visitor.
      * Usually for a parent view to share its visitor with a partial.
      */
-    protected abstract HtmlView<T> clone(HtmlVisitorCache visitor);
+    protected HtmlPage<T> clone(HtmlViewVisitor visitor) {
+        return new HtmlView<>(out, () -> visitor, false, template, binder);
+    }
+
+    /**
+     * Returns a new instance of HtmlFlow with the same properties of this object
+     * but with indented set to the value of isIndented parameter.
+     */
+    @Override
+    public final HtmlPage<T> setIndented(boolean isIndented) {
+        return clone(() -> getVisitor().clone(out, isIndented), false);
+    }
 }

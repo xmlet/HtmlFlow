@@ -24,14 +24,15 @@
 
 package htmlflow.test.views;
 
-import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import org.xmlet.htmlFaster.EnumTargetBrowsingContext;
 import org.xmlet.htmlapifaster.EnumShapeType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 public class HtmlVoidElements {
-    public static HtmlView voidElements = StaticHtml.view()
+    public static HtmlPage voidElements = HtmlFlow.doc()
         .html()
             .head()
                 .title()

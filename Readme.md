@@ -215,7 +215,7 @@ bound to a domain object `Task`.
 Note the use of the method `dynamic()` inside the `taskDetailsTemplate` whenever we are
 binding properties from the domain object `Task`.
 This is a **mandatory issue** to enable dynamic bind of properties, otherwise those values are
-cached and the domain object `Task` will be ignored on further renders.
+resolved as static HTML and the domain object `Task` will be ignored on further renders.
 
 ``` java
 HtmlView<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
