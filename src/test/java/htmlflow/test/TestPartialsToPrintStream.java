@@ -25,7 +25,7 @@ package htmlflow.test;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
-import htmlflow.visitor.HtmlViewVisitor;
+import htmlflow.visitor.HtmlVisitor;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -98,7 +98,7 @@ public class TestPartialsToPrintStream {
         /**
          * Assert
          */
-        HtmlViewVisitor visitor = view.getVisitor();
+        HtmlVisitor visitor = view.getVisitor();
         Field blocksField = visitor.getClass().getSuperclass().getDeclaredField("staticBlocksList");
         blocksField.setAccessible(true);
         List blocks = (List) blocksField.get(visitor);

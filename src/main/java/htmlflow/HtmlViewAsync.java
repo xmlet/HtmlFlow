@@ -1,8 +1,7 @@
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitor;
+import htmlflow.visitor.HtmlVisitor;
 import htmlflow.visitor.HtmlVisitorAsync;
-import org.xmlet.htmlapifaster.Html;
 
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +29,7 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
      * @param threadSafe
      * @param binder
      */
-    HtmlViewAsync(PrintStream out, Supplier<HtmlViewVisitor> visitorSupplier,
+    HtmlViewAsync(PrintStream out, Supplier<HtmlVisitor> visitorSupplier,
                   boolean threadSafe,
                   HtmlTemplate<T> template,
                   BiConsumer<HtmlView<T>, T> binder) {
@@ -71,7 +70,7 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
     }
     
     public final CompletableFuture<Void> writeAsync(T model) {
-        final HtmlViewVisitor localVisitor = this.getVisitor();
+        final HtmlVisitor localVisitor = this.getVisitor();
     
         if (!(localVisitor instanceof HtmlVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
@@ -83,7 +82,7 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
     }
     
     public final CompletableFuture<Void> writeAsync(T model, HtmlView... partials) {
-        final HtmlViewVisitor localVisitor = this.getVisitor();
+        final HtmlVisitor localVisitor = this.getVisitor();
     
         if (!(localVisitor instanceof HtmlVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);

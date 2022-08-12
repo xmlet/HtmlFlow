@@ -24,7 +24,7 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitor;
+import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Html;
 
 import java.io.PrintStream;
@@ -49,7 +49,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
      * throw the output and we use the threadLocalVisitor field instead.
      */
-    private final HtmlViewVisitor visitor;
+    private final HtmlVisitor visitor;
     /**
      * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
      * The given example deals with a static field of ThreadLocal which persists beyond an instance.
@@ -57,8 +57,8 @@ public class HtmlView<T> extends HtmlPage<T> {
      * thread local instances during its entire life cycle.
      */
     @java.lang.SuppressWarnings("squid:S5164")
-    private final ThreadLocal<HtmlViewVisitor> threadLocalVisitor;
-    private final Supplier<HtmlViewVisitor> visitorSupplier;
+    private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
+    private final Supplier<HtmlVisitor> visitorSupplier;
     private final boolean threadSafe;
 
     /**
@@ -86,7 +86,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      */
     HtmlView(
         PrintStream out,
-        Supplier<HtmlViewVisitor> visitorSupplier,
+        Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe,
         HtmlTemplate<T> template,
         BiConsumer<HtmlView<T>, T> binder)
@@ -119,7 +119,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     public final HtmlWriter<T> setPrintStream(PrintStream out) {
         if(threadSafe)
             throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
-        HtmlViewVisitor v = getVisitor();
+        HtmlVisitor v = getVisitor();
         return clone(() -> v.clone(out, v.isIndented), false);
     }
 
@@ -135,7 +135,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     }
 
     @Override
-    public HtmlViewVisitor getVisitor() {
+    public HtmlVisitor getVisitor() {
         return threadSafe
             ? threadLocalVisitor.get()
             : visitor;
@@ -199,7 +199,7 @@ public class HtmlView<T> extends HtmlPage<T> {
              * and the HTML document is based on a higher-order function, then our views instances only store
              * a few instance fields related to the visitor and the template function itself.
              */
-            HtmlViewVisitor v = getVisitor();
+            HtmlVisitor v = getVisitor();
             String p = partial.clone(v.newbie()).render(model);
             if(p != null) v.write(p);
         }
@@ -233,7 +233,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * @param threadSafe
      */
     protected final HtmlPage<T> clone(
-        Supplier<HtmlViewVisitor> visitorSupplier,
+        Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe)
     {
         return new HtmlView<>(out, visitorSupplier, threadSafe, template, binder);
@@ -244,7 +244,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * Receives an existent visitor.
      * Usually for a parent view to share its visitor with a partial.
      */
-    protected HtmlPage<T> clone(HtmlViewVisitor visitor) {
+    protected HtmlPage<T> clone(HtmlVisitor visitor) {
         return new HtmlView<>(out, () -> visitor, false, template, binder);
     }
 

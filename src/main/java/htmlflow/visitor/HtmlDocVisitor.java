@@ -142,16 +142,21 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     public final <E extends Element> void visitThen(Supplier<E> elem) {
         throw new IllegalStateException("Wrong use of then() in a static view! Use HtmlView to produce an async view.");
     }
-    /*=========================================================================*/
-    /*------------            Abstract HOOK Methods         -------------------*/
-    /*=========================================================================*/
-    /**
-     * Writes the string text directly to the output.
+        /**
+     * Since this visitor does not maintain static blocks then it is
+     * always emitting HTML.
      */
-    public abstract void write(String text);
+    @Override
+    public final boolean isWriting() {
+        return true;
+    }
 
     /**
-     * Writes the char c directly to the output.
+     * NOT Supported. This is useful only for partials in the context of HtmlView.
      */
-    protected abstract void write(char c);
+    @Override
+    public final HtmlViewVisitor newbie() {
+        throw new UnsupportedOperationException("Illegal operation for HtmlDoc. Only for partials in HtmlView.");
+    }
+
 }

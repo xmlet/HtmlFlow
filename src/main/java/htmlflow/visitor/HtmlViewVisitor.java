@@ -28,7 +28,6 @@ import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Text;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -99,16 +98,6 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
                     write(Tags.FINISH_TAG);
                 isClosed = true;
             }
-        }
-    }
-    /**
-     * Writes the {@code ">"} to output.
-     */
-    public final void closeBeginTag() {
-        if(!isClosed) {
-            write(Tags.FINISH_TAG);
-            isClosed = true;
-            depth++;
         }
     }
     /**
@@ -268,14 +257,6 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
     /**
-     * Writes the string text directly to the output.
-     */
-    public abstract void write(String text);
-    /**
-     * Writes the char c directly to the output.
-     */
-    protected abstract void write(char c);
-    /**
      * Returns a substring with the HTML content from the index staticBlockIndex
      */
     protected abstract String substring(int staticBlockIndex);
@@ -283,16 +264,4 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      * Returns the accumulated output and clear it.
      */
     protected abstract String readAndReset();
-    /**
-     * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
-     * existing HtmlVisitor instance with a different isIndented state.
-     *
-     * @param isIndented If thenew visitor should indent HTML output or not.
-     */
-    public abstract HtmlViewVisitor clone(PrintStream out, boolean isIndented);
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     * Used when visiting partial views.
-     */
-    public abstract HtmlViewVisitor newbie();
 }

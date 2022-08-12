@@ -79,6 +79,16 @@ public abstract class HtmlVisitor extends ElementVisitor {
     HtmlVisitor(boolean isIndented) {
         this.isIndented = isIndented;
     }
+    /**
+     * Writes the {@code ">"} to output.
+     */
+    public final void closeBeginTag() {
+        if(!isClosed) {
+            write(Tags.FINISH_TAG);
+            isClosed = true;
+            depth++;
+        }
+    }
 
     /**
      * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
@@ -90,6 +100,19 @@ public abstract class HtmlVisitor extends ElementVisitor {
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
+    /**
+     * This visitor may be writing to output or not, depending on the kind of HTML
+     * block that it is being visited and on the Visitor approach.
+     */
+    public abstract boolean isWriting();
+    /**
+     * Writes the string text directly to the output.
+     */
+    public abstract void write(String text);
+    /**
+     * Writes the char c directly to the output.
+     */
+    protected abstract void write(char c);
     /**
      * Write {@code "<elementName"}.
      */
@@ -126,6 +149,11 @@ public abstract class HtmlVisitor extends ElementVisitor {
      * @param isIndented If the new visitor should indent HTML output or not.
      */
     public abstract HtmlVisitor clone(PrintStream out, boolean isIndented);
+    /**
+     * Creates a new similar instance with all static bocks cleared.
+     * Used when visiting partial views.
+     */
+    public abstract HtmlViewVisitor newbie();
 
     /*=========================================================================*/
     /*------------            Root Element Methods         --------------------*/

@@ -24,7 +24,6 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlDocVisitor;
 import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Html;
 
@@ -60,7 +59,7 @@ public class HtmlDoc extends HtmlPage<Object> {
     }
 
     public final Html<HtmlPage<Object>> html() {
-        ((HtmlDocVisitor) this.getVisitor()).write(HEADER);
+        this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
 
@@ -90,7 +89,7 @@ public class HtmlDoc extends HtmlPage<Object> {
 
     @Override
     public HtmlWriter<Object> setPrintStream(PrintStream out) {
-        return null;
+        throw new UnsupportedOperationException("Cannot change output PrintStream on HtmlDoc. only valid for HtmlView");
     }
 
     @Override
