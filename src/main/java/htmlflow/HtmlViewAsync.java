@@ -8,7 +8,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-//TODO extends from HtmlView
 public class HtmlViewAsync<T> extends HtmlView<T> {
     
     private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
@@ -51,10 +50,11 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_ASYNC_VIEW);
     }
     
+    @Override
     public String render(T model, HtmlView...partials) {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_ASYNC_VIEW);
     }
-    
+    @Override
     public final void write(T model, HtmlView...partials) {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }

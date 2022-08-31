@@ -5,6 +5,7 @@ import htmlflow.async.subscribers.ObservableSubscriber;
 import htmlflow.async.subscribers.PreviousAsyncObservableSubscriber;
 import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Text;
 
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
@@ -12,11 +13,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 /**
- * Async version of an HtmlVisitorCache.
- * This visitor only handles async models.
+ * This is the implementation of the HtmlVisitor that can handle template with async models.
  */
-public class HtmlVisitorAsync extends HtmlViewVisitor {
+public class HtmlVisitorAsync extends HtmlVisitor {
     
+    private static final String CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC = "Cannot use static blocks cache with HtmlVisitorAsync";
+    private static final String CANNOT_CREATE_AN_HTML_VIEW_VISITOR_INSTANCE_FROM_HTML_VISITOR_ASYNC = "Cannot create an HtmlViewVisitor instance from " +
+            "HtmlVisitorAsync";
     /**
      * The PrintStream destination of the HTML content produced by the visitor
      */
@@ -33,10 +36,34 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
         this.depth = depth;
     }
     
+    /**
+     * Adds a new line and indentation.
+     * Checks whether the parent element is still opened or not (!isClosed).
+     * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     * REMARK intentionally duplicating this method in other HtmlVisitor implementations,
+     * to improve performance.
+     */
+    protected final void newlineAndIndent(){
+        if (isClosed){
+            if(isIndented) {
+                write(Indentation.tabs(depth)); // \n\t\t\t\...
+            }
+        } else {
+            depth++;
+            if(isIndented)
+                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+            else
+                write(Tags.FINISH_TAG);
+            isClosed = true;
+        }
+    }
+    
+    
+    
     
     @Override
     public HtmlViewVisitor newbie() {
-        return new HtmlVisitorAsync(out, isIndented, depth);
+        throw new UnsupportedOperationException(CANNOT_CREATE_AN_HTML_VIEW_VISITOR_INSTANCE_FROM_HTML_VISITOR_ASYNC);
     }
     
     @Override
@@ -59,6 +86,24 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
         Tags.printComment(out, comment);
     }
     
+    /**
+     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
+     * This method is invoked by visitParent specialization methods (at the end of this class)
+     * for each void element such as area, base, etc.
+     */
+    @Override
+    protected final void visitParentOnVoidElements() {
+        if (!isClosed){
+            write(Tags.FINISH_TAG);
+        }
+        isClosed = true;
+    }
+    
+    @Override
+    public boolean isWriting() {
+        return true;
+    }
+    
     @Override
     public void write(String text) {
         out.print(text);
@@ -70,18 +115,13 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
     }
     
     @Override
-    protected String substring(int staticBlockIndex) {
-        throw new UnsupportedOperationException();
-    }
-    
-    @Override
     protected int size() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC);
     }
     
     @Override
-    protected String readAndReset() {
-        throw new UnsupportedOperationException();
+    public String finished() {
+        throw new UnsupportedOperationException(CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC);
     }
     
     /**
@@ -99,7 +139,7 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
     }
     
     @Override
-    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
+    public HtmlVisitor clone(PrintStream out, boolean isIndented) {
         return new HtmlVisitorAsync(out, isIndented);
     }
     
@@ -119,6 +159,37 @@ public class HtmlVisitorAsync extends HtmlViewVisitor {
     
     public AsyncNode getCurr() {
         return curr.clone();
+    }
+    
+    @Override
+    public final void visitElement(Element element) {
+        newlineAndIndent();
+        beginTag(element.getName()); // "<elementName"
+        isClosed = false;
+    }
+    
+    @Override
+    public void visitAttribute(String attributeName, String attributeValue) {
+        addAttribute(attributeName, attributeValue);
+    }
+    
+    @Override
+    public void visitParent(Element element) {
+        depth--;
+        newlineAndIndent();
+        endTag(element.getName()); // </elementName>
+    }
+    
+    @Override
+    public <R> void visitText(Text<? extends Element, R> text) {
+        newlineAndIndent();
+        write(text.getValue());
+    }
+    
+    @Override
+    public <R> void visitComment(Text<? extends Element, R> text) {
+        newlineAndIndent();
+        addComment(text.getValue());
     }
     
     /**
