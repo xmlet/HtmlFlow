@@ -39,6 +39,7 @@ import org.xmlet.htmlapifaster.Meta;
 import org.xmlet.htmlapifaster.Param;
 import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
+import org.xmlet.htmlapifaster.Text;
 
 import java.io.PrintStream;
 
@@ -49,7 +50,7 @@ import java.io.PrintStream;
  * @author Miguel Gamboa
  *         created on 04-08-2022
  */
-public abstract class HtmlVisitor extends ElementVisitor {
+public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     /**
      * keep track of current indentation.
      */
@@ -84,18 +85,113 @@ public abstract class HtmlVisitor extends ElementVisitor {
      */
     public final void closeBeginTag() {
         if(!isClosed) {
-            write(Tags.FINISH_TAG);
+            write(FINISH_TAG);
             isClosed = true;
             depth++;
         }
     }
 
+
+    /**
+     * Adds a new line and indentation.
+     * Checks whether the parent element is still opened or not (!isClosed).
+     * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     * REMARK intentionally duplicating this method in other HtmlVisitor implementations,
+     * to improve performance.
+     */
+    private final void newlineAndIndent(){
+        /*
+         * DO NOT REFACTOR this if (isWriting()).
+         * Trying remove if (isWriting()) of newlineAndIndent() and
+         * move it to call sites:  if (isWriting()){ newlineAndIndent(); ... }
+         * DEGRADES performance.
+         */
+        if (isWriting()){ // Keep it. DO NOT REFACTOR this if (isWriting()).
+            if (isClosed){
+                if(isIndented) {
+                    write(Indentation.tabs(depth)); // \n\t\t\t\...
+                }
+            } else {
+                depth++;
+                if(isIndented)
+                    write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+                else
+                    write(FINISH_TAG);
+                isClosed = true;
+            }
+        }
+    }
+
+    /**
+     * Regarding HtmlViewVisitor:
+     * While the static blocks are not in staticBlocksList then it appends elements to
+     * the main StringBuilder or PrintStream.
+     * Once already in staticBlocksList then it does nothing.
+     * This method appends the String {@code "<elementName"} and it leaves the element
+     * open to include additional attributes.
+     * Before that it may close the parent begin tag with {@code ">"} if it is
+     * still opened (!isClosed).
+     * The newlineAndIndent() is responsible for this job to check whether the parent element
+     * is still opened or not.
+     *
+     * @param element
+     */
+    @Override
+    public final void visitElement(Element element) {
+        newlineAndIndent();
+        if (isWriting()){
+            beginTag(element.getName()); // "<elementName"
+            isClosed = false;
+        }
+    }
+
+    /**
+     * Writes the end tag for elementName: {@code "</elementName>."}.
+     * This visit occurs when the º() is invoked.
+     */
+    @Override
+    public final void visitParent(Element element) {
+        if (isWriting()){
+            depth--;
+            newlineAndIndent();
+            endTag(element.getName()); // </elementName>
+        }
+    }
     /**
      * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
      * This method is invoked by visitParent specialization methods (at the end of this class)
      * for each void element such as area, base, etc.
      */
-    protected abstract void visitParentOnVoidElements();
+    protected final void visitParentOnVoidElements(){
+        if (!isClosed){
+            write(FINISH_TAG);
+        }
+        isClosed = true;
+    }
+
+    @Override
+    public final void visitAttribute(String attributeName, String attributeValue) {
+        if (isWriting()){
+            addAttribute(attributeName, attributeValue);
+        }
+    }
+
+    @Override
+    public final <R> void visitText(Text<? extends Element, R> text) {
+        newlineAndIndent();
+        if (isWriting()){
+            write(text.getValue());
+        }
+    }
+
+
+    @Override
+    public final <R> void visitComment(Text<? extends Element, R> text) {
+        newlineAndIndent();
+        if (isWriting()){
+            addComment(text.getValue());
+        }
+    }
 
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/
@@ -113,25 +209,6 @@ public abstract class HtmlVisitor extends ElementVisitor {
      * Writes the char c directly to the output.
      */
     protected abstract void write(char c);
-    /**
-     * Write {@code "<elementName"}.
-     */
-    protected abstract void beginTag(String elementName);
-
-    /**
-     * Writes {@code "</elementName>"}.
-     */
-    protected abstract void endTag(String elementName);
-
-    /**
-     * Writes {@code "attributeName=attributeValue"}
-     */
-    protected abstract void addAttribute(String attributeName, String attributeValue);
-
-    /**
-     * Writes {@code "<!--s-->"}
-     */
-    protected abstract void addComment(String s);
     /**
      * The number of characters written until this moment.
      */

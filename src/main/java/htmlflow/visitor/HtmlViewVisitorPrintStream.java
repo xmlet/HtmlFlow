@@ -32,7 +32,7 @@ import java.io.PrintStream;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
+public class HtmlViewVisitorPrintStream extends HtmlViewVisitor implements TagsToPrintStream {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
@@ -45,13 +45,6 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
      * field out, which is a PrintStream.
      */
     private PrintStream current;
-
-    /**
-     * Set HTML output indentation with true by default.
-     */
-    public HtmlViewVisitorPrintStream(PrintStream out) {
-        this(out, true);
-    }
 
     public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented) {
         super(isIndented);
@@ -70,26 +63,6 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
     @Override
     public HtmlViewVisitor newbie() {
         return new HtmlViewVisitorPrintStream(out, isIndented, depth);
-    }
-
-    @Override
-    protected void beginTag(String elementName) {
-        Tags.printOpenTag(current, elementName); // "<elementName"
-    }
-
-    @Override
-    protected void endTag(String elementName) {
-        Tags.printCloseTag(current, elementName); // </elementName>
-    }
-
-    @Override
-    protected void addAttribute(String attributeName, String attributeValue) {
-        Tags.printAttribute(current, attributeName, attributeValue);
-    }
-
-    @Override
-    protected void addComment(String comment) {
-        Tags.printComment(current, comment);
     }
 
     @Override
@@ -136,5 +109,10 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor {
     @Override
     public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
         return new HtmlViewVisitorPrintStream(out, isIndented);
+    }
+
+    @Override
+    public PrintStream out() {
+        return current;
     }
 }

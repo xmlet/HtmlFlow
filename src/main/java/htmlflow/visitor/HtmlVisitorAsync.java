@@ -5,7 +5,6 @@ import htmlflow.async.subscribers.ObservableSubscriber;
 import htmlflow.async.subscribers.PreviousAsyncObservableSubscriber;
 import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Text;
 
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
@@ -15,7 +14,7 @@ import java.util.function.Supplier;
 /**
  * This is the implementation of the HtmlVisitor that can handle template with async models.
  */
-public class HtmlVisitorAsync extends HtmlVisitor {
+public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     
     private static final String CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC = "Cannot use static blocks cache with HtmlVisitorAsync";
     private static final String CANNOT_CREATE_AN_HTML_VIEW_VISITOR_INSTANCE_FROM_HTML_VISITOR_ASYNC = "Cannot create an HtmlViewVisitor instance from " +
@@ -36,67 +35,9 @@ public class HtmlVisitorAsync extends HtmlVisitor {
         this.depth = depth;
     }
     
-    /**
-     * Adds a new line and indentation.
-     * Checks whether the parent element is still opened or not (!isClosed).
-     * If it is open then it closes the parent begin tag with ">" (!isClosed).
-     * REMARK intentionally duplicating this method in other HtmlVisitor implementations,
-     * to improve performance.
-     */
-    protected final void newlineAndIndent(){
-        if (isClosed){
-            if(isIndented) {
-                write(Indentation.tabs(depth)); // \n\t\t\t\...
-            }
-        } else {
-            depth++;
-            if(isIndented)
-                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
-            else
-                write(Tags.FINISH_TAG);
-            isClosed = true;
-        }
-    }
-    
-    
-    
-    
     @Override
     public HtmlViewVisitor newbie() {
         throw new UnsupportedOperationException(CANNOT_CREATE_AN_HTML_VIEW_VISITOR_INSTANCE_FROM_HTML_VISITOR_ASYNC);
-    }
-    
-    @Override
-    protected void beginTag(String elementName) {
-        Tags.printOpenTag(out, elementName);
-    }
-    
-    @Override
-    protected void endTag(String elementName) {
-        Tags.printCloseTag(out, elementName);
-    }
-    
-    @Override
-    protected void addAttribute(String attributeName, String attributeValue) {
-        Tags.printAttribute(out, attributeName, attributeValue);
-    }
-    
-    @Override
-    protected void addComment(String comment) {
-        Tags.printComment(out, comment);
-    }
-    
-    /**
-     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
-     * This method is invoked by visitParent specialization methods (at the end of this class)
-     * for each void element such as area, base, etc.
-     */
-    @Override
-    protected final void visitParentOnVoidElements() {
-        if (!isClosed){
-            write(Tags.FINISH_TAG);
-        }
-        isClosed = true;
     }
     
     @Override
@@ -160,38 +101,7 @@ public class HtmlVisitorAsync extends HtmlVisitor {
     public AsyncNode getCurr() {
         return curr.clone();
     }
-    
-    @Override
-    public final void visitElement(Element element) {
-        newlineAndIndent();
-        beginTag(element.getName()); // "<elementName"
-        isClosed = false;
-    }
-    
-    @Override
-    public void visitAttribute(String attributeName, String attributeValue) {
-        addAttribute(attributeName, attributeValue);
-    }
-    
-    @Override
-    public void visitParent(Element element) {
-        depth--;
-        newlineAndIndent();
-        endTag(element.getName()); // </elementName>
-    }
-    
-    @Override
-    public <R> void visitText(Text<? extends Element, R> text) {
-        newlineAndIndent();
-        write(text.getValue());
-    }
-    
-    @Override
-    public <R> void visitComment(Text<? extends Element, R> text) {
-        newlineAndIndent();
-        addComment(text.getValue());
-    }
-    
+
     /**
      * VisitAsync is responsible to handle the logic for when the user calls {@code async} for a certain Element.
      * <p/>
@@ -332,5 +242,10 @@ public class HtmlVisitorAsync extends HtmlVisitor {
     private <E extends Element> void setCurrStateAsDone(Supplier<E> elem, AsyncNode parentNode) {
         elem.get();
         parentNode.setDone();
+    }
+
+    @Override
+    public PrintStream out() {
+        return out;
     }
 }

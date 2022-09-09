@@ -2,7 +2,7 @@ package htmlflow.visitor;
 
 import java.io.PrintStream;
 
-public class HtmlDocVisitorPrintStream extends HtmlDocVisitor {
+public class HtmlDocVisitorPrintStream extends HtmlDocVisitor implements TagsToPrintStream {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
@@ -26,26 +26,6 @@ public class HtmlDocVisitorPrintStream extends HtmlDocVisitor {
     }
 
     @Override
-    protected final void beginTag(String elementName) {
-        Tags.printOpenTag(out, elementName); // "<elementName"
-    }
-
-    @Override
-    protected final void endTag(String elementName) {
-        Tags.printCloseTag(out, elementName); // </elementName>
-    }
-
-    @Override
-    protected final void addAttribute(String attributeName, String attributeValue) {
-        Tags.printAttribute(out, attributeName, attributeValue);
-    }
-
-    @Override
-    protected final void addComment(String comment) {
-        Tags.printComment(out, comment);
-    }
-
-    @Override
     public final void write(String text) {
         out.print(text);
     }
@@ -66,5 +46,10 @@ public class HtmlDocVisitorPrintStream extends HtmlDocVisitor {
         if(out == null)
             throw new IllegalArgumentException("Out PrintStream cannot be null!");
         return new HtmlDocVisitorPrintStream(out, isIndented);
+    }
+
+    @Override
+    public PrintStream out() {
+        return out;
     }
 }

@@ -26,7 +26,6 @@ package htmlflow.visitor;
 
 import io.reactivex.rxjava3.core.Observable;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,36 +69,6 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     HtmlViewVisitor(boolean isIndented) {
         super(isIndented);
     }
-
-    /**
-     * Adds a new line and indentation.
-     * Checks whether the parent element is still opened or not (!isClosed).
-     * If it is open then it closes the parent begin tag with ">" (!isClosed).
-     * REMARK intentionally duplicating this method in other HtmlVisitor implementations,
-     * to improve performance.
-     */
-    private final void newlineAndIndent(){
-        /*
-         * DO NOT REFACTOR this if (isWriting()).
-         * Trying remove if (isWriting()) of newlineAndIndent() and
-         * move it to call sites:  if (isWriting()){ newwlineAndIndent(); ... }
-         * DEGRADES performance.
-         */
-        if (isWriting()){ // Keep it. DO NOT REFACTOR this if (isWriting()).
-            if (isClosed){
-                if(isIndented) {
-                    write(Indentation.tabs(depth)); // \n\t\t\t\...
-                }
-            } else {
-                depth++;
-                if(isIndented)
-                    write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
-                else
-                    write(Tags.FINISH_TAG);
-                isClosed = true;
-            }
-        }
-    }
     /**
      * This visitor may be writing to output or not, depending on the kind of HTML
      * block that it is being visited.
@@ -111,76 +80,6 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
      */
     public final boolean isWriting() {
         return !isStaticPartResolved || openDynamic;
-    }
-    /**
-     * While the static blocks are not in staticBlocksList then it appends elements to
-     * the main StringBuilder or PrintStream.
-     * Once already in staticBlocksList then it does nothing.
-     * This method appends the String {@code "<elementName"} and it leaves the element
-     * open to include additional attributes.
-     * Before that it may close the parent begin tag with {@code ">"} if it is
-     * still opened (!isClosed).
-     * The newlineAndIndent() is responsible for this job to check whether the parent element
-     * is still opened or not.
-     *
-     * @param element
-     */
-    @Override
-    public final void visitElement(Element element) {
-        newlineAndIndent();
-        if (isWriting()){
-            beginTag(element.getName()); // "<elementName"
-            isClosed = false;
-        }
-    }
-
-    /**
-     * Writes the end tag for elementName: {@code "</elementName>."}.
-     * This visit occurs when the º() is invoked.
-     */
-    @Override
-    public final void visitParent(Element element) {
-        if (isWriting()){
-            depth--;
-            newlineAndIndent();
-            endTag(element.getName()); // </elementName>
-        }
-    }
-    /**
-     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
-     * This method is invoked by visitParent specialization methods (at the end of this class)
-     * for each void element such as area, base, etc.
-     */
-    @Override
-    protected final void visitParentOnVoidElements(){
-        if (!isClosed){
-            write(Tags.FINISH_TAG);
-        }
-        isClosed = true;
-    }
-
-    @Override
-    public final void visitAttribute(String attributeName, String attributeValue) {
-        if (isWriting()){
-            addAttribute(attributeName, attributeValue);
-        }
-    }
-
-    @Override
-    public final <R> void visitText(Text<? extends Element, R> text) {
-        newlineAndIndent();
-        if (isWriting()){
-            write(text.getValue());
-        }
-    }
-
-
-    @Override
-    public final <R> void visitComment(Text<? extends Element, R> text) {
-        newlineAndIndent();
-        if (isWriting()){
-            addComment(text.getValue());
-        }
     }
 
     /**

@@ -34,7 +34,7 @@ import java.io.PrintStream;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor {
+public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor implements TagsToStringBuilder {
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
@@ -57,26 +57,6 @@ public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor {
     @Override
     public HtmlViewVisitor newbie() {
         return new HtmlViewVisitorStringBuilder(isIndented, depth);
-    }
-
-    @Override
-    protected void beginTag(String elementName) {
-        Tags.appendOpenTag(sb, elementName); // "<elementName"
-    }
-
-    @Override
-    protected void endTag(String elementName) {
-        Tags.appendCloseTag(sb, elementName); // </elementName>
-    }
-
-    @Override
-    protected void addAttribute(String attributeName, String attributeValue) {
-        Tags.appendAttribute(sb, attributeName, attributeValue);
-    }
-
-    @Override
-    protected void addComment(String comment) {
-        Tags.appendComment(sb, comment);
     }
 
     @Override
@@ -110,5 +90,10 @@ public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor {
         if(out != null)
             throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
         return new HtmlViewVisitorStringBuilder(isIndented);
+    }
+
+    @Override
+    public StringBuilder sb() {
+        return sb;
     }
 }

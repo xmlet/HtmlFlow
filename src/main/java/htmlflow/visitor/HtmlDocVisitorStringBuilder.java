@@ -2,7 +2,7 @@ package htmlflow.visitor;
 
 import java.io.PrintStream;
 
-public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor {
+public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor implements TagsToStringBuilder {
     /**
      * The main StringBuilder. Read by the finished() to return the
      * resulting string with the Html content.
@@ -13,34 +13,9 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor {
         super(isIndented);
     }
 
-    public HtmlDocVisitorStringBuilder(boolean isIndented, int depth) {
-        super(isIndented);
-        this.depth = depth;
-    }
-
     @Override
     public final String finished() {
         return sb.toString();
-    }
-
-    @Override
-    protected final void beginTag(String elementName) {
-        Tags.appendOpenTag(sb, elementName); // "<elementName"
-    }
-
-    @Override
-    protected final void endTag(String elementName) {
-        Tags.appendCloseTag(sb, elementName); // </elementName>
-    }
-
-    @Override
-    protected final void addAttribute(String attributeName, String attributeValue) {
-        Tags.appendAttribute(sb, attributeName, attributeValue);
-    }
-
-    @Override
-    protected final void addComment(String comment) {
-        Tags.appendComment(sb, comment);
     }
 
     @Override
@@ -62,5 +37,10 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor {
         if(out != null)
             throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
         return new HtmlDocVisitorStringBuilder(isIndented);
+    }
+
+    @Override
+    public StringBuilder sb() {
+        return sb;
     }
 }
