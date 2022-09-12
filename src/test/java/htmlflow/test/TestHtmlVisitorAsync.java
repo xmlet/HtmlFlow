@@ -1,7 +1,7 @@
 package htmlflow.test;
 
-import htmlflow.visitor.HtmlVisitorAsync;
 import htmlflow.async.AsyncNode;
+import htmlflow.visitor.HtmlVisitorAsync;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.internal.operators.observable.ObservableDelay;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.doNothing;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
-class HtmlVisitorAsyncTest {
+class TestHtmlVisitorAsync {
     
     @Nested
     @DisplayName("When user uses async methods")
