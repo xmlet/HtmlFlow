@@ -5,18 +5,24 @@ import htmlflow.HtmlView;
 import htmlflow.HtmlViewAsync;
 import htmlflow.test.model.AsyncModel;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.internal.schedulers.SingleScheduler;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.Thenable;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,14 +34,17 @@ class TestAsyncView {
     
     @Test
     void given_async_work_when_create_view_then_returns_thenable_and_prints_correct_html() throws ExecutionException, InterruptedException {
-        
-        Observable<String> titles = Observable
-                .fromArray("Nr", "Name");
-        
-        Observable<Student> studentObservable = Observable
-                .intervalRange(1, 5, 0, 10, TimeUnit.MILLISECONDS)
+    
+        final Publisher<Student> studentFlux = Flux.range(1, 5)
+                .delayElements(Duration.ofMillis(10), Schedulers.single())
                 .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
-        
+    
+        Observable<Student> studentObservable = Observable.fromPublisher(studentFlux);
+    
+        final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
+    
+        final Observable<String> titles = Observable.fromPublisher(titlesFlux);
+    
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titles, studentObservable);
     
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
