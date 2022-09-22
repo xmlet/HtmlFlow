@@ -4,8 +4,6 @@ import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
 import htmlflow.HtmlViewAsync;
 import htmlflow.test.model.AsyncModel;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.internal.schedulers.SingleScheduler;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -37,15 +35,14 @@ class TestAsyncView {
     
         final Publisher<Student> studentFlux = Flux.range(1, 5)
                 .delayElements(Duration.ofMillis(10), Schedulers.single())
+                .doOnNext(nr -> System.out.println(" ########################## Emit " + nr))
                 .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
     
-        Observable<Student> studentObservable = Observable.fromPublisher(studentFlux);
-    
+
         final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
     
-        final Observable<String> titles = Observable.fromPublisher(titlesFlux);
-    
-        final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titles, studentObservable);
+
+        final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
     
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
@@ -83,17 +80,23 @@ class TestAsyncView {
                 .thead()
                 .tr()
                 .async(model.titles,
-                        (tr, titlesObs) -> titlesObs.subscribe(nr -> tr.th().text(nr).__()))
+                        (tr, titlesObs) -> Flux
+                            .from(titlesObs)
+                            .doOnNext(nr -> tr.th().text(nr).__())
+                            .subscribe())
                 .then(tr -> tr.__().__().tbody())
                 .async(model.items,
-                        (tbody, studentObs) -> studentObs.subscribe(student -> tbody.tr()
-                                .th()
-                                .text(student.nr)
-                                .__()
-                                .td()
-                                .text(student.name)
-                                .__()
-                                .__()))
+                        (tbody, studentObs) -> Flux
+                            .from(studentObs)
+                            .doOnNext(student -> tbody.tr()
+                                    .th()
+                                    .text(student.nr)
+                                    .__()
+                                    .td()
+                                    .text(student.name)
+                                    .__()
+                                    .__())
+                            .subscribe())
                 .then(tr -> tr.__()
                         .__()
                         .__()

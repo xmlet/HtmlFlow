@@ -25,9 +25,12 @@
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
-import io.reactivex.rxjava3.core.Observable;
 import org.junit.Test;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -43,10 +46,12 @@ public class TestReactiveView {
         /**
          * Cont from 1 to 5 with 0 delay in 10 milliseconds interval.
          */
-        Observable<Long> nrs = Observable
-            .intervalRange(1, 5, 0, 10, TimeUnit.MILLISECONDS)
+        Flux<Long> nrs = Flux
+            .interval(Duration.of(10, ChronoUnit.MILLIS))
+            .map(n -> n + 1)
+            .take(5)
             .doOnComplete(() -> cf.complete(null));
-        HtmlView<Observable<Long>> view = HtmlFlow.view(System.out, TestReactiveView::RxViewWithListingFromObservable);
+        HtmlView<Publisher<Long>> view = HtmlFlow.view(System.out, TestReactiveView::RxViewWithListingFromObservable);
         /**
          * Act
          */
@@ -54,7 +59,7 @@ public class TestReactiveView {
         cf.join();       // Wait for nrs emit completion
     }
 
-    private static void RxViewWithListingFromObservable(HtmlView<Observable<Long>> view, Observable<Long> model) {
+    private static void RxViewWithListingFromObservable(HtmlView<Publisher<Long>> view, Publisher<Long> model) {
         view
             .html()
                 .head().title().text("Reactive Test").__().__()
@@ -62,7 +67,7 @@ public class TestReactiveView {
                     .div()
                         .p().text("Creating a listing from a reactive model: ").__()
                         .ul()
-                            .dynamic(ul -> model.forEach(nr -> ul
+                            .dynamic(ul -> Flux.from(model).subscribe(nr -> ul
                                 .li().text(nr).__()
                             ))
                         .__()

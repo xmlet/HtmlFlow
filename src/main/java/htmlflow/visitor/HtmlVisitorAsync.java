@@ -3,7 +3,7 @@ package htmlflow.visitor;
 import htmlflow.async.AsyncNode;
 import htmlflow.async.subscribers.ObservableSubscriber;
 import htmlflow.async.subscribers.PreviousAsyncObservableSubscriber;
-import io.reactivex.rxjava3.core.Observable;
+import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 
 import java.io.PrintStream;
@@ -105,7 +105,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     /**
      * VisitAsync is responsible to handle the logic for when the user calls {@code async} for a certain Element.
      * <p/>
-     * At the start we always wrap the call to the consumer, which is the logic for creating the Html tags from the Observable type, inside a
+     * At the start we always wrap the call to the consumer, which is the logic for creating the Html tags from the Publisher type, inside a
      * runnable, which will start running once we know that we can start emitting the Html.
      * <p/>
      * This Runnable is then used to create a Node. A Node represents an async action that was submitted by the user. The node always start at the
@@ -125,20 +125,20 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      * <p/>
      * After that we perform a preemptive check in order to see if the N-1 task is already done.
      * If that's the case we can advance the curr node for the N node.
-     * If that's not the case, we subscribe to the N-1 observable and once it emits the completed signal we can then advance the curr node to the N
+     * If that's not the case, we subscribe to the N-1 Publisher and once it emits the completed signal we can then advance the curr node to the N
      * task.
      *
      * @param supplier A {@link Supplier} containing the current {@link Element} being used for the async task
      * @param consumer The async action that was submitted
-     * @param obs {@link Observable} containing the reactive and async data which we are using to create the Html Element
+     * @param obs {@link Publisher} containing the reactive and async data which we are using to create the Html Element
      * @param <E> A generic type representing the current Html Element
-     * @param <T> A generic type representing the object inside the Observable
+     * @param <T> A generic type representing the object inside the Publisher
      *
      * @see Runnable
      * @see AsyncNode
      */
     @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Observable<T>> consumer, Observable<T> obs) {
+    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Publisher<T>> consumer, Publisher<T> obs) {
         
         Runnable asyncAction = () -> consumer.accept(supplier.get(), obs);
         
@@ -197,7 +197,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      *         If the state is {@link AsyncNode#isWaiting()} we don't do anything as the respective parent has not yet started emitting.
      *     </li>
      *     <li>
-     *         If the state {@link AsyncNode#isRunning()} we subscribe to the {@link Observable} of the parent and after it completes we set the
+     *         If the state {@link AsyncNode#isRunning()} we subscribe to the {@link Publisher} of the parent and after it completes we set the
      *         parent state as done and proceed to call the {@link Supplier}
      *     </li>
      * </ul>

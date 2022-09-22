@@ -1,10 +1,9 @@
 package htmlflow.async.subscribers;
 
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
-public class PreviousAsyncObservableSubscriber<T> implements Observer<T> {
+public class PreviousAsyncObservableSubscriber<T> implements Subscriber<T> {
     
     private final Runnable onTermination;
     
@@ -13,19 +12,20 @@ public class PreviousAsyncObservableSubscriber<T> implements Observer<T> {
     }
     
     @Override
-    public void onSubscribe(@NonNull Disposable d) {
+    public void onSubscribe(Subscription subscription) {
+        // Not used because we are not subscribing to this particular Subscriber
+        // We are just using this to subscribe to an Observable
+        subscription.request(Long.MAX_VALUE);
+    }
+
+    @Override
+    public void onNext(T t) {
         // Not used because we are not subscribing to this particular Subscriber
         // We are just using this to subscribe to an Observable
     }
     
     @Override
-    public void onNext(@NonNull T t) {
-        // Not used because we are not subscribing to this particular Subscriber
-        // We are just using this to subscribe to an Observable
-    }
-    
-    @Override
-    public void onError(@NonNull Throwable e) {
+    public void onError(Throwable e) {
         // Not used because we are not subscribing to this particular Subscriber
         // We are just using this to subscribe to an Observable
     }

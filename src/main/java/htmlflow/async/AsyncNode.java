@@ -1,6 +1,6 @@
 package htmlflow.async;
 
-import io.reactivex.rxjava3.core.Observable;
+import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 
 import java.util.concurrent.CompletableFuture;
@@ -10,10 +10,10 @@ public class AsyncNode<T> implements Cloneable {
     public final Runnable asyncAction;
     public AsyncNode next;
     public ChildNode childNode;
-    public final Observable<T> observable;
+    public final Publisher<T> observable;
     public CompletableFuture<Void> cf;
     
-    public AsyncNode(AsyncNode next, ChildNode childNode, Runnable asyncAction, Observable<T> observable) {
+    public AsyncNode(AsyncNode next, ChildNode childNode, Runnable asyncAction, Publisher<T> observable) {
         this.next = next;
         this.childNode = childNode;
         this.asyncAction = asyncAction;

@@ -24,7 +24,7 @@
 
 package htmlflow.visitor;
 
-import io.reactivex.rxjava3.core.Observable;
+import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 
 import java.util.ArrayList;
@@ -131,7 +131,7 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
         return result;
     }
     @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> element, BiConsumer<E, Observable<T>> asyncAction, Observable<T> obs) {
+    public <E extends Element, T> void visitAsync(Supplier<E> element, BiConsumer<E, Publisher<T>> asyncAction, Publisher<T> obs) {
         throw new IllegalStateException("Wrong use of async() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
     }
 
