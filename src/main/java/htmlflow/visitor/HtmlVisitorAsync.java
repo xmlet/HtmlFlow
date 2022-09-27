@@ -1,10 +1,10 @@
 package htmlflow.visitor;
 
 import htmlflow.async.AsyncNode;
-import htmlflow.async.subscribers.ObservableSubscriber;
-import htmlflow.async.subscribers.PreviousAsyncObservableSubscriber;
+import htmlflow.async.OnPublisherCompletionImpl;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
 
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
@@ -85,7 +85,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     }
     
     public AsyncNode getLastAsyncNode() {
-        return lastAsyncNode.clone();
+        return lastAsyncNode;
     }
     
     /**
@@ -99,7 +99,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     private AsyncNode lastAsyncNode = null;
     
     public AsyncNode getCurr() {
-        return curr.clone();
+        return curr;
     }
 
     /**
@@ -138,7 +138,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      * @see AsyncNode
      */
     @Override
-    public <E extends Element, T> void visitAsync(Supplier<E> supplier, BiConsumer<E, Publisher<T>> consumer, Publisher<T> obs) {
+    public <E extends Element, T> OnPublisherCompletion visitAsync(Supplier<E> supplier, BiConsumer<E, Publisher<T>> consumer, Publisher<T> obs) {
         
         Runnable asyncAction = () -> consumer.accept(supplier.get(), obs);
         
@@ -146,34 +146,24 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         
         if (curr == null) {
             curr = node;
-            setCurrStateAsRunning();
+            curr.setRunning();
         } else {
             final AsyncNode last = lastAsyncNode;
             last.next = node;
-            if (last.isDone()) {
-                advanceToNextAsyncAction();
-            } else {
-                last.observable.subscribe(new PreviousAsyncObservableSubscriber<>(this::advanceToNextAsyncAction));
+            
+            if (curr.isDone()) {
+                curr = curr.next;
+                curr.setRunning();
             }
         }
+        
         lastAsyncNode = node;
-    }
-    
-    private void advanceToNextAsyncAction() {
-        curr = curr.next;
-        setCurrStateAsRunning();
-    }
-    
-    /**
-     * Puts the current node into RUNNING mode, if this node already contains a child node we trigger the action that was set when the child node
-     * was created.
-     */
-    private void setCurrStateAsRunning() {
-        curr.setRunning();
-        curr.asyncAction.run();
-        if (curr.childNode != null) {
-            curr.childNode.onAsyncAction.trigger(curr);
-        }
+        return new OnPublisherCompletionImpl<>(node, () -> {
+            if (this.curr.next != null) {
+                curr = curr.next;
+                curr.setRunning();
+            }
+        });
     }
     
     /**
@@ -204,7 +194,6 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      *
      * @param elem The resulting Html element from the an {@code .then()} call.
      * @param <E> The generic type identifying the next Html Element.
-     * @see htmlflow.async.AsyncNode.OnAsyncAction
      */
     @Override
     public <E extends Element> void visitThen(Supplier<E> elem) {
@@ -212,36 +201,16 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         AsyncNode last = lastAsyncNode;
     
         if (last.childNode == null) {
-            last.childNode = new AsyncNode.ChildNode<>(elem, curr -> readParentState(curr, last, elem));
+            last.childNode = new AsyncNode.ChildNode<>(elem);
         }
         
-        this.readParentState(last, last, elem);
+        this.executeThenIfParentDone(last, elem);
     }
     
-    private <E extends Element> void readParentState(AsyncNode curr, AsyncNode last, Supplier<E> elem) {
+    private <E extends Element> void executeThenIfParentDone(AsyncNode curr, Supplier<E> elem) {
         if(curr.isDone()) {
             elem.get();
         }
-        else if(curr.isRunning()) {
-            last.observable.subscribe(new ObservableSubscriber<>(this::setCurrStateAsDone, elem, last));
-        }
-        else if(curr.isWaiting()) {
-            // no action needed
-        }
-        else
-            throw new IndexOutOfBoundsException();
-    }
-    
-    /**
-     * Executes the call to the Supplier and sets the parent state as {@link AsyncNode#isDone()}.
-     *
-     * @param elem The Supplier containing the execution of the {@code .then()}
-     * @param parentNode The parent node
-     * @param <E> Generic type representing the next type of Html Element
-     */
-    private <E extends Element> void setCurrStateAsDone(Supplier<E> elem, AsyncNode parentNode) {
-        elem.get();
-        parentNode.setDone();
     }
 
     @Override

@@ -10,56 +10,57 @@ public class AsyncNode<T> implements Cloneable {
     public final Runnable asyncAction;
     public AsyncNode next;
     public ChildNode childNode;
-    public final Publisher<T> observable;
-    public CompletableFuture<Void> cf;
+    public final Publisher<T> publisher;
+    public final CompletableFuture<Void> cf = new CompletableFuture<>();
     
-    public AsyncNode(AsyncNode next, ChildNode childNode, Runnable asyncAction, Publisher<T> observable) {
+    private State state = State.WAITING;
+    
+    public AsyncNode(AsyncNode next, ChildNode childNode, Runnable asyncAction, Publisher<T> publisher) {
         this.next = next;
         this.childNode = childNode;
         this.asyncAction = asyncAction;
-        this.observable = observable;
+        this.publisher = publisher;
     }
     
     public boolean isDone() {
-        return cf != null && cf.isDone();
+        return cf.isDone() && state == State.DONE;
     }
     
     public boolean isRunning() {
-        return cf != null;
+        return state == State.RUNNING;
     }
     
     public boolean isWaiting() {
-        return cf == null;
+        return state == State.WAITING;
     }
     
     @Override
     public AsyncNode<T> clone() {
-        final AsyncNode<T> node = new AsyncNode<>(this.next, this.childNode, this.asyncAction, this.observable);
-        node.cf = this.cf;
-        return node;
+        return new AsyncNode<>(this.next, this.childNode, this.asyncAction, this.publisher);
     }
     
     public void setDone() {
         this.cf.complete(null);
+        this.state = State.DONE;
     }
     
     public void setRunning() {
-        this.cf = new CompletableFuture<>();
+        this.asyncAction.run();
+        this.state = State.RUNNING;
     }
     
     public static class ChildNode<E extends Element> {
         public Supplier<E> elem;
-        public OnAsyncAction onAsyncAction;
-        
-        public ChildNode(Supplier<E> elem, OnAsyncAction onAsyncAction) {
+        public ChildNode(Supplier<E> elem) {
             this.elem = elem;
-            this.onAsyncAction = onAsyncAction;
         }
         
     }
     
-    public interface OnAsyncAction {
-        void trigger(AsyncNode node);
+    private enum State {
+        WAITING,
+        RUNNING,
+        DONE
     }
     
 }

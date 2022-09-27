@@ -17,6 +17,7 @@ import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Table;
+import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyChar;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -69,9 +71,10 @@ class TestHtmlVisitorAsync {
             
             BiConsumer<Table<Body<Html<Element>>>, Publisher<String>> action = (table, obs) -> table.thead().text("text");
             
-            final Publisher<String> observable = Flux.fromStream(of("1", "2", "3"));
+            final Flux<String> observable = Flux.fromStream(of("1", "2", "3"));
             
             visitor.visitAsync(elem, action, observable);
+            observable.subscribe();
             
             assertNull(visitor.getCurr().next);
             assertTrue(visitor.getCurr().isRunning());
@@ -107,7 +110,7 @@ class TestHtmlVisitorAsync {
             
         }
 
-                @Test
+        @Test
         void given_supplier_action_and_observable_when_previous_is_finished_runs_next_async() {
 
             AtomicBoolean isSubscribed = new AtomicBoolean(false);
@@ -125,7 +128,8 @@ class TestHtmlVisitorAsync {
             Flux<String> observable = sink.asFlux().doOnSubscribe(__ -> isSubscribed.set(true));
 
             // first call to trigger the logic
-            visitor.visitAsync(elem, action, observable);
+            final OnPublisherCompletion publisherCompletion = visitor.visitAsync(elem, action, observable);
+            observable.subscribe();
 
             //creates new element
             Sinks.Many<String> newSink = Sinks.many().replay().all();
@@ -140,9 +144,11 @@ class TestHtmlVisitorAsync {
             BiConsumer<Div<Body<Html<Element>>>, Publisher<String>> divAction = (div, obs) -> div.text("new action");
 
             visitor.visitAsync(() -> newElem, divAction, newSink.asFlux());
+            
             //forces termination of previous
             observable.blockLast();
-
+            publisherCompletion.onComplete();
+    
             assertNull(visitor.getCurr().next);
             assertTrue(visitor.getLastAsyncNode().isRunning());
             assertTrue(isSubscribed.get());
@@ -162,12 +168,13 @@ class TestHtmlVisitorAsync {
             sink.emitNext("3", FAIL_FAST);
             sink.emitComplete(FAIL_FAST);
 
-            Flux<String> observable = sink.asFlux().doOnSubscribe(__ -> isSubscribed.set(true));
+            Flux<String> flux = sink.asFlux().doOnSubscribe(__ -> isSubscribed.set(true));
 
 
 
             // first call to trigger the logic
-            visitor.visitAsync(elem, action, observable);
+            visitor.visitAsync(elem, action, flux);
+            flux.subscribe();
 
             visitor.visitThen(() -> baseElem.__().div());
 
@@ -209,8 +216,9 @@ class TestHtmlVisitorAsync {
 
 
             // first call to trigger the logic
-            visitor.visitAsync(elem, action, delayer);
-
+            final OnPublisherCompletion publisherCompletion = visitor.visitAsync(elem, action, delayer);
+            delayer.subscribe();
+    
             final Div<Body<Html<Element>>> div = baseElem.__().div();
             visitor.visitThen(() -> div);
 
@@ -221,6 +229,7 @@ class TestHtmlVisitorAsync {
 
             //force to wait for the delay
             delayer.blockLast();
+            publisherCompletion.onComplete();
 
             final AsyncNode last = visitor.getLastAsyncNode();
 
