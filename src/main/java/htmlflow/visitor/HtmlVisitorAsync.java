@@ -1,7 +1,8 @@
 package htmlflow.visitor;
 
-import htmlflow.async.AsyncNode;
-import htmlflow.async.OnPublisherCompletionImpl;
+import htmlflow.async.nodes.AsyncNode;
+import htmlflow.async.nodes.ContinuationNode;
+import htmlflow.async.nodes.ThenNode;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
@@ -68,15 +69,12 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     /**
      *
      * @return A {@link CompletableFuture} which completes upon the last async action achieves {@link AsyncNode#isDone()} state.
-     * @see htmlflow.async.AsyncNode
+     * @see AsyncNode
      */
     public CompletableFuture<Void> finishedAsync() {
-        CompletableFuture<Void> currCf = curr.cf;
-        for(AsyncNode node = curr.next; node != null; node = node.next) {
-            final AsyncNode myNode = node;
-            currCf = currCf.thenCompose(prev -> myNode.cf);
-        }
-        return currCf;
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        this.getLastNode().setCfForCompletion(cf);
+        return cf;
     }
     
     @Override
@@ -84,21 +82,21 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         return new HtmlVisitorAsync(out, isIndented);
     }
     
-    public AsyncNode getLastAsyncNode() {
-        return lastAsyncNode;
+    public ContinuationNode getLastNode() {
+        return lastNode;
     }
     
     /**
      * The current node represent the async action that is being processed at a certain point in time.
      */
-    private AsyncNode curr = null;
+    private ContinuationNode curr = null;
     
     /**
      * The last AsyncNode.
      */
-    private AsyncNode lastAsyncNode = null;
+    private ContinuationNode lastNode = null;
     
-    public AsyncNode getCurr() {
+    public ContinuationNode getCurr() {
         return curr;
     }
 
@@ -142,28 +140,27 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         
         Runnable asyncAction = () -> consumer.accept(supplier.get(), obs);
         
-        final AsyncNode<T> node = new AsyncNode<>(null, null, asyncAction, obs);
+        final AsyncNode<T> node = new AsyncNode<>(asyncAction, obs);
         
         if (curr == null) {
             curr = node;
-            curr.setRunning();
+            node.execute();
         } else {
-            final AsyncNode last = lastAsyncNode;
-            last.next = node;
+            final ContinuationNode last = lastNode;
+            last.setNext(node);
             
-            if (curr.isDone()) {
-                curr = curr.next;
-                curr.setRunning();
-            }
+            this.ifCurrDoneExecuteNext(node);
         }
-        
-        lastAsyncNode = node;
-        return new OnPublisherCompletionImpl<>(node, () -> {
-            if (this.curr.next != null) {
-                curr = curr.next;
-                curr.setRunning();
+    
+        lastNode = node;
+        return () -> {
+            curr.setDone();
+            final ContinuationNode next = curr.getNext();
+            if (next != null) {
+                curr = next;
+                curr.execute();
             }
-        });
+        };
     }
     
     /**
@@ -197,22 +194,29 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      */
     @Override
     public <E extends Element> void visitThen(Supplier<E> elem) {
+        final ThenNode<E> thenNode = new ThenNode<>(elem, () -> {
+            final ContinuationNode next = curr.getNext();
+            if (next != null) {
+                next.execute();
+                curr = next;
+            }
+        });
         
-        AsyncNode last = lastAsyncNode;
+        final ContinuationNode last = this.lastNode;
+        last.setNext(thenNode);
+        
+        this.lastNode = thenNode;
     
-        if (last.childNode == null) {
-            last.childNode = new AsyncNode.ChildNode<>(elem);
-        }
-        
-        this.executeThenIfParentDone(last, elem);
+        ifCurrDoneExecuteNext(thenNode);
     }
     
-    private <E extends Element> void executeThenIfParentDone(AsyncNode curr, Supplier<E> elem) {
-        if(curr.isDone()) {
-            elem.get();
+    private void ifCurrDoneExecuteNext(ContinuationNode nextNode) {
+        if (curr.isDone()) {
+            curr = curr.getNext();
+            nextNode.execute();
         }
     }
-
+    
     @Override
     public PrintStream out() {
         return out;

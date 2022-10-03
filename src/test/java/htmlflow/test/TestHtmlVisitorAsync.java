@@ -1,6 +1,7 @@
 package htmlflow.test;
 
-import htmlflow.async.AsyncNode;
+import htmlflow.async.nodes.AsyncNode;
+import htmlflow.async.nodes.ContinuationNode;
 import htmlflow.visitor.HtmlVisitorAsync;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,7 +77,7 @@ class TestHtmlVisitorAsync {
             visitor.visitAsync(elem, action, observable);
             observable.subscribe();
             
-            assertNull(visitor.getCurr().next);
+            assertNull(visitor.getCurr().getNext());
             assertTrue(visitor.getCurr().isRunning());
         }
         
@@ -103,10 +104,10 @@ class TestHtmlVisitorAsync {
             
             visitor.visitAsync(elem, action, sink.asFlux());
             
-            assertNull(visitor.getCurr().next.next); // size == 2
+            assertNull(visitor.getCurr().getNext().getNext()); // size == 2
             assertTrue(visitor.getCurr().isRunning());
-            assertTrue(visitor.getLastAsyncNode().isWaiting());
-            assertNull(visitor.getLastAsyncNode().next);
+            assertTrue(visitor.getLastNode().isWaiting());
+            assertNull(visitor.getLastNode().getNext());
             
         }
 
@@ -149,13 +150,13 @@ class TestHtmlVisitorAsync {
             observable.blockLast();
             publisherCompletion.onComplete();
     
-            assertNull(visitor.getCurr().next);
-            assertTrue(visitor.getLastAsyncNode().isRunning());
+            assertNull(visitor.getCurr().getNext());
+            assertTrue(visitor.getLastNode().isRunning());
             assertTrue(isSubscribed.get());
         }
 
         @Test
-        void given_new_elem_and_first_then_call_when_call_visitThen_set_child_node_and_subscribe() {
+        void given_new_elem_and_first_then_call_when_call_visitThen_set_next_node_and_subscribe() {
             AtomicBoolean isSubscribed = new AtomicBoolean(false);
 
             Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
@@ -170,22 +171,21 @@ class TestHtmlVisitorAsync {
 
             Flux<String> flux = sink.asFlux().doOnSubscribe(__ -> isSubscribed.set(true));
 
-
-
             // first call to trigger the logic
             visitor.visitAsync(elem, action, flux);
             flux.subscribe();
 
             visitor.visitThen(() -> baseElem.__().div());
 
-            final AsyncNode last = visitor.getLastAsyncNode();
+            final ContinuationNode last = visitor.getLastNode();
 
             assertTrue(isSubscribed.get());
-            assertNotNull(last.childNode);
+            assertNull(last.getNext());
+            assertNotNull(visitor.getCurr().getNext());
         }
 
         @Test
-        void given_new_elem_and_second_then_call_when_call_visitThen_set_child_node_and_read_state_when_ready() {
+        void given_new_elem_and_second_then_call_when_call_visitThen_set_next_node_and_read_state_when_ready() {
 
             Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
 
@@ -231,10 +231,13 @@ class TestHtmlVisitorAsync {
             delayer.blockLast();
             publisherCompletion.onComplete();
 
-            final AsyncNode last = visitor.getLastAsyncNode();
+            final ContinuationNode last = visitor.getLastNode();
+            final ContinuationNode curr = visitor.getCurr();
 
-            assertNotNull(last.childNode);
-            assertTrue(last.isRunning());
+            assertNull(last.getNext());
+            assertNotNull(curr.getNext());
+            assertTrue(curr.isRunning());
+            assertTrue(last.isWaiting());
 
             secondDelayer.blockLast();
         }
