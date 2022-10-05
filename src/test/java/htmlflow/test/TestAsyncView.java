@@ -11,7 +11,6 @@ import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.Thenable;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -19,8 +18,6 @@ import java.time.Duration;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,6 +1,5 @@
 package htmlflow.test;
 
-import htmlflow.async.nodes.AsyncNode;
 import htmlflow.async.nodes.ContinuationNode;
 import htmlflow.visitor.HtmlVisitorAsync;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyChar;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
 import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -78,7 +76,6 @@ class TestHtmlVisitorAsync {
             observable.subscribe();
             
             assertNull(visitor.getCurr().getNext());
-            assertTrue(visitor.getCurr().isRunning());
         }
         
         @Test
@@ -105,8 +102,6 @@ class TestHtmlVisitorAsync {
             visitor.visitAsync(elem, action, sink.asFlux());
             
             assertNull(visitor.getCurr().getNext().getNext()); // size == 2
-            assertTrue(visitor.getCurr().isRunning());
-            assertTrue(visitor.getLastNode().isWaiting());
             assertNull(visitor.getLastNode().getNext());
             
         }
@@ -151,7 +146,6 @@ class TestHtmlVisitorAsync {
             publisherCompletion.onComplete();
     
             assertNull(visitor.getCurr().getNext());
-            assertTrue(visitor.getLastNode().isRunning());
             assertTrue(isSubscribed.get());
         }
 
@@ -236,8 +230,6 @@ class TestHtmlVisitorAsync {
 
             assertNull(last.getNext());
             assertNotNull(curr.getNext());
-            assertTrue(curr.isRunning());
-            assertTrue(last.isWaiting());
 
             secondDelayer.blockLast();
         }

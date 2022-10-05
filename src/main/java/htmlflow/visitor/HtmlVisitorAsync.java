@@ -4,6 +4,7 @@ import htmlflow.async.nodes.AsyncNode;
 import htmlflow.async.nodes.ContinuationNode;
 import htmlflow.async.nodes.ThenNode;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
 
@@ -68,12 +69,12 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     
     /**
      *
-     * @return A {@link CompletableFuture} which completes upon the last async action achieves {@link AsyncNode#isDone()} state.
-     * @see AsyncNode
+     * @return A {@link CompletableFuture} which completes upon the last async action call the {@code onCompletion} listener.
+     * @see ContinuationNode
      */
     public CompletableFuture<Void> finishedAsync() {
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        this.getLastNode().setCfForCompletion(cf);
+        this.getLastNode().onCompletion(() -> cf.complete(null));
         return cf;
     }
     
@@ -92,7 +93,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     private ContinuationNode curr = null;
     
     /**
-     * The last AsyncNode.
+     * The last ContinuationNode.
      */
     private ContinuationNode lastNode = null;
     
@@ -106,9 +107,8 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      * At the start we always wrap the call to the consumer, which is the logic for creating the Html tags from the Publisher type, inside a
      * runnable, which will start running once we know that we can start emitting the Html.
      * <p/>
-     * This Runnable is then used to create a Node. A Node represents an async action that was submitted by the user. The node always start at the
-     * {@link AsyncNode#isWaiting()} state.
-     * These nodes are always added to the LinkedList of nodes.
+     * This Runnable is then used to create a Node. A Node represents an action that was submitted by the user
+     * The nodes are linked through the reference of a next node.
      * <p/>
      * Then we have two flows for processing async tasks:
      * <ul>
@@ -116,51 +116,44 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      * <li> When the async call is the N one. </li>
      * </ul>
      * <p/>
-     * Case 1 is very straightforward, we just set the {@link #curr} node to the newly created node and start the async action by putting it in
-     * {@link AsyncNode#isRunning()} state.
+     * Case 1 is very straightforward, we just set the {@link #curr} node to the newly created node and start the async action.
      * <p/>
-     * For case 2, the first thing we do is to associate the new node (N node) to the N-1 async action.
+     * For case 2, the first thing we do is to associate the new node (N node) to the N-1 async action, by using the method
+     * {@link ContinuationNode#setNext(ContinuationNode)} to make the connection between both actions.
      * <p/>
-     * After that we perform a preemptive check in order to see if the N-1 task is already done.
-     * If that's the case we can advance the curr node for the N node.
-     * If that's not the case, we subscribe to the N-1 Publisher and once it emits the completed signal we can then advance the curr node to the N
-     * task.
+     * In the end we return an implementation of {@link OnPublisherCompletion} which is going to be used as a Handler, which will allows us to be
+     * notified when the {@code obs} will emit the {@code onComplete signal}.
      *
      * @param supplier A {@link Supplier} containing the current {@link Element} being used for the async task
      * @param consumer The async action that was submitted
-     * @param obs {@link Publisher} containing the reactive and async data which we are using to create the Html Element
+     * @param source {@link Publisher} containing the reactive and async data which we are using to create the Html Element
      * @param <E> A generic type representing the current Html Element
      * @param <T> A generic type representing the object inside the Publisher
+     * @return {@link OnPublisherCompletion} A Handler for when the {@code source} Publisher has terminated we get notified.
      *
      * @see Runnable
      * @see AsyncNode
      */
     @Override
-    public <E extends Element, T> OnPublisherCompletion visitAsync(Supplier<E> supplier, BiConsumer<E, Publisher<T>> consumer, Publisher<T> obs) {
+    public <E extends Element, T> OnPublisherCompletion visitAsync(Supplier<E> supplier, BiConsumer<E, Publisher<T>> consumer, Publisher<T> source) {
         
-        Runnable asyncAction = () -> consumer.accept(supplier.get(), obs);
+        Runnable asyncAction = () -> consumer.accept(supplier.get(), source);
         
-        final AsyncNode<T> node = new AsyncNode<>(asyncAction, obs);
+        final AsyncNode<T> node = new AsyncNode<>(asyncAction, source);
         
-        if (curr == null) {
+        if (isFirstExecution()) {
             curr = node;
             node.execute();
         } else {
-            final ContinuationNode last = lastNode;
-            last.setNext(node);
-            
-            this.ifCurrDoneExecuteNext(node);
+            this.lastNode.setNext(node);
         }
     
         lastNode = node;
-        return () -> {
-            curr.setDone();
-            final ContinuationNode next = curr.getNext();
-            if (next != null) {
-                curr = next;
-                curr.execute();
-            }
-        };
+        return this::onPublisherCompletion;
+    }
+    
+    private boolean isFirstExecution() {
+        return curr == null;
     }
     
     /**
@@ -170,50 +163,36 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      * happens after the {@code async()} ends.
      * <p/>
      * Since this is always called after a call to the {@code .async()} method, the first thing we need to do is to associate this action to the
-     * async action.
-     * We do that by creating a {@link AsyncNode.ChildNode} and setting the {@link AsyncNode#childNode} reference for newly created one.
+     * async action. Just like with the {@link #visitAsync} method we link this node as a next action to the last one.
      * <p/>
-     * So we create an association of parent -> child between an {@code .async()} call and a {@code .then()}.
-     * After that we proceed to read the parent state, where,
-     * <ul>
-     *     <li>
-     *         If the state is {@link AsyncNode#isDone()} we can call the {@link Supplier} which will trigger the execution of the
-     *         {@link java.util.function.Function} inside the {@code .then()}
-     *     </li>
-     *     <li>
-     *         If the state is {@link AsyncNode#isWaiting()} we don't do anything as the respective parent has not yet started emitting.
-     *     </li>
-     *     <li>
-     *         If the state {@link AsyncNode#isRunning()} we subscribe to the {@link Publisher} of the parent and after it completes we set the
-     *         parent state as done and proceed to call the {@link Supplier}
-     *     </li>
-     * </ul>
+     * Just like in the {@link #visitAsync} method we set up a listener for when the last submitted node has terminated we can run this sync action.
+     * Unlike the {@linkplain #visitAsync} which we return a Handler that will be automatically called by us to inform us that the
+     * {@link Publisher} has finished the execution, by taking advantage of the {@link Subscriber#onComplete()} signal, we need to set up manually
+     * the continuation logic.
+     * We do that by giving a {@link Runnable} to the last assigned node which will run this conitnuation logic for us.
      *
      * @param elem The resulting Html element from the an {@code .then()} call.
      * @param <E> The generic type identifying the next Html Element.
      */
     @Override
     public <E extends Element> void visitThen(Supplier<E> elem) {
-        final ThenNode<E> thenNode = new ThenNode<>(elem, () -> {
-            final ContinuationNode next = curr.getNext();
-            if (next != null) {
-                next.execute();
-                curr = next;
-            }
-        });
-        
-        final ContinuationNode last = this.lastNode;
-        last.setNext(thenNode);
+        final ThenNode<E> thenNode = new ThenNode<>(elem);
+        thenNode.onCompletion(this::onPublisherCompletion);
+    
+        this.lastNode.setNext(thenNode);
+        lastNode.onCompletion(thenNode::execute);
         
         this.lastNode = thenNode;
-    
-        ifCurrDoneExecuteNext(thenNode);
     }
     
-    private void ifCurrDoneExecuteNext(ContinuationNode nextNode) {
-        if (curr.isDone()) {
-            curr = curr.getNext();
-            nextNode.execute();
+    /**
+     * Gets the current node and if there is a next one advances to that one.
+     */
+    private void onPublisherCompletion() {
+        final ContinuationNode next = curr.getNext();
+        if (next != null) {
+            curr = next;
+            curr.execute();
         }
     }
     
