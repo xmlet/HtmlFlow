@@ -43,11 +43,8 @@ class TestAsyncView {
         write_and_assert_asyncview(mem, view);
     }
 
-    void write_and_assert_asyncview(
-        ByteArrayOutputStream mem,
-        HtmlViewAsync<AsyncModel<String, Student>> view)
-        throws ExecutionException, InterruptedException
-    {
+    void write_and_assert_asyncview(ByteArrayOutputStream mem, HtmlViewAsync<AsyncModel<String, Student>> view)
+            throws ExecutionException, InterruptedException {
         final Publisher<Student> studentFlux = Flux.range(1, 5)
             .delayElements(Duration.ofMillis(10))
             .doOnNext(nr -> System.out.println(" ########################## Emit " + nr))

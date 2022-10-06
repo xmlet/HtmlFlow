@@ -79,6 +79,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         this.getLastNode().setNext(new ContinuationNode() {
             @Override
             public void execute() {
+                first = null;
                 cf.complete(null);
             }
         });
