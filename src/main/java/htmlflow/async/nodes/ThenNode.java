@@ -14,8 +14,9 @@ public class ThenNode<E extends Element> extends ContinuationNode {
     @Override
     public void execute() {
         this.action.get();
-        if (this.onCompletionHandler != null) {
-            this.onCompletionHandler.run();
+        final ContinuationNode next = this.next;
+        if (next != null) {
+            next.execute();
         }
     }
 

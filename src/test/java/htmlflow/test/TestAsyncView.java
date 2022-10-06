@@ -26,28 +26,39 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TestAsyncView {
-    
+
+    @Test
+    void given_async_work_when_create_view_and_render_it_twice_correctly() throws ExecutionException, InterruptedException {
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem), this::testAsyncModel);
+        write_and_assert_asyncview(mem, view);
+        mem.reset();
+        write_and_assert_asyncview(mem, view);
+    }
+
     @Test
     void given_async_work_when_create_view_then_returns_thenable_and_prints_correct_html() throws ExecutionException, InterruptedException {
-    
+        ByteArrayOutputStream mem = new ByteArrayOutputStream();
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem), this::testAsyncModel);
+        write_and_assert_asyncview(mem, view);
+    }
+
+    void write_and_assert_asyncview(
+        ByteArrayOutputStream mem,
+        HtmlViewAsync<AsyncModel<String, Student>> view)
+        throws ExecutionException, InterruptedException
+    {
         final Publisher<Student> studentFlux = Flux.range(1, 5)
-                .delayElements(Duration.ofMillis(10))
-                .doOnNext(nr -> System.out.println(" ########################## Emit " + nr))
-                .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
-    
+            .delayElements(Duration.ofMillis(10))
+            .doOnNext(nr -> System.out.println(" ########################## Emit " + nr))
+            .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
 
         final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
-    
 
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
-    
-        ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                this::testAsyncModel);
-        
+
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
-        
+
         writeAsync.get();
     
         Iterator<String> actual = Utils

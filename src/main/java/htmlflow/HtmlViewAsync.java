@@ -77,8 +77,15 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
         }
     
         HtmlVisitorAsync visitorAsync = (HtmlVisitorAsync) localVisitor;
+        /**
+         * 1st run binder to create AsyncNode linked instances.
+         * 2nd finishedAsync() to register a CompletableFuture on completion of last AsyncNode
+         * 3rd Call execute() on first AsyncNode that will propagate execute() to the next node and henceforward.
+         */
         this.binder.accept(this, model);
-        return visitorAsync.finishedAsync();
+        CompletableFuture<Void> cf = visitorAsync.finishedAsync();
+        visitorAsync.getFirst().execute();
+        return cf;
     }
     
     public final CompletableFuture<Void> writeAsync(T model, HtmlView... partials) {

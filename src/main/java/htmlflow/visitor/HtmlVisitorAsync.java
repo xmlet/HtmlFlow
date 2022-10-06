@@ -68,13 +68,20 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     }
     
     /**
-     *
+     * It is linking a new CF to the last ContinuationNode.
+     * Rendering twice this Visitor (i.e. call twice finishedAsync) will replace the former CF
+     * with a new one, and the former will be claimed by GC.
      * @return A {@link CompletableFuture} which completes upon the last async action call the {@code onCompletion} listener.
      * @see ContinuationNode
      */
     public CompletableFuture<Void> finishedAsync() {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        this.getLastNode().onCompletion(() -> cf.complete(null));
+        final CompletableFuture<Void> cf = new CompletableFuture<>();
+        this.getLastNode().setNext(new ContinuationNode() {
+            @Override
+            public void execute() {
+                cf.complete(null);
+            }
+        });
         return cf;
     }
     
@@ -88,17 +95,17 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     }
     
     /**
-     * The current node represent the async action that is being processed at a certain point in time.
+     * The first node to be processed.
      */
-    private ContinuationNode curr = null;
+    private ContinuationNode first = null;
     
     /**
      * The last ContinuationNode.
      */
     private ContinuationNode lastNode = null;
     
-    public ContinuationNode getCurr() {
-        return curr;
+    public ContinuationNode getFirst() {
+        return first;
     }
 
     /**
@@ -116,7 +123,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      * <li> When the async call is the N one. </li>
      * </ul>
      * <p/>
-     * Case 1 is very straightforward, we just set the {@link #curr} node to the newly created node and start the async action.
+     * Case 1 is very straightforward, we just set the {@link #first} node to the newly created node and start the async action.
      * <p/>
      * For case 2, the first thing we do is to associate the new node (N node) to the N-1 async action, by using the method
      * {@link ContinuationNode#setNext(ContinuationNode)} to make the connection between both actions.
@@ -139,23 +146,15 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         
         Runnable asyncAction = () -> consumer.accept(supplier.get(), source);
         
-        final AsyncNode<T> node = new AsyncNode<>(asyncAction, source);
+        final AsyncNode<T> node = new AsyncNode<>(asyncAction);
         
-        if (isFirstExecution()) {
-            curr = node;
-            node.execute();
-        } else {
-            this.lastNode.setNext(node);
-        }
-    
-        lastNode = node;
-        return this::onPublisherCompletion;
+        if (first == null) { lastNode = first = node; }
+
+        lastNode = lastNode.setNext(node);
+
+        return node::executeNextNode;
     }
-    
-    private boolean isFirstExecution() {
-        return curr == null;
-    }
-    
+
     /**
      * VisitThen is responsible to handle the calls for the {@code .then()} in a certain Html Element.
      * <p/>
@@ -177,25 +176,9 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     @Override
     public <E extends Element> void visitThen(Supplier<E> elem) {
         final ThenNode<E> thenNode = new ThenNode<>(elem);
-        thenNode.onCompletion(this::onPublisherCompletion);
-    
-        this.lastNode.setNext(thenNode);
-        lastNode.onCompletion(thenNode::execute);
-        
-        this.lastNode = thenNode;
+        lastNode = lastNode.setNext(thenNode);
     }
-    
-    /**
-     * Gets the current node and if there is a next one advances to that one.
-     */
-    private void onPublisherCompletion() {
-        final ContinuationNode next = curr.getNext();
-        if (next != null) {
-            curr = next;
-            curr.execute();
-        }
-    }
-    
+
     @Override
     public PrintStream out() {
         return out;

@@ -75,7 +75,7 @@ class TestHtmlVisitorAsync {
             visitor.visitAsync(elem, action, observable);
             observable.subscribe();
             
-            assertNull(visitor.getCurr().getNext());
+            assertNotNull(visitor.getFirst().getNext());
         }
         
         @Test
@@ -101,7 +101,7 @@ class TestHtmlVisitorAsync {
             
             visitor.visitAsync(elem, action, sink.asFlux());
             
-            assertNull(visitor.getCurr().getNext().getNext()); // size == 2
+            assertNull(visitor.getFirst().getNext().getNext()); // size == 2
             assertNull(visitor.getLastNode().getNext());
             
         }
@@ -145,7 +145,7 @@ class TestHtmlVisitorAsync {
             observable.blockLast();
             publisherCompletion.onComplete();
     
-            assertNull(visitor.getCurr().getNext());
+            assertNull(visitor.getLastNode().getNext());
             assertTrue(isSubscribed.get());
         }
 
@@ -175,7 +175,7 @@ class TestHtmlVisitorAsync {
 
             assertTrue(isSubscribed.get());
             assertNull(last.getNext());
-            assertNotNull(visitor.getCurr().getNext());
+            assertNotNull(visitor.getFirst().getNext());
         }
 
         @Test
@@ -226,7 +226,7 @@ class TestHtmlVisitorAsync {
             publisherCompletion.onComplete();
 
             final ContinuationNode last = visitor.getLastNode();
-            final ContinuationNode curr = visitor.getCurr();
+            final ContinuationNode curr = visitor.getFirst();
 
             assertNull(last.getNext());
             assertNotNull(curr.getNext());

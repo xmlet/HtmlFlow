@@ -1,24 +1,30 @@
 package htmlflow.async.nodes;
 
-import org.reactivestreams.Publisher;
-
 public class AsyncNode<T> extends ContinuationNode {
     public final Runnable asyncAction;
-    public final Publisher<T> publisher;
-    
-    
-    public AsyncNode(Runnable asyncAction, Publisher<T> publisher) {
+
+    public AsyncNode(Runnable asyncAction) {
         this.asyncAction = asyncAction;
-        this.publisher = publisher;
     }
     
     @Override
     public AsyncNode<T> clone() {
-        return new AsyncNode<>(this.asyncAction, this.publisher);
+        return new AsyncNode<>(this.asyncAction);
     }
     
     @Override
     public void execute() {
         this.asyncAction.run();
+    }
+
+    /**
+     * If there is a next ContinuationNode then execute it.
+     * This handler is registered onCompletion of wrapper Publisher from HtmlApiFaster.
+     */
+    public final void executeNextNode() {
+        final ContinuationNode next = this.next;
+        if (next != null) {
+            next.execute();
+        }
     }
 }
