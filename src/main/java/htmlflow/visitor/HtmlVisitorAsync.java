@@ -79,7 +79,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         this.getLastNode().setNext(new ContinuationNode() {
             @Override
             public void execute() {
-                first = null;
+                first.resetNode();
                 cf.complete(null);
             }
         });
@@ -98,7 +98,14 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     /**
      * The first node to be processed.
      */
-    private ContinuationNode first = null;
+    private final ContinuationNode first = new ContinuationNode() {
+        @Override
+        public void execute() {
+            if (this.next != null) {
+                this.next.execute();
+            }
+        }
+    };
     
     /**
      * The last ContinuationNode.
@@ -149,7 +156,10 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         
         final AsyncNode<T> node = new AsyncNode<>(asyncAction);
         
-        if (first == null) { lastNode = first = node; }
+        if (first.getNext() == null) {
+            first.setNext(node);
+            lastNode  = node;
+        }
 
         lastNode = lastNode.setNext(node);
 

@@ -14,4 +14,8 @@ public abstract class ContinuationNode {
     }
 
     public abstract void execute();
+    
+    public void resetNode() {
+        this.next = null;
+    }
 }
