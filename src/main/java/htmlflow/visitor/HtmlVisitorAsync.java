@@ -26,6 +26,16 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
      */
     private final PrintStream out;
     
+    /**
+     * The first node to be processed.
+     */
+    private ContinuationNode first = null;
+    
+    /**
+     * The last ContinuationNode.
+     */
+    private ContinuationNode lastNode = null;
+    
     
     public HtmlVisitorAsync(PrintStream out, boolean isIndented) {
         super(isIndented);
@@ -67,53 +77,14 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         throw new UnsupportedOperationException(CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC);
     }
     
-    /**
-     * It is linking a new CF to the last ContinuationNode.
-     * Rendering twice this Visitor (i.e. call twice finishedAsync) will replace the former CF
-     * with a new one, and the former will be claimed by GC.
-     * @return A {@link CompletableFuture} which completes upon the last async action call the {@code onCompletion} listener.
-     * @see ContinuationNode
-     */
-    public CompletableFuture<Void> finishedAsync() {
-        final CompletableFuture<Void> cf = new CompletableFuture<>();
-        this.getLastNode().setNext(new ContinuationNode() {
-            @Override
-            public void execute() {
-                first.resetNode();
-                cf.complete(null);
-            }
-        });
-        return cf;
-    }
-    
     @Override
     public HtmlVisitor clone(PrintStream out, boolean isIndented) {
         return new HtmlVisitorAsync(out, isIndented);
     }
     
-    public ContinuationNode getLastNode() {
-        return lastNode;
-    }
-    
-    /**
-     * The first node to be processed.
-     */
-    private final ContinuationNode first = new ContinuationNode() {
-        @Override
-        public void execute() {
-            if (this.next != null) {
-                this.next.execute();
-            }
-        }
-    };
-    
-    /**
-     * The last ContinuationNode.
-     */
-    private ContinuationNode lastNode = null;
-    
-    public ContinuationNode getFirst() {
-        return first;
+    @Override
+    public PrintStream out() {
+        return out;
     }
 
     /**
@@ -154,12 +125,9 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         
         Runnable asyncAction = () -> consumer.accept(supplier.get(), source);
         
-        final AsyncNode<T> node = new AsyncNode<>(asyncAction);
+        final AsyncNode node = new AsyncNode(asyncAction);
         
-        if (first.getNext() == null) {
-            first.setNext(node);
-            lastNode  = node;
-        }
+        if (first == null) { lastNode = first = node; }
 
         lastNode = lastNode.setNext(node);
 
@@ -189,9 +157,32 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         final ThenNode<E> thenNode = new ThenNode<>(elem);
         lastNode = lastNode.setNext(thenNode);
     }
-
-    @Override
-    public PrintStream out() {
-        return out;
+    
+    /**
+     * It is linking a new CF to the last ContinuationNode.
+     * Rendering twice this Visitor (i.e. call twice finishedAsync) will replace the former CF
+     * with a new one, and the former will be claimed by GC.
+     * @return A {@link CompletableFuture} which completes upon the last async action call the {@code onCompletion} listener.
+     * @see ContinuationNode
+     */
+    public CompletableFuture<Void> finishedAsync() {
+        final CompletableFuture<Void> cf = new CompletableFuture<>();
+        this.getLastNode().setNext(new ContinuationNode() {
+            @Override
+            public void execute() {
+                first = null;
+                cf.complete(null);
+            }
+        });
+        return cf;
+    }
+    
+    
+    public ContinuationNode getLastNode() {
+        return lastNode;
+    }
+    
+    public ContinuationNode getFirst() {
+        return first;
     }
 }

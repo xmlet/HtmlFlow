@@ -1,15 +1,10 @@
 package htmlflow.async.nodes;
 
-public class AsyncNode<T> extends ContinuationNode {
+public class AsyncNode extends ContinuationNode {
     public final Runnable asyncAction;
 
     public AsyncNode(Runnable asyncAction) {
         this.asyncAction = asyncAction;
-    }
-    
-    @Override
-    public AsyncNode<T> clone() {
-        return new AsyncNode<>(this.asyncAction);
     }
     
     @Override

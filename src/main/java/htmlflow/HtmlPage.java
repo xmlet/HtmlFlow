@@ -42,12 +42,12 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * The root container for HTML elements.
- * It it responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
+ * It is responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
  * implementation, which is responsible for printing the tree of elements and
  * attributes.
  *
- * Instances of AbstractHtmlWriter are immutable. Any change to its properties returns a new
- * instance of AbstractHtmlWriter.
+ * Instances of HtmlPage are immutable. Any change to its properties returns a new
+ * instance of HtmlPage.
  *
  * @param <T> The type of domain object bound to this View.
  *
