@@ -41,7 +41,7 @@ import java.util.function.Supplier;
  *
  * @author Pedro Fialho
  */
-public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
+public class HtmlVisitorAsync<T> extends HtmlViewVisitor<T> implements TagsToPrintStream {
     
     private static final String CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC = "Cannot use static blocks cache with HtmlVisitorAsync";
     private static final String CANNOT_CREATE_AN_HTML_VIEW_VISITOR_INSTANCE_FROM_HTML_VISITOR_ASYNC = "Cannot create an HtmlViewVisitor instance from " +
@@ -76,12 +76,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     public HtmlViewVisitor newbie() {
         throw new UnsupportedOperationException(CANNOT_CREATE_AN_HTML_VIEW_VISITOR_INSTANCE_FROM_HTML_VISITOR_ASYNC);
     }
-    
-    @Override
-    public boolean isWriting() {
-        return true;
-    }
-    
+
     @Override
     public void write(String text) {
         out.print(text);
@@ -96,12 +91,7 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
     protected int size() {
         throw new UnsupportedOperationException(CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC);
     }
-    
-    @Override
-    public String finished() {
-        throw new UnsupportedOperationException(CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC);
-    }
-    
+
     @Override
     public HtmlVisitor clone(PrintStream out, boolean isIndented) {
         return new HtmlVisitorAsync(out, isIndented);
@@ -182,7 +172,17 @@ public class HtmlVisitorAsync extends HtmlVisitor implements TagsToPrintStream {
         final ThenNode<E> thenNode = new ThenNode<>(elem);
         lastNode = lastNode.setNext(thenNode);
     }
-    
+
+    @Override
+    protected String substring(int staticBlockIndex) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected String readAndReset() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * It is linking a new CF to the last ContinuationNode.
      * Rendering twice this Visitor (i.e. call twice finishedAsync) will replace the former CF

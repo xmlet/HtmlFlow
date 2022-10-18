@@ -31,6 +31,7 @@ import htmlflow.visitor.HtmlVisitorAsync;
 
 import java.io.PrintStream;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class HtmlFlow {
 
@@ -48,22 +49,14 @@ public class HtmlFlow {
     }
 
     public static <U> HtmlView<U> view(PrintStream out, HtmlTemplate<U> template){
-        return new HtmlView<>(out, (() -> new HtmlViewVisitorPrintStream(out, true)), false, template, null);
-    }
-
-    public static <U> HtmlView<U> view(PrintStream out, BiConsumer<HtmlView<U>, U> binder){
-        return new HtmlView<>(out, (() -> new HtmlViewVisitorPrintStream(out, true)), false, null, binder);
+        return new HtmlView<>(out, (() -> new HtmlViewVisitorPrintStream(out, true)), false, template);
     }
 
     public static <U> HtmlView<U> view(HtmlTemplate<U> template){
-        return new HtmlView<>(null, (() -> new HtmlViewVisitorStringBuilder(true)), false, template, null);
+        return new HtmlView<>(null, (() -> new HtmlViewVisitorStringBuilder(true)), false, template);
     }
 
-    public static <U> HtmlView<U> view(BiConsumer<HtmlView<U>, U> binder) {
-        return new HtmlView<>(null, (() -> new HtmlViewVisitorStringBuilder(true)), false, null, binder);
-    }
-    
-    public static <U> HtmlViewAsync<U> viewAsync(PrintStream out, BiConsumer<HtmlView<U>, U> binder) {
-        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false, null, binder);
+    public static <U> HtmlViewAsync<U> viewAsync(PrintStream out, HtmlTemplate<U> template) {
+        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false, template);
     }
 }

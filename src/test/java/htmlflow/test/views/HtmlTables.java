@@ -34,7 +34,7 @@ import org.xmlet.htmlapifaster.EnumTypeContentType;
 
 public class HtmlTables {
 
-    public static void simpleTableView(HtmlView<int[][]> view, int[][] outputRows){
+    public static void simpleTableView(HtmlView<int[][]> view){
         view
             .html()
                 .head()
@@ -51,11 +51,10 @@ public class HtmlTables {
                                 .th().text("Id2").__()
                                 .th().text("Id3").__()
                             .__() //tr
-                            // IF all bound tables have the same number of rows then we may postpone dynamic for each field
-                            .of(table -> {
+                            .<int[][]>dynamic((table, outputRows) -> {
                                 for (int[] outputRow : outputRows) {
                                     table.tr()
-                                         .dynamic(tr -> {
+                                         .of(tr -> {
                                              for (int rowValue : outputRow) {
                                                  tr.td()
                                                      .text("" + rowValue)
@@ -76,7 +75,6 @@ public class HtmlTables {
      */
     public static void taskListViewWithPartials(
         HtmlView<Iterable<Task>> view,
-        Iterable<Task> tasks,
         HtmlView[] partials)
     {
         view
@@ -106,7 +104,7 @@ public class HtmlTables {
                                 .th().text("Priority").__()
                             .__()
                             .tbody()
-                                .dynamic(tbody ->
+                                .<Iterable<Task> >dynamic((tbody, tasks) ->
                                     tasks.forEach(task -> view.addPartial(partials[0], task)) // taskListRow
                                 )
                             .__() // tbody
@@ -125,16 +123,16 @@ public class HtmlTables {
             .__(); // div
     }
 
-    public static HtmlView<Task> taskListRow = HtmlFlow.view((view, task) -> {
+    public static HtmlView<Task> taskListRow = HtmlFlow.view((view) -> {
         view
             .tr()
-                .td().dynamic(td -> td.text(task.getTitle())).__()
-                .td().dynamic(td -> td.text(task.getDescription())).__()
-                .td().dynamic(td -> td.text(task.getPriority().toString())).__()
+                .td().<Task>dynamic((td, task) -> td.text(task.getTitle())).__()
+                .td().<Task>dynamic((td, task) -> td.text(task.getDescription())).__()
+                .td().<Task>dynamic((td, task) -> td.text(task.getPriority().toString())).__()
             .__(); // tr
     });
 
-    public static void taskTableView(HtmlView<Iterable<Task>> view, Iterable<Task> tasks){
+    public static void taskTableView(HtmlView<Iterable<Task>> view){
         view
             .html()
                 .head()
@@ -151,7 +149,7 @@ public class HtmlTables {
                                 .th().text("Description").__()
                                 .th().text("Priority").__()
                             .__() // tr
-                            .dynamic(table ->
+                            .<Iterable<Task>>dynamic((table, tasks) ->
                                 tasks.forEach(item ->
                                     table
                                         .tr()

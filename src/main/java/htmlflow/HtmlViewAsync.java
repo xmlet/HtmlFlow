@@ -24,6 +24,7 @@
 
 package htmlflow;
 
+import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlVisitor;
 import htmlflow.visitor.HtmlVisitorAsync;
 
@@ -57,13 +58,11 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
      * @param out
      * @param visitorSupplier
      * @param threadSafe
-     * @param binder
      */
-    HtmlViewAsync(PrintStream out, Supplier<HtmlVisitor> visitorSupplier,
+    HtmlViewAsync(PrintStream out, Supplier<HtmlViewVisitor> visitorSupplier,
                   boolean threadSafe,
-                  HtmlTemplate<T> template,
-                  BiConsumer<HtmlView<T>, T> binder) {
-        super(out, visitorSupplier, threadSafe, template, binder);
+                  HtmlTemplate<T> template) {
+        super(out, visitorSupplier, threadSafe, template);
     }
     
     @Override
@@ -113,7 +112,7 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
          * 2nd finishedAsync() to register a CompletableFuture on completion of last AsyncNode
          * 3rd Call execute() on first AsyncNode that will propagate execute() to the next node and henceforward.
          */
-        this.binder.accept(this, model);
+        this.template.resolve(this);
         CompletableFuture<Void> cf = visitorAsync.finishedAsync();
         visitorAsync.getFirst().execute();
         return cf;
@@ -127,7 +126,7 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
         }
     
         HtmlVisitorAsync visitorAsync = (HtmlVisitorAsync) localVisitor;
-        template.resolve(this, model, partials);
+        template.resolve(this);
         return visitorAsync.finishedAsync();
     }
 }

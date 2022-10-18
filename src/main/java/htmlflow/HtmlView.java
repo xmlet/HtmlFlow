@@ -24,11 +24,11 @@
 
 package htmlflow;
 
+import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Html;
 
 import java.io.PrintStream;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 /**
@@ -49,7 +49,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
      * throw the output and we use the threadLocalVisitor field instead.
      */
-    private final HtmlVisitor visitor;
+    private final HtmlViewVisitor visitor;
     /**
      * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
      * The given example deals with a static field of ThreadLocal which persists beyond an instance.
@@ -57,22 +57,14 @@ public class HtmlView<T> extends HtmlPage<T> {
      * thread local instances during its entire life cycle.
      */
     @java.lang.SuppressWarnings("squid:S5164")
-    private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
-    private final Supplier<HtmlVisitor> visitorSupplier;
+    private final ThreadLocal<HtmlViewVisitor> threadLocalVisitor;
+    private final Supplier<HtmlViewVisitor> visitorSupplier;
     private final boolean threadSafe;
 
     /**
-     * Used alternately with the field binder.
-     * A template function receives 3 arguments:
-     *   the view, the domain object and a varargs array of partial views.
+     * A template function receives the view and a varargs array of partial views.
      */
     protected final HtmlTemplate<T> template;
-    /**
-     * Used alternately with the field template.
-     * A binder function is responsible for binding the View with a domain object.
-     * Thus, it is a function that receives two arguments: the view and the domain object.
-     */
-    protected final BiConsumer<HtmlView<T>, T> binder;
 
     /**
      * To check whether this view is emitting to PrintStream, or not.
@@ -86,16 +78,14 @@ public class HtmlView<T> extends HtmlPage<T> {
      */
     HtmlView(
         PrintStream out,
-        Supplier<HtmlVisitor> visitorSupplier,
+        Supplier<HtmlViewVisitor> visitorSupplier,
         boolean threadSafe,
-        HtmlTemplate<T> template,
-        BiConsumer<HtmlView<T>, T> binder)
+        HtmlTemplate<T> template)
     {
         this.out = out;
         this.visitorSupplier = visitorSupplier;
         this.threadSafe = threadSafe;
         this.template = template;
-        this.binder = binder;
         if(threadSafe) {
             this.visitor = null;
             this.threadLocalVisitor = ThreadLocal.withInitial(visitorSupplier);
@@ -120,7 +110,7 @@ public class HtmlView<T> extends HtmlPage<T> {
         if(threadSafe)
             throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
         HtmlVisitor v = getVisitor();
-        return clone(() -> v.clone(out, v.isIndented), false);
+        return clone(() -> (HtmlViewVisitor) v.clone(out, v.isIndented), false);
     }
 
     public final HtmlPage<T> threadSafe(){
@@ -135,7 +125,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     }
 
     @Override
-    public HtmlVisitor getVisitor() {
+    public HtmlViewVisitor getVisitor() {
         return threadSafe
             ? threadLocalVisitor.get()
             : visitor;
@@ -153,13 +143,12 @@ public class HtmlView<T> extends HtmlPage<T> {
 
     @Override
     public String render(T model) {
-        binder.accept(this, model);
-        return getVisitor().finished();
+        return getVisitor().finished(model);
     }
 
     public String render(T model, HtmlView...partials) {
-        template.resolve(this, model, partials);
-        return getVisitor().finished();
+        template.resolve(this);
+        return getVisitor().finished(model, partials);
     }
 
     @Override
@@ -233,10 +222,10 @@ public class HtmlView<T> extends HtmlPage<T> {
      * @param threadSafe
      */
     protected final HtmlPage<T> clone(
-        Supplier<HtmlVisitor> visitorSupplier,
+        Supplier<HtmlViewVisitor> visitorSupplier,
         boolean threadSafe)
     {
-        return new HtmlView<>(out, visitorSupplier, threadSafe, template, binder);
+        return new HtmlView<>(out, visitorSupplier, threadSafe, template);
     }
 
     /**
@@ -244,8 +233,8 @@ public class HtmlView<T> extends HtmlPage<T> {
      * Receives an existent visitor.
      * Usually for a parent view to share its visitor with a partial.
      */
-    protected HtmlPage<T> clone(HtmlVisitor visitor) {
-        return new HtmlView<>(out, () -> visitor, false, template, binder);
+    protected HtmlPage<T> clone(HtmlViewVisitor visitor) {
+        return new HtmlView<>(out, () -> visitor, false, template);
     }
 
     /**
@@ -254,6 +243,6 @@ public class HtmlView<T> extends HtmlPage<T> {
      */
     @Override
     public final HtmlPage<T> setIndented(boolean isIndented) {
-        return clone(() -> getVisitor().clone(out, isIndented), false);
+        return clone(() -> (HtmlViewVisitor) getVisitor().clone(out, isIndented), false);
     }
 }

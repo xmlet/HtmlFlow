@@ -215,11 +215,6 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     protected abstract int size();
 
     /**
-     * Returns the accumulated output and clear it.
-     */
-    public abstract String finished();
-
-    /**
      * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
      * existing HtmlVisitor instance with a different isIndented state.
      *

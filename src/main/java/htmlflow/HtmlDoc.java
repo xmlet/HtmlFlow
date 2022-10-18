@@ -24,6 +24,7 @@
 
 package htmlflow;
 
+import htmlflow.visitor.HtmlDocVisitor;
 import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Html;
 
@@ -51,9 +52,9 @@ public class HtmlDoc extends HtmlPage<Object> {
 
 
     private final PrintStream out;
-    private final HtmlVisitor visitor;
+    private final HtmlDocVisitor visitor;
 
-    HtmlDoc(PrintStream out, HtmlVisitor visitor) {
+    HtmlDoc(PrintStream out, HtmlDocVisitor visitor) {
         this.out = out;
         this.visitor = visitor;
     }
@@ -99,7 +100,7 @@ public class HtmlDoc extends HtmlPage<Object> {
 
     @Override
     public HtmlPage<Object> setIndented(boolean isIndented) {
-        return new HtmlDoc(out, getVisitor().clone(out, isIndented));
+        return new HtmlDoc(out, (HtmlDocVisitor) getVisitor().clone(out, isIndented));
     }
 
     @Override
@@ -109,7 +110,7 @@ public class HtmlDoc extends HtmlPage<Object> {
     }
 
     @Override
-    public HtmlVisitor getVisitor() {
+    public HtmlDocVisitor getVisitor() {
         return visitor;
     }
 }

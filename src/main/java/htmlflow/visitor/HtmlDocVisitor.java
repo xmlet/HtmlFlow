@@ -45,12 +45,7 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     }
 
     @Override
-    public final void visitOpenDynamic(){
-        throw new IllegalStateException("Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view.");
-    }
-
-    @Override
-    public final void visitCloseDynamic(){
+    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
         throw new IllegalStateException("Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view.");
     }
 
@@ -80,4 +75,8 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
         throw new UnsupportedOperationException("Illegal operation for HtmlDoc. Only for partials in HtmlView.");
     }
 
+    /**
+     * Returns the accumulated output and clear it.
+     */
+    public abstract String finished();
 }

@@ -27,5 +27,5 @@ package htmlflow;
 @FunctionalInterface
 public interface HtmlTemplate<T> {
 
-    void resolve(HtmlView<T> view, T model, HtmlView...partials);
+    void resolve(HtmlView<T> view);
 }

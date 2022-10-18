@@ -24,6 +24,7 @@
 
 package htmlflow.visitor;
 
+import htmlflow.HtmlView;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
@@ -40,10 +41,12 @@ import java.util.function.Supplier;
  * The HTML static content is collected into an internal staticBlocksList.
  * Static content is interleaved with dynamic content.
  *
+ * @param <T> The type of domain object (i.e. the model)
+ *
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public abstract class HtmlViewVisitor extends HtmlVisitor {
+public abstract class HtmlViewVisitor<T> extends HtmlVisitor {
     /**
      * The begin index of a static HTML block.
      */
@@ -84,36 +87,43 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     }
 
     /**
-     * Copies from or to staticBlocksList depending on whether the content is already stored, or not.
-     * Copying from staticBlocksList will write through write() method.
-     * Copying to staticBlocksList will read from substring().
+     * Here we are writing the previous static HTML block and the next dynamicHtmlBlock.
+     *
+     * @param dynamicHtmlBlock The continuation that consumes the element and a model.
      */
     @Override
-    public final void visitOpenDynamic(){
+    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
         if (openDynamic )
             throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
-        openDynamic = true;
         if (isStaticPartResolved){
+            /**
+             * Writing the previous static HTML block.
+             */
             HtmlBlockInfo block = staticBlocksList.get(staticBlocksIndex);
             this.write(block.html);
+            /**
+             * Prepare for next dynamic block.
+             */
             this.depth = block.currentDepth;
             this.isClosed = block.isClosed;
             ++staticBlocksIndex;
         } else {
+            /**
+             * Storing the previous static HTML block that has been already written.
+             */
             String staticBlock = substring(staticBlockIndex);
             staticBlocksList.add(new HtmlBlockInfo(staticBlock, depth, isClosed));
         }
+        /**
+         * Write the next dynamic HTML block.
+         */
+        openDynamic = true;
+        dynamicHtmlBlock.accept(element, null);
+        openDynamic = false;
+        staticBlockIndex = size();
     }
 
-    @Override
-    public final void visitCloseDynamic(){
-        openDynamic = false;
-        if (!isStaticPartResolved){
-            staticBlockIndex = size();
-        }
-    }
-    @Override
-    public final String finished(){
+    public final String finished(T model, HtmlView...partials){
         if (isStaticPartResolved && staticBlocksIndex <= staticBlocksList.size()){
             HtmlBlockInfo block = staticBlocksList.get(staticBlocksIndex);
             write(block.html);
