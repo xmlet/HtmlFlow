@@ -24,36 +24,33 @@
 
 package htmlflow.visitor;
 
-import htmlflow.util.PrintStringBuilder;
-
 import java.io.PrintStream;
 
 /**
+ * @param <T> The type of domain object (i.e. the model)
  * @author Miguel Gamboa, Luís Duare
- *         created on 17-01-2018
+ * created on 17-01-2018
  */
-public class HtmlViewVisitorPrintStream extends HtmlViewVisitor implements TagsToPrintStream {
+public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations<T> implements TagsToPrintStream {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
      */
     private final PrintStream out;
-    /**
-     * This is a PrintStringBuilder which collects all content into
-     * an internal StringBuilder.
-     * When first visit finishes we exchange current to the value of
-     * field out, which is a PrintStream.
-     */
-    private PrintStream current;
 
-    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented) {
-        super(isIndented);
+    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, HtmlContinuation<Object> first)
+    {
+        super(isIndented, first);
         this.out = out;
-        this.current = new PrintStringBuilder(out);
     }
 
-    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, int depth) {
-        this(out, isIndented);
+    public HtmlViewVisitorPrintStream(
+        PrintStream out,
+        boolean isIndented,
+        int depth,
+        HtmlContinuation<Object> first)
+    {
+        this(out, isIndented, first);
         this.depth = depth;
     }
 
@@ -62,41 +59,21 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor implements TagsT
      */
     @Override
     public HtmlViewVisitor newbie() {
-        return new HtmlViewVisitorPrintStream(out, isIndented, depth);
+        return new HtmlViewVisitorPrintStream(out, isIndented, depth, first);
     }
 
     @Override
     public void write(String text) {
-        current.print(text);
+        out.print(text);
     }
+
     @Override
     protected void write(char c) {
-        current.print(c);
-    }
-
-    @Override
-    protected String substring(int staticBlockIndex) {
-        /**
-         * REMARK: we need to keep current field of type PrintStream because after
-         * the first visit we exchange it to the value of field out, which is a PrintStream.
-         * After that, we are sure that substring() is no longer invoked.
-         */
-        return ((PrintStringBuilder) current).substring(staticBlockIndex);
-    }
-
-    @Override
-    protected int size() {
-        /**
-         * REMARK: we need to keep current field of type PrintStream because after
-         * the first visit we exchange it to the value of field out, which is a PrintStream.
-         * After that, we are sure that size() is no longer invoked.
-         */
-        return ((PrintStringBuilder) current).length();
+        out.print(c);
     }
 
     @Override
     protected String readAndReset() {
-        this.current = out;
         /**
          * This visitor writes the content to a PrintStream and we should not consider
          * the value returned by readAndReset().
@@ -105,14 +82,14 @@ public class HtmlViewVisitorPrintStream extends HtmlViewVisitor implements TagsT
          */
         return null;
     }
-    
+
     @Override
     public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
-        return new HtmlViewVisitorPrintStream(out, isIndented);
+        return new HtmlViewVisitorPrintStream(out, isIndented, first);
     }
 
     @Override
     public PrintStream out() {
-        return current;
+        return out;
     }
 }

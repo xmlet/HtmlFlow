@@ -123,7 +123,7 @@ public class HtmlTables {
             .__(); // div
     }
 
-    public static HtmlView<Task> taskListRow = HtmlFlow.view((view) -> {
+    public static HtmlView<Task> taskListRow = HtmlFlow.view(Task.class, (view) -> {
         view
             .tr()
                 .td().<Task>dynamic((td, task) -> td.text(task.getTitle())).__()

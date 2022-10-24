@@ -44,6 +44,21 @@
     </distributionManagement>
     <dependencies>
         <dependency>
+          <groupId>uk.co.jemos.podam</groupId>
+          <artifactId>podam</artifactId>
+          <version>7.2.10.RELEASE</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>2.0.3</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>2.0.3</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlApiFaster</artifactId>
             <version>1.0.12-SNAPSHOT</version>

@@ -1,7 +1,8 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-2022, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
+ * and Pedro Fialho.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,36 +23,32 @@
  * SOFTWARE.
  */
 
-package htmlflow.util;
+package htmlflow.visitor;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
-public class PrintStringBuilder extends PrintStream{
-
-    private final StringBuilder sb = new StringBuilder();
-
-    public PrintStringBuilder(OutputStream out) {
-        super(out);
+/**
+ * @param <U> the type of the template's model.
+ */
+public class HtmlContinuationStatic<U> extends HtmlContinuation<U> {
+    final String staticHtmlBlock;
+    /**
+     * Sets indentation to -1 to inform that visitor should continue with previous indentation.
+     * The isClosed is useless because it just writes what it is in its staticHtmlBlock.
+     */
+    HtmlContinuationStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation next) {
+        super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
+        this.staticHtmlBlock = staticHtmlBlock;
     }
 
     @Override
-    public void print(char c) {
-        super.print(c);
-        sb.append(c);
+    protected void emitHtml(U model) {
+        visitor.write(staticHtmlBlock);
     }
 
     @Override
-    public void print(String s) {
-        super.print(s);
-        sb.append(s);
-    }
-
-    public String substring(int startingIndex) {
-        return sb.substring(startingIndex);
-    }
-
-    public int length() {
-        return sb.length();
+    protected HtmlContinuation<U> copy(HtmlVisitor v) {
+        return new HtmlContinuationStatic<>(
+            staticHtmlBlock,
+            v,
+            next != null ? next.copy(v) : null); // call copy recursively
     }
 }

@@ -58,14 +58,6 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     public final <E extends Element> void visitThen(Supplier<E> elem) {
         throw new IllegalStateException("Wrong use of then() in a static view! Use HtmlView to produce an async view.");
     }
-        /**
-     * Since this visitor does not maintain static blocks then it is
-     * always emitting HTML.
-     */
-    @Override
-    public final boolean isWriting() {
-        return true;
-    }
 
     /**
      * NOT Supported. This is useful only for partials in the context of HtmlView.
@@ -78,5 +70,5 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     /**
      * Returns the accumulated output and clear it.
      */
-    public abstract String finished();
+    public abstract String finish();
 }

@@ -31,23 +31,25 @@ import java.io.PrintStream;
  * library) which uses an internal StringBuilder to collect information
  * about visited Html elements of a HtmlView.
  *
+ * @param <T> The type of domain object (i.e. the model)
+ *
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor implements TagsToStringBuilder {
+public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuations<T> implements TagsToStringBuilder {
     /**
-     * The main StringBuilder. Read by the finished() to return the
+     * The main StringBuilder. Read by the finish() to return the
      * resulting string with the Html content.
      */
     private final StringBuilder sb = new StringBuilder();
     
 
-    public HtmlViewVisitorStringBuilder(boolean isIndented) {
-        super(isIndented);
+    public HtmlViewVisitorStringBuilder(boolean isIndented, HtmlContinuation<Object> first) {
+        super(isIndented, first);
     }
 
-    public HtmlViewVisitorStringBuilder(boolean isIndented, int depth) {
-        this(isIndented);
+    public HtmlViewVisitorStringBuilder(boolean isIndented, int depth, HtmlContinuation<Object> first) {
+        this(isIndented, first);
         this.depth = depth;
     }
 
@@ -56,7 +58,7 @@ public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor implements Tag
      */
     @Override
     public HtmlViewVisitor newbie() {
-        return new HtmlViewVisitorStringBuilder(isIndented, depth);
+        return new HtmlViewVisitorStringBuilder(isIndented, depth, first);
     }
 
     @Override
@@ -66,16 +68,6 @@ public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor implements Tag
     @Override
     protected void write(char c) {
         sb.append(c);
-    }
-
-    @Override
-    protected String substring(int staticBlockIndex) {
-        return sb.substring(staticBlockIndex);
-    }
-
-    @Override
-    protected int size() {
-        return sb.length();
     }
 
     @Override
@@ -89,7 +81,7 @@ public class HtmlViewVisitorStringBuilder extends HtmlViewVisitor implements Tag
     public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
         if(out != null)
             throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
-        return new HtmlViewVisitorStringBuilder(isIndented);
+        return new HtmlViewVisitorStringBuilder(isIndented, first);
     }
 
     @Override

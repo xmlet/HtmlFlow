@@ -4,7 +4,7 @@ import java.io.PrintStream;
 
 public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor implements TagsToStringBuilder {
     /**
-     * The main StringBuilder. Read by the finished() to return the
+     * The main StringBuilder. Read by the finish() to return the
      * resulting string with the Html content.
      */
     protected final StringBuilder sb = new StringBuilder();
@@ -14,7 +14,7 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor implements TagsT
     }
 
     @Override
-    public final String finished() {
+    public final String finish() {
         return sb.toString();
     }
 
@@ -25,11 +25,6 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor implements TagsT
     @Override
     protected final void write(char c) {
         sb.append(c);
-    }
-
-    @Override
-    protected final int size() {
-        return sb.length();
     }
 
     @Override

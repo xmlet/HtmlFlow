@@ -23,6 +23,7 @@
  */
 package htmlflow.visitor;
 
+import htmlflow.HtmlView;
 import htmlflow.async.nodes.AsyncNode;
 import htmlflow.async.nodes.ContinuationNode;
 import htmlflow.async.nodes.ThenNode;
@@ -86,11 +87,6 @@ public class HtmlVisitorAsync<T> extends HtmlViewVisitor<T> implements TagsToPri
     protected void write(char c) {
         out.print(c);
     }
-    
-    @Override
-    protected int size() {
-        throw new UnsupportedOperationException(CANNOT_USE_STATIC_BLOCKS_CACHE_WITH_HTML_VISITOR_ASYNC);
-    }
 
     @Override
     public HtmlVisitor clone(PrintStream out, boolean isIndented) {
@@ -100,6 +96,11 @@ public class HtmlVisitorAsync<T> extends HtmlViewVisitor<T> implements TagsToPri
     @Override
     public PrintStream out() {
         return out;
+    }
+
+    @Override
+    public <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> consumer) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -174,12 +175,7 @@ public class HtmlVisitorAsync<T> extends HtmlViewVisitor<T> implements TagsToPri
     }
 
     @Override
-    protected String substring(int staticBlockIndex) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected String readAndReset() {
+    public String finish(T model, HtmlView... partials) {
         throw new UnsupportedOperationException();
     }
 

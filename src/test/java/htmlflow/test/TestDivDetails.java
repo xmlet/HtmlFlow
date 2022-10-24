@@ -24,9 +24,7 @@
 package htmlflow.test;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlView;
 import htmlflow.HtmlPage;
-import htmlflow.HtmlDoc;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import htmlflow.test.views.HtmlLists;
@@ -118,7 +116,7 @@ public class TestDivDetails {
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlPage<Task> view = HtmlFlow
-            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
+            .view(Task.class, new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
                 .keySet()
@@ -140,10 +138,11 @@ public class TestDivDetails {
     }
 
     @Test
-    public void testDivDetailsBindingWithRender() {
+    public void testDivDetailsBindingWithRenderInParallelThreadSafe() {
         HtmlPage<Task> view = HtmlFlow
-            .view(HtmlLists::taskDetailsTemplate)
+            .view(Task.class, HtmlLists::taskDetailsTemplate)
             .threadSafe();
+
         expectedTaskViews
                 .keySet()
                 .stream()
@@ -151,10 +150,13 @@ public class TestDivDetails {
                 .map(task -> TaskHtml.of(task,
                                 htmlRender(view, task)))
                 .forEach(taskHtml -> {
+                    // taskHtml.html.forEach(System.out::println);
+
                     Iterator<String> actual = taskHtml.html.iterator();
                     expectedTaskViews
                             .get(taskHtml.obj)
                             .forEach(line -> assertEquals(line, actual.next()));
+
                 });
     }
 

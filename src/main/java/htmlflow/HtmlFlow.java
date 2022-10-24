@@ -1,7 +1,8 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-2022, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
+ * and Pedro Fialho.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,35 +29,97 @@ import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
 import htmlflow.visitor.HtmlVisitorAsync;
+import htmlflow.visitor.PreprocessingVisitor;
 
 import java.io.PrintStream;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
+/**
+ * Factory to create HtmlDoc or HtmlView instances corresponding to static HTMl pages or dynamic pages.
+ * HtmlView objects depend on a model.
+ */
 public class HtmlFlow {
-
+    /**
+     * Make private constructor to forbid instantiation.
+     */
     private HtmlFlow() {
     }
-
+    /**
+     * This will invoke the HtmlTemplate to a PreprocessingVisitor that collects a chain of
+     * HtmlContinuation objects containing the static HTML strings and dynamic HTML consumers.
+     *
+     * @param modelClass The class of the model.
+     * @param template An HtmlTemplate function, which depends on an HtmlView used to create HTMl elements.
+     * @param <U> The type of the model.
+     */
+    private static <U> PreprocessingVisitor<U> preprocessing(Class<U> modelClass, HtmlTemplate<U> template) {
+        PreprocessingVisitor<U> pre = new PreprocessingVisitor<>(modelClass, true);
+        HtmlView<U> preView = new HtmlView<>(null, () -> pre, false);
+        template.resolve(preView);
+        /**
+         * NO problem with null model. We are just preprocessing static HTML blocks.
+         * Thus, dynamic blocks which depend on model are not invoked.
+         */
+        preView.getVisitor().finish(null);
+        return pre;
+    }
+    /**
+     * Creates a HtmlDoc object corresponding to a static HTML page (without model dependency)
+     * that emits HTML to an output PrintStream
+     *
+     * @param out The output Printstream
+     */
     public static HtmlDoc doc(PrintStream out){
         return out == null
             ? new HtmlDoc(null, new HtmlDocVisitorStringBuilder(true))
             : new HtmlDoc(out, new HtmlDocVisitorPrintStream(out, true));
     }
-
+    /**
+     * Creates a HtmlDoc object corresponding to a static HTML page (without model dependency)
+     * that emits HTML to and internal StringBuilder that provides the resulting String on
+     * render() of HtmDoc.
+     */
     public static HtmlDoc doc(){
         return doc(null);
     }
-
-    public static <U> HtmlView<U> view(PrintStream out, HtmlTemplate<U> template){
-        return new HtmlView<>(out, (() -> new HtmlViewVisitorPrintStream(out, true)), false, template);
+    /**
+     * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
+     *
+     * @param modelClass Used to crate fake model object for preprocessing of HtmlTemplate.
+     * @param out Output PrintStream.
+     * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param <U> Type of the model.
+     */
+    public static <U> HtmlView<U> view(Class<U> modelClass, PrintStream out, HtmlTemplate<U> template){
+        PreprocessingVisitor<U> pre = preprocessing(modelClass, template);
+        return new HtmlView<>(
+            out,
+            (() -> new HtmlViewVisitorPrintStream<>(out, true, pre.getFirst())),
+            false); // not thread safe by default
     }
-
-    public static <U> HtmlView<U> view(HtmlTemplate<U> template){
-        return new HtmlView<>(null, (() -> new HtmlViewVisitorStringBuilder(true)), false, template);
+    /**
+     * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
+     *
+     * @param modelClass Used to crate fake model object for preprocessing of HtmlTemplate.
+     * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param <U> Type of the model.
+     */
+    public static <U> HtmlView<U> view(Class<U> modelClass, HtmlTemplate<U> template){
+        PreprocessingVisitor<U> pre = preprocessing(modelClass, template);
+        return new HtmlView<>(
+            null, // Without output stream
+            () -> new HtmlViewVisitorStringBuilder<>(true, pre.getFirst()), // visitor
+            false); // Not thread safe by default
     }
-
-    public static <U> HtmlViewAsync<U> viewAsync(PrintStream out, HtmlTemplate<U> template) {
-        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false, template);
+    /**
+     * Creates a HtmlViewAsync corresponding to a dynamic HtmlPage with an asynchronous model.
+     *
+     * @param modelClass Used to crate fake model object for preprocessing of HtmlTemplate.
+     * @param out Output PrintStream.
+     * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param <U> Type of the model.
+     */
+    public static <U> HtmlViewAsync<U> viewAsync(Class<U> modelClass, PrintStream out, HtmlTemplate<U> template) {
+        PreprocessingVisitor<U> pre = preprocessing(modelClass, template);
+        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false);
     }
 }

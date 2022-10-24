@@ -32,9 +32,9 @@ import java.io.PrintStream;
 import java.util.function.Supplier;
 
 /**
- * Dynamic views can be bound to a domain object.
+ * Dynamic views can be bound to a Model object.
  *
- * @param <T> The type of domain object bound to this View.
+ * @param <T> The type of the Model bound to this View.
  *
  * @author Miguel Gamboa, Luís Duare
  */
@@ -44,12 +44,12 @@ public class HtmlView<T> extends HtmlPage<T> {
              "Wrong use of HtmlView! You should provide a " +
              "model parameter or use a static view instead!";
     /**
-     * This field is like an union with the threadLocalVisitor, being used alternatively.
+     * This field is like a union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
      * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
-     * throw the output and we use the threadLocalVisitor field instead.
+     * emit HTML to the output, and we use the threadLocalVisitor field instead.
      */
-    private final HtmlViewVisitor visitor;
+    private final HtmlViewVisitor<T> visitor;
     /**
      * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
      * The given example deals with a static field of ThreadLocal which persists beyond an instance.
@@ -57,15 +57,9 @@ public class HtmlView<T> extends HtmlPage<T> {
      * thread local instances during its entire life cycle.
      */
     @java.lang.SuppressWarnings("squid:S5164")
-    private final ThreadLocal<HtmlViewVisitor> threadLocalVisitor;
-    private final Supplier<HtmlViewVisitor> visitorSupplier;
+    private final ThreadLocal<HtmlViewVisitor<T>> threadLocalVisitor;
+    private final Supplier<HtmlViewVisitor<T>> visitorSupplier;
     private final boolean threadSafe;
-
-    /**
-     * A template function receives the view and a varargs array of partial views.
-     */
-    protected final HtmlTemplate<T> template;
-
     /**
      * To check whether this view is emitting to PrintStream, or not.
      * Notice since the PrintStream maybe shared by different views processing
@@ -78,14 +72,12 @@ public class HtmlView<T> extends HtmlPage<T> {
      */
     HtmlView(
         PrintStream out,
-        Supplier<HtmlViewVisitor> visitorSupplier,
-        boolean threadSafe,
-        HtmlTemplate<T> template)
+        Supplier<HtmlViewVisitor<T>> visitorSupplier,
+        boolean threadSafe)
     {
         this.out = out;
         this.visitorSupplier = visitorSupplier;
         this.threadSafe = threadSafe;
-        this.template = template;
         if(threadSafe) {
             this.visitor = null;
             this.threadLocalVisitor = ThreadLocal.withInitial(visitorSupplier);
@@ -96,8 +88,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     }
 
     public final Html<HtmlPage<T>> html() {
-        if (this.getVisitor().isWriting())
-            this.getVisitor().write(HEADER);
+        this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
 
@@ -110,7 +101,7 @@ public class HtmlView<T> extends HtmlPage<T> {
         if(threadSafe)
             throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
         HtmlVisitor v = getVisitor();
-        return clone(() -> (HtmlViewVisitor) v.clone(out, v.isIndented), false);
+        return clone(() -> (HtmlViewVisitor<T>) v.clone(out, v.isIndented), false);
     }
 
     public final HtmlPage<T> threadSafe(){
@@ -143,12 +134,11 @@ public class HtmlView<T> extends HtmlPage<T> {
 
     @Override
     public String render(T model) {
-        return getVisitor().finished(model);
+        return getVisitor().finish(model);
     }
 
     public String render(T model, HtmlView...partials) {
-        template.resolve(this);
-        return getVisitor().finished(model, partials);
+        return getVisitor().finish(model, partials);
     }
 
     @Override
@@ -175,7 +165,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     public final <U> void addPartial(HtmlView<U> partial, U model) {
         getVisitor().closeBeginTag();
         partial.getVisitor().setDepth(getVisitor().getDepth());
-        if (this.getVisitor().isWriting()) {
+
             /**
              * Next partial.clone() is related with https://github.com/xmlet/HtmlFlow/issues/75
              * The call to render() returns null or an HTML string depending on whether it has
@@ -191,7 +181,7 @@ public class HtmlView<T> extends HtmlPage<T> {
             HtmlVisitor v = getVisitor();
             String p = partial.clone(v.newbie()).render(model);
             if(p != null) v.write(p);
-        }
+
     }
 
     /**
@@ -203,7 +193,7 @@ public class HtmlView<T> extends HtmlPage<T> {
     public final <U> void addPartial(HtmlView<U> partial) {
         getVisitor().closeBeginTag();
         partial.getVisitor().setDepth(getVisitor().getDepth());
-        if (this.getVisitor().isWriting()) {
+
             /**
              * This overloaded addPartial does not have a model object.
              * Thus we do not expect to incur in the same problem reported on the other addPartial(partial, model).
@@ -211,7 +201,7 @@ public class HtmlView<T> extends HtmlPage<T> {
              */
             String p = partial.render(null);
             if(p != null) getVisitor().write(p);
-        }
+
     }
 
     /**
@@ -222,10 +212,10 @@ public class HtmlView<T> extends HtmlPage<T> {
      * @param threadSafe
      */
     protected final HtmlPage<T> clone(
-        Supplier<HtmlViewVisitor> visitorSupplier,
+        Supplier<HtmlViewVisitor<T>> visitorSupplier,
         boolean threadSafe)
     {
-        return new HtmlView<>(out, visitorSupplier, threadSafe, template);
+        return new HtmlView<>(out, visitorSupplier, threadSafe);
     }
 
     /**
@@ -233,8 +223,8 @@ public class HtmlView<T> extends HtmlPage<T> {
      * Receives an existent visitor.
      * Usually for a parent view to share its visitor with a partial.
      */
-    protected HtmlPage<T> clone(HtmlViewVisitor visitor) {
-        return new HtmlView<>(out, () -> visitor, false, template);
+    protected HtmlPage<T> clone(HtmlViewVisitor<T> visitor) {
+        return new HtmlView<>(out, () -> visitor, false);
     }
 
     /**
@@ -243,6 +233,6 @@ public class HtmlView<T> extends HtmlPage<T> {
      */
     @Override
     public final HtmlPage<T> setIndented(boolean isIndented) {
-        return clone(() -> (HtmlViewVisitor) getVisitor().clone(out, isIndented), false);
+        return clone(() -> (HtmlViewVisitor<T>) getVisitor().clone(out, isIndented), false);
     }
 }
