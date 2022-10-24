@@ -32,6 +32,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
@@ -72,11 +73,16 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     /**
      * Used create a mocked instance of the model to be passed to dynamic HTML blocks.
      */
-    private final Class<T> modelClass;
+    private final Class<?> modelClass;
+    /**
+     * Generic type arguments of the Model.
+     */
+    private final Type[] genericTypeArgs;
 
-    public PreprocessingVisitor(Class<T> modelClass, boolean isIndented) {
+    public PreprocessingVisitor(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
         super(isIndented);
         this.modelClass = modelClass;
+        this.genericTypeArgs = genericTypeArgs;
     }
 
     public HtmlContinuation<Object> getFirst() {
@@ -127,7 +133,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
          * the next static HTML block.
          */
         PodamFactory factory = new PodamFactoryImpl();
-        T model = factory.manufacturePojoWithFullData(modelClass);
+        T model = (T) factory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
         dynamicHtmlBlock.accept(element, (U) model);
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
     }

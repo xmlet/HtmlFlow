@@ -32,6 +32,7 @@ import htmlflow.visitor.HtmlVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
 
 import java.io.PrintStream;
+import java.lang.reflect.Type;
 
 /**
  * Factory to create HtmlDoc or HtmlView instances corresponding to static HTMl pages or dynamic pages.
@@ -51,8 +52,12 @@ public class HtmlFlow {
      * @param template An HtmlTemplate function, which depends on an HtmlView used to create HTMl elements.
      * @param <U> The type of the model.
      */
-    private static <U> PreprocessingVisitor<U> preprocessing(Class<U> modelClass, HtmlTemplate<U> template) {
-        PreprocessingVisitor<U> pre = new PreprocessingVisitor<>(modelClass, true);
+    private static <U> PreprocessingVisitor<U> preprocessing(
+        HtmlTemplate<U> template,
+        Class<?> modelClass,
+        Type... genericTypeArgs
+    ) {
+        PreprocessingVisitor<U> pre = new PreprocessingVisitor<>(true, modelClass, genericTypeArgs);
         HtmlView<U> preView = new HtmlView<>(null, () -> pre, false);
         template.resolve(preView);
         /**
@@ -89,8 +94,13 @@ public class HtmlFlow {
      * @param template Function that consumes an HtmlView to produce HTML elements.
      * @param <U> Type of the model.
      */
-    public static <U> HtmlView<U> view(Class<U> modelClass, PrintStream out, HtmlTemplate<U> template){
-        PreprocessingVisitor<U> pre = preprocessing(modelClass, template);
+    public static <U> HtmlView<U> view(
+        PrintStream out,
+        HtmlTemplate<U> template,
+        Class<?> modelClass,  // Cannot replace wildcard by U due to generic collections.
+        Type... genericTypeArgs
+    ){
+        PreprocessingVisitor<U> pre = preprocessing(template, modelClass, genericTypeArgs);
         return new HtmlView<>(
             out,
             (() -> new HtmlViewVisitorPrintStream<>(out, true, pre.getFirst())),
@@ -103,8 +113,12 @@ public class HtmlFlow {
      * @param template Function that consumes an HtmlView to produce HTML elements.
      * @param <U> Type of the model.
      */
-    public static <U> HtmlView<U> view(Class<U> modelClass, HtmlTemplate<U> template){
-        PreprocessingVisitor<U> pre = preprocessing(modelClass, template);
+    public static <U> HtmlView<U> view(
+        HtmlTemplate<U> template,
+        Class<?> modelClass, // Cannot replace wildcard by U due to generic collections.
+        Type... genericTypeArgs
+    ){
+        PreprocessingVisitor<U> pre = preprocessing(template, modelClass, genericTypeArgs);
         return new HtmlView<>(
             null, // Without output stream
             () -> new HtmlViewVisitorStringBuilder<>(true, pre.getFirst()), // visitor
@@ -118,8 +132,13 @@ public class HtmlFlow {
      * @param template Function that consumes an HtmlView to produce HTML elements.
      * @param <U> Type of the model.
      */
-    public static <U> HtmlViewAsync<U> viewAsync(Class<U> modelClass, PrintStream out, HtmlTemplate<U> template) {
-        PreprocessingVisitor<U> pre = preprocessing(modelClass, template);
+    public static <U> HtmlViewAsync<U> viewAsync(
+        PrintStream out,
+        HtmlTemplate<U> template,
+        Class<U> modelClass,
+        Type... genericTypeArgs
+    ){
+        PreprocessingVisitor<U> pre = preprocessing(template, modelClass, genericTypeArgs);
         return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false);
     }
 }

@@ -24,13 +24,14 @@
 
 package htmlflow.test.views;
 
-import htmlflow.HtmlDoc;
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
+
+import java.util.List;
 
 public class HtmlTables {
 
@@ -74,8 +75,8 @@ public class HtmlTables {
      * an array with two partial views: a div heading and table row.
      */
     public static void taskListViewWithPartials(
-        HtmlView<Iterable<Task>> view,
-        HtmlView[] partials)
+        HtmlView<Iterable<Task>> view)
+        // HtmlTemplate[] partials)
     {
         view
             .html()
@@ -104,9 +105,9 @@ public class HtmlTables {
                                 .th().text("Priority").__()
                             .__()
                             .tbody()
-                                .<Iterable<Task> >dynamic((tbody, tasks) ->
-                                    tasks.forEach(task -> view.addPartial(partials[0], task)) // taskListRow
-                                )
+                                // .<Iterable<Task> >dynamic((tbody, tasks) ->
+                                //    tasks.forEach(task -> view.addPartial(partials[0], task)) // taskListRow
+                                // )
                             .__() // tbody
                         .__() // table
                     .__() // div
@@ -123,14 +124,14 @@ public class HtmlTables {
             .__(); // div
     }
 
-    public static HtmlView<Task> taskListRow = HtmlFlow.view(Task.class, (view) -> {
+    public static HtmlView<Task> taskListRow = HtmlFlow.view(view -> {
         view
             .tr()
                 .td().<Task>dynamic((td, task) -> td.text(task.getTitle())).__()
                 .td().<Task>dynamic((td, task) -> td.text(task.getDescription())).__()
                 .td().<Task>dynamic((td, task) -> td.text(task.getPriority().toString())).__()
             .__(); // tr
-    });
+        }, Task.class);
 
     public static void taskTableView(HtmlView<Iterable<Task>> view){
         view
