@@ -64,7 +64,10 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory, 3));
         podamFactory.getStrategy().addOrReplaceTypeManufacturer(Stream.class, new StreamFactory(podamFactory, 3));
     }
-
+    /**
+     * Flag to avoid nested dynamic blocks.
+     */
+    boolean openDynamic = false;
     /**
      * The main StringBuilder.
      */
@@ -119,12 +122,20 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
      * corresponding to the consumer passed to dynamic().
      * We will first create the dynamic continuation that will be the next node of the static continuation.
      *
+     * U is the type of the model passed to the dynamic HTML block that is the same as T in this visitor.
+     * Yet, since it came from HtmlApiFaster that is not typed by the Model, then we have to use
+     * another generic argument for the type of the model.
+     *
      * @param element The parent element.
      * @param dynamicHtmlBlock The continuation that consumes the element and a model.
+     * @param <E> Type of the parent Element.
+     * @param <U> Type of the model passed to the dynamic HTML block that is the same as T in this visitor.
      */
-
     @Override
     public <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
+        if (openDynamic)
+            throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
+        openDynamic = true;
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
@@ -146,6 +157,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
         dynamicHtmlBlock.accept(element, (U) model);
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
+        openDynamic = false;
     }
 
     /**

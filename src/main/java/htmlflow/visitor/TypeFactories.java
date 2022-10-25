@@ -76,8 +76,9 @@ class StreamFactory implements TypeManufacturer<Stream> {
 
     @Override
     public Stream getType(DataProviderStrategy dataProviderStrategy, AttributeMetadata attributeMetadata, Map<String, Type> map) {
+        Type typeArg = map.values().stream().findFirst().get();
         return Stream
-            .generate(() -> podamFactory.manufacturePojoWithFullData((Class) map.values().stream().findFirst().get()))
+            .generate(() -> podamFactory.manufacturePojoWithFullData((Class) typeArg))
             .limit(size);
     }
 }
