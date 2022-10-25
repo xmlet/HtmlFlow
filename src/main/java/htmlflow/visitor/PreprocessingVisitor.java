@@ -27,19 +27,15 @@ package htmlflow.visitor;
 
 import htmlflow.HtmlView;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
 import org.xmlet.htmlapifaster.Element;
-import uk.co.jemos.podam.api.AttributeMetadata;
-import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
-import uk.co.jemos.podam.typeManufacturers.TypeManufacturer;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
 
@@ -65,26 +61,8 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
 
     static {
         podamFactory = new PodamFactoryImpl();
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory());
-    }
-
-    static class PublisherFactory implements TypeManufacturer<Publisher> {
-        @Override
-        public Publisher getType(DataProviderStrategy dataProviderStrategy, AttributeMetadata attributeMetadata, Map<String, Type> map) {
-            return subscriber -> subscriber.onSubscribe(new Subscription() {
-                @Override
-                public void request(long l) {
-                    for (int i = 0; i < 3; i++) {
-                        Object item = podamFactory.manufacturePojoWithFullData((Class) map.values().stream().findFirst().get());
-                        subscriber.onNext(item);
-                    }
-                    subscriber.onComplete();
-
-                }
-                @Override
-                public void cancel() {}
-            });
-        }
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory, 3));
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Stream.class, new StreamFactory(podamFactory, 3));
     }
 
     /**
