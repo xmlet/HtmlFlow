@@ -43,7 +43,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -135,16 +134,15 @@ public class TestTable {
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        Type taskClass = Task.class;
         HtmlView<Iterable<Task>> view = HtmlFlow.view(
             new PrintStream(mem),
-            HtmlTables::taskListViewWithPartials,
+            HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow),
             List.class,
-            taskClass);
-        view.write(dataSource, HtmlTables.taskListRow);
+            Task.class);
+        view.write(dataSource);
         validateBindingTable(mem.toString());
         mem.reset();
-        view.write(dataSource, HtmlTables.taskListRow);
+        view.write(dataSource);
         validateBindingTable(mem.toString());
     }
 
@@ -156,9 +154,12 @@ public class TestTable {
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
-        HtmlView<Iterable<Task>> view = HtmlFlow.view(HtmlTables::taskListViewWithPartials, List.class, Task.class);
-        validateBindingTable(view.render(dataSource, HtmlTables.taskListRow));
-        validateBindingTable(view.render(dataSource, HtmlTables.taskListRow));
+        HtmlView<Iterable<Task>> view = HtmlFlow.view(
+            HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow),
+            List.class,
+            Task.class);
+        validateBindingTable(view.render(dataSource));
+        validateBindingTable(view.render(dataSource));
     }
 
     static void validateBindingTable(String actual){

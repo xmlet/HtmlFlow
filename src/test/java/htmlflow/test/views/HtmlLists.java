@@ -91,7 +91,7 @@ public class HtmlLists {
                 .__() //body
             .__(); //html
 
-    public static void taskDetailsTemplate(HtmlView<Task> view) {
+    public static void taskDetailsTemplate(HtmlPage<Task> view) {
         view
             .html()
                 .head()

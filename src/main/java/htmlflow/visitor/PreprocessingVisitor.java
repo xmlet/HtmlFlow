@@ -161,11 +161,6 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     }
 
     @Override
-    public HtmlViewVisitor newbie() {
-        throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
-    }
-
-    @Override
     public StringBuilder sb() {
         return sb;
     }

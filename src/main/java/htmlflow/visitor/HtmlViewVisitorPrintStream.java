@@ -54,14 +54,6 @@ public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations<
         this.depth = depth;
     }
 
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     */
-    @Override
-    public HtmlViewVisitor newbie() {
-        return new HtmlViewVisitorPrintStream(out, isIndented, depth, first);
-    }
-
     @Override
     public void write(String text) {
         out.print(text);

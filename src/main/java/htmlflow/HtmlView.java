@@ -155,55 +155,6 @@ public class HtmlView<T> extends HtmlPage<T> {
         this.render(model, partials);
     }
 
-        /**
-     * Adds a partial view to this view.
-     *
-     * @param partial inner view.
-     * @param model the domain object bound to the partial view.
-     * @param <U> the type of the domain model of the partial view.
-     */
-    public final <U> void addPartial(HtmlView<U> partial, U model) {
-        getVisitor().closeBeginTag();
-        partial.getVisitor().setDepth(getVisitor().getDepth());
-
-            /**
-             * Next partial.clone() is related with https://github.com/xmlet/HtmlFlow/issues/75
-             * The call to render() returns null or an HTML string depending on whether it has
-             * a HtmlVisitorPrintStream or a HtmlVisitorStringBuilder.
-             * The latter incurs in additional overheads due to internal string buffering and may
-             * throw OutOfMemoryError for large data model.
-             * Thus we can avoid that problem sharing the parent view's visitor with the partial.
-             * Once the visitor is stored in a final field, we must clone the partial view.
-             * Since our views and templates are data-structure less avoiding in memory trees and nodes,
-             * and the HTML document is based on a higher-order function, then our views instances only store
-             * a few instance fields related to the visitor and the template function itself.
-             */
-            HtmlVisitor v = getVisitor();
-            String p = partial.clone(v.newbie()).render(model);
-            if(p != null) v.write(p);
-
-    }
-
-    /**
-     * Adds a partial view to this view.
-     *
-     * @param partial inner view.
-     * @param <U> the type of the domain model of the partial view.
-     */
-    public final <U> void addPartial(HtmlView<U> partial) {
-        getVisitor().closeBeginTag();
-        partial.getVisitor().setDepth(getVisitor().getDepth());
-
-            /**
-             * This overloaded addPartial does not have a model object.
-             * Thus we do not expect to incur in the same problem reported on the other addPartial(partial, model).
-             * Moreover partials are HTML fragments that are not expect to incur in more than Kb.
-             */
-            String p = partial.render(null);
-            if(p != null) getVisitor().write(p);
-
-    }
-
     /**
      * Since HtmlView is immutable this is the preferred way to create a copy of the
      * existing HtmlView instance with a different threadSafe state.

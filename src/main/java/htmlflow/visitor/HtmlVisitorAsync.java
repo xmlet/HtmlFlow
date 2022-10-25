@@ -72,11 +72,6 @@ public class HtmlVisitorAsync<T> extends HtmlViewVisitor<T> implements TagsToPri
         this(out, isIndented);
         this.depth = depth;
     }
-    
-    @Override
-    public HtmlViewVisitor newbie() {
-        throw new UnsupportedOperationException(CANNOT_CREATE_AN_HTML_VIEW_VISITOR_INSTANCE_FROM_HTML_VISITOR_ASYNC);
-    }
 
     @Override
     public void write(String text) {

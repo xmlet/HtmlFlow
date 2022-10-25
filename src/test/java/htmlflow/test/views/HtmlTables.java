@@ -26,16 +26,19 @@ package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
+import htmlflow.HtmlTemplate;
 import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
+import org.xmlet.htmlapifaster.Tbody;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class HtmlTables {
 
-    public static void simpleTableView(HtmlView<int[][]> view){
+    public static void simpleTableView(HtmlPage<int[][]> view){
         view
             .html()
                 .head()
@@ -74,11 +77,8 @@ public class HtmlTables {
      * An example of a dynamic view with an Iterable<Task> as domain model and
      * an array with two partial views: a div heading and table row.
      */
-    public static void taskListViewWithPartials(
-        HtmlView<Iterable<Task>> view)
-        // HtmlTemplate[] partials)
-    {
-        view
+    public static HtmlTemplate<Iterable<Task>> taskListViewWithPartials(BiConsumer<Tbody<?>, Task> partial) {
+        return view -> view
             .html()
                 .head()
                     .title()
@@ -105,9 +105,9 @@ public class HtmlTables {
                                 .th().text("Priority").__()
                             .__()
                             .tbody()
-                                // .<Iterable<Task> >dynamic((tbody, tasks) ->
-                                //    tasks.forEach(task -> view.addPartial(partials[0], task)) // taskListRow
-                                // )
+                                .<Iterable<Task>>dynamic((tbody, tasks) ->
+                                    tasks.forEach(task -> partial.accept(tbody, task)) // taskListRow
+                                )
                             .__() // tbody
                         .__() // table
                     .__() // div
@@ -124,16 +124,16 @@ public class HtmlTables {
             .__(); // div
     }
 
-    public static HtmlView<Task> taskListRow = HtmlFlow.view(view -> {
-        view
+    public static void taskListRow(Tbody<?> tbody, Task task) {
+        tbody
             .tr()
-                .td().<Task>dynamic((td, task) -> td.text(task.getTitle())).__()
-                .td().<Task>dynamic((td, task) -> td.text(task.getDescription())).__()
-                .td().<Task>dynamic((td, task) -> td.text(task.getPriority().toString())).__()
+                .td().text(task.getTitle()).__()
+                .td().text(task.getDescription()).__()
+                .td().text(task.getPriority().toString()).__()
             .__(); // tr
-        }, Task.class);
+    }
 
-    public static void taskTableView(HtmlView<Iterable<Task>> view){
+    public static void taskTableView(HtmlPage<Iterable<Task>> view){
         view
             .html()
                 .head()

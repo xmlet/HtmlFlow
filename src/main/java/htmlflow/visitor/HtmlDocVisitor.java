@@ -60,14 +60,6 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     }
 
     /**
-     * NOT Supported. This is useful only for partials in the context of HtmlView.
-     */
-    @Override
-    public final HtmlViewVisitor newbie() {
-        throw new UnsupportedOperationException("Illegal operation for HtmlDoc. Only for partials in HtmlView.");
-    }
-
-    /**
      * Returns the accumulated output and clear it.
      */
     public abstract String finish();

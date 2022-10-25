@@ -186,11 +186,6 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
      * @param isIndented If the new visitor should indent HTML output or not.
      */
     public abstract HtmlVisitor clone(PrintStream out, boolean isIndented);
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     * Used when visiting partial views.
-     */
-    public abstract HtmlViewVisitor newbie();
 
     /*=========================================================================*/
     /*------------            Root Element Methods         --------------------*/

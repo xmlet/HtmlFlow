@@ -53,14 +53,6 @@ public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuation
         this.depth = depth;
     }
 
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     */
-    @Override
-    public HtmlViewVisitor newbie() {
-        return new HtmlViewVisitorStringBuilder(isIndented, depth, first);
-    }
-
     @Override
     public void write(String text) {
         sb.append(text);
