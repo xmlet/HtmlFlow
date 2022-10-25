@@ -26,13 +26,19 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 import org.xmlet.htmlapifaster.Element;
+import uk.co.jemos.podam.api.AttributeMetadata;
+import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
+import uk.co.jemos.podam.typeManufacturers.TypeManufacturer;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
@@ -54,6 +60,33 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
 public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsToStringBuilder {
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
+
+    static final PodamFactory podamFactory;
+
+    static {
+        podamFactory = new PodamFactoryImpl();
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory());
+    }
+
+    static class PublisherFactory implements TypeManufacturer<Publisher> {
+        @Override
+        public Publisher getType(DataProviderStrategy dataProviderStrategy, AttributeMetadata attributeMetadata, Map<String, Type> map) {
+            return subscriber -> subscriber.onSubscribe(new Subscription() {
+                @Override
+                public void request(long l) {
+                    for (int i = 0; i < 3; i++) {
+                        Object item = podamFactory.manufacturePojoWithFullData((Class) map.values().stream().findFirst().get());
+                        subscriber.onNext(item);
+                    }
+                    subscriber.onComplete();
+
+                }
+                @Override
+                public void cancel() {}
+            });
+        }
+    }
+
     /**
      * The main StringBuilder.
      */
@@ -132,8 +165,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
          * We have to run dynamicContinuation to leave isClosed and indentation correct for
          * the next static HTML block.
          */
-        PodamFactory factory = new PodamFactoryImpl();
-        T model = (T) factory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
+        T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
         dynamicHtmlBlock.accept(element, (U) model);
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
     }
