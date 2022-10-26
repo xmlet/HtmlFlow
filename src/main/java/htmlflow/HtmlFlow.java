@@ -28,7 +28,6 @@ import htmlflow.visitor.HtmlDocVisitorPrintStream;
 import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
-import htmlflow.visitor.HtmlVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
 
 import java.io.PrintStream;
@@ -123,22 +122,5 @@ public class HtmlFlow {
             null, // Without output stream
             () -> new HtmlViewVisitorStringBuilder<>(true, pre.getFirst()), // visitor
             false); // Not thread safe by default
-    }
-    /**
-     * Creates a HtmlViewAsync corresponding to a dynamic HtmlPage with an asynchronous model.
-     *
-     * @param modelClass Used to crate fake model object for preprocessing of HtmlTemplate.
-     * @param out Output PrintStream.
-     * @param template Function that consumes an HtmlView to produce HTML elements.
-     * @param <U> Type of the model.
-     */
-    public static <U> HtmlViewAsync<U> viewAsync(
-        PrintStream out,
-        HtmlTemplate<U> template,
-        Class<U> modelClass,
-        Type... genericTypeArgs
-    ){
-        PreprocessingVisitor<U> pre = preprocessing(template, modelClass, genericTypeArgs);
-        return new HtmlViewAsync<>(out, () -> new HtmlVisitorAsync(out, true), false);
     }
 }
