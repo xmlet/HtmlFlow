@@ -33,23 +33,23 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.typeManufacturers.TypeManufacturer;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 class PublisherFactory implements TypeManufacturer<Publisher> {
     final PodamFactory podamFactory;
-    final int size;
 
-    PublisherFactory(PodamFactory podamFactory, int size) {
+    PublisherFactory(PodamFactory podamFactory) {
         this.podamFactory = podamFactory;
-        this.size = size;
     }
 
     @Override
-    public Publisher getType(DataProviderStrategy dataProviderStrategy, AttributeMetadata attributeMetadata, Map<String, Type> map) {
+    public Publisher getType(DataProviderStrategy strat, AttributeMetadata attributeMetadata, Map<String, Type> map) {
         return subscriber -> subscriber.onSubscribe(new Subscription() {
             @Override
             public void request(long l) {
+                int size = strat.getNumberOfCollectionElements(List.class);
                 for (int i = 0; i < size; i++) {
                     Object item = podamFactory.manufacturePojoWithFullData((Class) map.values().stream().findFirst().get());
                     subscriber.onNext(item);
@@ -67,18 +67,31 @@ class PublisherFactory implements TypeManufacturer<Publisher> {
 
 class StreamFactory implements TypeManufacturer<Stream> {
     final PodamFactory podamFactory;
-    final int size;
 
-    StreamFactory(PodamFactory podamFactory, int size) {
+    StreamFactory(PodamFactory podamFactory) {
         this.podamFactory = podamFactory;
-        this.size = size;
     }
 
     @Override
-    public Stream getType(DataProviderStrategy dataProviderStrategy, AttributeMetadata attributeMetadata, Map<String, Type> map) {
+    public Stream getType(DataProviderStrategy strat, AttributeMetadata attributeMetadata, Map<String, Type> map) {
+        int size = strat.getNumberOfCollectionElements(List.class);
         Type typeArg = map.values().stream().findFirst().get();
         return Stream
             .generate(() -> podamFactory.manufacturePojoWithFullData((Class) typeArg))
             .limit(size);
     }
+}
+
+class IterableFactory implements TypeManufacturer<Iterable> {
+    final StreamFactory streamFactory;
+
+    IterableFactory(PodamFactory podamFactory) {
+        this.streamFactory = new StreamFactory(podamFactory);
+    }
+
+    @Override
+    public Iterable getType(DataProviderStrategy strat, AttributeMetadata metadata, Map<String, Type> map) {
+        return () -> streamFactory.getType(strat, metadata, map).iterator();
+    }
+
 }

@@ -57,12 +57,13 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
 
-    static final PodamFactory podamFactory;
+    public static final PodamFactory podamFactory;
 
     static {
         podamFactory = new PodamFactoryImpl();
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory, 3));
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Stream.class, new StreamFactory(podamFactory, 3));
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Stream.class, new StreamFactory(podamFactory));
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Iterable.class, new IterableFactory(podamFactory));
     }
     /**
      * Flag to avoid nested dynamic blocks.
