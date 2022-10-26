@@ -44,7 +44,7 @@ public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuation
     private final StringBuilder sb = new StringBuilder();
     
 
-    public HtmlViewVisitorStringBuilder(boolean isIndented, HtmlContinuation<Object> first) {
+    public HtmlViewVisitorStringBuilder(boolean isIndented, HtmlContinuation<T> first) {
         super(isIndented, first);
     }
 
@@ -65,10 +65,10 @@ public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuation
     }
 
     @Override
-    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
+    public HtmlViewVisitor<T> clone(PrintStream out, boolean isIndented) {
         if(out != null)
             throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
-        return new HtmlViewVisitorStringBuilder(isIndented, first);
+        return new HtmlViewVisitorStringBuilder<>(isIndented, first);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
         boolean isClosed,
         E element, BiConsumer<E, U> consumer,
         HtmlVisitor visitor,
-        HtmlContinuation next
+        HtmlContinuation<U> next
     ) {
         super(currentDepth, isClosed, visitor, next);
         this.element = element;
@@ -78,6 +78,7 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
             next != null ? next.copy(v) : null); // call copy recursively
     }
 
+    @SuppressWarnings("squid:S3011")
     public E copyElement(HtmlVisitor v) {
         try {
             Constructor<E> ctor = ((Class<E>) element
@@ -86,7 +87,7 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
             ctor.setAccessible(true);
             return ctor.newInstance(element.getParent(), v, false); // false to not dispatch visit now
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
     }
 }

@@ -35,8 +35,24 @@ import uk.co.jemos.podam.typeManufacturers.TypeManufacturer;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import static htmlflow.visitor.TypeFactories.typeArgument;
+
+class TypeFactories {
+
+    private TypeFactories() {
+    }
+
+    public static Class<?> typeArgument(Map<String, Type> map) {
+        Optional<Type> typeArg = map.values().stream().findFirst();
+        if(!typeArg.isPresent()) throw new IllegalArgumentException("Missing type argument in  generic collection!");
+        else return (Class<?>) typeArg.get();
+    }
+}
+
+@SuppressWarnings("squid:S3740")
 class PublisherFactory implements TypeManufacturer<Publisher> {
     final PodamFactory podamFactory;
 
@@ -49,22 +65,27 @@ class PublisherFactory implements TypeManufacturer<Publisher> {
         return subscriber -> subscriber.onSubscribe(new Subscription() {
             @Override
             public void request(long l) {
+                Class<?> typeArg = typeArgument(map);
                 int size = strat.getNumberOfCollectionElements(List.class);
                 for (int i = 0; i < size; i++) {
-                    Object item = podamFactory.manufacturePojoWithFullData((Class) map.values().stream().findFirst().get());
+                    Object item = podamFactory.manufacturePojoWithFullData(typeArg);
                     subscriber.onNext(item);
                 }
                 subscriber.onComplete();
 
             }
-
             @Override
             public void cancel() {
+                /*
+                 * The request() starts emitting to the subscriber in same thread from the caller,
+                 * without chance for cancellation.
+                 */
             }
         });
     }
 }
 
+@SuppressWarnings("squid:S3740")
 class StreamFactory implements TypeManufacturer<Stream> {
     final PodamFactory podamFactory;
 
@@ -75,13 +96,14 @@ class StreamFactory implements TypeManufacturer<Stream> {
     @Override
     public Stream getType(DataProviderStrategy strat, AttributeMetadata attributeMetadata, Map<String, Type> map) {
         int size = strat.getNumberOfCollectionElements(List.class);
-        Type typeArg = map.values().stream().findFirst().get();
+        Class<?> typeArg = typeArgument(map);
         return Stream
             .generate(() -> podamFactory.manufacturePojoWithFullData((Class) typeArg))
             .limit(size);
     }
 }
 
+@SuppressWarnings("squid:S3740")
 class IterableFactory implements TypeManufacturer<Iterable> {
     final StreamFactory streamFactory;
 

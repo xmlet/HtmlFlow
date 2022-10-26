@@ -27,7 +27,6 @@ package htmlflow;
 import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Tr;
 
 import java.io.BufferedReader;

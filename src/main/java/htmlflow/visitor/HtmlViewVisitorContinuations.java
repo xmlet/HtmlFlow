@@ -40,12 +40,12 @@ public abstract class HtmlViewVisitorContinuations<T> extends HtmlViewVisitor<T>
     /**
      * The first node to be processed.
      */
-    protected final HtmlContinuation<Object> first;
+    protected final HtmlContinuation<T> first;
     /**
      * @param isIndented
      * @param first
      */
-    HtmlViewVisitorContinuations(boolean isIndented, HtmlContinuation<Object> first) {
+    HtmlViewVisitorContinuations(boolean isIndented, HtmlContinuation<T> first) {
         super(isIndented);
         this.first = first.copy(this);
     }
@@ -69,8 +69,7 @@ public abstract class HtmlViewVisitorContinuations<T> extends HtmlViewVisitor<T>
     @Override
     public final String finish(T model, HtmlView...partials){
         first.execute(model);
-        String result = readAndReset();
-        return result;
+        return readAndReset();
     }
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/

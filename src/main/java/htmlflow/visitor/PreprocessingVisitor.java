@@ -80,11 +80,11 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     /**
      * The first node to be processed.
      */
-    private HtmlContinuation<Object> first;
+    private HtmlContinuation<T> first;
     /**
      * The last HtmlContinuation
      */
-    private HtmlContinuation<Object> last;
+    private HtmlContinuation<T> last;
     /**
      * Used create a mocked instance of the model to be passed to dynamic HTML blocks.
      */
@@ -100,7 +100,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         this.genericTypeArgs = genericTypeArgs;
     }
 
-    public HtmlContinuation<Object> getFirst() {
+    public HtmlContinuation<T> getFirst() {
         return first;
     }
 
@@ -136,14 +136,14 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
-        HtmlContinuation dynamicCont = new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, null);
+        HtmlContinuation<T> dynamicCont = (HtmlContinuation<T>) new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, null);
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
          * which will be followed by the dynamicCont.
          */
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<Object> staticCont = new HtmlContinuationStatic<>(staticHtml, this, dynamicCont);
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, dynamicCont);
         if(first == null) first = staticCont; // on first visit initializes the first pointer
         else setNext(last, staticCont);       // else append the staticCont to existing chain
         last = dynamicCont;                   // advance last to point to the new dynamicCont
@@ -163,7 +163,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     @Override
     public String finish(T model, HtmlView... partials) {
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<Object> staticCont = new HtmlContinuationStatic<>(staticHtml, this, null);
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, null);
         last = first == null
             ? first = staticCont         // assign both first and last
             : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
@@ -184,7 +184,11 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         return sb;
     }
 
+    @SuppressWarnings({"squid:S3011", "squid:S112"})
     static class HtmlContinuationSetter {
+        private HtmlContinuationSetter() {
+        }
+
         static final Field fieldNext;
         static {
             try {
@@ -194,12 +198,12 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
                 throw new RuntimeException(e);
             }
         }
-        static HtmlContinuation<Object> setNext(HtmlContinuation<Object> cont, HtmlContinuation next) {
+        static <Z> HtmlContinuation<Z> setNext(HtmlContinuation<Z> cont, HtmlContinuation<Z> next) {
             try {
                 fieldNext.set(cont, next);
                 return next;
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         }
     }

@@ -34,7 +34,7 @@ public class HtmlContinuationStatic<U> extends HtmlContinuation<U> {
      * Sets indentation to -1 to inform that visitor should continue with previous indentation.
      * The isClosed is useless because it just writes what it is in its staticHtmlBlock.
      */
-    HtmlContinuationStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation next) {
+    HtmlContinuationStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation<U> next) {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
         this.staticHtmlBlock = staticHtmlBlock;
     }

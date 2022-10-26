@@ -38,7 +38,7 @@ public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations<
      */
     private final PrintStream out;
 
-    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, HtmlContinuation<Object> first)
+    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, HtmlContinuation<T> first)
     {
         super(isIndented, first);
         this.out = out;
@@ -66,8 +66,8 @@ public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations<
     }
 
     @Override
-    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
-        return new HtmlViewVisitorPrintStream(out, isIndented, first);
+    public HtmlViewVisitor<T> clone(PrintStream out, boolean isIndented) {
+        return new HtmlViewVisitorPrintStream<>(out, isIndented, first);
     }
 
     @Override

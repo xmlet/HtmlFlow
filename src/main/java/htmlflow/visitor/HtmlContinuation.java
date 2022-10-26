@@ -50,7 +50,7 @@ public abstract class HtmlContinuation<U> {
     /**
      * @param currentDepth Indentation depth associated to this block.
      */
-    public HtmlContinuation(int currentDepth, boolean isClosed, HtmlVisitor visitor, HtmlContinuation<U> next) {
+    protected HtmlContinuation(int currentDepth, boolean isClosed, HtmlVisitor visitor, HtmlContinuation<U> next) {
         this.currentDepth = currentDepth;
         this.isClosed = isClosed;
         this.visitor = visitor;
@@ -80,12 +80,12 @@ public abstract class HtmlContinuation<U> {
      *
      * @param model
      */
-    abstract protected void emitHtml(U model);
+    protected abstract void emitHtml(U model);
     /**
      * Creates a copy of this HtmlContinuation with a new visitor
      *
      * @param visitor
      */
-    abstract protected HtmlContinuation<U> copy(HtmlVisitor visitor);
+    protected abstract HtmlContinuation<U> copy(HtmlVisitor visitor);
 
 }
