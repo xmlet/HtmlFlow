@@ -91,10 +91,6 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
         return new Tr<>(this);
     }
 
-    public final Root<HtmlPage<T>> defineRoot(){
-        return new Root<>(this);
-    }
-
     /**
      * Returns a new instance of HtmlFlow with the same properties of this object
      * but with indented set to the value of isIndented parameter.
