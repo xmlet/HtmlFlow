@@ -48,11 +48,6 @@ public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuation
         super(isIndented, first);
     }
 
-    public HtmlViewVisitorStringBuilder(boolean isIndented, int depth, HtmlContinuation<Object> first) {
-        this(isIndented, first);
-        this.depth = depth;
-    }
-
     @Override
     public void write(String text) {
         sb.append(text);

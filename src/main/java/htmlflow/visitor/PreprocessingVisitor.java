@@ -104,10 +104,6 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         return first;
     }
 
-    public HtmlContinuation<Object> getLast() {
-        return last;
-    }
-
     @Override
     public void write(String text) {
         sb.append(text);

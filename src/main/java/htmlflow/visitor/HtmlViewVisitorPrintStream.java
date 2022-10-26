@@ -44,16 +44,6 @@ public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations<
         this.out = out;
     }
 
-    public HtmlViewVisitorPrintStream(
-        PrintStream out,
-        boolean isIndented,
-        int depth,
-        HtmlContinuation<Object> first)
-    {
-        this(out, isIndented, first);
-        this.depth = depth;
-    }
-
     @Override
     public void write(String text) {
         out.print(text);

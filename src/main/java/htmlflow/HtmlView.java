@@ -137,10 +137,6 @@ public class HtmlView<T> extends HtmlPage<T> {
         return getVisitor().finish(model);
     }
 
-    public String render(T model, HtmlView...partials) {
-        return getVisitor().finish(model, partials);
-    }
-
     @Override
     public void write() {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
@@ -149,10 +145,6 @@ public class HtmlView<T> extends HtmlPage<T> {
     @Override
     public void write(T model) {
         this.render(model);
-    }
-
-    public void write(T model, HtmlView...partials) {
-        this.render(model, partials);
     }
 
     /**
@@ -167,15 +159,6 @@ public class HtmlView<T> extends HtmlPage<T> {
         boolean threadSafe)
     {
         return new HtmlView<>(out, visitorSupplier, threadSafe);
-    }
-
-    /**
-     * Resulting in a non thread safe view.
-     * Receives an existent visitor.
-     * Usually for a parent view to share its visitor with a partial.
-     */
-    protected HtmlPage<T> clone(HtmlViewVisitor<T> visitor) {
-        return new HtmlView<>(out, () -> visitor, false);
     }
 
     /**
