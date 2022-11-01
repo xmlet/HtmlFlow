@@ -26,7 +26,6 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
-import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -61,7 +60,6 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
 
     static {
         podamFactory = new PodamFactoryImpl();
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
         podamFactory.getStrategy().addOrReplaceTypeManufacturer(Stream.class, new StreamFactory(podamFactory));
         podamFactory.getStrategy().addOrReplaceTypeManufacturer(Iterable.class, new IterableFactory(podamFactory));
     }

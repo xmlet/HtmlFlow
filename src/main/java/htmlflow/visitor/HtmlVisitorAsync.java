@@ -132,9 +132,9 @@ public class HtmlVisitorAsync<T> extends HtmlViewVisitor<T> implements TagsToPri
      * @see AsyncNode
      */
     @Override
-    public <E extends Element, T> OnPublisherCompletion visitAsync(Supplier<E> supplier, BiConsumer<E, Publisher<T>> consumer, Publisher<T> source) {
+    public <E extends Element, T> OnPublisherCompletion visitAsync(E supplier, BiConsumer<E, Publisher<T>> consumer, Publisher<T> source) {
         
-        Runnable asyncAction = () -> consumer.accept(supplier.get(), source);
+        Runnable asyncAction = () -> consumer.accept(supplier, source);
         
         final AsyncNode node = new AsyncNode(asyncAction);
         

@@ -1,15 +1,13 @@
 package htmlflow.test;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlView;
+import htmlflow.HtmlPage;
 import htmlflow.HtmlViewAsync;
 import htmlflow.test.model.AsyncModel;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.async.Thenable;
 import reactor.core.publisher.Flux;
 
 import java.io.ByteArrayOutputStream;
@@ -30,29 +28,43 @@ class TestAsyncView {
     @Test
     void given_async_work_when_create_view_and_render_it_twice_correctly() throws ExecutionException, InterruptedException {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem), this::testAsyncModel);
-        write_and_assert_asyncview(mem, view);
+    
+        final Publisher<Student> studentFlux = Flux.range(1, 5)
+                .delayElements(Duration.ofMillis(10))
+                .doOnNext(nr -> System.out.println(" ########################## Emit " + nr))
+                .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
+    
+        final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
+    
+        final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
+        
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
+                (page) -> this.testAsyncModel(page, asyncModel), Publisher.class, AsyncModel.class);
+        write_and_assert_asyncview(mem, view, asyncModel);
         mem.reset();
-        write_and_assert_asyncview(mem, view);
+        write_and_assert_asyncview(mem, view, asyncModel);
     }
     
     @Test
     void given_async_work_when_create_view_then_returns_thenable_and_prints_correct_html() throws ExecutionException, InterruptedException {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem), this::testAsyncModel);
-        write_and_assert_asyncview(mem, view);
-    }
     
-    void write_and_assert_asyncview(ByteArrayOutputStream mem, HtmlViewAsync<AsyncModel<String, Student>> view)
-            throws ExecutionException, InterruptedException {
         final Publisher<Student> studentFlux = Flux.range(1, 5)
                 .delayElements(Duration.ofMillis(10))
                 .doOnNext(nr -> System.out.println(" ########################## Emit " + nr))
                 .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
-        
+    
         final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
-        
+    
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
+        
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
+                (page) -> this.testAsyncModel(page, asyncModel), Publisher.class, AsyncModel.class);
+        write_and_assert_asyncview(mem, view, asyncModel);
+    }
+    
+    void write_and_assert_asyncview(ByteArrayOutputStream mem, HtmlViewAsync<AsyncModel<String, Student>> view, AsyncModel<String, Student> asyncModel)
+            throws ExecutionException, InterruptedException {
         
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
         
@@ -90,7 +102,7 @@ class TestAsyncView {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
         HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                this::testAsyncModel);
+                (page) -> this.testAsyncModel(page, asyncModel), Publisher.class, AsyncModel.class);
         
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
         
@@ -110,8 +122,8 @@ class TestAsyncView {
         assertFalse(actual.hasNext());
     }
     
-    void testAsyncModel(HtmlView<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
-        final Thenable<Element> thenable = view.html()
+    void testAsyncModel(HtmlPage<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
+        final HtmlPage<AsyncModel<String, Student>> thenable = view.html()
                 .body()
                 .div()
                 .p()
@@ -127,7 +139,7 @@ class TestAsyncView {
                                 .from(titlesObs)
                                 .doOnNext(nr -> tr.th().text(nr).__())
                                 .subscribe())
-                .then(tr -> tr.__().__().tbody())
+                .__().__().tbody()
                 .async(model.items,
                         (tbody, studentObs) -> Flux
                                 .from(studentObs)
@@ -140,7 +152,7 @@ class TestAsyncView {
                                         .__()
                                         .__())
                                 .subscribe())
-                .then(tr -> tr.__()
+                .__()
                         .__()
                         .__()
                         .div()
@@ -149,7 +161,7 @@ class TestAsyncView {
                         .__()
                         .__()
                         .__()
-                        .__());
+                        .__();
         
         assertNotNull(thenable);
     }

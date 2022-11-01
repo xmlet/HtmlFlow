@@ -66,13 +66,11 @@ class TestHtmlVisitorAsync {
         @Test
         void given_supplier_action_and_observable_when_first_call_to_visitAsync_then_add_node_and_set_running() {
             
-            Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
-            
             BiConsumer<Table<Body<Html<Element>>>, Publisher<String>> action = (table, obs) -> table.thead().text("text");
             
             final Flux<String> observable = Flux.fromStream(of("1", "2", "3"));
             
-            visitor.visitAsync(elem, action, observable);
+            visitor.visitAsync(baseElem, action, observable);
             observable.subscribe();
             
             assertNotNull(visitor.getFirst().getNext());
@@ -80,8 +78,6 @@ class TestHtmlVisitorAsync {
         
         @Test
         void given_supplier_action_and_observable_when_n_call_to_visitAsync_then_add_node_and_wait() {
-            
-            Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
             
             BiConsumer<Table<Body<Html<Element>>>, Publisher<String>> action = (table, obs) -> table.thead().text("text");
             
@@ -97,9 +93,9 @@ class TestHtmlVisitorAsync {
             
             
             // first call to trigger the logic
-            visitor.visitAsync(elem, action, delayer);
+            visitor.visitAsync(baseElem, action, delayer);
             
-            visitor.visitAsync(elem, action, sink.asFlux());
+            visitor.visitAsync(baseElem, action, sink.asFlux());
             
             assertNull(visitor.getFirst().getNext().getNext()); // size == 2
             assertNull(visitor.getLastNode().getNext());
@@ -111,7 +107,6 @@ class TestHtmlVisitorAsync {
             
             AtomicBoolean isSubscribed = new AtomicBoolean(false);
             
-            Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
             
             BiConsumer<Table<Body<Html<Element>>>, Publisher<String>> action = (table, obs) -> table.thead().text("text");
             
@@ -124,7 +119,7 @@ class TestHtmlVisitorAsync {
             Flux<String> observable = sink.asFlux().doOnSubscribe(__ -> isSubscribed.set(true));
             
             // first call to trigger the logic
-            final OnPublisherCompletion publisherCompletion = visitor.visitAsync(elem, action, observable);
+            final OnPublisherCompletion publisherCompletion = visitor.visitAsync(baseElem, action, observable);
             observable.subscribe();
             
             //creates new element
@@ -139,7 +134,7 @@ class TestHtmlVisitorAsync {
             
             BiConsumer<Div<Body<Html<Element>>>, Publisher<String>> divAction = (div, obs) -> div.text("new action");
             
-            visitor.visitAsync(() -> newElem, divAction, newSink.asFlux());
+            visitor.visitAsync(newElem, divAction, newSink.asFlux());
             
             //forces termination of previous
             observable.blockLast();
@@ -153,8 +148,6 @@ class TestHtmlVisitorAsync {
         void given_new_elem_and_first_then_call_when_call_visitThen_set_next_node_and_subscribe() {
             AtomicBoolean isSubscribed = new AtomicBoolean(false);
             
-            Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
-            
             BiConsumer<Table<Body<Html<Element>>>, Publisher<String>> action = (table, obs) -> table.thead().text("text");
             
             Sinks.Many<String> sink = Sinks.many().replay().all();
@@ -166,7 +159,7 @@ class TestHtmlVisitorAsync {
             Flux<String> flux = sink.asFlux().doOnSubscribe(__ -> isSubscribed.set(true));
             
             // first call to trigger the logic
-            visitor.visitAsync(elem, action, flux);
+            visitor.visitAsync(baseElem, action, flux);
             flux.subscribe();
             
             visitor.visitThen(() -> baseElem.__().div());
@@ -180,8 +173,6 @@ class TestHtmlVisitorAsync {
         
         @Test
         void given_new_elem_and_second_then_call_when_call_visitThen_set_next_node_and_read_state_when_ready() {
-            
-            Supplier<Table<Body<Html<Element>>>> elem = () -> baseElem;
             
             BiConsumer<Table<Body<Html<Element>>>, Publisher<String>> action = (table, obs) -> table.thead().text("text");
             BiConsumer<Div<Body<Html<Element>>>, Publisher<String>> secondAction = (div, obs) -> div.text("text");
@@ -210,14 +201,14 @@ class TestHtmlVisitorAsync {
             
             
             // first call to trigger the logic
-            final OnPublisherCompletion publisherCompletion = visitor.visitAsync(elem, action, delayer);
+            final OnPublisherCompletion publisherCompletion = visitor.visitAsync(baseElem, action, delayer);
             delayer.subscribe();
             
             final Div<Body<Html<Element>>> div = baseElem.__().div();
             visitor.visitThen(() -> div);
             
             //real logic
-            visitor.visitAsync(() -> div, secondAction, secondDelayer);
+            visitor.visitAsync(div, secondAction, secondDelayer);
             
             visitor.visitThen(() -> div.text("text").__());
             

@@ -50,7 +50,7 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     }
 
     @Override
-    public final <E extends Element, T> OnPublisherCompletion visitAsync(Supplier<E> element, BiConsumer<E, Publisher<T>> asyncAction, Publisher<T> obs) {
+    public final <E extends Element, T> OnPublisherCompletion visitAsync(E element, BiConsumer<E, Publisher<T>> asyncAction, Publisher<T> obs) {
         throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
     }
 
