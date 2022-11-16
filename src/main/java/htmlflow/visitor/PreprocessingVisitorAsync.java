@@ -94,10 +94,8 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         throw new UnsupportedOperationException();
     }
     
-    //TODO SWITCH TYPE TO THE GENERIC TYPE OF PUBLISHER
-    //TODO KEEP THE PUBLISHER FACTORY AND CREATE A MODEL WHEN WE ACCEPT THE HTMLBLOCK
     @Override
-    public <E extends Element, M, U> void visitAwait(Class<U> typeClass, E element, BiConsumer<E, Publisher<U>> asyncHtmlBlock,
+    public <E extends Element, M, U> void visitAwait(E element, BiConsumer<E, Publisher<U>> asyncHtmlBlock,
                                                   Function<M,Publisher<U>> modelToObs) {
         /**
          * Creates an HtmlContinuation for the async block.

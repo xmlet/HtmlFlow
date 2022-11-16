@@ -134,13 +134,13 @@ class TestAsyncView {
                 .table()
                 .thead()
                 .tr()
-                .<AsyncModel<String, Student>, String>await(String.class, model -> model.titles,
+                .<AsyncModel<String, Student>, String>await(model -> model.titles,
                         (tr, titlesObs) -> Flux
                                 .from(titlesObs)
                                 .doOnNext(nr -> tr.th().text(nr).__())
                                 .subscribe())
                 .__().__().tbody()
-                .<AsyncModel<String,Student>, Student>await(Student.class, model -> model.items,
+                .<AsyncModel<String,Student>, Student>await(model -> model.items,
                         (tbody, studentObs) -> Flux
                                 .from(studentObs)
                                 .doOnNext(student -> tbody.tr()
