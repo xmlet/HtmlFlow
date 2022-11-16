@@ -1,9 +1,10 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
+import htmlflow.async.PublisherOnCompleteHandlerProxy;
+import htmlflow.async.PublisherOnCompleteHandlerProxy.PublisherOnCompleteHandler;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -11,7 +12,9 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
+import static htmlflow.async.PublisherOnCompleteHandlerProxy.proxyPublisher;
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
 
@@ -26,11 +29,11 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     /**
      * The first node to be processed.
      */
-    private HtmlContinuation<T> first;
+    private HtmlContinuation first;
     /**
      * The last HtmlContinuation
      */
-    private HtmlContinuation<T> last;
+    private HtmlContinuation last;
     /**
      * Used create a mocked instance of the model to be passed to dynamic HTML blocks.
      */
@@ -40,12 +43,7 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
      */
     private final Type[] genericTypeArgs;
     
-    public static final PodamFactory podamFactory;
-    
-    static {
-        podamFactory = new PodamFactoryImpl();
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
-    }
+    public static final PodamFactory podamFactory = new PodamFactoryImpl();
     
     public PreprocessingVisitorAsync(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
         super(isIndented);
@@ -53,12 +51,12 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         this.genericTypeArgs = genericTypeArgs;
     }
     
-    public HtmlContinuation<T> getFirst() {
+    public HtmlContinuation getFirst() {
         return first;
     }
     
     
-    public HtmlContinuation<T> getLast() {
+    public HtmlContinuation getLast() {
         return last;
     }
     
@@ -96,18 +94,26 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         throw new UnsupportedOperationException();
     }
     
+    //TODO SWITCH TYPE TO THE GENERIC TYPE OF PUBLISHER
+    //TODO KEEP THE PUBLISHER FACTORY AND CREATE A MODEL WHEN WE ACCEPT THE HTMLBLOCK
     @Override
-    public <E extends Element, U> OnPublisherCompletion visitAsync(E element, BiConsumer<E, Publisher<U>> asyncHtmlBlock,
-                                                                   Publisher<U> source) {
+    public <E extends Element, M, U> void visitAwait(Class<U> typeClass, E element, BiConsumer<E, Publisher<U>> asyncHtmlBlock,
+                                                  Function<M,Publisher<U>> modelToObs) {
         /**
          * Creates an HtmlContinuation for the async block.
          */
         
-//        Runnable asyncAction = () -> asyncHtmlBlock.accept(element.get(), source);
+//        T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, typeClass);
+//
+//        final Publisher<U> source = obs.apply((M) model);
+//
+//        final PublisherOnCompleteHandler<U> proxy = proxyPublisher(source);
+//
+        HtmlContinuation<T> asyncCont = new HtmlContinuationAsync<>(depth, isClosed, element,
+                asyncHtmlBlock, this, (Function<T, Publisher<U>>) modelToObs,null);
     
-        HtmlContinuation<T> asyncCont =
-                new HtmlContinuationAsync<>(depth, isClosed, element, asyncHtmlBlock, this, source,null);
-        
+//        proxy.addOnCompleteHandler(() -> asyncCont.execute(source));
+    
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
@@ -116,15 +122,16 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         String staticHtml = sb.substring(staticBlockIndex);
         HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, asyncCont);
         if(first == null) first = staticCont; // on first visit initializes the first pointer
-        else setNext(last, staticCont);       // else append the staticCont to existing chain
+        
+        else {
+            setNext(last, staticCont);       // else append the staticCont to existing chain
+        }
         last = asyncCont;                   // advance last to point to the new asyncCont
         /**
          * We have to run dynamicContinuation to leave isClosed and indentation correct for
          * the next static HTML block.
          */
-        T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
-        return () -> asyncCont.execute((T) source);
     }
     
     @Override
@@ -153,14 +160,6 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
             try {
                 fieldNext.set(cont, next);
                 return next;
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-    
-        public static <Z> void resetFirst(HtmlContinuation<Z> first) {
-            try {
-                fieldFirst.set(first, null);
             } catch (IllegalAccessException e) {
                 throw new IllegalStateException(e);
             }

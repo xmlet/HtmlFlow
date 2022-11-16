@@ -1,11 +1,8 @@
 package htmlflow.visitor;
 
-import htmlflow.async.nodes.ContinuationNode;
-
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
 
-import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.resetFirst;
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
 /**
@@ -52,8 +49,14 @@ public class HtmlVisitorAsyncWithPreProcessor<T> extends HtmlViewVisitorContinua
         final CompletableFuture<Void> cf = new CompletableFuture<>();
         setNext(last, new HtmlContinuation<T>(-1, isClosed, this, null) {
             @Override
-            protected void emitHtml(Object model) {
-                resetFirst(first);
+            public void execute(T model) {
+                this.emitHtml(model);
+            }
+    
+            @Override
+            protected void emitHtml(T model) {
+                //TODO SEE IF IT'S STILL NEEDED
+                //resetFirst((HtmlContinuation<?>) first);
                 cf.complete(null);
             }
     

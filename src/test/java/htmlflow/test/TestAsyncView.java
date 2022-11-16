@@ -39,7 +39,7 @@ class TestAsyncView {
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
         HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                (page) -> this.testAsyncModel(page, asyncModel), Publisher.class, AsyncModel.class);
+                this::testAsyncModel, Publisher.class, AsyncModel.class);
         write_and_assert_asyncview(mem, view, asyncModel);
         mem.reset();
         write_and_assert_asyncview(mem, view, asyncModel);
@@ -59,7 +59,7 @@ class TestAsyncView {
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
         HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                (page) -> this.testAsyncModel(page, asyncModel), Publisher.class, AsyncModel.class);
+                this::testAsyncModel, AsyncModel.class, String.class, Student.class);
         write_and_assert_asyncview(mem, view, asyncModel);
     }
     
@@ -102,7 +102,7 @@ class TestAsyncView {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
         HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                (page) -> this.testAsyncModel(page, asyncModel), Publisher.class, AsyncModel.class);
+                this::testAsyncModel, Publisher.class, AsyncModel.class);
         
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
         
@@ -122,7 +122,7 @@ class TestAsyncView {
         assertFalse(actual.hasNext());
     }
     
-    void testAsyncModel(HtmlPage<AsyncModel<String, Student>> view, AsyncModel<String, Student> model) {
+    void testAsyncModel(HtmlPage<AsyncModel<String, Student>> view) {
         final HtmlPage<AsyncModel<String, Student>> thenable = view.html()
                 .body()
                 .div()
@@ -134,13 +134,13 @@ class TestAsyncView {
                 .table()
                 .thead()
                 .tr()
-                .async(model.titles,
+                .<AsyncModel<String, Student>, String>await(String.class, model -> model.titles,
                         (tr, titlesObs) -> Flux
                                 .from(titlesObs)
                                 .doOnNext(nr -> tr.th().text(nr).__())
                                 .subscribe())
                 .__().__().tbody()
-                .async(model.items,
+                .<AsyncModel<String,Student>, Student>await(Student.class, model -> model.items,
                         (tbody, studentObs) -> Flux
                                 .from(studentObs)
                                 .doOnNext(student -> tbody.tr()

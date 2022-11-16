@@ -38,7 +38,7 @@ public class HtmlDynamicChainTwiceOnTopgenius {
                                 tracks.forEach(track ->
                                     table
                                         .tr()
-                                            .td().<Object>dynamic((td, obj) -> td.text(count[0]++)).__()
+                                            .td().dynamic((td, obj) -> td.text(count[0]++)).__()
                                             .td()
                                                 .<Track>dynamic((td, trk) -> td
                                                     .a()

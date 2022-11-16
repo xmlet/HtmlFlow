@@ -61,7 +61,19 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
         this.element = element;
         this.consumer = consumer;
     }
-
+    
+    @Override
+    public void execute(U model) {
+        if (currentDepth >= 0) {
+            this.visitor.isClosed = isClosed;
+            this.visitor.depth = currentDepth;
+        }
+        emitHtml(model);
+        if (next != null) {
+            next.execute(model);
+        }
+    }
+    
     @Override
     protected void emitHtml(U model) {
         consumer.accept(element, model);

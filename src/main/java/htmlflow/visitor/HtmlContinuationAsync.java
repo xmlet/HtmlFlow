@@ -1,5 +1,6 @@
 package htmlflow.visitor;
 
+import htmlflow.async.PublisherOnCompleteHandlerProxy;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
@@ -7,6 +8,9 @@ import org.xmlet.htmlapifaster.ElementVisitor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+
+import static htmlflow.async.PublisherOnCompleteHandlerProxy.proxyPublisher;
 
 /**
  * @author Pedro Fialho
@@ -15,24 +19,42 @@ public class HtmlContinuationAsync<E extends Element, U, T> extends HtmlContinua
     
     private final E element;
     private final BiConsumer<E, Publisher<U>> consumer;
-    private final Publisher<U> source;
+    private final Function<T,Publisher<U>> modelToObs;
     
     HtmlContinuationAsync(int currentDepth,
                           boolean isClosed,
-                          E element, BiConsumer<E, Publisher<U>> consumer,
+                          E element,
+                          BiConsumer<E, Publisher<U>> consumer,
                           HtmlVisitor visitor,
-                          Publisher<U> source,
+                          Function<T,Publisher<U>> modelToObs,
                           HtmlContinuation<T> next) {
         super(currentDepth, isClosed, visitor, next);
         this.element = element;
         this.consumer = consumer;
-        this.source = source;
+        this.modelToObs = modelToObs;
+    }
+    
+    @Override
+    public void execute(T model) {
+        if (currentDepth >= 0) {
+            this.visitor.isClosed = isClosed;
+            this.visitor.depth = currentDepth;
+        }
+        emitHtml(model);
     }
     
     @Override
     protected void emitHtml(T model) {
-        this.consumer.accept(element, source);
+        Publisher<U> source = modelToObs.apply(model);
+    
+        final PublisherOnCompleteHandlerProxy.PublisherOnCompleteHandler<U> proxy = proxyPublisher(source);
+        proxy.addOnCompleteHandler(() -> this.next.execute(model));
+        
+        this.consumer.accept(element, proxy);
+        
+//        this.consumer.accept(element, source);
     }
+    
     
     @Override
     protected HtmlContinuation<T> copy(HtmlVisitor v) {
@@ -42,7 +64,7 @@ public class HtmlContinuationAsync<E extends Element, U, T> extends HtmlContinua
                 copyElement(v),
                 consumer,
                 v,
-                this.source,
+                modelToObs,
                 next != null ? next.copy(v) : null); // call copy recursively
     }
     

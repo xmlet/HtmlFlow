@@ -28,7 +28,6 @@ import htmlflow.visitor.HtmlDocVisitorPrintStream;
 import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
-import htmlflow.visitor.HtmlVisitorAsync;
 import htmlflow.visitor.HtmlVisitorAsyncWithPreProcessor;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
