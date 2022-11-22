@@ -28,7 +28,7 @@ import htmlflow.visitor.HtmlDocVisitorPrintStream;
 import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
-import htmlflow.visitor.HtmlVisitorAsyncWithPreProcessor;
+import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
 
@@ -160,7 +160,7 @@ public class HtmlFlow {
         PreprocessingVisitorAsync<U> pre = preprocessingAsync(template, modelClass, genericTypeArgs);
         return new HtmlViewAsync<>(
                 out,
-                () -> new HtmlVisitorAsyncWithPreProcessor<>(out, true, pre.getFirst(), pre.getLast()),
+                () -> new HtmlViewVisitorAsync<>(out, true, pre.getFirst(), pre.getLast(), pre.getCf()),
                 false);
     }
 }

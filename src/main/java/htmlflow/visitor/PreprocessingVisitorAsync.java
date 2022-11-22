@@ -11,8 +11,11 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static htmlflow.async.PublisherOnCompleteHandlerProxy.proxyPublisher;
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
@@ -43,7 +46,14 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
      */
     private final Type[] genericTypeArgs;
     
-    public static final PodamFactory podamFactory = new PodamFactoryImpl();
+    public static final PodamFactory podamFactory;
+    
+    static {
+        podamFactory = new PodamFactoryImpl();
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
+    }
+    
+    private final CompletableFuture<Void> cf = new CompletableFuture<>();
     
     public PreprocessingVisitorAsync(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
         super(isIndented);
@@ -60,18 +70,41 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         return last;
     }
     
+    public CompletableFuture<Void> getCf() {
+        return cf;
+    }
+    
     @Override
     public String finish(T model, HtmlView... partials) {
+        this.finishAsync();
+        return null;
+    }
+    
+    public void finishAsync() {
+        HtmlContinuation<T> cfContinuation  = new HtmlContinuation<T>(-1, isClosed, this, null) {
+            @Override
+            public void execute(T model) {
+                this.emitHtml(model);
+            }
+        
+            @Override
+            protected void emitHtml(T model) {
+                //TODO SEE IF IT'S STILL NEEDED
+                //resetFirst((HtmlContinuation<?>) first);
+                cf.complete(null);
+            }
+        
+            @Override
+            protected HtmlContinuation<T> copy(HtmlVisitor visitor) {
+                return this;
+            }
+        };
+        
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, null);
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, cfContinuation);
         last = first == null
                 ? first = staticCont         // assign both first and last
                 : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
-        /**
-         * We are just collecting static HTML blocks and the resulting HTML should be ignored.
-         * Intentionally return null to force a NullPointerException if someone intend to use this result.
-         */
-        return null;
     }
     
     @Override
@@ -95,22 +128,16 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     }
     
     @Override
-    public <E extends Element, M, U> void visitAwait(E element, BiConsumer<E, Publisher<U>> asyncHtmlBlock,
+    public <E extends Element, M, U> void visitAwait(E element, Class<U> clazz, BiConsumer<E, Publisher<U>> asyncHtmlBlock,
                                                   Function<M,Publisher<U>> modelToObs) {
         /**
          * Creates an HtmlContinuation for the async block.
          */
         
-//        T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, typeClass);
-//
-//        final Publisher<U> source = obs.apply((M) model);
-//
-//        final PublisherOnCompleteHandler<U> proxy = proxyPublisher(source);
-//
+        T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
+        
         HtmlContinuation<T> asyncCont = new HtmlContinuationAsync<>(depth, isClosed, element,
                 asyncHtmlBlock, this, (Function<T, Publisher<U>>) modelToObs,null);
-    
-//        proxy.addOnCompleteHandler(() -> asyncCont.execute(source));
     
         /**
          * We are resolving this view for the first time.
@@ -126,9 +153,11 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         }
         last = asyncCont;                   // advance last to point to the new asyncCont
         /**
-         * We have to run dynamicContinuation to leave isClosed and indentation correct for
+         * We have to run asyncCont to leave isClosed and indentation correct for
          * the next static HTML block.
          */
+        asyncCont.execute(model);
+        
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
     }
     

@@ -26,7 +26,7 @@ package htmlflow;
 
 import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlVisitor;
-import htmlflow.visitor.HtmlVisitorAsyncWithPreProcessor;
+import htmlflow.visitor.HtmlViewVisitorAsync;
 
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
@@ -91,11 +91,11 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
     public final CompletableFuture<Void> writeAsync(T model) {
         final HtmlVisitor localVisitor = this.getVisitor();
         
-        if (!(localVisitor instanceof HtmlVisitorAsyncWithPreProcessor)) {
+        if (!(localVisitor instanceof HtmlViewVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
         }
         
-        HtmlVisitorAsyncWithPreProcessor<T> visitorAsync = (HtmlVisitorAsyncWithPreProcessor<T>) localVisitor;
+        HtmlViewVisitorAsync<T> visitorAsync = (HtmlViewVisitorAsync<T>) localVisitor;
         /**
          * 1st run binder to create AsyncNode linked instances.
          * 2nd finishedAsync() to register a CompletableFuture on completion of last AsyncNode

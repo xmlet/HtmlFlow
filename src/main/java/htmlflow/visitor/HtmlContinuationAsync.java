@@ -1,6 +1,7 @@
 package htmlflow.visitor;
 
 import htmlflow.async.PublisherOnCompleteHandlerProxy;
+import htmlflow.async.PublisherOnCompleteHandlerProxy.PublisherOnCompleteHandler;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
@@ -40,6 +41,7 @@ public class HtmlContinuationAsync<E extends Element, U, T> extends HtmlContinua
             this.visitor.isClosed = isClosed;
             this.visitor.depth = currentDepth;
         }
+        
         emitHtml(model);
     }
     
@@ -48,11 +50,13 @@ public class HtmlContinuationAsync<E extends Element, U, T> extends HtmlContinua
         Publisher<U> source = modelToObs.apply(model);
     
         final PublisherOnCompleteHandlerProxy.PublisherOnCompleteHandler<U> proxy = proxyPublisher(source);
-        proxy.addOnCompleteHandler(() -> this.next.execute(model));
+        proxy.addOnCompleteHandler(() -> {
+            if (this.next != null) {
+                this.next.execute(model);
+            }
+        });
         
         this.consumer.accept(element, proxy);
-        
-//        this.consumer.accept(element, source);
     }
     
     

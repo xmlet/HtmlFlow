@@ -4,6 +4,7 @@ import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
 import htmlflow.HtmlViewAsync;
 import htmlflow.test.model.AsyncModel;
+import htmlflow.test.model.Student;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -134,21 +135,21 @@ class TestAsyncView {
                 .table()
                 .thead()
                 .tr()
-                .<AsyncModel<String, Student>, String>await(model -> model.titles,
+                .<AsyncModel<String, Student>, String>await(String.class, model -> model.titles,
                         (tr, titlesObs) -> Flux
                                 .from(titlesObs)
                                 .doOnNext(nr -> tr.th().text(nr).__())
                                 .subscribe())
                 .__().__().tbody()
-                .<AsyncModel<String,Student>, Student>await(model -> model.items,
+                .<AsyncModel<String, Student>, Student>await(Student.class, model -> model.items,
                         (tbody, studentObs) -> Flux
                                 .from(studentObs)
                                 .doOnNext(student -> tbody.tr()
                                         .th()
-                                        .text(student.nr)
+                                        .text(student.getNr())
                                         .__()
                                         .td()
-                                        .text(student.name)
+                                        .text(student.getName())
                                         .__()
                                         .__())
                                 .subscribe())
@@ -169,20 +170,5 @@ class TestAsyncView {
     private String randomNameGenerator(int nr) {
         String[] names = new String[]{"Pedro", "Manuel", "Maria", "Clara", "Rafael"};
         return names[nr - 1];
-    }
-    
-    private static class Student {
-        private final long nr;
-        private final String name;
-        
-        private Student(long nr, String name) {
-            this.nr = nr;
-            this.name = name;
-        }
-        
-        @Override
-        public String toString() {
-            return String.format("Student nr " + nr + " with name " + name);
-        }
     }
 }

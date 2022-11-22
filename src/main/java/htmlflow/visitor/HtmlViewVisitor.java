@@ -48,7 +48,7 @@ public abstract class HtmlViewVisitor<T> extends HtmlVisitor {
     }
 
     @Override
-    public <E extends Element, M, U> void visitAwait(E element, BiConsumer<E, Publisher<U>> asyncAction,
+    public <E extends Element, M, U> void visitAwait(E element, Class<U> clazz, BiConsumer<E, Publisher<U>> asyncAction,
                                                   Function<M,Publisher<U>> obs) {
         throw new IllegalStateException("Wrong use of async() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
     }
