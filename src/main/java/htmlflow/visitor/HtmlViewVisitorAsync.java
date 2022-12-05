@@ -9,14 +9,11 @@ import java.util.concurrent.CompletableFuture;
 public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> implements TagsToPrintStream {
     
     private final PrintStream out;
-    private final HtmlContinuation<T> last;
     private final CompletableFuture<Void> cf;
     
-    public HtmlViewVisitorAsync(PrintStream out, boolean isIndented, HtmlContinuation<T> first,
-                                HtmlContinuation<T> last, CompletableFuture<Void> cf) {
+    public HtmlViewVisitorAsync(PrintStream out, boolean isIndented, HtmlContinuation<T> first, CompletableFuture<Void> cf) {
         super(isIndented, first);
         this.out = out;
-        this.last = last;
         this.cf = cf;
     }
     
@@ -37,7 +34,7 @@ public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> imp
     
     @Override
     public HtmlVisitor clone(PrintStream out, boolean isIndented) {
-        return new HtmlViewVisitorAsync<>(out, isIndented, first, last, cf);
+        return new HtmlViewVisitorAsync<>(out, isIndented, first, cf);
     }
     
     @Override

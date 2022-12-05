@@ -1,8 +1,6 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
-import htmlflow.async.PublisherOnCompleteHandlerProxy;
-import htmlflow.async.PublisherOnCompleteHandlerProxy.PublisherOnCompleteHandler;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -11,13 +9,10 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
-import static htmlflow.async.PublisherOnCompleteHandlerProxy.proxyPublisher;
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
 
@@ -65,11 +60,6 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         return first;
     }
     
-    
-    public HtmlContinuation getLast() {
-        return last;
-    }
-    
     public CompletableFuture<Void> getCf() {
         return cf;
     }
@@ -89,8 +79,8 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         
             @Override
             protected void emitHtml(T model) {
-                //TODO SEE IF IT'S STILL NEEDED
-                //resetFirst((HtmlContinuation<?>) first);
+                PreprocessingVisitorAsync.this.isClosed = true;
+                PreprocessingVisitorAsync.this.depth = -1;
                 cf.complete(null);
             }
         
@@ -133,11 +123,12 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         /**
          * Creates an HtmlContinuation for the async block.
          */
-        
-        T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
+    
+        HtmlContinuationCloseAndIndent<T> closeAndIndent =
+                new HtmlContinuationCloseAndIndent<>(depth, isClosed, this, null);
         
         HtmlContinuation<T> asyncCont = new HtmlContinuationAsync<>(depth, isClosed, element,
-                asyncHtmlBlock, this, (Function<T, Publisher<U>>) modelToObs,null);
+                asyncHtmlBlock, this, (Function<T, Publisher<U>>) modelToObs, closeAndIndent);
     
         /**
          * We are resolving this view for the first time.
@@ -156,8 +147,7 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
          * We have to run asyncCont to leave isClosed and indentation correct for
          * the next static HTML block.
          */
-        asyncCont.execute(model);
-        
+        newlineAndIndent();
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
     }
     
@@ -172,17 +162,15 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         }
         
         static final Field fieldNext;
-        static final Field fieldFirst;
         static {
             try {
                 fieldNext = HtmlContinuation.class.getDeclaredField("next");
-                fieldFirst = PreprocessingVisitorAsync.class.getDeclaredField("first");
                 fieldNext.setAccessible(true);
-                fieldFirst.setAccessible(true);
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
         }
+        
         public static <Z> HtmlContinuation<Z> setNext(HtmlContinuation<Z> cont, HtmlContinuation<Z> next) {
             try {
                 fieldNext.set(cont, next);

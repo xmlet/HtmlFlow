@@ -160,7 +160,7 @@ public class HtmlFlow {
         PreprocessingVisitorAsync<U> pre = preprocessingAsync(template, modelClass, genericTypeArgs);
         return new HtmlViewAsync<>(
                 out,
-                () -> new HtmlViewVisitorAsync<>(out, true, pre.getFirst(), pre.getLast(), pre.getCf()),
+                () -> new HtmlViewVisitorAsync<>(out, true, pre.getFirst(), pre.getCf()),
                 false);
     }
 }
