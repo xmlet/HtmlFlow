@@ -63,6 +63,7 @@ public class HtmlDoc extends HtmlPage<Object> {
         return new Html<>(this);
     }
 
+    //TODO remove finish and delete not needed related classes
     @Override
     public final String render() {
         return getVisitor().finish();

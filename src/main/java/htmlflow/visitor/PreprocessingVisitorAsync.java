@@ -1,8 +1,10 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
+import htmlflow.async.TerminationHtmlContinuationNode;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.OnCompletion;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -11,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
@@ -47,9 +48,7 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         podamFactory = new PodamFactoryImpl();
         podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
     }
-    
-    private final CompletableFuture<Void> cf = new CompletableFuture<>();
-    
+
     public PreprocessingVisitorAsync(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
         super(isIndented);
         this.modelClass = modelClass;
@@ -59,11 +58,7 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     public HtmlContinuation getFirst() {
         return first;
     }
-    
-    public CompletableFuture<Void> getCf() {
-        return cf;
-    }
-    
+
     @Override
     public String finish(T model, HtmlView... partials) {
         this.finishAsync();
@@ -71,30 +66,18 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     }
     
     public void finishAsync() {
-        HtmlContinuation<T> cfContinuation  = new HtmlContinuation<T>(-1, isClosed, this, null) {
-            @Override
-            public void execute(T model) {
-                this.emitHtml(model);
-            }
-        
-            @Override
-            protected void emitHtml(T model) {
-                PreprocessingVisitorAsync.this.isClosed = true;
-                PreprocessingVisitorAsync.this.depth = -1;
-                cf.complete(null);
-            }
-        
-            @Override
-            protected HtmlContinuation<T> copy(HtmlVisitor visitor) {
-                return this;
-            }
-        };
-        
+        TerminationHtmlContinuationNode<T> terminationNode = new TerminationHtmlContinuationNode<>(this);
+
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, cfContinuation);
-        last = first == null
-                ? first = staticCont         // assign both first and last
-                : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, terminationNode);
+
+        if (first == null) {
+            last = first = staticCont; // assign both first and last
+        } else {
+            setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
+
+            last = terminationNode; // set last as the termination node
+        }
     }
     
     @Override
@@ -118,17 +101,16 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     }
     
     @Override
-    public <E extends Element, M, U> void visitAwait(E element, Class<U> clazz, BiConsumer<E, Publisher<U>> asyncHtmlBlock,
-                                                  Function<M,Publisher<U>> modelToObs) {
+    public <E extends Element> void visitAwait(E element, BiConsumer<E, OnCompletion> asyncHtmlBlock) {
         /**
          * Creates an HtmlContinuation for the async block.
          */
     
         HtmlContinuationCloseAndIndent<T> closeAndIndent =
-                new HtmlContinuationCloseAndIndent<>(depth, isClosed, this, null);
+                new HtmlContinuationCloseAndIndent<>(this);
         
         HtmlContinuation<T> asyncCont = new HtmlContinuationAsync<>(depth, isClosed, element,
-                asyncHtmlBlock, this, (Function<T, Publisher<U>>) modelToObs, closeAndIndent);
+                asyncHtmlBlock, this, closeAndIndent);
     
         /**
          * We are resolving this view for the first time.
@@ -136,13 +118,14 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
          * which will be followed by the asyncCont.
          */
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, asyncCont);
+        String staticHtmlTrimmed = staticHtml.trim();
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtmlTrimmed, this, asyncCont);
         if(first == null) first = staticCont; // on first visit initializes the first pointer
         
         else {
             setNext(last, staticCont);       // else append the staticCont to existing chain
         }
-        last = asyncCont;                   // advance last to point to the new asyncCont
+        last = asyncCont.next;                   // advance last to point to the new asyncCont
         /**
          * We have to run asyncCont to leave isClosed and indentation correct for
          * the next static HTML block.
@@ -155,17 +138,21 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     public StringBuilder sb() {
         return this.sb;
     }
-    
+
+
     @SuppressWarnings({"squid:S3011", "squid:S112"})
     public static class HtmlContinuationSetter {
         private HtmlContinuationSetter() {
         }
         
         static final Field fieldNext;
+        static final Field fieldCf;
         static {
             try {
                 fieldNext = HtmlContinuation.class.getDeclaredField("next");
                 fieldNext.setAccessible(true);
+                fieldCf = TerminationHtmlContinuationNode.class.getDeclaredField("cf");
+                fieldCf.setAccessible(true);
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
@@ -175,6 +162,15 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
             try {
                 fieldNext.set(cont, next);
                 return next;
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        public static <Z> TerminationHtmlContinuationNode<Z> setCf(TerminationHtmlContinuationNode<Z> cont, CompletableFuture<Void> cf) {
+            try {
+                fieldCf.set(cont, cf);
+                return cont;
             } catch (IllegalAccessException e) {
                 throw new IllegalStateException(e);
             }

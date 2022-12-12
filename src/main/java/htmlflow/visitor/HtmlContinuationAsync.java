@@ -1,38 +1,31 @@
 package htmlflow.visitor;
 
-import htmlflow.async.PublisherOnCompleteHandlerProxy;
-import htmlflow.async.PublisherOnCompleteHandlerProxy.PublisherOnCompleteHandler;
-import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
+import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-import static htmlflow.async.PublisherOnCompleteHandlerProxy.proxyPublisher;
 
 /**
  * @author Pedro Fialho
  **/
-public class HtmlContinuationAsync<E extends Element, U, T> extends HtmlContinuation<T> {
+public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuation<T> {
     
     private final E element;
-    private final BiConsumer<E, Publisher<U>> consumer;
-    private final Function<T,Publisher<U>> modelToObs;
-    
+    private final BiConsumer<E, OnCompletion> consumer;
+
     HtmlContinuationAsync(int currentDepth,
                           boolean isClosed,
                           E element,
-                          BiConsumer<E, Publisher<U>> consumer,
+                          BiConsumer<E, OnCompletion> consumer,
                           HtmlVisitor visitor,
-                          Function<T,Publisher<U>> modelToObs,
                           HtmlContinuation<T> next) {
         super(currentDepth, isClosed, visitor, next);
         this.element = element;
         this.consumer = consumer;
-        this.modelToObs = modelToObs;
     }
     
     @Override
@@ -47,16 +40,11 @@ public class HtmlContinuationAsync<E extends Element, U, T> extends HtmlContinua
     
     @Override
     protected void emitHtml(T model) {
-        Publisher<U> source = modelToObs.apply(model);
-    
-        final PublisherOnCompleteHandlerProxy.PublisherOnCompleteHandler<U> proxy = proxyPublisher(source);
-        proxy.addOnCompleteHandler(() -> {
-            if (this.next != null) {
-                this.next.execute(model);
+        this.consumer.accept(element, () -> {
+            if (next != null) {
+                next.execute(model);
             }
         });
-        
-        this.consumer.accept(element, proxy);
     }
     
     
@@ -68,7 +56,6 @@ public class HtmlContinuationAsync<E extends Element, U, T> extends HtmlContinua
                 copyElement(v),
                 consumer,
                 v,
-                modelToObs,
                 next != null ? next.copy(v) : null); // call copy recursively
     }
     

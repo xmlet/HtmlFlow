@@ -1,7 +1,11 @@
 package htmlflow.visitor;
 
+import htmlflow.async.TerminationHtmlContinuationNode;
+
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
+
+import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setCf;
 
 /**
  * @author Pedro Fialho
@@ -9,12 +13,10 @@ import java.util.concurrent.CompletableFuture;
 public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> implements TagsToPrintStream {
     
     private final PrintStream out;
-    private final CompletableFuture<Void> cf;
-    
-    public HtmlViewVisitorAsync(PrintStream out, boolean isIndented, HtmlContinuation<T> first, CompletableFuture<Void> cf) {
+
+    public HtmlViewVisitorAsync(PrintStream out, boolean isIndented, HtmlContinuation<T> first) {
         super(isIndented, first);
         this.out = out;
-        this.cf = cf;
     }
     
     @Override
@@ -34,7 +36,7 @@ public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> imp
     
     @Override
     public HtmlVisitor clone(PrintStream out, boolean isIndented) {
-        return new HtmlViewVisitorAsync<>(out, isIndented, first, cf);
+        return new HtmlViewVisitorAsync<>(out, isIndented, first.copy(this));
     }
     
     @Override
@@ -43,7 +45,25 @@ public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> imp
     }
     
     public CompletableFuture<Void> finishedAsync(T model) {
+
+        TerminationHtmlContinuationNode<T> terminationNode = findLast();
+
+        if (terminationNode.getCf().isDone()) {
+            terminationNode = setCf(terminationNode, new CompletableFuture<>());
+        }
+
         this.first.execute(model);
-        return cf;
+
+        return terminationNode.getCf();
+    }
+
+    private TerminationHtmlContinuationNode<T> findLast() {
+        HtmlContinuation<T> node = this.first;
+
+        while (node.next != null){
+            node = node.next;
+        }
+
+        return (TerminationHtmlContinuationNode<T>) node;
     }
 }

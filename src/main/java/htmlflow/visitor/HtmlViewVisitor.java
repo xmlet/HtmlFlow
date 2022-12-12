@@ -27,6 +27,7 @@ package htmlflow.visitor;
 import htmlflow.HtmlView;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -48,8 +49,7 @@ public abstract class HtmlViewVisitor<T> extends HtmlVisitor {
     }
 
     @Override
-    public <E extends Element, M, U> void visitAwait(E element, Class<U> clazz, BiConsumer<E, Publisher<U>> asyncAction,
-                                                  Function<M,Publisher<U>> obs) {
+    public <E extends Element> void visitAwait(E element, BiConsumer<E, OnCompletion> asyncAction) {
         throw new IllegalStateException("Wrong use of async() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
     }
 

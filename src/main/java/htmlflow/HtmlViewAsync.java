@@ -96,11 +96,7 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
         }
         
         HtmlViewVisitorAsync<T> visitorAsync = (HtmlViewVisitorAsync<T>) localVisitor;
-        /**
-         * 1st run binder to create AsyncNode linked instances.
-         * 2nd finishedAsync() to register a CompletableFuture on completion of last AsyncNode
-         * 3rd Call execute() on first AsyncNode that will propagate execute() to the next node and henceforward.
-         */
+
         return visitorAsync.finishedAsync(model);
     }
 }
