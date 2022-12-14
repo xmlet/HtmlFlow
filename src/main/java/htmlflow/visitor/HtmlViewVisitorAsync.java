@@ -13,6 +13,7 @@ import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.
 public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> implements TagsToPrintStream {
     
     private final PrintStream out;
+
     /**
      * The last node to be processed.
      */
@@ -70,9 +71,11 @@ public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> imp
 
     private HtmlContinuation<T> findLast() {
         HtmlContinuation<T> node = this.first;
+
         while (node.next != null){
             node = node.next;
         }
+
         return node;
     }
 }

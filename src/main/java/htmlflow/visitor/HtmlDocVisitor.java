@@ -25,9 +25,11 @@
 package htmlflow.visitor;
 
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
 import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -48,7 +50,7 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     }
 
     @Override
-    public final <E extends Element> void visitAwait(E element, BiConsumer<E, OnCompletion> asyncAction) {
+    public final <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
         throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
     }
 

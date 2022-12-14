@@ -69,12 +69,8 @@ public class HtmlFlow {
         return pre;
     }
     
-    private static <U> PreprocessingVisitorAsync<U> preprocessingAsync(
-            HtmlTemplate<U> template,
-            Class<?> modelClass,
-            Type... genericTypeArgs
-    ) {
-        PreprocessingVisitorAsync<U> pre = new PreprocessingVisitorAsync<>(true, modelClass, genericTypeArgs);
+    private static <U> PreprocessingVisitorAsync<U> preprocessingAsync(HtmlTemplate<U> template) {
+        PreprocessingVisitorAsync<U> pre = new PreprocessingVisitorAsync<>(true);
         HtmlView<U> preView = new HtmlView<>(null, () -> pre, false);
         template.resolve(preView);
         /**
@@ -153,11 +149,9 @@ public class HtmlFlow {
      */
     public static <U> HtmlViewAsync<U> viewAsync(
             PrintStream out,
-            HtmlTemplate<U> template,
-            Class<?> modelClass,
-            Type... genericTypeArgs
+            HtmlTemplate<U> template
     ){
-        PreprocessingVisitorAsync<U> pre = preprocessingAsync(template, modelClass, genericTypeArgs);
+        PreprocessingVisitorAsync<U> pre = preprocessingAsync(template);
         return new HtmlViewAsync<>(
                 out,
                 () -> new HtmlViewVisitorAsync<>(out, true, pre.getFirst()),

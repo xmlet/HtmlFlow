@@ -17,13 +17,16 @@ public class TerminationHtmlContinuationNode<T> extends HtmlContinuation<T> {
         this.cf = cf;
     }
 
-    @Override
     public void execute(T model) {
         cf.complete(null);
     }
 
     @Override
-    protected void emitHtml(T model) { /* nothing to emit */}
+    public void emitHtml(T model) {
+        /*
+        nothing to emit
+         */
+    }
 
     @Override
     protected TerminationHtmlContinuationNode<T> copy(HtmlVisitor visitor) {

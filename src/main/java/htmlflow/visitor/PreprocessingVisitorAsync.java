@@ -1,13 +1,18 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
+import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
 import org.xmlet.htmlapifaster.async.OnCompletion;
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
@@ -28,19 +33,16 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
      * The last HtmlContinuation
      */
     private HtmlContinuation last;
-    /**
-     * Used create a mocked instance of the model to be passed to dynamic HTML blocks.
-     */
-    private final Class<?> modelClass;
-    /**
-     * Generic type arguments of the Model.
-     */
-    private final Type[] genericTypeArgs;
     
-    public PreprocessingVisitorAsync(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
+    public static final PodamFactory podamFactory;
+    
+    static {
+        podamFactory = new PodamFactoryImpl();
+        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
+    }
+
+    public PreprocessingVisitorAsync(boolean isIndented) {
         super(isIndented);
-        this.modelClass = modelClass;
-        this.genericTypeArgs = genericTypeArgs;
     }
     
     public HtmlContinuation getFirst() {
@@ -85,7 +87,7 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     }
     
     @Override
-    public <E extends Element> void visitAwait(E element, BiConsumer<E, OnCompletion> asyncHtmlBlock) {
+    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E, M> asyncHtmlBlock) {
         /**
          * Creates an HtmlContinuation for the async block.
          */
@@ -94,7 +96,7 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
                 new HtmlContinuationCloseAndIndent<>(this);
         
         HtmlContinuation<T> asyncCont = new HtmlContinuationAsync<>(depth, isClosed, element,
-                asyncHtmlBlock, this, closeAndIndent);
+                (AwaitConsumer<E, T>) asyncHtmlBlock, this, closeAndIndent);
     
         /**
          * We are resolving this view for the first time.
@@ -147,6 +149,5 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
                 throw new IllegalStateException(e);
             }
         }
-
     }
 }

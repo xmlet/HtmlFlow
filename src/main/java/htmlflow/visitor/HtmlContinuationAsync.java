@@ -2,11 +2,12 @@ package htmlflow.visitor;
 
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
 import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 
 /**
@@ -15,12 +16,12 @@ import java.util.function.BiConsumer;
 public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuation<T> {
     
     private final E element;
-    private final BiConsumer<E, OnCompletion> consumer;
+    private final AwaitConsumer<E,T> consumer;
 
     HtmlContinuationAsync(int currentDepth,
                           boolean isClosed,
                           E element,
-                          BiConsumer<E, OnCompletion> consumer,
+                          AwaitConsumer<E,T> consumer,
                           HtmlVisitor visitor,
                           HtmlContinuation<T> next) {
         super(currentDepth, isClosed, visitor, next);
@@ -40,7 +41,7 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
     
     @Override
     protected void emitHtml(T model) {
-        this.consumer.accept(element, () -> {
+        this.consumer.accept(element, model, () -> {
             if (next != null) {
                 next.execute(model);
             }
