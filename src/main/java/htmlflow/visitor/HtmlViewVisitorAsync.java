@@ -5,7 +5,7 @@ import htmlflow.async.TerminationHtmlContinuationNode;
 import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
 
-import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setCf;
+import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
 /**
  * @author Pedro Fialho
@@ -13,9 +13,14 @@ import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.
 public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> implements TagsToPrintStream {
     
     private final PrintStream out;
+    /**
+     * The last node to be processed.
+     */
+    protected final HtmlContinuation<T> last;
 
     public HtmlViewVisitorAsync(PrintStream out, boolean isIndented, HtmlContinuation<T> first) {
         super(isIndented, first);
+        this.last = findLast();
         this.out = out;
     }
     
@@ -45,25 +50,29 @@ public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> imp
     }
     
     public CompletableFuture<Void> finishedAsync(T model) {
-
-        TerminationHtmlContinuationNode<T> terminationNode = findLast();
-
-        if (terminationNode.getCf().isDone()) {
-            terminationNode = setCf(terminationNode, new CompletableFuture<>());
-        }
-
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        TerminationHtmlContinuationNode<T> terminationNode = new TerminationHtmlContinuationNode<>(cf);
+        /**
+         * Chain terminationNode next to the last node.
+         * Keep last pointing to the same node to replace the terminationNode on
+         * others render async.
+         */
+        setNext(last, terminationNode);
+        /**
+         * Initializes render on first node.
+         */
         this.first.execute(model);
-
-        return terminationNode.getCf();
+        /**
+         * Returns CF from terminationNode.
+         */
+        return cf;
     }
 
-    private TerminationHtmlContinuationNode<T> findLast() {
+    private HtmlContinuation<T> findLast() {
         HtmlContinuation<T> node = this.first;
-
         while (node.next != null){
             node = node.next;
         }
-
-        return (TerminationHtmlContinuationNode<T>) node;
+        return node;
     }
 }

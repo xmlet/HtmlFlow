@@ -1,17 +1,12 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
-import htmlflow.async.TerminationHtmlContinuationNode;
-import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.OnCompletion;
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
@@ -42,13 +37,6 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
      */
     private final Type[] genericTypeArgs;
     
-    public static final PodamFactory podamFactory;
-    
-    static {
-        podamFactory = new PodamFactoryImpl();
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
-    }
-
     public PreprocessingVisitorAsync(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
         super(isIndented);
         this.modelClass = modelClass;
@@ -66,17 +54,13 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     }
     
     public void finishAsync() {
-        TerminationHtmlContinuationNode<T> terminationNode = new TerminationHtmlContinuationNode<>(this);
-
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, terminationNode);
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, null);
 
         if (first == null) {
             last = first = staticCont; // assign both first and last
         } else {
-            setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
-
-            last = terminationNode; // set last as the termination node
+            last = setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
         }
     }
     
@@ -146,13 +130,10 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
         }
         
         static final Field fieldNext;
-        static final Field fieldCf;
         static {
             try {
                 fieldNext = HtmlContinuation.class.getDeclaredField("next");
                 fieldNext.setAccessible(true);
-                fieldCf = TerminationHtmlContinuationNode.class.getDeclaredField("cf");
-                fieldCf.setAccessible(true);
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
@@ -167,13 +148,5 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
             }
         }
 
-        public static <Z> TerminationHtmlContinuationNode<Z> setCf(TerminationHtmlContinuationNode<Z> cont, CompletableFuture<Void> cf) {
-            try {
-                fieldCf.set(cont, cf);
-                return cont;
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
-        }
     }
 }

@@ -10,28 +10,23 @@ import java.util.concurrent.CompletableFuture;
  **/
 public class TerminationHtmlContinuationNode<T> extends HtmlContinuation<T> {
 
-    private final CompletableFuture<Void> cf = new CompletableFuture<>();
+    private final CompletableFuture<Void> cf;
 
-    public TerminationHtmlContinuationNode(HtmlVisitor visitor) {
-        super(-1, false, visitor, null);
-    }
-
-    public void execute(T model) {
-        this.emitHtml(model);
+    public TerminationHtmlContinuationNode(CompletableFuture<Void> cf) {
+        super(-1, false, null, null);
+        this.cf = cf;
     }
 
     @Override
-    protected void emitHtml(T model) {
+    public void execute(T model) {
         cf.complete(null);
     }
 
-    public CompletableFuture<Void> getCf() {
-        return cf;
-    }
+    @Override
+    protected void emitHtml(T model) { /* nothing to emit */}
 
     @Override
     protected TerminationHtmlContinuationNode<T> copy(HtmlVisitor visitor) {
-        return new TerminationHtmlContinuationNode<>(
-                visitor);
+        throw new UnsupportedOperationException("Used once and never copied!");
     }
 }
