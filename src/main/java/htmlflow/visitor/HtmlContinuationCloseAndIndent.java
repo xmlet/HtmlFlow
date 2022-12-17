@@ -29,7 +29,14 @@ public class HtmlContinuationCloseAndIndent<U> extends HtmlContinuation<U> {
     
     @Override
     protected void emitHtml(U model) {
-        //TODO ADD COMMENT
+        /**
+         * !!!!! This continuation may follow a dynamic or await block that may create a block or inline element.
+         * Block elements increment (depth) indentation at the beginning and decrement at the end.
+         * Ont the other hand, inline elements keep indentation (depth) unmodified.
+         * We assume most dynamic or await blocks will create block elements.
+         * Thus, here we start by decrementing depth.
+         * However, this could not be true for some cases, and we will get inconsistent indentation !!!!
+         */
         visitor.depth--;
         visitor.newlineAndIndent();
     }

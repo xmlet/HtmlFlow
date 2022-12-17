@@ -1,18 +1,12 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
-import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-import org.xmlet.htmlapifaster.async.OnCompletion;
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
@@ -34,12 +28,6 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
      */
     private HtmlContinuation last;
     
-    public static final PodamFactory podamFactory;
-    
-    static {
-        podamFactory = new PodamFactoryImpl();
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
-    }
 
     public PreprocessingVisitorAsync(boolean isIndented) {
         super(isIndented);

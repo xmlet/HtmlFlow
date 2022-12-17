@@ -114,7 +114,7 @@ public class TestPartialsToPrintStream {
             count++;
             node = node.getNext();
         }
-        assertEquals(3, count);
+        assertEquals(4, count); // one more continuation for HtmlContinuationCloseAndIndent
     }
 
     static  String getSaltString(int length) {
