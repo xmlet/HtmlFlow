@@ -42,7 +42,7 @@ import java.util.function.Supplier;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public abstract class HtmlViewVisitor<T> extends HtmlVisitor {
+public abstract class HtmlViewVisitor extends HtmlVisitor {
 
     HtmlViewVisitor(boolean isIndented) {
         super(isIndented);
@@ -59,5 +59,5 @@ public abstract class HtmlViewVisitor<T> extends HtmlVisitor {
     /**
      * Returns the accumulated output and clear it.
      */
-    public abstract String finish(T model, HtmlView...partials);
+    public abstract String finish(Object model, HtmlView...partials);
 }

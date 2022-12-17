@@ -31,14 +31,14 @@ import java.io.PrintStream;
  * @author Miguel Gamboa, Luís Duare
  * created on 17-01-2018
  */
-public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations<T> implements TagsToPrintStream {
+public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations implements TagsToPrintStream {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
      */
     private final PrintStream out;
 
-    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, HtmlContinuation<T> first)
+    public HtmlViewVisitorPrintStream(PrintStream out, boolean isIndented, HtmlContinuation first)
     {
         super(isIndented, first);
         this.out = out;
@@ -66,7 +66,7 @@ public class HtmlViewVisitorPrintStream<T> extends HtmlViewVisitorContinuations<
     }
 
     @Override
-    public HtmlViewVisitor<T> clone(PrintStream out, boolean isIndented) {
+    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
         return new HtmlViewVisitorPrintStream<>(out, isIndented, first);
     }
 

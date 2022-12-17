@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @author Pedro Fialho
  **/
-public class TerminationHtmlContinuationNode<T> extends HtmlContinuation<T> {
+public class TerminationHtmlContinuationNode extends HtmlContinuation<Object> {
 
     private final CompletableFuture<Void> cf;
 
@@ -17,19 +17,19 @@ public class TerminationHtmlContinuationNode<T> extends HtmlContinuation<T> {
         this.cf = cf;
     }
 
-    public void execute(T model) {
+    public void execute(Object model) {
         cf.complete(null);
     }
 
     @Override
-    public void emitHtml(T model) {
+    public void emitHtml(Object model) {
         /*
         nothing to emit
          */
     }
 
     @Override
-    protected TerminationHtmlContinuationNode<T> copy(HtmlVisitor visitor) {
+    protected TerminationHtmlContinuationNode copy(HtmlVisitor visitor) {
         throw new UnsupportedOperationException("Used once and never copied!");
     }
 }

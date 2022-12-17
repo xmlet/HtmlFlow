@@ -3,11 +3,9 @@ package htmlflow.visitor;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Consumer;
 
 
 /**

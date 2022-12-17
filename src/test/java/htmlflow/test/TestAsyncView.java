@@ -39,7 +39,7 @@ class TestAsyncView {
     
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
+        HtmlViewAsync view = HtmlFlow.viewAsync(new PrintStream(mem),
                 this::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
         mem.reset();
@@ -59,7 +59,7 @@ class TestAsyncView {
 
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
 
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
+        HtmlViewAsync view = HtmlFlow.viewAsync(new PrintStream(mem),
                 this::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
         //
@@ -86,13 +86,13 @@ class TestAsyncView {
     
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
+        HtmlViewAsync view = HtmlFlow.viewAsync(new PrintStream(mem),
                 this::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
     }
 
     void write_and_assert_asyncview(String expectedHtml, ByteArrayOutputStream mem,
-                                    HtmlViewAsync<AsyncModel<String, Student>> view, AsyncModel<String, Student> asyncModel)
+                                    HtmlViewAsync view, AsyncModel<String, Student> asyncModel)
             throws ExecutionException, InterruptedException {
 
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
@@ -130,7 +130,7 @@ class TestAsyncView {
         
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
+        HtmlViewAsync view = HtmlFlow.viewAsync(new PrintStream(mem),
                 this::testAsyncModel);
         
         final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
@@ -151,8 +151,8 @@ class TestAsyncView {
         assertFalse(actual.hasNext());
     }
     
-    void testAsyncModel(HtmlPage<AsyncModel<String, Student>> view) {
-        final HtmlPage<AsyncModel<String, Student>> thenable = view.html()
+    void testAsyncModel(HtmlPage view) {
+        final HtmlPage thenable = view.html()
                 .body()
                 .div()
                 .p()

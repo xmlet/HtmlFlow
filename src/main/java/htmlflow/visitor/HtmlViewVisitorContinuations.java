@@ -36,16 +36,16 @@ import java.util.function.BiConsumer;
  *
  * @param <T>
  */
-public abstract class HtmlViewVisitorContinuations<T> extends HtmlViewVisitor<T> {
+public abstract class HtmlViewVisitorContinuations extends HtmlViewVisitor {
     /**
      * The first node to be processed.
      */
-    protected final HtmlContinuation<T> first;
+    protected final HtmlContinuation first;
     /**
      * @param isIndented
      * @param first
      */
-    HtmlViewVisitorContinuations(boolean isIndented, HtmlContinuation<T> first) {
+    HtmlViewVisitorContinuations(boolean isIndented, HtmlContinuation first) {
         super(isIndented);
         this.first = first.copy(this);
     }
@@ -67,7 +67,7 @@ public abstract class HtmlViewVisitorContinuations<T> extends HtmlViewVisitor<T>
     }
 
     @Override
-    public final String finish(T model, HtmlView...partials){
+    public final String finish(Object model, HtmlView...partials){
         first.execute(model);
         return readAndReset();
     }

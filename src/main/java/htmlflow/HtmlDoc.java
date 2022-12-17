@@ -34,7 +34,7 @@ import java.io.PrintStream;
  *
  * @author Miguel Gamboa, Luís Duare
  */
-public class HtmlDoc extends HtmlPage<Object> {
+public class HtmlDoc extends HtmlPage {
 
     private static final String WRONG_USE_OF_RENDER_WITH_MODEL =
             "Wrong use of StaticView! Model object not " +
@@ -57,7 +57,7 @@ public class HtmlDoc extends HtmlPage<Object> {
         this.visitor = visitor;
     }
 
-    public final Html<HtmlPage<Object>> html() {
+    public final Html<HtmlPage> html() {
         this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
@@ -92,12 +92,12 @@ public class HtmlDoc extends HtmlPage<Object> {
     }
 
     @Override
-    public HtmlPage<Object> setIndented(boolean isIndented) {
+    public HtmlPage setIndented(boolean isIndented) {
         return new HtmlDoc(out, (HtmlDocVisitor) getVisitor().clone(out, isIndented));
     }
 
     @Override
-    public HtmlPage<Object> threadSafe() {
+    public HtmlPage threadSafe() {
         throw new IllegalStateException("HtmlDoc is not reusable and does not keep internal static blocks!" +
          "Thus it does not require thread safety!");
     }

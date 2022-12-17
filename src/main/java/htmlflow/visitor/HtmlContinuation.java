@@ -27,7 +27,7 @@ package htmlflow.visitor;
 /**
  * @param <U> the type of the template's model.
  */
-public abstract class HtmlContinuation<U> {
+public abstract class HtmlContinuation<T> {
     /**
      * A negative number means that should be ignored.
      */
@@ -45,19 +45,19 @@ public abstract class HtmlContinuation<U> {
     /**
      * Next HtmlContinuation
      */
-    final HtmlContinuation<U> next;
+    final HtmlContinuation<T> next;
 
     /**
      * @param currentDepth Indentation depth associated to this block.
      */
-    protected HtmlContinuation(int currentDepth, boolean isClosed, HtmlVisitor visitor, HtmlContinuation<U> next) {
+    protected HtmlContinuation(int currentDepth, boolean isClosed, HtmlVisitor visitor, HtmlContinuation<T> next) {
         this.currentDepth = currentDepth;
         this.isClosed = isClosed;
         this.visitor = visitor;
         this.next = next;
     }
 
-    public HtmlContinuation<U> getNext() {
+    public HtmlContinuation<T> getNext() {
         return next;
     }
     /**
@@ -65,18 +65,18 @@ public abstract class HtmlContinuation<U> {
      *
      * @param model
      */
-    public abstract void execute(U model);
+    public abstract void execute(T model);
     /**
      * Hook method to emit HTML.
      *
      * @param model
      */
-    protected abstract void emitHtml(U model);
+    protected abstract void emitHtml(T model);
     /**
      * Creates a copy of this HtmlContinuation with a new visitor
      *
      * @param visitor
      */
-    protected abstract HtmlContinuation<U> copy(HtmlVisitor visitor);
+    protected abstract HtmlContinuation<T> copy(HtmlVisitor visitor);
 
 }

@@ -56,7 +56,7 @@ public class TestWrongUseOfViews {
         HtmlFlow
             .view(view -> {
                 view.html().head().title().text("Task Details").__();
-            }, LocalDate.class)
+            })
             .render(); // wrong use of render without a model
 
     }
@@ -70,7 +70,7 @@ public class TestWrongUseOfViews {
         HtmlFlow
             .view(System.out, view -> {
                 view.html().head().title().text("Task Details").__();
-            }, LocalDate.class)
+            })
             .write(); // wrong use of write without a model
 
     }

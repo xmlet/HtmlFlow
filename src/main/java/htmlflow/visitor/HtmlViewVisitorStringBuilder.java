@@ -36,7 +36,7 @@ import java.io.PrintStream;
  * @author Miguel Gamboa, Luís Duare
  *         created on 17-01-2018
  */
-public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuations<T> implements TagsToStringBuilder {
+public class HtmlViewVisitorStringBuilder extends HtmlViewVisitorContinuations implements TagsToStringBuilder {
     /**
      * The main StringBuilder. Read by the finish() to return the
      * resulting string with the Html content.
@@ -44,7 +44,7 @@ public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuation
     private final StringBuilder sb = new StringBuilder();
     
 
-    public HtmlViewVisitorStringBuilder(boolean isIndented, HtmlContinuation<T> first) {
+    public HtmlViewVisitorStringBuilder(boolean isIndented, HtmlContinuation first) {
         super(isIndented, first);
     }
 
@@ -65,10 +65,10 @@ public class HtmlViewVisitorStringBuilder<T> extends HtmlViewVisitorContinuation
     }
 
     @Override
-    public HtmlViewVisitor<T> clone(PrintStream out, boolean isIndented) {
+    public HtmlViewVisitor clone(PrintStream out, boolean isIndented) {
         if(out != null)
             throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
-        return new HtmlViewVisitorStringBuilder<>(isIndented, first);
+        return new HtmlViewVisitorStringBuilder(isIndented, first);
     }
 
     @Override

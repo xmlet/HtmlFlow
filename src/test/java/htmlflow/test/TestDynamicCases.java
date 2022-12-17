@@ -19,10 +19,7 @@ public class TestDynamicCases {
     @Test(expected = IllegalStateException.class)
     public void testDynamicChainedTwice() {
         HtmlFlow
-            .view(
-                HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice,
-                Stream.class,
-                Track.class);
+            .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice);
     }
 
     @Test

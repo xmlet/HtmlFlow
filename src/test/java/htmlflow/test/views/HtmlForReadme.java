@@ -104,7 +104,7 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample03() throws IOException {
-        HtmlPage<Task> view = HtmlFlow.view(HtmlLists::taskDetailsTemplate, Task.class);
+        HtmlPage view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
 
         List<Task> tasks = Arrays.asList(
             new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
@@ -118,8 +118,7 @@ public class HtmlForReadme {
         }
     }
 
-    static HtmlPage<Stream<Task>> tasksTableView = HtmlFlow.view(
-        HtmlForReadme::tasksTableTemplate, Stream.class, Task.class);
+    static HtmlPage tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -139,7 +138,7 @@ public class HtmlForReadme {
         // Desktop.getDesktop().browse(path.toUri());
     }
 
-    static void tasksTableTemplate(HtmlPage<Stream<Task>> page) {
+    static void tasksTableTemplate(HtmlPage page) {
         page
             .html()
                 .head()

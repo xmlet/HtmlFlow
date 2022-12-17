@@ -64,7 +64,7 @@ public class TestPartialsToPrintStream {
          * Act
          */
         HtmlFlow
-            .view(new PrintStream(mem), this::template, Stream.class, Penguin.class)
+            .view(new PrintStream(mem), this::template)
             .write(Stream.of(penguins));
         /**
          * Assert
@@ -96,11 +96,7 @@ public class TestPartialsToPrintStream {
          * Act
          */
         // Discards all bytes through the PrintStream.
-        HtmlView<Stream<Penguin>> view = HtmlFlow.view(
-            new PrintStream(nullOutputStream()),
-            this::template,
-            Stream.class,
-            Penguin.class);
+        HtmlView view = HtmlFlow.view(new PrintStream(nullOutputStream()), this::template);
         view.write(penguins);
         /**
          * Assert
@@ -140,7 +136,7 @@ public class TestPartialsToPrintStream {
         public String getDnaCode() { return dnaCode; }
     }
 
-    private void template(HtmlPage<Stream<Penguin>> page) {
+    private void template(HtmlPage page) {
         page.html()
                 .head()
                     .title().text("MyPenguinExample").__()

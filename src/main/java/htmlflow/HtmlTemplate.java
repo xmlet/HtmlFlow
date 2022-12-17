@@ -31,7 +31,7 @@ package htmlflow;
  * @param <T> The type of the Model bound to this template.
  */
 @FunctionalInterface
-public interface HtmlTemplate<T> {
+public interface HtmlTemplate {
 
-    void resolve(HtmlPage<T> page);
+    void resolve(HtmlPage page);
 }

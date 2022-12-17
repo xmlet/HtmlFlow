@@ -63,7 +63,7 @@ public class Utils {
         return new BufferedReader(actual).lines();
     }
 
-    static <T> Stream<String> htmlRender(HtmlPage<T> view, T model){
+    static <T> Stream<String> htmlRender(HtmlPage view, T model){
         String html = view.render(model);
         return NEWLINE.splitAsStream(html);
     }

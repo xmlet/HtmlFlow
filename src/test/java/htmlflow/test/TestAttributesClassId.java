@@ -55,7 +55,7 @@ public class TestAttributesClassId {
 
     @Test
     public void testGetElementName() {
-        Div<Body<Html<HtmlPage<Object>>>> div = HtmlFlow.doc().html().body().div();
+        Div<Body<Html<HtmlPage>>> div = HtmlFlow.doc().html().body().div();
         assertEquals(DIV_NAME, div.getName());
     }
 

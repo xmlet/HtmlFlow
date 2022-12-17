@@ -4,15 +4,12 @@ import htmlflow.HtmlView;
 import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-import org.xmlet.htmlapifaster.async.OnCompletion;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
 
@@ -20,7 +17,7 @@ import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.
 /**
  * @author Pedro Fialho
  **/
-public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements TagsToStringBuilder {
+public class PreprocessingVisitorAsync extends HtmlViewVisitor implements TagsToStringBuilder {
     
     private final StringBuilder sb = new StringBuilder();
     
@@ -33,13 +30,6 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
      * The last HtmlContinuation
      */
     private HtmlContinuation last;
-    
-    public static final PodamFactory podamFactory;
-    
-    static {
-        podamFactory = new PodamFactoryImpl();
-        podamFactory.getStrategy().addOrReplaceTypeManufacturer(Publisher.class, new PublisherFactory(podamFactory));
-    }
 
     public PreprocessingVisitorAsync(boolean isIndented) {
         super(isIndented);
@@ -50,14 +40,14 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
     }
 
     @Override
-    public String finish(T model, HtmlView... partials) {
+    public String finish(Object model, HtmlView... partials) {
         this.finishAsync();
         return null;
     }
     
     public void finishAsync() {
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, null);
+        HtmlContinuation<Object> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, null);
 
         if (first == null) {
             last = first = staticCont; // assign both first and last
@@ -92,11 +82,11 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
          * Creates an HtmlContinuation for the async block.
          */
     
-        HtmlContinuationCloseAndIndent<T> closeAndIndent =
+        HtmlContinuationCloseAndIndent<M> closeAndIndent =
                 new HtmlContinuationCloseAndIndent<>(this);
         
-        HtmlContinuation<T> asyncCont = new HtmlContinuationAsync<>(depth, isClosed, element,
-                (AwaitConsumer<E, T>) asyncHtmlBlock, this, closeAndIndent);
+        HtmlContinuation<M> asyncCont = new HtmlContinuationAsync<>(depth, isClosed, element,
+                asyncHtmlBlock, this, closeAndIndent);
     
         /**
          * We are resolving this view for the first time.
@@ -105,7 +95,7 @@ public class PreprocessingVisitorAsync<T> extends HtmlViewVisitor<T> implements 
          */
         String staticHtml = sb.substring(staticBlockIndex);
         String staticHtmlTrimmed = staticHtml.trim();
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtmlTrimmed, this, asyncCont);
+        HtmlContinuationStatic<M> staticCont = new HtmlContinuationStatic<>(staticHtmlTrimmed, this, asyncCont);
         if(first == null) first = staticCont; // on first visit initializes the first pointer
         
         else {

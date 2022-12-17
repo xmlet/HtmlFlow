@@ -115,8 +115,8 @@ public class TestDivDetails {
     @Test
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlPage<Task> view = HtmlFlow
-            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate, Task.class);
+        HtmlPage view = HtmlFlow
+            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
                 .keySet()
@@ -139,8 +139,8 @@ public class TestDivDetails {
 
     @Test
     public void testDivDetailsBindingWithRenderInParallelThreadSafe() {
-        HtmlPage<Task> view = HtmlFlow
-            .view(HtmlLists::taskDetailsTemplate, Task.class)
+        HtmlPage view = HtmlFlow
+            .view(HtmlLists::taskDetailsTemplate)
             .threadSafe();
 
         expectedTaskViews
