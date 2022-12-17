@@ -134,23 +134,27 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
-        HtmlContinuation<T> dynamicCont = (HtmlContinuation<T>) new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, null);
+        HtmlContinuation<T> dynamicCont = (HtmlContinuation<T>) new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this,
+                new HtmlContinuationCloseAndIndent(this));
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
          * which will be followed by the dynamicCont.
          */
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, dynamicCont);
+        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtmlTrimmed, this, dynamicCont);
+
         if(first == null) first = staticCont; // on first visit initializes the first pointer
         else setNext(last, staticCont);       // else append the staticCont to existing chain
-        last = dynamicCont;                   // advance last to point to the new dynamicCont
+        last = dynamicCont.next;              // advance last to point to the new HtmlContinuationCloseAndIndent
         /**
          * We have to run dynamicContinuation to leave isClosed and indentation correct for
          * the next static HTML block.
          */
-        T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
-        dynamicHtmlBlock.accept(element, (U) model);
+        // T model = (T) podamFactory.manufacturePojoWithFullData(modelClass, genericTypeArgs);
+        // dynamicHtmlBlock.accept(element, (U) model);
+        newlineAndIndent();
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
         openDynamic = false;
     }
@@ -161,10 +165,10 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     @Override
     public String finish(T model, HtmlView... partials) {
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml, this, null);
+        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, null);
         last = first == null
-            ? first = staticCont         // assign both first and last
-            : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
+                ? first = staticCont         // assign both first and last
+                : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
         /**
          * We are just collecting static HTML blocks and the resulting HTML should be ignored.
          * Intentionally return null to force a NullPointerException if someone intend to use this result.

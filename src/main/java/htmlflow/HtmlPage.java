@@ -53,9 +53,7 @@ import static java.util.stream.Collectors.joining;
  * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
-public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>, Element<?,?>> {
-    static final String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
-            "Cannot use PrintStream output for thread-safe views!";
+public abstract class HtmlPage<T> implements Element<HtmlPage<T>, Element<?,?>> {
 
     static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
             "Cannot set thread-safety for views with PrintStream output!";
@@ -79,6 +77,14 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
             throw new UncheckedIOException(e);
         }
     }
+
+    public abstract String render();
+
+    public abstract String render(T model);
+
+    public abstract void write(T model);
+
+    public abstract void write();
 
     public abstract Html<HtmlPage<T>> html();
 

@@ -29,7 +29,14 @@ public class HtmlContinuationCloseAndIndent<U> extends HtmlContinuation<U> {
     
     @Override
     protected void emitHtml(U model) {
-        //TODO ADD COMMENT
+        /*
+         * !!!!
+         * This is needed to adjust the depth when coming out of a await/dynamic block.
+         * With the usage of the Trim the first element is being left out of the next static continuation
+         * So it's now expected that the user puts `.__()` right after the await/dynamic block.
+         * This `visitor.depth--` is to replicate that call.
+         * !!!!
+         */
         visitor.depth--;
         visitor.newlineAndIndent();
     }

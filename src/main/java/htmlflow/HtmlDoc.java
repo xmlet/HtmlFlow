@@ -37,18 +37,17 @@ import java.io.PrintStream;
 public class HtmlDoc extends HtmlPage<Object> {
 
     private static final String WRONG_USE_OF_RENDER_WITH_MODEL =
-             "Wrong use of StaticView! Model object not " +
-             "supported or you should use a dynamic view instead!";
+            "Wrong use of StaticView! Model object not " +
+                    "supported or you should use a dynamic view instead!";
 
     private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER =
             "Use render() instead of write(). This HtmlDoc has already a " +
-            "HtmlVisitorStringBuilder that collects emitted HTML.";
+                    "HtmlVisitorStringBuilder that collects emitted HTML.";
 
     private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM =
             "Do not call write() on HtmlDoc with a PrintStream because HTML" +
-            "fragments have been already emitted on each element call." +
-            "Use write() only for reusable dynamic HtmlView.";
-
+                    "fragments have been already emitted on each element call." +
+                    "Use write() only for reusable dynamic HtmlView.";
 
     private final PrintStream out;
     private final HtmlDocVisitor visitor;
@@ -63,7 +62,6 @@ public class HtmlDoc extends HtmlPage<Object> {
         return new Html<>(this);
     }
 
-    //TODO remove finish and delete not needed related classes
     @Override
     public final String render() {
         return getVisitor().finish();
@@ -75,22 +73,17 @@ public class HtmlDoc extends HtmlPage<Object> {
     }
 
     @Override
+    public final void write(Object model) {
+        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
+    }
+
+    @Override
     public final void write() {
         if(out == null)
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER);
         else
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM);
 
-    }
-
-    @Override
-    public final void write(Object model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
-    }
-
-    @Override
-    public HtmlWriter<Object> setPrintStream(PrintStream out) {
-        throw new UnsupportedOperationException("Cannot change output PrintStream on HtmlDoc. only valid for HtmlView");
     }
 
     @Override

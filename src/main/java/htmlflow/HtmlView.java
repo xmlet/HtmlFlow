@@ -92,18 +92,6 @@ public class HtmlView<T> extends HtmlPage<T> {
         return new Html<>(this);
     }
 
-    /**
-     * Returns a new instance of AbstractHtmlWriter with the same properties of this object
-     * but with a new HtmlVisitor set with the out PrintStream parameter.
-     */
-    @Override
-    public final HtmlWriter<T> setPrintStream(PrintStream out) {
-        if(threadSafe)
-            throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
-        HtmlVisitor v = getVisitor();
-        return clone(() -> (HtmlViewVisitor<T>) v.clone(out, v.isIndented), false);
-    }
-
     public final HtmlPage<T> threadSafe(){
         /**
          * PrintStream output is not viable in a multi-thread scenario,
@@ -127,24 +115,20 @@ public class HtmlView<T> extends HtmlPage<T> {
         return "HtmlView";
     }
 
-    @Override
     public String render() {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
-    @Override
     public String render(T model) {
         return getVisitor().finish(model);
     }
 
-    @Override
-    public void write() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
-    }
-
-    @Override
     public void write(T model) {
         this.render(model);
+    }
+
+    public void write() {
+        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
 
     /**

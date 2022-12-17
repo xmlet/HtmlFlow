@@ -79,11 +79,6 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
     }
     
     @Override
-    public final void write() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
-    }
-    
-    @Override
     public final void write(T model) {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
