@@ -25,11 +25,11 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
-import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
+import org.xmlet.htmlapifaster.async.OnCompletion;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 
@@ -49,13 +49,8 @@ public abstract class HtmlViewVisitor<T> extends HtmlVisitor {
     }
 
     @Override
-    public <E extends Element, U> OnPublisherCompletion visitAsync(Supplier<E> element, BiConsumer<E, Publisher<U>> asyncAction, Publisher<U> obs) {
+    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
         throw new IllegalStateException("Wrong use of async() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
-    }
-
-    @Override
-    public <E extends Element> void visitThen(Supplier<E> elem) {
-        throw new IllegalStateException("Wrong use of then() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
     }
 
     /*=========================================================================*/

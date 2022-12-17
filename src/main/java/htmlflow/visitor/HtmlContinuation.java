@@ -65,16 +65,7 @@ public abstract class HtmlContinuation<U> {
      *
      * @param model
      */
-    public final void execute(U model) {
-        if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
-        }
-        emitHtml(model);
-        if (next != null) {
-            next.execute(model);
-        }
-    }
+    public abstract void execute(U model);
     /**
      * Hook method to emit HTML.
      *

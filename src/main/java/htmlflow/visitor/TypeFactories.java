@@ -33,22 +33,28 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.typeManufacturers.TypeManufacturer;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.visitor.TypeFactories.typeArgument;
+import static htmlflow.visitor.TypeFactories.singleTypeArgument;
 
 class TypeFactories {
 
     private TypeFactories() {
     }
 
-    public static Class<?> typeArgument(Map<String, Type> map) {
+    public static Class<?> singleTypeArgument(Map<String, Type> map) {
         Optional<Type> typeArg = map.values().stream().findFirst();
         if(!typeArg.isPresent()) throw new IllegalArgumentException("Missing type argument in  generic collection!");
         else return (Class<?>) typeArg.get();
+    }
+    
+    public static List<Class<?>> typeArgument(Map<String, Type> map) {
+        return map.values().stream().map(v -> (Class<?>) v).collect(Collectors.toList());
     }
 }
 
@@ -65,7 +71,7 @@ class PublisherFactory implements TypeManufacturer<Publisher> {
         return subscriber -> subscriber.onSubscribe(new Subscription() {
             @Override
             public void request(long l) {
-                Class<?> typeArg = typeArgument(map);
+                Class<?> typeArg = singleTypeArgument(map);
                 int size = strat.getNumberOfCollectionElements(List.class);
                 for (int i = 0; i < size; i++) {
                     Object item = podamFactory.manufacturePojoWithFullData(typeArg);
@@ -96,7 +102,7 @@ class StreamFactory implements TypeManufacturer<Stream> {
     @Override
     public Stream getType(DataProviderStrategy strat, AttributeMetadata attributeMetadata, Map<String, Type> map) {
         int size = strat.getNumberOfCollectionElements(List.class);
-        Class<?> typeArg = typeArgument(map);
+        Class<?> typeArg = singleTypeArgument(map);
         return Stream
             .generate(() -> podamFactory.manufacturePojoWithFullData((Class) typeArg))
             .limit(size);

@@ -24,12 +24,12 @@
 
 package htmlflow.visitor;
 
-import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.async.OnPublisherCompletion;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
+import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -50,13 +50,8 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     }
 
     @Override
-    public final <E extends Element, T> OnPublisherCompletion visitAsync(Supplier<E> element, BiConsumer<E, Publisher<T>> asyncAction, Publisher<T> obs) {
+    public final <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
         throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
-    }
-
-    @Override
-    public final <E extends Element> void visitThen(Supplier<E> elem) {
-        throw new IllegalStateException("Wrong use of then() in a static view! Use HtmlView to produce an async view.");
     }
 
     /**

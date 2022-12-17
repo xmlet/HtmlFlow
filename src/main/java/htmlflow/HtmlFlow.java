@@ -28,7 +28,9 @@ import htmlflow.visitor.HtmlDocVisitorPrintStream;
 import htmlflow.visitor.HtmlDocVisitorStringBuilder;
 import htmlflow.visitor.HtmlViewVisitorPrintStream;
 import htmlflow.visitor.HtmlViewVisitorStringBuilder;
+import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
+import htmlflow.visitor.PreprocessingVisitorAsync;
 
 import java.io.PrintStream;
 import java.lang.reflect.Type;
@@ -66,6 +68,19 @@ public class HtmlFlow {
         preView.getVisitor().finish(null);
         return pre;
     }
+    
+    private static <U> PreprocessingVisitorAsync<U> preprocessingAsync(HtmlTemplate<U> template) {
+        PreprocessingVisitorAsync<U> pre = new PreprocessingVisitorAsync<>(true);
+        HtmlView<U> preView = new HtmlView<>(null, () -> pre, false);
+        template.resolve(preView);
+        /**
+         * NO problem with null model. We are just preprocessing static HTML blocks.
+         * Thus, dynamic blocks which depend on model are not invoked.
+         */
+        preView.getVisitor().finish(null);
+        return pre;
+    }
+    
     /**
      * Creates a HtmlDoc object corresponding to a static HTML page (without model dependency)
      * that emits HTML to an output PrintStream
@@ -122,5 +137,24 @@ public class HtmlFlow {
             null, // Without output stream
             () -> new HtmlViewVisitorStringBuilder<>(true, pre.getFirst()), // visitor
             false); // Not thread safe by default
+    }
+    
+    /**
+     * Creates a HtmlViewAsync corresponding to a dynamic HtmlPage with an asynchronous model.
+     *
+     * @param modelClass Used to crate fake model object for preprocessing of HtmlTemplate.
+     * @param out Output PrintStream.
+     * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param <U> Type of the model.
+     */
+    public static <U> HtmlViewAsync<U> viewAsync(
+            PrintStream out,
+            HtmlTemplate<U> template
+    ){
+        PreprocessingVisitorAsync<U> pre = preprocessingAsync(template);
+        return new HtmlViewAsync<>(
+                out,
+                () -> new HtmlViewVisitorAsync<>(out, true, pre.getFirst()),
+                false);
     }
 }
