@@ -52,7 +52,7 @@ public class Utils {
 
     private Utils() {}
 
-    static Element getRootElement(byte[] input) throws UnsupportedEncodingException {
+    static Element getRootElement(byte[] input) {
         W3CDom w3cDom = new W3CDom();
         Document doc = w3cDom.fromJsoup(Jsoup.parse(new String(input, StandardCharsets.UTF_8)));
         return doc.getDocumentElement();

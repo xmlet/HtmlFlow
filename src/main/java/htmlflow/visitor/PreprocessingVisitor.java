@@ -27,14 +27,10 @@ package htmlflow.visitor;
 
 import htmlflow.HtmlView;
 import org.xmlet.htmlapifaster.Element;
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
 
