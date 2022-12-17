@@ -24,9 +24,12 @@
 package htmlflow.test;
 
 import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
+import htmlflow.visitor.HtmlContinuation;
 import htmlflow.visitor.HtmlVisitor;
 import org.junit.Test;
+import org.xmlet.htmlapifaster.Div;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,7 +64,7 @@ public class TestPartialsToPrintStream {
          * Act
          */
         HtmlFlow
-            .view(new PrintStream(mem), this::template)
+            .view(new PrintStream(mem), this::template, Stream.class, Penguin.class)
             .write(Stream.of(penguins));
         /**
          * Assert
@@ -93,16 +96,25 @@ public class TestPartialsToPrintStream {
          * Act
          */
         // Discards all bytes through the PrintStream.
-        HtmlView<Stream<Penguin>> view = HtmlFlow.view(new PrintStream(nullOutputStream()), this::template);
+        HtmlView<Stream<Penguin>> view = HtmlFlow.view(
+            new PrintStream(nullOutputStream()),
+            this::template,
+            Stream.class,
+            Penguin.class);
         view.write(penguins);
         /**
          * Assert
          */
         HtmlVisitor visitor = view.getVisitor();
-        Field blocksField = visitor.getClass().getSuperclass().getDeclaredField("staticBlocksList");
-        blocksField.setAccessible(true);
-        List blocks = (List) blocksField.get(visitor);
-        assertEquals(2, blocks.size());
+        Field firstField = visitor.getClass().getSuperclass().getDeclaredField("first");
+        firstField.setAccessible(true);
+        HtmlContinuation node = (HtmlContinuation) firstField.get(visitor);
+        int count = 0;
+        while(node != null) {
+            count++;
+            node = node.getNext();
+        }
+        assertEquals(3, count);
     }
 
     static  String getSaltString(int length) {
@@ -128,28 +140,28 @@ public class TestPartialsToPrintStream {
         public String getDnaCode() { return dnaCode; }
     }
 
-    private void template(HtmlView<Stream<Penguin>> view, Stream<Penguin> model) {
-        view.html()
+    private void template(HtmlPage<Stream<Penguin>> page) {
+        page.html()
                 .head()
                     .title().text("MyPenguinExample").__()
                 .__() //head
                 .body()
                     .div().attrClass("local-storage").attrStyle("display: none;")
-                        .dynamic(localStorageDiv ->
-                            model.forEachOrdered(penguin ->
-                                view.addPartial(penguimPartialView, penguin)))
+                        .<Stream<Penguin>>dynamic((div, model) ->
+                            model.forEachOrdered(penguin -> penguimPartialView(div, penguin)))
                     .__()
                 .__() //body
               .__(); //html
     }
 
-    private final HtmlView<Penguin> penguimPartialView = HtmlFlow.view((view, penguin) -> {
-        view
+    private final void penguimPartialView (Div<?> div, Penguin penguin) {
+        div
             .div()
                 .attrId("data-penguin-" + penguin.getName())
                 .attrStyle("display: none;")
-                .addAttr("data-dna",penguin.getDnaCode());
-    });
+                .addAttr("data-dna",penguin.getDnaCode())
+            .__();
+    }
 
     /**
      * Copied from JDK 11

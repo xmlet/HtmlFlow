@@ -25,6 +25,7 @@
 package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
 import htmlflow.test.model.Stock;
 import org.xmlet.htmlapifaster.EnumHttpEquivType;
@@ -32,15 +33,17 @@ import org.xmlet.htmlapifaster.EnumMediaType;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
+import org.xmlet.htmlapifaster.Tbody;
 
 public class HtmlDynamic {
 
-    public static HtmlView<Iterable<Stock>> stocksViewOk = HtmlFlow.view(HtmlDynamic::templateStocksOk);
+    public static HtmlView<Iterable<Stock>> stocksViewOk = HtmlFlow.view(
+        HtmlDynamic::templateStocksOk,
+        Iterable.class,
+        Stock.class);
 
-    public static HtmlView<Iterable<Stock>> stocksViewWrong = HtmlFlow.view(HtmlDynamic::templateStocksWrong);
-
-    private static void templateStocksOk(HtmlView<Iterable<Stock>> view, Iterable<Stock> stocks) {
-        view
+    private static void templateStocksOk(HtmlPage<Iterable<Stock>> page) {
+        page
             .html()
                 .head()
                     .title().text("Stock Prices").__()
@@ -85,103 +88,42 @@ public class HtmlDynamic {
                             .__() // tr
                         .__() // thead
                         .tbody()
-                            .dynamic(tbody -> stocks.forEach(stock -> view.addPartial(tableRowView, stock)))
+                            .<Iterable<Stock>>dynamic((tbody, stocks) -> stocks.forEach(stock -> tableRowView(tbody, stock)))
                         .__() // tbody
                     .__() // table
                 .__() // body
             .__(); // html
     };
 
-    private static void templateStocksWrong(HtmlView<Iterable<Stock>> view, Iterable<Stock> stocks) {
-        view
-            .html()
-                .head()
-                    .title().text("Stock Prices").__()
-                    .meta()
-                        .attrHttpEquiv(EnumHttpEquivType.CONTENT_TYPE)
-                        .attrContent("text/html; charset=UTF-8")
+    static final void tableRowView(Tbody<?> tbody, Stock stock) {
+            tbody
+                .tr().attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd")
+                    .td().text(stock.getIndex()).__()
+                    .td()
+                        .a().attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol()).__()
                     .__()
-                    .meta()
-                        .addAttr("http-equiv", "Content-Style-Type")
-                        .attrContent("text/CSS")
+                    .td()
+                        .a().attrHref(stock.getUrl()).text(stock.getName()).__()
                     .__()
-                    .meta()
-                        .addAttr("http-equiv", "Content-Script-Type")
-                        .attrContent("text/javascript")
+                    .td().strong().text(stock.getPrice()).__().__()
+                    .td()
+                        .of(td -> {
+                            double change = stock.getChange();
+                            if (change < 0) {
+                                td.attrClass("minus");
+                            }
+                            td.text(change);
+                        })
                     .__()
-                    .link()
-                        .addAttr("rel", "shortcut icon")
-                        .attrHref("/images/favicon.ico")
-                    .__()
-                    .link()
-                        .attrRel(EnumRelType.STYLESHEET)
-                        .attrType(EnumTypeContentType.TEXT_CSS)
-                        .attrHref("/CSS/style.CSS")
-                        .attrMedia(EnumMediaType.ALL)
-                    .__()
-                    .script()
-                        .attrType(EnumTypeScriptType.TEXT_JAVASCRIPT)
-                        .attrSrc("/js/util.js")
-                    .__()
-                .__() // head
-                .body()
-                    .h1().text("Stock Prices").__()
-                    .table()
-                        .thead()
-                            .tr()
-                                .th().text("#").__()
-                                .th().text("symbol").__()
-                                .th().text("name").__()
-                                .th().text("price").__()
-                                .th().text("change").__()
-                                .th().text("ratio").__()
-                            .__() // tr
-                        .__() // thead
-                        .tbody()
-                            // !!!!! Here it is the wrong use with of() for the unit test !!!
-                            .of(tbody -> stocks.forEach(stock -> view.addPartial(tableRowView, stock)))
-                        .__() // tbody
-                    .__() // table
-                .__() // body
-            .__(); // html
-    };
-
-    static final HtmlView<Stock> tableRowView = HtmlFlow.view((view, stock) -> {
-            view
-                .defineRoot()
-                    .tr()
-                        .dynamic(tr -> tr.attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd"))
-                        .td()
-                            .dynamic(td -> td.text(stock.getIndex()))
-                        .__()
-                        .td()
-                            .a().dynamic(a -> a.attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol())).__()
-                        .__()
-                        .td()
-                            .a().dynamic(a -> a.attrHref(stock.getUrl()).text(stock.getName())).__()
-                        .__()
-                        .td()
-                            .strong().dynamic(strong -> strong.text(stock.getPrice())).__()
-                        .__()
-                        .td()
-                            .dynamic(td -> {
-                                double change = stock.getChange();
-                                if (change < 0) {
-                                    td.attrClass("minus");
-                                }
-                                td.text(change);
-                            })
-                        .__()
-                        .td()
-                            .dynamic(td -> {
-                                double ratio = stock.getRatio();
-                                if (ratio < 0) {
-                                    td.attrClass("minus");
-                                }
-                                td.text(ratio);
-                            })
-                        .__()
+                    .td()
+                        .of(td -> {
+                            double ratio = stock.getRatio();
+                            if (ratio < 0) {
+                                td.attrClass("minus");
+                            }
+                            td.text(ratio);
+                        })
                     .__()
                 .__();
-    });
+    }
 }

@@ -25,6 +25,7 @@
 package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
 import htmlflow.test.model.Stock;
 import org.xmlet.htmlapifaster.EnumHttpEquivType;
@@ -35,12 +36,13 @@ import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
 public class HtmlDynamicStocks {
 
-    public static HtmlView<Iterable<Stock>> stocksViewOk = HtmlFlow.view(HtmlDynamicStocks::templateStocksOk);
+    public static HtmlView<Iterable<Stock>> stocksViewOk = HtmlFlow.view(
+        HtmlDynamicStocks::templateStocksOk,
+        Iterable.class,
+        Stock.class);
 
-    public static HtmlView<Iterable<Stock>> stocksViewWrong = HtmlFlow.view(HtmlDynamicStocks::templateStocksWrong);
-
-    private static void templateStocksOk(HtmlView<Iterable<Stock>> view, Iterable<Stock> stocks) {
-        view
+    private static void templateStocksOk(HtmlPage<Iterable<Stock>> page) {
+        page
             .html()
                 .head()
                     .title().text("Stock Prices").__()
@@ -85,132 +87,39 @@ public class HtmlDynamicStocks {
                             .__() // tr
                         .__() // thead
                         .tbody()
-                        .of(tbody -> stocks.forEach(stock ->
+                        .<Iterable<Stock>>dynamic((tbody, stocks) -> stocks.forEach(stock ->
                             tbody
-                                .tr()
-                                    .dynamic(tr -> tr.attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd"))
-                                    .td()
-                                        .dynamic(td -> td.text(stock.getIndex()))
-                                    .__()
-                                    .td()
-                                        .a().dynamic(a -> a.attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol())).__()
-                                    .__()
-                                    .td()
-                                        .a().dynamic(a -> a.attrHref(stock.getUrl()).text(stock.getName())).__()
-                                    .__()
-                                    .td()
-                                        .strong().dynamic(strong -> strong.text(stock.getPrice())).__()
-                                    .__()
-                                    .td()
-                                        .dynamic(td -> {
-                                            double change = stock.getChange();
-                                            if (change < 0) {
-                                                td.attrClass("minus");
-                                            }
-                                            td.text(change);
-                                        })
-                                    .__()
-                                    .td()
-                                        .dynamic(td -> {
-                                            double ratio = stock.getRatio();
-                                            if (ratio < 0) {
-                                                td.attrClass("minus");
-                                            }
-                                            td.text(ratio);
-                                        })
-                                    .__()
-                                .__()))
-                        .__() // tbody
-                    .__() // table
-                .__() // body
-            .__(); // html
-    };
-
-    private static void templateStocksWrong(HtmlView<Iterable<Stock>> view, Iterable<Stock> stocks) {
-        view
-            .html()
-                .head()
-                    .title().text("Stock Prices").__()
-                    .meta()
-                        .attrHttpEquiv(EnumHttpEquivType.CONTENT_TYPE)
-                        .attrContent("text/html; charset=UTF-8")
-                    .__()
-                    .meta()
-                        .addAttr("http-equiv", "Content-Style-Type")
-                        .attrContent("text/CSS")
-                    .__()
-                    .meta()
-                        .addAttr("http-equiv", "Content-Script-Type")
-                        .attrContent("text/javascript")
-                    .__()
-                    .link()
-                        .addAttr("rel", "shortcut icon")
-                        .attrHref("/images/favicon.ico")
-                    .__()
-                    .link()
-                        .attrRel(EnumRelType.STYLESHEET)
-                        .attrType(EnumTypeContentType.TEXT_CSS)
-                        .attrHref("/CSS/style.CSS")
-                        .attrMedia(EnumMediaType.ALL)
-                    .__()
-                    .script()
-                        .attrType(EnumTypeScriptType.TEXT_JAVASCRIPT)
-                        .attrSrc("/js/util.js")
-                    .__()
-                .__() // head
-                .body()
-                    .h1().text("Stock Prices").__()
-                    .table()
-                        .thead()
-                            .tr()
-                                .th().text("#").__()
-                                .th().text("symbol").__()
-                                .th().text("name").__()
-                                .th().text("price").__()
-                                .th().text("change").__()
-                                .th().text("ratio").__()
-                            .__() // tr
-                        .__() // thead
-                        .tbody()
-                        .of(tbody -> stocks.forEach(stock ->
-                            tbody
-                                .tr()
-                                    // !!!!! In the following it is the wrong use with of() for the unit test !!!
-                                    .of(tr -> tr.attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd"))
-                                    .td()
-                                        .of(td -> td.text(stock.getIndex()))
-                                    .__()
-                                    .td()
-                                        .a().of(a -> a.attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol())).__()
-                                    .__()
-                                    .td()
-                                        .a().of(a -> a.attrHref(stock.getUrl()).text(stock.getName())).__()
-                                    .__()
-                                    .td()
-                                        .strong().of(strong -> strong.text(stock.getPrice())).__()
-                                    .__()
-                                    .td()
-                                        .of(td -> {
-                                            double change = stock.getChange();
-                                            if (change < 0) {
-                                                td.attrClass("minus");
-                                            }
-                                            td.text(change);
-                                        })
-                                    .__()
-                                    .td()
-                                        .of(td -> {
-                                            double ratio = stock.getRatio();
-                                            if (ratio < 0) {
-                                                td.attrClass("minus");
-                                            }
-                                            td.text(ratio);
-                                        })
-                                    .__()
-                                .__()))
-                        .__() // tbody
-                    .__() // table
-                .__() // body
-            .__(); // html
-    };
+                                .tr().attrClass(stock.getIndex() % 2 == 0 ? "even" : "odd")
+                                .td().text(stock.getIndex()).__()
+                                .td()
+                                    .a().attrHref("/stocks/" + stock.getSymbol()).text(stock.getSymbol()).__()
+                                .__()
+                                .td()
+                                    .a().attrHref(stock.getUrl()).text(stock.getName()).__()
+                                .__()
+                                .td().strong().text(stock.getPrice()).__().__()
+                                .td()
+                                    .of(td -> {
+                                        double change = stock.getChange();
+                                        if (change < 0) {
+                                            td.attrClass("minus");
+                                        }
+                                        td.text(change);
+                                    })
+                                .__()
+                                .td()
+                                    .of(td -> {
+                                        double ratio = stock.getRatio();
+                                        if (ratio < 0) {
+                                            td.attrClass("minus");
+                                        }
+                                        td.text(ratio);
+                                    })
+                                .__()
+                            .__()))
+                    .__() // tbody
+                .__() // table
+            .__() // body
+        .__(); // html
+    }
 }

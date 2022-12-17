@@ -91,18 +91,18 @@ public class HtmlLists {
                 .__() //body
             .__(); //html
 
-    public static void taskDetailsTemplate(HtmlView<Task> view, Task task) {
+    public static void taskDetailsTemplate(HtmlPage<Task> view) {
         view
             .html()
                 .head()
                     .title().text("Task Details").__()
                 .__() //head
                 .body()
-                    .dynamic(body -> body.text("Title:").text(task.getTitle()))
+                    .<Task>dynamic((body, task) -> body.text("Title:").text(task.getTitle()))
                     .br().__()
-                    .dynamic(body -> body.text("Description:").text(task.getDescription()))
+                    .<Task>dynamic((body, task) -> body.text("Description:").text(task.getDescription()))
                     .br().__()
-                    .dynamic(body -> body.text("Priority:").text(task.getPriority()))
+                    .<Task>dynamic((body, task) -> body.text("Priority:").text(task.getPriority()))
                 .__() //body
             .__(); // html
     }

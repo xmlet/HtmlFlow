@@ -44,8 +44,8 @@ import org.xmlet.htmlapifaster.Text;
 import java.io.PrintStream;
 
 /**
- * This is the implementation of the ElementVisitor (from HtmlApiFaster
- * library) that emits HTML immediately with no optimizations.
+ * This is the base implementation of the ElementVisitor (from HtmlApiFaster
+ * library).
  *
  * @author Miguel Gamboa
  *         created on 04-08-2022
@@ -56,8 +56,8 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
      */
     protected int depth;
     /**
-     * If the begin tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code "<elem"}.
-     * On element visit the begin tag is left open to include additional attributes.
+     * If the beginning tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code "<elem"}.
+     * On element visit the beginning tag is left open to include additional attributes.
      */
     protected boolean isClosed = true;
     /**
@@ -91,42 +91,27 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
         }
     }
 
-
     /**
      * Adds a new line and indentation.
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
-     * REMARK intentionally duplicating this method in other HtmlVisitor implementations,
-     * to improve performance.
      */
-    private final void newlineAndIndent(){
-        /*
-         * DO NOT REFACTOR this if (isWriting()).
-         * Trying remove if (isWriting()) of newlineAndIndent() and
-         * move it to call sites:  if (isWriting()){ newlineAndIndent(); ... }
-         * DEGRADES performance.
-         */
-        if (isWriting()){ // Keep it. DO NOT REFACTOR this if (isWriting()).
-            if (isClosed){
-                if(isIndented) {
-                    write(Indentation.tabs(depth)); // \n\t\t\t\...
-                }
-            } else {
-                depth++;
-                if(isIndented)
-                    write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
-                else
-                    write(FINISH_TAG);
-                isClosed = true;
+    final void newlineAndIndent(){
+        if (isClosed){
+            if(isIndented) {
+                write(Indentation.tabs(depth)); // \n\t\t\t\...
             }
+        } else {
+            depth++;
+            if(isIndented)
+                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+            else
+                write(FINISH_TAG);
+            isClosed = true;
         }
     }
 
     /**
-     * Regarding HtmlViewVisitor:
-     * While the static blocks are not in staticBlocksList then it appends elements to
-     * the main StringBuilder or PrintStream.
-     * Once already in staticBlocksList then it does nothing.
      * This method appends the String {@code "<elementName"} and it leaves the element
      * open to include additional attributes.
      * Before that it may close the parent begin tag with {@code ">"} if it is
@@ -139,10 +124,8 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     @Override
     public final void visitElement(Element element) {
         newlineAndIndent();
-        if (isWriting()){
-            beginTag(element.getName()); // "<elementName"
-            isClosed = false;
-        }
+        beginTag(element.getName()); // "<elementName"
+        isClosed = false;
     }
 
     /**
@@ -151,11 +134,9 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
      */
     @Override
     public final void visitParent(Element element) {
-        if (isWriting()){
-            depth--;
-            newlineAndIndent();
-            endTag(element.getName()); // </elementName>
-        }
+        depth--;
+        newlineAndIndent();
+        endTag(element.getName()); // </elementName>
     }
     /**
      * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
@@ -171,36 +152,25 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
 
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
-        if (isWriting()){
-            addAttribute(attributeName, attributeValue);
-        }
+        addAttribute(attributeName, attributeValue);
     }
 
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
         newlineAndIndent();
-        if (isWriting()){
-            write(text.getValue());
-        }
+        write(text.getValue());
     }
 
 
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
         newlineAndIndent();
-        if (isWriting()){
-            addComment(text.getValue());
-        }
+        addComment(text.getValue());
     }
 
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
-    /**
-     * This visitor may be writing to output or not, depending on the kind of HTML
-     * block that it is being visited and on the Visitor approach.
-     */
-    public abstract boolean isWriting();
     /**
      * Writes the string text directly to the output.
      */
@@ -210,27 +180,12 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
      */
     protected abstract void write(char c);
     /**
-     * The number of characters written until this moment.
-     */
-    protected abstract int size();
-
-    /**
-     * Returns the accumulated output and clear it.
-     */
-    public abstract String finished();
-
-    /**
      * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
      * existing HtmlVisitor instance with a different isIndented state.
      *
      * @param isIndented If the new visitor should indent HTML output or not.
      */
     public abstract HtmlVisitor clone(PrintStream out, boolean isIndented);
-    /**
-     * Creates a new similar instance with all static bocks cleared.
-     * Used when visiting partial views.
-     */
-    public abstract HtmlViewVisitor newbie();
 
     /*=========================================================================*/
     /*------------            Root Element Methods         --------------------*/

@@ -20,8 +20,8 @@ public class HtmlDocVisitorPrintStream extends HtmlDocVisitor implements TagsToP
     }
 
     @Override
-    public final String finished() {
-        throw new UnsupportedOperationException("Do not call finished() on HtmlVisitorPrintStream because" +
+    public final String finish() {
+        throw new UnsupportedOperationException("Do not call finish() on HtmlVisitorPrintStream because" +
             "HTML fragments have been already emitted on each element call.");
     }
 
@@ -32,13 +32,6 @@ public class HtmlDocVisitorPrintStream extends HtmlDocVisitor implements TagsToP
     @Override
     protected final void write(char c) {
         out.print(c);
-    }
-
-    @Override
-    protected final int size() {
-        throw new UnsupportedOperationException("HtmlVisitorPrintStream does not keep buffer, " +
-            "and neither controls the emitted chars. " +
-            "HTML fragments have been already emitted on each element call.");
     }
 
     @Override

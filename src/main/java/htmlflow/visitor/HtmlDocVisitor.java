@@ -24,11 +24,12 @@
 
 package htmlflow.visitor;
 
-import org.reactivestreams.Publisher;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
+import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -44,39 +45,17 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
     }
 
     @Override
-    public final void visitOpenDynamic(){
+    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
         throw new IllegalStateException("Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view.");
     }
 
     @Override
-    public final void visitCloseDynamic(){
-        throw new IllegalStateException("Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view.");
-    }
-
-    @Override
-    public final <E extends Element, T> void visitAsync(Supplier<E> element, BiConsumer<E, Publisher<T>> asyncAction, Publisher<T> obs) {
+    public final <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
         throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
     }
 
-    @Override
-    public final <E extends Element> void visitThen(Supplier<E> elem) {
-        throw new IllegalStateException("Wrong use of then() in a static view! Use HtmlView to produce an async view.");
-    }
-        /**
-     * Since this visitor does not maintain static blocks then it is
-     * always emitting HTML.
-     */
-    @Override
-    public final boolean isWriting() {
-        return true;
-    }
-
     /**
-     * NOT Supported. This is useful only for partials in the context of HtmlView.
+     * Returns the accumulated output and clear it.
      */
-    @Override
-    public final HtmlViewVisitor newbie() {
-        throw new UnsupportedOperationException("Illegal operation for HtmlDoc. Only for partials in HtmlView.");
-    }
-
+    public abstract String finish();
 }

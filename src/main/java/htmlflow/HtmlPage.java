@@ -27,7 +27,6 @@ package htmlflow;
 import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Tr;
 
 import java.io.BufferedReader;
@@ -42,12 +41,12 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * The root container for HTML elements.
- * It it responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
+ * It is responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
  * implementation, which is responsible for printing the tree of elements and
  * attributes.
  *
- * Instances of AbstractHtmlWriter are immutable. Any change to its properties returns a new
- * instance of AbstractHtmlWriter.
+ * Instances of HtmlPage are immutable. Any change to its properties returns a new
+ * instance of HtmlPage.
  *
  * @param <T> The type of domain object bound to this View.
  *
@@ -89,10 +88,6 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
 
     public final Tr<HtmlPage<T>> tr() {
         return new Tr<>(this);
-    }
-
-    public final Root<HtmlPage<T>> defineRoot(){
-        return new Root<>(this);
     }
 
     /**

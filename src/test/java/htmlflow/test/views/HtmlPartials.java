@@ -6,29 +6,44 @@ import htmlflow.HtmlTemplate;
 import htmlflow.HtmlPage;
 import htmlflow.test.model.Track;
 import org.junit.Test;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Footer;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
- * These tests do not contain any assertion because they are only a samplefor README.md.
+ * These tests do not contain any assertion because they are only a sample for README.md.
  */
 @SuppressWarnings("squid:S3577")
 public class HtmlPartials {
 
-    static void bbView(HtmlPage view) {
-        view.div().text("Dummy bbView").__(); // div
+    static void bbView(Footer<?> footer) {
+        footer.div().text("Dummy bbView").__(); // div
     }
 
-    static HtmlView footerView(Consumer<HtmlPage> banner) {
-        return HtmlFlow.view((view, model) -> view
-            .div()
-                .of(__ -> banner.accept(view))
+    static Consumer<Div<?>> footerView(Consumer<Footer<?>> banner) {
+        return div -> div
+            .footer()
+                .of(footer -> banner.accept(footer))
                 .p()
                     .text("Created with HtmFlow")
                 .__() // p
-            .__() // div
-        ); //
+            .__(); // footer
+    }
+
+    static HtmlTemplate<Stream<Track>> tracksTemplate(Consumer<Div<?>> footer) {
+        return view -> view
+            .div()
+                .ul()
+                    .<Stream<Track>>dynamic((ul, tracks) -> tracks.forEach (item -> ul
+                        .li()
+                            .text(item. getName ())
+                        .__() // li
+                    ))
+                .__ () // ul
+                .of(div -> footer.accept(div))
+            .__(); // div
     }
 
 
@@ -38,22 +53,13 @@ public class HtmlPartials {
     @SuppressWarnings("squid:S2699")
     @Test
     public void testPartials() {
-        HtmlTemplate<Stream<Track>> tracksTemplate = (view , tracks, partials) -> view
-        .div()
-            .ul()
-                .of(ul -> tracks.forEach (item -> ul
-                    .li()
-                        .text(item. getName ())
-                    .__() // li
-                ))
-            .__ () // ul
-            .of(__ -> view.addPartial(partials[0]))
-        .__(); // div
-
 
         Stream<Track> tracks = Stream.of(new Track("Space Odyssey"), new Track("Bad"), new Track("Under Pressure"));
-        HtmlView<Stream<Track>> tracksView = HtmlFlow.view(tracksTemplate);
-        String html = tracksView.render(tracks, footerView(HtmlPartials::bbView));
+        HtmlView<Stream<Track>> tracksView = HtmlFlow.view(
+            tracksTemplate(footerView(HtmlPartials::bbView)),
+            Stream.class,
+            Track.class);
+        String html = tracksView.render(tracks);
         System.out.println(html);
     }
 }

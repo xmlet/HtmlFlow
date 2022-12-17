@@ -25,15 +25,16 @@
 package htmlflow.test;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlView;
-import htmlflow.HtmlDoc;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.time.LocalDate;
 
 public class TestWrongUseOfViews {
 
     /**
      * A StaticHtml view should not use dynamic().
+     * LocalDate is the model type in this test.
      */
     @Test(expected = IllegalStateException.class)
     public void testWrongUseOfDynamicInStaticHtml(){
@@ -41,33 +42,35 @@ public class TestWrongUseOfViews {
             .html()
                 .head()
                     .title().text("Task Details").__()
-                    .dynamic(head -> {
+                    .dynamic((head, model) -> {
                         Assert.fail("It should not reach here!");
                     });
     }
 
     /**
      * A DynamicHtml view should use render() with a model.
+     * LocalDate is the model type in this test.
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testWrongUseOfRenderWithoutModelInDynamicView(){
         HtmlFlow
-            .view((view, model) -> {
+            .view(view -> {
                 view.html().head().title().text("Task Details").__();
-            })
+            }, LocalDate.class)
             .render(); // wrong use of render without a model
 
     }
 
     /**
      * A PrintStream DynamicHtml view should use write() with a model.
+     * LocalDate is the model type in this test.
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testWrongUseOfWriteWithoutModelInDynamicView(){
         HtmlFlow
-            .view(System.out, (view, model) -> {
+            .view(System.out, view -> {
                 view.html().head().title().text("Task Details").__();
-            })
+            }, LocalDate.class)
             .write(); // wrong use of write without a model
 
     }

@@ -53,26 +53,6 @@ public class TestDynamicVersusOfWithPartials {
         assertLines("stocks5items.html", actual);
     }
 
-    @Test
-    public void testOfWrongUseWithTwoDifferentModels(){
-        /*
-         * First render with Stock.dummy3Items()
-         */
-        String actual = HtmlDynamic
-            .stocksViewWrong
-            .render(Stock.dummy3Items());
-        assertLines("stocks3items.html", actual);
-        /*
-         * Then render with Stock.dummy5Items() but it will return
-         * again the same previous 3 items that were stored in staticBlocksList
-         * of stocksViewWrong due to its wrong use with of() instead of dynamic.
-         */
-        actual = HtmlDynamic
-            .stocksViewWrong
-            .render(Stock.dummy5Items());
-        assertLines("stocks3items.html", actual);
-    }
-
     private static void assertLines(String pathToExpected, String actual) {
         Iterator<String> iter = NEWLINE
             .splitAsStream(actual)

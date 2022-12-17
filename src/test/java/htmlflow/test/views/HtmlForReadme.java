@@ -25,14 +25,14 @@
 package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlView;
 import htmlflow.HtmlPage;
-import htmlflow.HtmlDoc;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -74,29 +74,29 @@ public class HtmlForReadme {
     @SuppressWarnings("squid:S2699")
     @Test
     public void testSample02() throws IOException {
-        String html = view.render(null);        // 1) Get a string with the HTML
+        String html = view.render();        // 1) Get a string with the HTML
 
         // System.out.println(html);
+        /*
+        view
+            .setPrintStream(System.out)
+            .write();                       // 2) print to the standard output
 
         view
-            // .setPrintStream(System.out)
-            .write(null);                       // 2) print to the standard output
-
-        view
-            // .setPrintStream(new PrintStream(new FileOutputStream("details.html")))
-            .write(null);                       // 3) write to details.html file
-
-        // Desktop.getDesktop().browse(URI.create("details.html"));
+            .setPrintStream(new PrintStream(new FileOutputStream("details.html")))
+            .write();                       // 3) write to details.html file
+        Desktop.getDesktop().browse(URI.create("details.html"));
+        */
     }
 
 
-    static HtmlPage view = HtmlFlow.view((view, model) -> view
+    static HtmlPage view = HtmlFlow.doc()
                 .html()
                     .body()
                         .p().text("Typesafe is awesome! :-)").__()
                     .__() //body
-                .__() // html
-    );
+                .__(); // html
+
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -104,7 +104,7 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample03() throws IOException {
-        HtmlPage<Task> view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
+        HtmlPage<Task> view = HtmlFlow.view(HtmlLists::taskDetailsTemplate, Task.class);
 
         List<Task> tasks = Arrays.asList(
             new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
@@ -118,7 +118,8 @@ public class HtmlForReadme {
         }
     }
 
-    static HtmlPage<Stream<Task>> tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
+    static HtmlPage<Stream<Task>> tasksTableView = HtmlFlow.view(
+        HtmlForReadme::tasksTableTemplate, Stream.class, Task.class);
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -138,8 +139,8 @@ public class HtmlForReadme {
         // Desktop.getDesktop().browse(path.toUri());
     }
 
-    static void tasksTableTemplate(HtmlView<Stream<Task>> view, Stream<Task> tasks) {
-        view
+    static void tasksTableTemplate(HtmlPage<Stream<Task>> page) {
+        page
             .html()
                 .head()
                     .title()
@@ -155,7 +156,7 @@ public class HtmlForReadme {
                             .th().text("Priority").__()
                         .__()
                         .tbody()
-                            .dynamic(tbody ->
+                            .<Stream<Task>>dynamic((tbody, tasks) ->
                                 tasks.forEach(task -> tbody
                                     .tr()
                                         .td().of(td -> td.text(task.getTitle())).__()
