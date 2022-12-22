@@ -31,24 +31,17 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
     }
     
     @Override
-    public void execute(Object model) {
+    public final void execute(Object model) {
         if (currentDepth >= 0) {
             this.visitor.isClosed = isClosed;
             this.visitor.depth = currentDepth;
         }
-        
-        emitHtml(model);
-    }
-    
-    @Override
-    protected void emitHtml(Object model) {
         this.consumer.accept(element, (T) model, () -> {
             if (next != null) {
                 next.execute(model);
             }
         });
     }
-    
     
     @Override
     protected HtmlContinuation copy(HtmlVisitor v) {

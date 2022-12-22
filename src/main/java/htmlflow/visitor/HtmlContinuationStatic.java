@@ -28,7 +28,7 @@ package htmlflow.visitor;
 /**
  * HtmlContinuation for a static HTML block.
  */
-public class HtmlContinuationStatic extends HtmlContinuation {
+public class HtmlContinuationStatic extends HtmlContinuationSync {
     final String staticHtmlBlock;
     /**
      * Sets indentation to -1 to inform that visitor should continue with previous indentation.
@@ -38,21 +38,9 @@ public class HtmlContinuationStatic extends HtmlContinuation {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
         this.staticHtmlBlock = staticHtmlBlock;
     }
-    
+
     @Override
-    public void execute(Object model) {
-        if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
-        }
-        emitHtml(model);
-        if (next != null) {
-            next.execute(model);
-        }
-    }
-    
-    @Override
-    protected void emitHtml(Object model) {
+    protected final void emitHtml(Object model) {
         visitor.write(staticHtmlBlock);
     }
 

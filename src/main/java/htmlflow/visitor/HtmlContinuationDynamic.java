@@ -38,7 +38,7 @@ import java.util.function.BiConsumer;
  * @param <E> the type of the parent HTML element received by the dynamic HTML block.
  * @param <T> the type of the template's model.
  */
-public class HtmlContinuationDynamic<E extends Element, T> extends HtmlContinuation {
+public class HtmlContinuationDynamic<E extends Element, T> extends HtmlContinuationSync {
 
     /**
      * The continuation that consumes the element and a model.
@@ -64,21 +64,8 @@ public class HtmlContinuationDynamic<E extends Element, T> extends HtmlContinuat
         this.element = element;
         this.consumer = consumer;
     }
-    
     @Override
-    public void execute(Object model) {
-        if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
-        }
-        emitHtml(model);
-        if (next != null) {
-            next.execute(model);
-        }
-    }
-    
-    @Override
-    protected void emitHtml(Object model) {
+    protected final void emitHtml(Object model) {
         consumer.accept(element, (T) model);
     }
 

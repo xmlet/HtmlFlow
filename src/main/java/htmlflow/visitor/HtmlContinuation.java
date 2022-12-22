@@ -68,12 +68,6 @@ public abstract class HtmlContinuation {
      */
     public abstract void execute(Object model);
     /**
-     * Hook method to emit HTML.
-     *
-     * @param model
-     */
-    protected abstract void emitHtml(Object model);
-    /**
      * Creates a copy of this HtmlContinuation with a new visitor
      *
      * @param visitor

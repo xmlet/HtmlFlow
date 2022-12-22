@@ -3,7 +3,7 @@ package htmlflow.visitor;
 /**
  * @author Pedro Fialho
  **/
-public class HtmlContinuationCloseAndIndent extends HtmlContinuation {
+public class HtmlContinuationCloseAndIndent extends HtmlContinuationSync {
     /**
      * Sets indentation to -1 to inform that visitor should continue with previous indentation.
      * The isClosed is useless here.
@@ -16,19 +16,7 @@ public class HtmlContinuationCloseAndIndent extends HtmlContinuation {
     }
     
     @Override
-    public void execute(Object model) {
-        if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
-        }
-        emitHtml(model);
-        if (next != null) {
-            next.execute(model);
-        }
-    }
-    
-    @Override
-    protected void emitHtml(Object model) {
+    protected final void emitHtml(Object model) {
         /**
          * !!!!! This continuation may follow a dynamic or await block that may create a block or inline element.
          * Block elements increment (depth) indentation at the beginning and decrement at the end.
