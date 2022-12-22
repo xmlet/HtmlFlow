@@ -30,7 +30,6 @@ import org.xmlet.htmlapifaster.Element;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
@@ -45,11 +44,8 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  * The U comes from external module HtmlApiFaster whose classes are not strongly typed with the Model.
  * Thus, only the dynamic() and visitDynamic() methods in HtmlApiFaster were made generic to carry
  * a type parameter U corresponding to the type of the Model.
- * Nevertheless, this U should be corresponding to this visitor T of model that is parametrized in HtmlView.
- *
- * @param <T> The type of the Model bound to a view.
  */
-public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsToStringBuilder {
+public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToStringBuilder {
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
 
@@ -68,27 +64,17 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     /**
      * The first node to be processed.
      */
-    private HtmlContinuation<T> first;
+    private HtmlContinuation first;
     /**
      * The last HtmlContinuation
      */
-    private HtmlContinuation<T> last;
-    /**
-     * Used create a mocked instance of the model to be passed to dynamic HTML blocks.
-     */
-    private final Class<?> modelClass;
-    /**
-     * Generic type arguments of the Model.
-     */
-    private final Type[] genericTypeArgs;
+    private HtmlContinuation last;
 
-    public PreprocessingVisitor(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
+    public PreprocessingVisitor(boolean isIndented) {
         super(isIndented);
-        this.modelClass = modelClass;
-        this.genericTypeArgs = genericTypeArgs;
     }
 
-    public HtmlContinuation<T> getFirst() {
+    public HtmlContinuation getFirst() {
         return first;
     }
 
@@ -124,22 +110,30 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
-        HtmlContinuation<T> dynamicCont = (HtmlContinuation<T>) new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationCloseAndIndent(this));
+        HtmlContinuation dynamicCont = new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationCloseAndIndent(this));
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
          * which will be followed by the dynamicCont.
          */
-        String staticHtml = sb.substring(staticBlockIndex);
-        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtmlTrimmed, this, dynamicCont);
-        if(first == null) first = staticCont; // on first visit initializes the first pointer
-        else setNext(last, staticCont);       // else append the staticCont to existing chain
-        last = dynamicCont.next;              // advance last to point to the new HtmlContinuationCloseAndIndent
+        chainContinuationStatic(dynamicCont);
         /**
-         * We have to run dynamicContinuation to leave isClosed and indentation correct for
+         * We have to run newlineAndIndent to leave isClosed and indentation correct for
          * the next static HTML block.
          */
+        indentAndAdvanceStaticBlockIndex();
+    }
+
+    protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
+        String staticHtml = sb.substring(staticBlockIndex);
+        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
+        HtmlContinuation staticCont = new HtmlContinuationStatic(staticHtmlTrimmed, this, nextContinuation);
+        if(first == null) first = staticCont; // on first visit initializes the first pointer
+        else setNext(last, staticCont);       // else append the staticCont to existing chain
+        last = nextContinuation.next;         // advance last to point to the new HtmlContinuationCloseAndIndent
+    }
+
+    protected final void indentAndAdvanceStaticBlockIndex() {
         newlineAndIndent();
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
         openDynamic = false;
@@ -149,9 +143,9 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
      * Creates the last static HTML block.
      */
     @Override
-    public String finish(T model, HtmlView... partials) {
+    public String finish(Object model, HtmlView... partials) {
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, null);
+        HtmlContinuation staticCont = new HtmlContinuationStatic(staticHtml.trim(), this, null);
         last = first == null
             ? first = staticCont         // assign both first and last
             : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
@@ -163,7 +157,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     }
 
     @Override
-    public HtmlVisitor clone(PrintStream out, boolean isIndented) {
+    public final HtmlVisitor clone(PrintStream out, boolean isIndented) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
     }
 
@@ -186,7 +180,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
                 throw new RuntimeException(e);
             }
         }
-        static <Z> HtmlContinuation<Z> setNext(HtmlContinuation<Z> cont, HtmlContinuation<Z> next) {
+        static HtmlContinuation setNext(HtmlContinuation cont, HtmlContinuation next) {
             try {
                 fieldNext.set(cont, next);
                 return next;
