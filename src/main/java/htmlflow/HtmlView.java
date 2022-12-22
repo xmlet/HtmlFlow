@@ -65,12 +65,12 @@ public class HtmlView extends HtmlPage {
      * we cannot ensure thread safety, because concurrent threads maybe emitting
      * different HTML to the same PrintStream.
      */
-    private final PrintStream out;
+    private final Appendable out;
     /**
      * Auxiliary constructor used by clone().
      */
     HtmlView(
-        PrintStream out,
+        Appendable out,
         Supplier<HtmlViewVisitor> visitorSupplier,
         boolean threadSafe)
     {
@@ -96,7 +96,7 @@ public class HtmlView extends HtmlPage {
          * PrintStream output is not viable in a multi-thread scenario,
          * because different Visitor instances may share the same PrintStream.
          */
-        if(out != null) {
+        if(out instanceof PrintStream) {
             throw new IllegalStateException(WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM);
         }
         return clone(visitorSupplier, true);
@@ -150,6 +150,6 @@ public class HtmlView extends HtmlPage {
      */
     @Override
     public final HtmlPage setIndented(boolean isIndented) {
-        return clone(() -> (HtmlViewVisitor) getVisitor().clone(out, isIndented), false);
+        return clone(() -> (HtmlViewVisitor) getVisitor().clone(isIndented), false);
     }
 }

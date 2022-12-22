@@ -24,12 +24,12 @@
 
 package htmlflow.visitor;
 
+import htmlflow.exceptions.HtmlFlowAppendException;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-import org.xmlet.htmlapifaster.async.OnCompletion;
 
+import java.io.IOException;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -38,10 +38,18 @@ import java.util.function.Consumer;
  * @author Miguel Gamboa
  *         created on 04-08-2022
  */
-public abstract class HtmlDocVisitor extends HtmlVisitor {
+public class HtmlDocVisitor extends HtmlVisitor implements TagsToAppendable {
 
-    HtmlDocVisitor(boolean isIndented) {
+    private final Appendable out;
+
+    public HtmlDocVisitor(Appendable out, boolean isIndented) {
+        this(out, isIndented, 0);
+    }
+
+    public HtmlDocVisitor(Appendable out,boolean isIndented, int depth) {
         super(isIndented);
+        this.out = out;
+        this.depth = depth;
     }
 
     @Override
@@ -54,8 +62,42 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
         throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
     }
 
+    @Override
+    public final void write(String text) {
+        try {
+            out.append(text);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
+    }
+
+    @Override
+    protected final void write(char c) {
+        try {
+            out.append(c);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
+    }
+
+    @Override
+    public final HtmlDocVisitor clone(boolean isIndented) {
+        return new HtmlDocVisitor(this.out, isIndented);
+    }
+
+    @Override
+    public Appendable out() {
+        return out;
+    }
+
     /**
      * Returns the accumulated output and clear it.
      */
-    public abstract String finish();
+    public String finish() {
+        if (out instanceof StringBuilder) {
+            return ((StringBuilder) out).toString();
+        }
+        throw new UnsupportedOperationException("Do not call finish() with non String Builder Appendable because" +
+                "HTML fragments have been already emitted on each element call.");
+    }
 }

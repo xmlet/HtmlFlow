@@ -24,8 +24,7 @@
  */
 package htmlflow;
 
-import htmlflow.visitor.HtmlDocVisitorPrintStream;
-import htmlflow.visitor.HtmlDocVisitorStringBuilder;
+import htmlflow.visitor.HtmlDocVisitor;
 import htmlflow.visitor.HtmlViewVisitorAppendable;
 import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
@@ -76,22 +75,16 @@ public class HtmlFlow {
     
     /**
      * Creates a HtmlDoc object corresponding to a static HTML page (without model dependency)
-     * that emits HTML to an output PrintStream
+     * that emits HTML to an output Appendable
      *
-     * @param out The output Printstream
+     * @param out The output Appendable
      */
-    public static HtmlDoc doc(PrintStream out){
-        return out == null
-            ? new HtmlDoc(null, new HtmlDocVisitorStringBuilder(true))
-            : new HtmlDoc(out, new HtmlDocVisitorPrintStream(out, true));
+    public static HtmlDoc doc(Appendable out){
+        return new HtmlDoc(new HtmlDocVisitor(out, true));
     }
-    /**
-     * Creates a HtmlDoc object corresponding to a static HTML page (without model dependency)
-     * that emits HTML to and internal StringBuilder that provides the resulting String on
-     * render() of HtmDoc.
-     */
+
     public static HtmlDoc doc(){
-        return doc(null);
+        return new HtmlDoc(new HtmlDocVisitor(new StringBuilder(), true));
     }
     /**
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
@@ -100,7 +93,7 @@ public class HtmlFlow {
      * @param out Output PrintStream.
      * @param template Function that consumes an HtmlView to produce HTML elements.
      */
-    public static HtmlView view(PrintStream out, HtmlTemplate template){
+    public static HtmlView view(Appendable out, HtmlTemplate template){
         PreprocessingVisitor pre = preprocessing(template);
         return new HtmlView(
             out,

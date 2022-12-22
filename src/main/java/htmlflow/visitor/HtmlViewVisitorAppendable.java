@@ -19,7 +19,6 @@ public class HtmlViewVisitorAppendable extends HtmlViewVisitorContinuations impl
 
     @Override
     protected String readAndReset() {
-
         if (out instanceof StringBuilder) {
             String data = out.toString();
             ((StringBuilder) out).setLength(0);
@@ -48,8 +47,8 @@ public class HtmlViewVisitorAppendable extends HtmlViewVisitorContinuations impl
     }
 
     @Override
-    public HtmlVisitor clone(Appendable out, boolean isIndented) {
-        return new HtmlViewVisitorAppendable(out, isIndented, first);
+    public HtmlVisitor clone(boolean isIndented) {
+        return new HtmlViewVisitorAppendable(this.out, isIndented, first);
     }
 
     @Override

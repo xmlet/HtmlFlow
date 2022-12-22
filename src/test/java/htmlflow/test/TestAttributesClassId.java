@@ -62,7 +62,7 @@ public class TestAttributesClassId {
     @Test
     public void testIdAndClassAttribute() {
         String actual = HtmlLists
-            .taskView(null)
+            .taskView(new StringBuilder())
             .render();
         assertHtml(actual);
     }

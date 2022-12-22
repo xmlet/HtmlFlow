@@ -41,7 +41,7 @@ public class HtmlLists {
     public static final String divClass = "divClass";
     public static final String divId = "divId";
 
-    public static HtmlPage taskView (PrintStream out) {
+    public static HtmlPage taskView (Appendable out) {
         return HtmlFlow.doc(out)
             .html()
                 .head()

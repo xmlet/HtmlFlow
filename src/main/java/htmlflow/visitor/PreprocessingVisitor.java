@@ -154,7 +154,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
     }
 
     @Override
-    public HtmlVisitor clone(Appendable out, boolean isIndented) {
+    public HtmlVisitor clone(boolean isIndented) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
     }
 

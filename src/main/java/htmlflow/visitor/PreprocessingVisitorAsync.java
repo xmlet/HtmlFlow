@@ -14,7 +14,10 @@ import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.
  * @author Pedro Fialho
  **/
 public class PreprocessingVisitorAsync extends HtmlViewVisitor implements TagsToAppendable {
-    
+
+    private static final String NOT_SUPPORTED_ERROR =
+            "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
+
     private final StringBuilder sb = new StringBuilder();
     
     private int staticBlockIndex = 0;
@@ -63,8 +66,8 @@ public class PreprocessingVisitorAsync extends HtmlViewVisitor implements TagsTo
     }
     
     @Override
-    public HtmlVisitor clone(Appendable out, boolean isIndented) {
-        return null;
+    public HtmlVisitor clone(boolean isIndented) {
+        throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
     }
     
     @Override

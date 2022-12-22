@@ -27,8 +27,6 @@ package htmlflow;
 import htmlflow.visitor.HtmlDocVisitor;
 import org.xmlet.htmlapifaster.Html;
 
-import java.io.PrintStream;
-
 /**
  * Static Html view.
  *
@@ -40,20 +38,14 @@ public class HtmlDoc extends HtmlPage {
             "Wrong use of StaticView! Model object not " +
                     "supported or you should use a dynamic view instead!";
 
-    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER =
-            "Use render() instead of write(). This HtmlDoc has already a " +
-                    "HtmlVisitorStringBuilder that collects emitted HTML.";
-
-    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM =
-            "Do not call write() on HtmlDoc with a PrintStream because HTML" +
+    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR =
+            "Do not call write() on HtmlDoc because HTML" +
                     "fragments have been already emitted on each element call." +
                     "Use write() only for reusable dynamic HtmlView.";
 
-    private final PrintStream out;
     private final HtmlDocVisitor visitor;
 
-    HtmlDoc(PrintStream out, HtmlDocVisitor visitor) {
-        this.out = out;
+    HtmlDoc(HtmlDocVisitor visitor) {
         this.visitor = visitor;
     }
 
@@ -79,11 +71,7 @@ public class HtmlDoc extends HtmlPage {
 
     @Override
     public final void write() {
-        if(out == null)
-            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER);
-        else
-            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM);
-
+        throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR);
     }
 
     @Override
@@ -93,7 +81,7 @@ public class HtmlDoc extends HtmlPage {
 
     @Override
     public HtmlPage setIndented(boolean isIndented) {
-        return new HtmlDoc(out, (HtmlDocVisitor) getVisitor().clone(out, isIndented));
+        return new HtmlDoc(getVisitor().clone(isIndented));
     }
 
     @Override

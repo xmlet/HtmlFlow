@@ -50,8 +50,8 @@ public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implement
     }
     
     @Override
-    public HtmlVisitor clone(Appendable out, boolean isIndented) {
-        return new HtmlViewVisitorAsync(out, isIndented, first.copy(this));
+    public HtmlVisitor clone(boolean isIndented) {
+        return new HtmlViewVisitorAsync(this.out, isIndented, first.copy(this));
     }
     
     @Override

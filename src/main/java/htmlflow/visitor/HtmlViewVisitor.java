@@ -27,10 +27,6 @@ package htmlflow.visitor;
 import htmlflow.HtmlView;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-import org.xmlet.htmlapifaster.async.OnCompletion;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 
 /**
