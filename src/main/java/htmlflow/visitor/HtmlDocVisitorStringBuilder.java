@@ -1,8 +1,7 @@
 package htmlflow.visitor;
 
-import java.io.PrintStream;
 
-public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor implements TagsToStringBuilder {
+public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor implements TagsToAppendable {
     /**
      * The main StringBuilder. Read by the finish() to return the
      * resulting string with the Html content.
@@ -28,14 +27,14 @@ public class HtmlDocVisitorStringBuilder extends HtmlDocVisitor implements TagsT
     }
 
     @Override
-    public final HtmlDocVisitor clone(PrintStream out, boolean isIndented) {
+    public final HtmlDocVisitor clone(Appendable out, boolean isIndented) {
         if(out != null)
             throw new IllegalArgumentException("This HtmlVisitor emits to StringBuilder and does not support PrintStream!");
         return new HtmlDocVisitorStringBuilder(isIndented);
     }
 
     @Override
-    public StringBuilder sb() {
-        return sb;
+    public Appendable out() {
+        return this.sb;
     }
 }

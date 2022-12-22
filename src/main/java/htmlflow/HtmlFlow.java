@@ -26,14 +26,12 @@ package htmlflow;
 
 import htmlflow.visitor.HtmlDocVisitorPrintStream;
 import htmlflow.visitor.HtmlDocVisitorStringBuilder;
-import htmlflow.visitor.HtmlViewVisitorPrintStream;
-import htmlflow.visitor.HtmlViewVisitorStringBuilder;
+import htmlflow.visitor.HtmlViewVisitorAppendable;
 import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
 
 import java.io.PrintStream;
-import java.lang.reflect.Type;
 
 /**
  * Factory to create HtmlDoc or HtmlView instances corresponding to static HTMl pages or dynamic pages.
@@ -106,7 +104,7 @@ public class HtmlFlow {
         PreprocessingVisitor pre = preprocessing(template);
         return new HtmlView(
             out,
-            (() -> new HtmlViewVisitorPrintStream<>(out, true, pre.getFirst())),
+            (() -> new HtmlViewVisitorAppendable(out, true, pre.getFirst())),
             false); // not thread safe by default
     }
     /**
@@ -120,7 +118,7 @@ public class HtmlFlow {
         PreprocessingVisitor pre = preprocessing(template);
         return new HtmlView(
             null, // Without output stream
-            () -> new HtmlViewVisitorStringBuilder(true, pre.getFirst()), // visitor
+            () -> new HtmlViewVisitorAppendable(new StringBuilder(), true, pre.getFirst()), // visitor
             false); // Not thread safe by default
     }
     

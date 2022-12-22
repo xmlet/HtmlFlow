@@ -1,19 +1,21 @@
 package htmlflow.visitor;
 
-import java.io.PrintStream;
+import htmlflow.exceptions.HtmlFlowAppendException;
 
-public class HtmlDocVisitorPrintStream extends HtmlDocVisitor implements TagsToPrintStream {
+import java.io.IOException;
+
+public class HtmlDocVisitorPrintStream extends HtmlDocVisitor implements TagsToAppendable {
     /**
      * The final PrintStream destination of the HTML content
      * produced by this visitor.
      */
-    private final PrintStream out;
+    private final Appendable out;
 
-    public HtmlDocVisitorPrintStream(PrintStream out, boolean isIndented) {
+    public HtmlDocVisitorPrintStream(Appendable out, boolean isIndented) {
         this(out, isIndented, 0);
     }
 
-    public HtmlDocVisitorPrintStream(PrintStream out, boolean isIndented, int depth) {
+    public HtmlDocVisitorPrintStream(Appendable out, boolean isIndented, int depth) {
         super(isIndented);
         this.out = out;
         this.depth = depth;
@@ -27,22 +29,31 @@ public class HtmlDocVisitorPrintStream extends HtmlDocVisitor implements TagsToP
 
     @Override
     public final void write(String text) {
-        out.print(text);
-    }
-    @Override
-    protected final void write(char c) {
-        out.print(c);
+        try {
+            out.append(text);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
     }
 
     @Override
-    public final HtmlDocVisitor clone(PrintStream out, boolean isIndented) {
+    protected final void write(char c) {
+        try {
+            out.append(c);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
+    }
+
+    @Override
+    public final HtmlDocVisitor clone(Appendable out, boolean isIndented) {
         if(out == null)
-            throw new IllegalArgumentException("Out PrintStream cannot be null!");
+            throw new IllegalArgumentException("Out Appendable cannot be null!");
         return new HtmlDocVisitorPrintStream(out, isIndented);
     }
 
     @Override
-    public PrintStream out() {
+    public Appendable out() {
         return out;
     }
 }

@@ -1,8 +1,9 @@
 package htmlflow.visitor;
 
 import htmlflow.async.TerminationHtmlContinuationNode;
+import htmlflow.exceptions.HtmlFlowAppendException;
 
-import java.io.PrintStream;
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
@@ -10,16 +11,16 @@ import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.
 /**
  * @author Pedro Fialho
  **/
-public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implements TagsToPrintStream {
+public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implements TagsToAppendable {
     
-    private final PrintStream out;
+    private final Appendable out;
 
     /**
      * The last node to be processed.
      */
     protected final HtmlContinuation last;
 
-    public HtmlViewVisitorAsync(PrintStream out, boolean isIndented, HtmlContinuation first) {
+    public HtmlViewVisitorAsync(Appendable out, boolean isIndented, HtmlContinuation first) {
         super(isIndented, first);
         this.last = findLast();
         this.out = out;
@@ -32,21 +33,29 @@ public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implement
     
     @Override
     public void write(String text) {
-        out.print(text);
+        try {
+            out.append(text);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
     }
     
     @Override
     protected void write(char c) {
-        out.print(c);
+        try {
+            out.append(c);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
     }
     
     @Override
-    public HtmlVisitor clone(PrintStream out, boolean isIndented) {
+    public HtmlVisitor clone(Appendable out, boolean isIndented) {
         return new HtmlViewVisitorAsync(out, isIndented, first.copy(this));
     }
     
     @Override
-    public PrintStream out() {
+    public Appendable out() {
         return this.out;
     }
     

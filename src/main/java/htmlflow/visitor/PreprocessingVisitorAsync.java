@@ -4,7 +4,6 @@ import htmlflow.HtmlView;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 
@@ -14,7 +13,7 @@ import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.
 /**
  * @author Pedro Fialho
  **/
-public class PreprocessingVisitorAsync extends HtmlViewVisitor implements TagsToStringBuilder {
+public class PreprocessingVisitorAsync extends HtmlViewVisitor implements TagsToAppendable {
     
     private final StringBuilder sb = new StringBuilder();
     
@@ -64,7 +63,7 @@ public class PreprocessingVisitorAsync extends HtmlViewVisitor implements TagsTo
     }
     
     @Override
-    public HtmlVisitor clone(PrintStream out, boolean isIndented) {
+    public HtmlVisitor clone(Appendable out, boolean isIndented) {
         return null;
     }
     
@@ -106,10 +105,10 @@ public class PreprocessingVisitorAsync extends HtmlViewVisitor implements TagsTo
         newlineAndIndent();
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
     }
-    
+
     @Override
-    public StringBuilder sb() {
-        return this.sb;
+    public Appendable out() {
+        return sb;
     }
 
 

@@ -28,7 +28,6 @@ package htmlflow.visitor;
 import htmlflow.HtmlView;
 import org.xmlet.htmlapifaster.Element;
 
-import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 
@@ -48,7 +47,7 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  *
  * @param <T> The type of the Model bound to a view.
  */
-public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToStringBuilder {
+public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppendable {
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
 
@@ -155,12 +154,12 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToStrin
     }
 
     @Override
-    public HtmlVisitor clone(PrintStream out, boolean isIndented) {
+    public HtmlVisitor clone(Appendable out, boolean isIndented) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
     }
 
     @Override
-    public StringBuilder sb() {
+    public Appendable out() {
         return sb;
     }
 
