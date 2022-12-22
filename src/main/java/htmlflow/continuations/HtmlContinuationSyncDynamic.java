@@ -39,7 +39,7 @@ import java.util.function.BiConsumer;
  * @param <E> the type of the parent HTML element received by the dynamic HTML block.
  * @param <T> the type of the template's model.
  */
-public class HtmlContinuationDynamic<E extends Element, T> extends HtmlContinuationSync {
+public class HtmlContinuationSyncDynamic<E extends Element, T> extends HtmlContinuationSync {
 
     /**
      * The continuation that consumes the element and a model.
@@ -54,7 +54,7 @@ public class HtmlContinuationDynamic<E extends Element, T> extends HtmlContinuat
      * @param currentDepth Indentation depth associated to this block.
      * @param consumer     The continuation that consumes the element and a model.
      */
-    HtmlContinuationDynamic(
+    public HtmlContinuationSyncDynamic(
         int currentDepth,
         boolean isClosed,
         E element, BiConsumer<E, T> consumer,
@@ -71,8 +71,8 @@ public class HtmlContinuationDynamic<E extends Element, T> extends HtmlContinuat
     }
 
     @Override
-    protected HtmlContinuation copy(HtmlVisitor v) {
-        return new HtmlContinuationDynamic<>(
+    public HtmlContinuation copy(HtmlVisitor v) {
+        return new HtmlContinuationSyncDynamic<>(
             currentDepth,
             isClosed,
             copyElement(v),

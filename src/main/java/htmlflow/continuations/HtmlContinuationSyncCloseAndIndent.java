@@ -5,15 +5,15 @@ import htmlflow.visitor.HtmlVisitor;
 /**
  * @author Pedro Fialho
  **/
-public class HtmlContinuationCloseAndIndent extends HtmlContinuationSync {
+public class HtmlContinuationSyncCloseAndIndent extends HtmlContinuationSync {
     /**
      * Sets indentation to -1 to inform that visitor should continue with previous indentation.
      * The isClosed is useless here.
      */
-    HtmlContinuationCloseAndIndent(HtmlVisitor visitor, HtmlContinuation next) {
+    public HtmlContinuationSyncCloseAndIndent(HtmlVisitor visitor, HtmlContinuation next) {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case
     }
-    HtmlContinuationCloseAndIndent(HtmlVisitor visitor) {
+    public HtmlContinuationSyncCloseAndIndent(HtmlVisitor visitor) {
         super(-1, false, visitor, null); // The isClosed parameter is useless in this case
     }
     
@@ -27,13 +27,13 @@ public class HtmlContinuationCloseAndIndent extends HtmlContinuationSync {
          * Thus, here we start by decrementing depth.
          * However, this could not be true for some cases, and we will get inconsistent indentation !!!!
          */
-        visitor.depth--;
+        visitor.setDepth(visitor.getDepth() - 1);
         visitor.newlineAndIndent();
     }
     
     @Override
-    protected HtmlContinuation copy(HtmlVisitor visitor) {
-        return new HtmlContinuationCloseAndIndent(
+    public HtmlContinuation copy(HtmlVisitor visitor) {
+        return new HtmlContinuationSyncCloseAndIndent(
                 visitor,
                 next != null ? next.copy(visitor) : null); // call copy recursively
     }

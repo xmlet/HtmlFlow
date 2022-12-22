@@ -22,7 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package htmlflow.visitor;
+package htmlflow.continuations;
+
+import htmlflow.visitor.HtmlVisitor;
 
 /**
  * Base class for a linked list of nodes, corresponding to HtmlContinuation objects.
@@ -46,7 +48,7 @@ public abstract class HtmlContinuation {
     /**
      * Next HtmlContinuation
      */
-    final HtmlContinuation next;
+    public final HtmlContinuation next;
 
     /**
      * @param currentDepth Indentation depth associated to this block.
@@ -72,6 +74,6 @@ public abstract class HtmlContinuation {
      *
      * @param visitor
      */
-    protected abstract HtmlContinuation copy(HtmlVisitor visitor);
+    public abstract HtmlContinuation copy(HtmlVisitor visitor);
 
 }

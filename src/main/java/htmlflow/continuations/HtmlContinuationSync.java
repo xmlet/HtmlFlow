@@ -1,4 +1,6 @@
-package htmlflow.visitor;
+package htmlflow.continuations;
+
+import htmlflow.visitor.HtmlVisitor;
 
 public abstract class HtmlContinuationSync extends HtmlContinuation{
     /**
@@ -18,8 +20,8 @@ public abstract class HtmlContinuationSync extends HtmlContinuation{
     @Override
     public final void execute(Object model) {
         if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
+            this.visitor.setIsClosed(isClosed);
+            this.visitor.setDepth(currentDepth);
         }
         emitHtml(model);
         if (next != null) {

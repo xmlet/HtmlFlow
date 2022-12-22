@@ -1,5 +1,6 @@
-package htmlflow.visitor;
+package htmlflow.continuations;
 
+import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
@@ -19,12 +20,12 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
     private final E element;
     private final AwaitConsumer<E,T> consumer;
 
-    HtmlContinuationAsync(int currentDepth,
-                          boolean isClosed,
-                          E element,
-                          AwaitConsumer<E,T> consumer,
-                          HtmlVisitor visitor,
-                          HtmlContinuation next) {
+    public HtmlContinuationAsync(int currentDepth,
+                                 boolean isClosed,
+                                 E element,
+                                 AwaitConsumer<E,T> consumer,
+                                 HtmlVisitor visitor,
+                                 HtmlContinuation next) {
         super(currentDepth, isClosed, visitor, next);
         this.element = element;
         this.consumer = consumer;
@@ -33,8 +34,8 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
     @Override
     public final void execute(Object model) {
         if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
+            this.visitor.setIsClosed(isClosed);
+            this.visitor.setDepth(currentDepth);
         }
         this.consumer.accept(element, (T) model, () -> {
             if (next != null) {
@@ -44,7 +45,7 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
     }
     
     @Override
-    protected HtmlContinuation copy(HtmlVisitor v) {
+    public HtmlContinuation copy(HtmlVisitor v) {
         return new HtmlContinuationAsync<>(
                 currentDepth,
                 isClosed,
