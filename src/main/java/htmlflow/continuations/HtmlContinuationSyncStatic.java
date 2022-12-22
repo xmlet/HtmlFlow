@@ -23,7 +23,9 @@
  * SOFTWARE.
  */
 
-package htmlflow.visitor;
+package htmlflow.continuations;
+
+import htmlflow.visitor.HtmlVisitor;
 
 /**
  * HtmlContinuation for a static HTML block.

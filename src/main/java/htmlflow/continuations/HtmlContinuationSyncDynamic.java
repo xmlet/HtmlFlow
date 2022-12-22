@@ -23,8 +23,9 @@
  * SOFTWARE.
  */
 
-package htmlflow.visitor;
+package htmlflow.continuations;
 
+import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
 

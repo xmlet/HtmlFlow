@@ -1,6 +1,6 @@
 package htmlflow.async;
 
-import htmlflow.visitor.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuation;
 import htmlflow.visitor.HtmlVisitor;
 
 import java.util.concurrent.CompletableFuture;

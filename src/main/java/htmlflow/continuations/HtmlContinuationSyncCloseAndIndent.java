@@ -1,4 +1,6 @@
-package htmlflow.visitor;
+package htmlflow.continuations;
+
+import htmlflow.visitor.HtmlVisitor;
 
 /**
  * @author Pedro Fialho
