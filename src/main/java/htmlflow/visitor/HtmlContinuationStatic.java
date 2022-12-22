@@ -26,21 +26,21 @@
 package htmlflow.visitor;
 
 /**
- * @param <U> the type of the template's model.
+ * HtmlContinuation for a static HTML block.
  */
-public class HtmlContinuationStatic<U> extends HtmlContinuation<U> {
+public class HtmlContinuationStatic extends HtmlContinuation {
     final String staticHtmlBlock;
     /**
      * Sets indentation to -1 to inform that visitor should continue with previous indentation.
      * The isClosed is useless because it just writes what it is in its staticHtmlBlock.
      */
-    HtmlContinuationStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation<U> next) {
+    HtmlContinuationStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation next) {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
         this.staticHtmlBlock = staticHtmlBlock;
     }
     
     @Override
-    public void execute(U model) {
+    public void execute(Object model) {
         if (currentDepth >= 0) {
             this.visitor.isClosed = isClosed;
             this.visitor.depth = currentDepth;
@@ -52,13 +52,13 @@ public class HtmlContinuationStatic<U> extends HtmlContinuation<U> {
     }
     
     @Override
-    protected void emitHtml(U model) {
+    protected void emitHtml(Object model) {
         visitor.write(staticHtmlBlock);
     }
 
     @Override
-    protected HtmlContinuation<U> copy(HtmlVisitor v) {
-        return new HtmlContinuationStatic<>(
+    protected HtmlContinuation copy(HtmlVisitor v) {
+        return new HtmlContinuationStatic(
             staticHtmlBlock,
             v,
             next != null ? next.copy(v) : null); // call copy recursively

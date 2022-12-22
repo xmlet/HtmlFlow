@@ -33,14 +33,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.function.BiConsumer;
 
 /**
- * @param <U> the type of the template's model.
+ * HtmlContinuation for a dynamic block (i.e. BiConsumer) depending of an object model.
+ *
+ * @param <E> the type of the parent HTML element received by the dynamic HTML block.
+ * @param <T> the type of the template's model.
  */
-public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuation<U> {
+public class HtmlContinuationDynamic<E extends Element, T> extends HtmlContinuation {
 
     /**
      * The continuation that consumes the element and a model.
      */
-    final BiConsumer<E, U> consumer;
+    final BiConsumer<E, T> consumer;
     /**
      * The element passed to the continuation consumer.
      */
@@ -53,9 +56,9 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
     HtmlContinuationDynamic(
         int currentDepth,
         boolean isClosed,
-        E element, BiConsumer<E, U> consumer,
+        E element, BiConsumer<E, T> consumer,
         HtmlVisitor visitor,
-        HtmlContinuation<U> next
+        HtmlContinuation next
     ) {
         super(currentDepth, isClosed, visitor, next);
         this.element = element;
@@ -63,7 +66,7 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
     }
     
     @Override
-    public void execute(U model) {
+    public void execute(Object model) {
         if (currentDepth >= 0) {
             this.visitor.isClosed = isClosed;
             this.visitor.depth = currentDepth;
@@ -75,12 +78,12 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
     }
     
     @Override
-    protected void emitHtml(U model) {
-        consumer.accept(element, model);
+    protected void emitHtml(Object model) {
+        consumer.accept(element, (T) model);
     }
 
     @Override
-    protected HtmlContinuation<U> copy(HtmlVisitor v) {
+    protected HtmlContinuation copy(HtmlVisitor v) {
         return new HtmlContinuationDynamic<>(
             currentDepth,
             isClosed,

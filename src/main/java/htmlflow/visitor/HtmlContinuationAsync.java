@@ -3,17 +3,18 @@ package htmlflow.visitor;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Consumer;
-
 
 /**
- * @author Pedro Fialho
- **/
-public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuation<T> {
+ * HtmlContinuation for an asynchronous block (i.e. AwaitConsumer) depending of an asynchronous object model.
+ * The next continuation will be invoked on completion of asynchronous object model.
+ *
+ * @param <E> the type of the parent HTML element received by the dynamic HTML block.
+ * @param <T> the type of the template's model.
+ */
+public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuation {
     
     private final E element;
     private final AwaitConsumer<E,T> consumer;
@@ -23,14 +24,14 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
                           E element,
                           AwaitConsumer<E,T> consumer,
                           HtmlVisitor visitor,
-                          HtmlContinuation<T> next) {
+                          HtmlContinuation next) {
         super(currentDepth, isClosed, visitor, next);
         this.element = element;
         this.consumer = consumer;
     }
     
     @Override
-    public void execute(T model) {
+    public void execute(Object model) {
         if (currentDepth >= 0) {
             this.visitor.isClosed = isClosed;
             this.visitor.depth = currentDepth;
@@ -40,8 +41,8 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
     }
     
     @Override
-    protected void emitHtml(T model) {
-        this.consumer.accept(element, model, () -> {
+    protected void emitHtml(Object model) {
+        this.consumer.accept(element, (T) model, () -> {
             if (next != null) {
                 next.execute(model);
             }
@@ -50,7 +51,7 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
     
     
     @Override
-    protected HtmlContinuation<T> copy(HtmlVisitor v) {
+    protected HtmlContinuation copy(HtmlVisitor v) {
         return new HtmlContinuationAsync<>(
                 currentDepth,
                 isClosed,
