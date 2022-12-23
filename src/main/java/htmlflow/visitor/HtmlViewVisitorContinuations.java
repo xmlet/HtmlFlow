@@ -26,6 +26,7 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
+import htmlflow.continuations.HtmlContinuation;
 import org.xmlet.htmlapifaster.Element;
 
 import java.util.function.BiConsumer;

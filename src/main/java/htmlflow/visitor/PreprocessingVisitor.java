@@ -26,6 +26,10 @@
 package htmlflow.visitor;
 
 import htmlflow.HtmlView;
+import htmlflow.continuations.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
+import htmlflow.continuations.HtmlContinuationSyncDynamic;
+import htmlflow.continuations.HtmlContinuationSyncStatic;
 import org.xmlet.htmlapifaster.Element;
 
 import java.lang.reflect.Field;
@@ -37,7 +41,7 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  * This visitor is used to make a preprocessing resolution of an HtmlTemplate.
  * It will collect the resulting HTML from visiting static HTML elements into an auxiliary
  * StringBuilder that later is extracted to: String staticHtml = sb.substring(staticBlockIndex);
- * to create an HtmlContinuationStatic object.
+ * to create an HtmlContinuationSyncStatic object.
  * It also interleaves the creation of HtmlContinuationDynamic nodes that only store dynamicHtmlBlock
  * objects corresponding to a BiConsumer<E, U> (being E an element and U the model).
  * The U comes from external module HtmlApiFaster whose classes are not strongly typed with the Model.
@@ -109,7 +113,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
-        HtmlContinuation dynamicCont = new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationCloseAndIndent(this));
+        HtmlContinuation dynamicCont = new HtmlContinuationSyncDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationSyncCloseAndIndent(this));
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
@@ -126,7 +130,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
     protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
         String staticHtml = sb.substring(staticBlockIndex);
         String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
-        HtmlContinuation staticCont = new HtmlContinuationStatic(staticHtmlTrimmed, this, nextContinuation);
+        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtmlTrimmed, this, nextContinuation);
         if(first == null) first = staticCont; // on first visit initializes the first pointer
         else setNext(last, staticCont);       // else append the staticCont to existing chain
         last = nextContinuation.next;         // advance last to point to the new HtmlContinuationCloseAndIndent
@@ -144,7 +148,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
     @Override
     public String finish(Object model, HtmlView... partials) {
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation staticCont = new HtmlContinuationStatic(staticHtml.trim(), this, null);
+        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtml.trim(), this, null);
         last = first == null
                 ? first = staticCont         // assign both first and last
                 : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.

@@ -1,5 +1,8 @@
 package htmlflow.visitor;
 
+import htmlflow.continuations.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuationAsync;
+import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
@@ -24,7 +27,7 @@ public class PreprocessingVisitorAsync extends PreprocessingVisitor {
                 element,
                 asyncHtmlBlock,
                 this,
-                new HtmlContinuationCloseAndIndent(this));
+                new HtmlContinuationSyncCloseAndIndent(this));
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,

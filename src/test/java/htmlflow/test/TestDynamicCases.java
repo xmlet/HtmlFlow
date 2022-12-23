@@ -18,8 +18,12 @@ public class TestDynamicCases {
 
     @Test(expected = IllegalStateException.class)
     public void testDynamicChainedTwice() {
+        Track [] tracks1 = {
+                new Track("Space Odyssey"),
+                new Track("Under Pressure")};
         HtmlFlow
-            .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice);
+            .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice)
+                .render(of(tracks1));
     }
 
     @Test

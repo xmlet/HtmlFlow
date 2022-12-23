@@ -26,7 +26,7 @@ package htmlflow.test;
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
-import htmlflow.visitor.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuation;
 import htmlflow.visitor.HtmlVisitor;
 import org.junit.Test;
 import org.xmlet.htmlapifaster.Div;

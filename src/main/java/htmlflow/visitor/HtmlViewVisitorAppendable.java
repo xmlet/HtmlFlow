@@ -1,5 +1,6 @@
 package htmlflow.visitor;
 
+import htmlflow.continuations.HtmlContinuation;
 import htmlflow.exceptions.HtmlFlowAppendException;
 
 import java.io.IOException;

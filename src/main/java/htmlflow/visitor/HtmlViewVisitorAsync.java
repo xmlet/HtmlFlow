@@ -1,12 +1,14 @@
 package htmlflow.visitor;
 
-import htmlflow.async.TerminationHtmlContinuationNode;
+import htmlflow.continuations.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuationAsyncTerminationNode;
 import htmlflow.exceptions.HtmlFlowAppendException;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
+import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
+
 
 /**
  * @author Pedro Fialho
@@ -61,7 +63,7 @@ public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implement
     
     public CompletableFuture<Void> finishedAsync(Object model) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        TerminationHtmlContinuationNode terminationNode = new TerminationHtmlContinuationNode(cf);
+        HtmlContinuationAsyncTerminationNode terminationNode = new HtmlContinuationAsyncTerminationNode(cf);
         /**
          * Chain terminationNode next to the last node.
          * Keep last pointing to the same node to replace the terminationNode on

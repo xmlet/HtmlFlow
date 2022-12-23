@@ -77,6 +77,10 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
         depth = v;
     }
 
+    public void setIsClosed(boolean isClosed) {
+        this.isClosed = isClosed;
+    }
+
     HtmlVisitor(boolean isIndented) {
         this.isIndented = isIndented;
     }
@@ -96,7 +100,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
-    final void newlineAndIndent(){
+    public final void newlineAndIndent(){
         if (isClosed){
             if(isIndented) {
                 write(Indentation.tabs(depth)); // \n\t\t\t\...
