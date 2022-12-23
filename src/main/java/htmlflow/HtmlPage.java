@@ -48,15 +48,10 @@ import static java.util.stream.Collectors.joining;
  * Instances of HtmlPage are immutable. Any change to its properties returns a new
  * instance of HtmlPage.
  *
- * @param <T> The type of domain object bound to this View.
- *
  * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
 public abstract class HtmlPage implements Element<HtmlPage, Element<?,?>> {
-
-    static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
-            "Cannot set thread-safety for views with PrintStream output!";
 
     public  static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -77,14 +72,6 @@ public abstract class HtmlPage implements Element<HtmlPage, Element<?,?>> {
             throw new UncheckedIOException(e);
         }
     }
-
-    public abstract String render();
-
-    public abstract String render(Object model);
-
-    public abstract void write(Object model);
-
-    public abstract void write();
 
     public abstract Html<HtmlPage> html();
 

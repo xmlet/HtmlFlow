@@ -102,7 +102,7 @@ public class TestPartialsToPrintStream {
          * Assert
          */
         HtmlVisitor visitor = view.getVisitor();
-        Field firstField = visitor.getClass().getSuperclass().getDeclaredField("first");
+        Field firstField = visitor.getClass().getDeclaredField("first");
         firstField.setAccessible(true);
         HtmlContinuation node = (HtmlContinuation) firstField.get(visitor);
         int count = 0;

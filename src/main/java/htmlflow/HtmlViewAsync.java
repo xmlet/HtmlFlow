@@ -24,18 +24,14 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitor;
-import htmlflow.visitor.HtmlVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
+import htmlflow.visitor.HtmlVisitor;
 
-import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /**
  * Dynamic views can be bound to a domain object within an asynchronous context with the usage of {@link org.reactivestreams.Publisher}.
- *
- * @param <T> The type of async domain object bound to this View.
  *
  * @author Pedro Fialho
  */
@@ -54,13 +50,11 @@ public class HtmlViewAsync extends HtmlView {
     /**
      * Auxiliary constructor used by clone().
      *
-     * @param out
      * @param visitorSupplier
      * @param threadSafe
      */
-    HtmlViewAsync(Appendable out, Supplier<HtmlViewVisitor> visitorSupplier,
-                  boolean threadSafe) {
-        super(out, visitorSupplier, threadSafe);
+    HtmlViewAsync(Supplier<HtmlVisitor> visitorSupplier, boolean threadSafe) {
+        super(visitorSupplier, threadSafe);
     }
     
     @Override
@@ -84,15 +78,13 @@ public class HtmlViewAsync extends HtmlView {
     }
     
     public final CompletableFuture<Void> writeAsync(Object model) {
-        final HtmlViewVisitor localVisitor = this.getVisitor();
+        final HtmlVisitor localVisitor = this.getVisitor();
         
         if (!(localVisitor instanceof HtmlViewVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
         }
-        
-        HtmlViewVisitorAsync visitorAsync = (HtmlViewVisitorAsync) localVisitor;
-        visitorAsync.setAppendable(this.out);
 
+        HtmlViewVisitorAsync visitorAsync = (HtmlViewVisitorAsync) localVisitor;
         return visitorAsync.finishedAsync(model);
     }
 }

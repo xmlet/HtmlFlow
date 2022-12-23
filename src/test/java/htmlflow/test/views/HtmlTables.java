@@ -170,7 +170,7 @@ public class HtmlTables {
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    public static HtmlPage nestedTable = HtmlFlow.doc()
+    public static HtmlView nestedTable = HtmlFlow.view(view -> view
             .html()
                 .body()
                     .table()
@@ -200,5 +200,6 @@ public class HtmlTables {
                         .__() // tr
                     .__() // table
                 .__() // body
-            .__(); // html
+            .__() // html
+    );
 }

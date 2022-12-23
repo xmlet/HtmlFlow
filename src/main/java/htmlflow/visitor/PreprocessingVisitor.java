@@ -25,12 +25,12 @@
 
 package htmlflow.visitor;
 
-import htmlflow.HtmlView;
 import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import htmlflow.continuations.HtmlContinuationSyncDynamic;
 import htmlflow.continuations.HtmlContinuationSyncStatic;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
@@ -48,7 +48,7 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  * Thus, only the dynamic() and visitDynamic() methods in HtmlApiFaster were made generic to carry
  * a type parameter U corresponding to the type of the Model.
  */
-public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppendable {
+public class PreprocessingVisitor extends HtmlVisitor {
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
     /**
@@ -119,6 +119,11 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
         indentAndAdvanceStaticBlockIndex();
     }
 
+    @Override
+    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E, M> asyncAction) {
+        throw new UnsupportedOperationException();
+    }
+
     protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
         String staticHtml = sb.substring(staticBlockIndex);
         String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
@@ -137,7 +142,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
      * Creates the last static HTML block.
      */
     @Override
-    public void resolve(Object model, HtmlView... partials) {
+    public void resolve(Object model) {
         String staticHtml = sb.substring(staticBlockIndex);
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtml.trim(), this, null);
         last = first == null
@@ -146,10 +151,11 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
     }
 
     @Override
-    public void setAppendable(Appendable builder) {
+    public HtmlVisitor setAppendable(Appendable builder) {
         /**
          * !!!NOT USED!!!
          */
+        throw new UnsupportedOperationException();
     }
 
     @Override

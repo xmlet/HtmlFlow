@@ -26,13 +26,12 @@ package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -51,8 +50,8 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample01() {
-        String html= HtmlFlow
-            .doc()
+        HtmlFlow
+            .doc(System.out)
                 .html()
                     .head()
                         .title().text("HtmlFlow").__()
@@ -64,9 +63,7 @@ public class HtmlForReadme {
                             .p().text("Typesafe is awesome! :-)").__()
                         .__()
                     .__() //body
-                .__() //html
-            .render();
-        // System.out.println(html);
+                .__(); //html
     }
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -90,13 +87,13 @@ public class HtmlForReadme {
     }
 
 
-    static HtmlPage view = HtmlFlow.doc()
+    static HtmlView view = HtmlFlow.view(view -> view
                 .html()
                     .body()
                         .p().text("Typesafe is awesome! :-)").__()
                     .__() //body
-                .__(); // html
-
+                .__() // html
+            );
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -118,7 +115,7 @@ public class HtmlForReadme {
         }
     }
 
-    static HtmlPage tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
+    static HtmlView tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.

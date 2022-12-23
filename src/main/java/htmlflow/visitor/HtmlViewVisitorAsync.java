@@ -2,9 +2,7 @@ package htmlflow.visitor;
 
 import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationAsyncTerminationNode;
-import htmlflow.exceptions.HtmlFlowAppendException;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
@@ -13,51 +11,21 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
 /**
  * @author Pedro Fialho
  **/
-public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implements TagsToAppendable {
+public class HtmlViewVisitorAsync extends HtmlViewVisitor {
     
-    private Appendable out;
-
     /**
      * The last node to be processed.
      */
     protected final HtmlContinuation last;
 
-    public HtmlViewVisitorAsync(boolean isIndented, HtmlContinuation first) {
-        super(isIndented, first);
+    public HtmlViewVisitorAsync(Appendable out, boolean isIndented, HtmlContinuation first) {
+        super(out, isIndented, first);
         this.last = findLast();
     }
     
     @Override
-    public void write(String text) {
-        try {
-            out.append(text);
-        } catch (IOException e) {
-            throw new HtmlFlowAppendException(e);
-        }
-    }
-    
-    @Override
-    protected void write(char c) {
-        try {
-            out.append(c);
-        } catch (IOException e) {
-            throw new HtmlFlowAppendException(e);
-        }
-    }
-    
-    @Override
     public HtmlVisitor clone(boolean isIndented) {
-        return new HtmlViewVisitorAsync(isIndented, first.copy(this));
-    }
-    
-    @Override
-    public Appendable out() {
-        return this.out;
-    }
-
-    @Override
-    public void setAppendable(Appendable appendable) {
-        this.out = appendable;
+        return new HtmlViewVisitorAsync(out, isIndented, first.copy(this));
     }
 
     public CompletableFuture<Void> finishedAsync(Object model) {

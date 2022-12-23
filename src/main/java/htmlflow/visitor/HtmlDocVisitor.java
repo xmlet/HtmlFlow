@@ -38,7 +38,7 @@ import java.util.function.BiConsumer;
  * @author Miguel Gamboa
  *         created on 04-08-2022
  */
-public class HtmlDocVisitor extends HtmlVisitor implements TagsToAppendable {
+public class HtmlDocVisitor extends HtmlVisitor {
 
     private final Appendable out;
 
@@ -81,6 +81,18 @@ public class HtmlDocVisitor extends HtmlVisitor implements TagsToAppendable {
     }
 
     @Override
+    public HtmlVisitor setAppendable(Appendable appendable) {
+        throw new UnsupportedOperationException("Cannot set output appendable! " +
+                "You must set output Appendable on creation of HtmlDoc!");
+    }
+
+    @Override
+    public void resolve(Object model) {
+        throw new UnsupportedOperationException("HTML has been already emitted on elements flow. " +
+                "resolve() is only available for HtmlView pages.");
+    }
+
+    @Override
     public final HtmlDocVisitor clone(boolean isIndented) {
         return new HtmlDocVisitor(this.out, isIndented);
     }
@@ -88,12 +100,5 @@ public class HtmlDocVisitor extends HtmlVisitor implements TagsToAppendable {
     @Override
     public Appendable out() {
         return out;
-    }
-
-    /**
-     * Returns the accumulated output and clear it.
-     */
-    public String finish() {
-        return out.toString();
     }
 }

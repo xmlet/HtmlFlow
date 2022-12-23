@@ -41,8 +41,6 @@ import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
-import java.io.PrintStream;
-
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster
  * library).
@@ -83,16 +81,6 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
 
     HtmlVisitor(boolean isIndented) {
         this.isIndented = isIndented;
-    }
-    /**
-     * Writes the {@code ">"} to output.
-     */
-    public final void closeBeginTag() {
-        if(!isClosed) {
-            write(FINISH_TAG);
-            isClosed = true;
-            depth++;
-        }
     }
 
     /**
@@ -183,6 +171,15 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
      * Writes the char c directly to the output.
      */
     protected abstract void write(char c);
+
+    /**
+     * Set the output.
+     */
+    public abstract HtmlVisitor setAppendable(Appendable appendable);
+    /**
+     * Processing output.
+     */
+    public abstract void resolve(Object model);
     /**
      * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
      * existing HtmlVisitor instance with a different isIndented state.

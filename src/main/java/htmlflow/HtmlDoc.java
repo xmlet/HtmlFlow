@@ -34,15 +34,6 @@ import org.xmlet.htmlapifaster.Html;
  */
 public class HtmlDoc extends HtmlPage {
 
-    private static final String WRONG_USE_OF_RENDER_WITH_MODEL =
-            "Wrong use of StaticView! Model object not " +
-                    "supported or you should use a dynamic view instead!";
-
-    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR =
-            "Do not call write() on HtmlDoc because HTML" +
-                    "fragments have been already emitted on each element call." +
-                    "Use write() only for reusable dynamic HtmlView.";
-
     private final HtmlDocVisitor visitor;
 
     HtmlDoc(HtmlDocVisitor visitor) {
@@ -52,26 +43,6 @@ public class HtmlDoc extends HtmlPage {
     public final Html<HtmlPage> html() {
         this.getVisitor().write(HEADER);
         return new Html<>(this);
-    }
-
-    @Override
-    public final String render() {
-        return getVisitor().finish();
-    }
-
-    @Override
-    public final String render(Object model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
-    }
-
-    @Override
-    public final void write(Object model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
-    }
-
-    @Override
-    public final void write() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR);
     }
 
     @Override

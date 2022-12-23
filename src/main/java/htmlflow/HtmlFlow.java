@@ -25,7 +25,7 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlDocVisitor;
-import htmlflow.visitor.HtmlViewVisitorAppendable;
+import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
@@ -46,12 +46,11 @@ public class HtmlFlow {
      * This will invoke the HtmlTemplate to a PreprocessingVisitor that collects a chain of
      * HtmlContinuation objects containing the static HTML strings and dynamic HTML consumers.
      *
-     * @param modelClass The class of the model.
      * @param template An HtmlTemplate function, which depends on an HtmlView used to create HTMl elements.
      */
     private static PreprocessingVisitor preprocessing(HtmlTemplate template) {
         PreprocessingVisitor pre = new PreprocessingVisitor(true);
-        HtmlView preView = new HtmlView(null, () -> pre, false);
+        HtmlView preView = new HtmlView(() -> pre, false);
         template.resolve(preView);
         /**
          * NO problem with null model. We are just preprocessing static HTML blocks.
@@ -63,7 +62,7 @@ public class HtmlFlow {
     
     private static PreprocessingVisitorAsync preprocessingAsync(HtmlTemplate template) {
         PreprocessingVisitorAsync pre = new PreprocessingVisitorAsync(true);
-        HtmlView preView = new HtmlView(null, () -> pre, false);
+        HtmlView preView = new HtmlView(() -> pre, false);
         template.resolve(preView);
         /**
          * NO problem with null model. We are just preprocessing static HTML blocks.
@@ -83,29 +82,22 @@ public class HtmlFlow {
         return new HtmlDoc(new HtmlDocVisitor(out, true));
     }
 
-    public static HtmlDoc doc(){
-        return doc(new StringBuilder());
-    }
     /**
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
      *
-     * @param modelClass Used to crate fake model object for preprocessing of HtmlTemplate.
      * @param out Output PrintStream.
      * @param template Function that consumes an HtmlView to produce HTML elements.
      */
     public static HtmlView view(Appendable out, HtmlTemplate template){
         PreprocessingVisitor pre = preprocessing(template);
         return new HtmlView(
-            out,
-            (() -> new HtmlViewVisitorAppendable(true, pre.getFirst())),
+            (() -> new HtmlViewVisitor(out, true, pre.getFirst())),
             false); // not thread safe by default
     }
     /**
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
      *
-     * @param modelClass Used to crate fake model object for preprocessing of HtmlTemplate.
      * @param template Function that consumes an HtmlView to produce HTML elements.
-     * @param <U> Type of the model.
      */
     public static HtmlView view(HtmlTemplate template){
         return view(new StringBuilder(), template);
@@ -116,13 +108,11 @@ public class HtmlFlow {
      *
      * @param out Output PrintStream.
      * @param template Function that consumes an HtmlView to produce HTML elements.
-     * @param <U> Type of the model.
      */
     public static HtmlViewAsync viewAsync(PrintStream out, HtmlTemplate template){
         PreprocessingVisitorAsync pre = preprocessingAsync(template);
         return new HtmlViewAsync(
-                out,
-                () -> new HtmlViewVisitorAsync(true, pre.getFirst()),
+                () -> new HtmlViewVisitorAsync(out, true, pre.getFirst()),
                 false);
     }
 }

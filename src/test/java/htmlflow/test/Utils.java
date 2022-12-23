@@ -23,7 +23,7 @@
  */
 package htmlflow.test;
 
-import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.w3c.dom.Document;
@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -63,7 +62,7 @@ public class Utils {
         return new BufferedReader(actual).lines();
     }
 
-    static <T> Stream<String> htmlRender(HtmlPage view, T model){
+    static <T> Stream<String> htmlRender(HtmlView view, T model){
         String html = view.render(model);
         return NEWLINE.splitAsStream(html);
     }

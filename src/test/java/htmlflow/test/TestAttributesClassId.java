@@ -55,16 +55,16 @@ public class TestAttributesClassId {
 
     @Test
     public void testGetElementName() {
-        Div<Body<Html<HtmlPage>>> div = HtmlFlow.doc().html().body().div();
+        Div<Body<Html<HtmlPage>>> div = HtmlFlow.doc(System.out).html().body().div();
         assertEquals(DIV_NAME, div.getName());
     }
 
     @Test
     public void testIdAndClassAttribute() {
-        String actual = HtmlLists
-            .taskView(new StringBuilder())
-            .render();
-        assertHtml(actual);
+        StringBuilder actual = new StringBuilder();
+        HtmlLists
+            .taskView(actual);
+        assertHtml(actual.toString());
     }
 
     @Test

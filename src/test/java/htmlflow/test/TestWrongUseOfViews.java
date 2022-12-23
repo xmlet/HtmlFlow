@@ -28,8 +28,6 @@ import htmlflow.HtmlFlow;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.time.LocalDate;
-
 public class TestWrongUseOfViews {
 
     /**
@@ -38,7 +36,7 @@ public class TestWrongUseOfViews {
      */
     @Test(expected = IllegalStateException.class)
     public void testWrongUseOfDynamicInStaticHtml(){
-        HtmlFlow.doc()
+        HtmlFlow.doc(System.out)
             .html()
                 .head()
                     .title().text("Task Details").__()
@@ -76,24 +74,6 @@ public class TestWrongUseOfViews {
     }
 
     /**
-     * A StaticHtml view cannot use render() with a model.
-     */
-    @Test(expected = UnsupportedOperationException.class)
-    public void testWrongUseOfRenderWithModelInStaticView(){
-        HtmlFlow
-            .doc()
-                .html()
-                    .head()
-                        .title()
-                            .text("Task Details")
-                        .__()
-                    .__()
-                .__()
-            .render(new Object()); // wrong use of render with a model
-
-    }
-
-    /**
      * A StaticHtml view cannot use write() with a model.
      */
     @Test(expected = UnsupportedOperationException.class)
@@ -106,8 +86,7 @@ public class TestWrongUseOfViews {
                             .text("Task Details")
                         .__()
                     .__()
-                .__()
-            .write(new Object()); // wrong use of write with a model
+                .__(); // wrong use of write with a model
 
     }
     /**
