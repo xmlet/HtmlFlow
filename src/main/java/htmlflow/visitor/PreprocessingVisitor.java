@@ -43,9 +43,6 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  * The U comes from external module HtmlApiFaster whose classes are not strongly typed with the Model.
  * Thus, only the dynamic() and visitDynamic() methods in HtmlApiFaster were made generic to carry
  * a type parameter U corresponding to the type of the Model.
- * Nevertheless, this U should be corresponding to this visitor T of model that is parametrized in HtmlView.
- *
- * @param <T> The type of the Model bound to a view.
  */
 public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppendable {
     private static final String NOT_SUPPORTED_ERROR =
@@ -112,25 +109,30 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
-        HtmlContinuation<U> dynamicCont = new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this,
-                new HtmlContinuationCloseAndIndent<>(this));
+        HtmlContinuation dynamicCont = new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationCloseAndIndent(this));
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
          * which will be followed by the dynamicCont.
          */
-        String staticHtml = sb.substring(staticBlockIndex);
-        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
-        HtmlContinuation<U> staticCont = new HtmlContinuationStatic<>(staticHtmlTrimmed, this, dynamicCont);
-
-        if(first == null) first = staticCont; // on first visit initializes the first pointer
-        else setNext(last, staticCont);       // else append the staticCont to existing chain
-        last = dynamicCont.next;              // advance last to point to the new HtmlContinuationCloseAndIndent
+        chainContinuationStatic(dynamicCont);
         /**
-         * We have to run dynamicContinuation to leave isClosed and indentation correct for
+         * We have to run newlineAndIndent to leave isClosed and indentation correct for
          * the next static HTML block.
          */
+        indentAndAdvanceStaticBlockIndex();
+    }
 
+    protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
+        String staticHtml = sb.substring(staticBlockIndex);
+        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
+        HtmlContinuation staticCont = new HtmlContinuationStatic(staticHtmlTrimmed, this, nextContinuation);
+        if(first == null) first = staticCont; // on first visit initializes the first pointer
+        else setNext(last, staticCont);       // else append the staticCont to existing chain
+        last = nextContinuation.next;         // advance last to point to the new HtmlContinuationCloseAndIndent
+    }
+
+    protected final void indentAndAdvanceStaticBlockIndex() {
         newlineAndIndent();
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
         openDynamic = false;
@@ -142,7 +144,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
     @Override
     public String finish(Object model, HtmlView... partials) {
         String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<Object> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, null);
+        HtmlContinuation staticCont = new HtmlContinuationStatic(staticHtml.trim(), this, null);
         last = first == null
                 ? first = staticCont         // assign both first and last
                 : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
@@ -154,7 +156,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
     }
 
     @Override
-    public HtmlVisitor clone(boolean isIndented) {
+    public final HtmlVisitor clone(boolean isIndented) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
     }
 
@@ -177,7 +179,7 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
                 throw new RuntimeException(e);
             }
         }
-        static <Z> HtmlContinuation<Z> setNext(HtmlContinuation<Z> cont, HtmlContinuation<Z> next) {
+        static HtmlContinuation setNext(HtmlContinuation cont, HtmlContinuation next) {
             try {
                 fieldNext.set(cont, next);
                 return next;
