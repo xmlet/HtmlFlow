@@ -10,23 +10,10 @@ import java.io.IOException;
  **/
 public class HtmlViewVisitorAppendable extends HtmlViewVisitorContinuations implements TagsToAppendable {
 
-    private final Appendable out;
+    private Appendable out;
 
-    public HtmlViewVisitorAppendable(Appendable out, boolean isIndented, HtmlContinuation first) {
+    public HtmlViewVisitorAppendable(boolean isIndented, HtmlContinuation first) {
         super(isIndented, first);
-        this.out = out;
-    }
-
-
-    @Override
-    protected String readAndReset() {
-        if (out instanceof StringBuilder) {
-            String data = out.toString();
-            ((StringBuilder) out).setLength(0);
-            return data;
-        }
-
-        return null;
     }
 
     @Override
@@ -49,11 +36,16 @@ public class HtmlViewVisitorAppendable extends HtmlViewVisitorContinuations impl
 
     @Override
     public HtmlVisitor clone(boolean isIndented) {
-        return new HtmlViewVisitorAppendable(this.out, isIndented, first);
+        return new HtmlViewVisitorAppendable(isIndented, first);
     }
 
     @Override
     public Appendable out() {
         return this.out;
+    }
+
+    @Override
+    public void setAppendable(Appendable appendable) {
+        this.out = appendable;
     }
 }

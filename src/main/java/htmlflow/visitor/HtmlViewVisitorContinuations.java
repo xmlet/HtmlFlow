@@ -68,15 +68,7 @@ public abstract class HtmlViewVisitorContinuations extends HtmlViewVisitor {
     }
 
     @Override
-    public final String finish(Object model, HtmlView...partials){
+    public final void resolve(Object model, HtmlView...partials){
         first.execute(model);
-        return readAndReset();
     }
-    /*=========================================================================*/
-    /*------------            Abstract HOOK Methods         -------------------*/
-    /*=========================================================================*/
-    /**
-     * Returns the accumulated output and clear it.
-     */
-    protected abstract String readAndReset();
 }

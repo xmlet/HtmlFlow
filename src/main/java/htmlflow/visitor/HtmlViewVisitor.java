@@ -55,5 +55,7 @@ public abstract class HtmlViewVisitor extends HtmlVisitor {
     /**
      * Returns the accumulated output and clear it.
      */
-    public abstract String finish(Object model, HtmlView...partials);
+    public abstract void resolve(Object model, HtmlView...partials);
+
+    public abstract void setAppendable(Appendable builder);
 }

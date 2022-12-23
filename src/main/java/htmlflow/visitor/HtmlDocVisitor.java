@@ -94,10 +94,6 @@ public class HtmlDocVisitor extends HtmlVisitor implements TagsToAppendable {
      * Returns the accumulated output and clear it.
      */
     public String finish() {
-        if (out instanceof StringBuilder) {
-            return ((StringBuilder) out).toString();
-        }
-        throw new UnsupportedOperationException("Do not call finish() with non String Builder Appendable because" +
-                "HTML fragments have been already emitted on each element call.");
+        return out.toString();
     }
 }

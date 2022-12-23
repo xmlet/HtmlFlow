@@ -15,22 +15,16 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  **/
 public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implements TagsToAppendable {
     
-    private final Appendable out;
+    private Appendable out;
 
     /**
      * The last node to be processed.
      */
     protected final HtmlContinuation last;
 
-    public HtmlViewVisitorAsync(Appendable out, boolean isIndented, HtmlContinuation first) {
+    public HtmlViewVisitorAsync(boolean isIndented, HtmlContinuation first) {
         super(isIndented, first);
         this.last = findLast();
-        this.out = out;
-    }
-    
-    @Override
-    protected String readAndReset() {
-        return null;
     }
     
     @Override
@@ -53,14 +47,19 @@ public class HtmlViewVisitorAsync extends HtmlViewVisitorContinuations implement
     
     @Override
     public HtmlVisitor clone(boolean isIndented) {
-        return new HtmlViewVisitorAsync(this.out, isIndented, first.copy(this));
+        return new HtmlViewVisitorAsync(isIndented, first.copy(this));
     }
     
     @Override
     public Appendable out() {
         return this.out;
     }
-    
+
+    @Override
+    public void setAppendable(Appendable appendable) {
+        this.out = appendable;
+    }
+
     public CompletableFuture<Void> finishedAsync(Object model) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         HtmlContinuationAsyncTerminationNode terminationNode = new HtmlContinuationAsyncTerminationNode(cf);

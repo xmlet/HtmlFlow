@@ -51,11 +51,6 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
 public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppendable {
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
-
-    /**
-     * Flag to avoid nested dynamic blocks.
-     */
-    boolean openDynamic = false;
     /**
      * The main StringBuilder.
      */
@@ -107,9 +102,6 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
      */
     @Override
     public <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
-        if (openDynamic)
-            throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
-        openDynamic = true;
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
@@ -139,24 +131,25 @@ public class PreprocessingVisitor extends HtmlViewVisitor implements TagsToAppen
     protected final void indentAndAdvanceStaticBlockIndex() {
         newlineAndIndent();
         staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
-        openDynamic = false;
     }
 
     /**
      * Creates the last static HTML block.
      */
     @Override
-    public String finish(Object model, HtmlView... partials) {
+    public void resolve(Object model, HtmlView... partials) {
         String staticHtml = sb.substring(staticBlockIndex);
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtml.trim(), this, null);
         last = first == null
                 ? first = staticCont         // assign both first and last
                 : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
+    }
+
+    @Override
+    public void setAppendable(Appendable builder) {
         /**
-         * We are just collecting static HTML blocks and the resulting HTML should be ignored.
-         * Intentionally return null to force a NullPointerException if someone intend to use this result.
+         * !!!NOT USED!!!
          */
-        return null;
     }
 
     @Override

@@ -58,7 +58,7 @@ public class HtmlViewAsync extends HtmlView {
      * @param visitorSupplier
      * @param threadSafe
      */
-    HtmlViewAsync(PrintStream out, Supplier<HtmlViewVisitor> visitorSupplier,
+    HtmlViewAsync(Appendable out, Supplier<HtmlViewVisitor> visitorSupplier,
                   boolean threadSafe) {
         super(out, visitorSupplier, threadSafe);
     }
@@ -84,13 +84,14 @@ public class HtmlViewAsync extends HtmlView {
     }
     
     public final CompletableFuture<Void> writeAsync(Object model) {
-        final HtmlVisitor localVisitor = this.getVisitor();
+        final HtmlViewVisitor localVisitor = this.getVisitor();
         
         if (!(localVisitor instanceof HtmlViewVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
         }
         
         HtmlViewVisitorAsync visitorAsync = (HtmlViewVisitorAsync) localVisitor;
+        visitorAsync.setAppendable(this.out);
 
         return visitorAsync.finishedAsync(model);
     }

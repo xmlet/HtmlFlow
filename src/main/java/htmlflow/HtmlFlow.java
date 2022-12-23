@@ -57,7 +57,7 @@ public class HtmlFlow {
          * NO problem with null model. We are just preprocessing static HTML blocks.
          * Thus, dynamic blocks which depend on model are not invoked.
          */
-        preView.getVisitor().finish(null);
+        preView.getVisitor().resolve(null);
         return pre;
     }
     
@@ -69,7 +69,7 @@ public class HtmlFlow {
          * NO problem with null model. We are just preprocessing static HTML blocks.
          * Thus, dynamic blocks which depend on model are not invoked.
          */
-        preView.getVisitor().finish(null);
+        preView.getVisitor().resolve(null);
         return pre;
     }
     
@@ -84,7 +84,7 @@ public class HtmlFlow {
     }
 
     public static HtmlDoc doc(){
-        return new HtmlDoc(new HtmlDocVisitor(new StringBuilder(), true));
+        return doc(new StringBuilder());
     }
     /**
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
@@ -97,7 +97,7 @@ public class HtmlFlow {
         PreprocessingVisitor pre = preprocessing(template);
         return new HtmlView(
             out,
-            (() -> new HtmlViewVisitorAppendable(out, true, pre.getFirst())),
+            (() -> new HtmlViewVisitorAppendable(true, pre.getFirst())),
             false); // not thread safe by default
     }
     /**
@@ -108,11 +108,7 @@ public class HtmlFlow {
      * @param <U> Type of the model.
      */
     public static HtmlView view(HtmlTemplate template){
-        PreprocessingVisitor pre = preprocessing(template);
-        return new HtmlView(
-            null, // Without output stream
-            () -> new HtmlViewVisitorAppendable(new StringBuilder(), true, pre.getFirst()), // visitor
-            false); // Not thread safe by default
+        return view(new StringBuilder(), template);
     }
     
     /**
@@ -126,7 +122,7 @@ public class HtmlFlow {
         PreprocessingVisitorAsync pre = preprocessingAsync(template);
         return new HtmlViewAsync(
                 out,
-                () -> new HtmlViewVisitorAsync(out, true, pre.getFirst()),
+                () -> new HtmlViewVisitorAsync(true, pre.getFirst()),
                 false);
     }
 }

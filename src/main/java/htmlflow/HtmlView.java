@@ -65,7 +65,7 @@ public class HtmlView extends HtmlPage {
      * we cannot ensure thread safety, because concurrent threads maybe emitting
      * different HTML to the same PrintStream.
      */
-    private final Appendable out;
+    protected final Appendable out;
     /**
      * Auxiliary constructor used by clone().
      */
@@ -119,15 +119,28 @@ public class HtmlView extends HtmlPage {
     }
 
     public String render(Object model) {
-        return getVisitor().finish(model);
+        resolveView(model);
+        return readAndReset();
     }
 
     public void write(Object model) {
-        this.render(model);
+        resolveView(model);
     }
 
     public void write() {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
+    }
+
+    private void resolveView(Object model) {
+        HtmlViewVisitor viewVisitor = getVisitor();
+        viewVisitor.setAppendable(this.out);
+        viewVisitor.resolve(model);
+    }
+
+    private String readAndReset() {
+        String data = out.toString();
+        ((StringBuilder) out).setLength(0);
+        return data;
     }
 
     /**
