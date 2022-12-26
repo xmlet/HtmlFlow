@@ -46,50 +46,6 @@ public class TestWrongUseOfViews {
     }
 
     /**
-     * A DynamicHtml view should use render() with a model.
-     * LocalDate is the model type in this test.
-     */
-    @Test(expected = UnsupportedOperationException.class)
-    public void testWrongUseOfRenderWithoutModelInDynamicView(){
-        HtmlFlow
-            .view(view -> {
-                view.html().head().title().text("Task Details").__();
-            })
-            .render(); // wrong use of render without a model
-
-    }
-
-    /**
-     * A PrintStream DynamicHtml view should use write() with a model.
-     * LocalDate is the model type in this test.
-     */
-    @Test(expected = UnsupportedOperationException.class)
-    public void testWrongUseOfWriteWithoutModelInDynamicView(){
-        HtmlFlow
-            .view(System.out, view -> {
-                view.html().head().title().text("Task Details").__();
-            })
-            .write(); // wrong use of write without a model
-
-    }
-
-    /**
-     * A StaticHtml view cannot use write() with a model.
-     */
-    @Test(expected = UnsupportedOperationException.class)
-    public void testWrongUseOfWriteWithModelInStaticView(){
-        HtmlFlow
-            .doc(System.out)
-                .html()
-                    .head()
-                        .title()
-                            .text("Task Details")
-                        .__()
-                    .__()
-                .__(); // wrong use of write with a model
-
-    }
-    /**
      * A HtmlDoc cannot be set to thread-safety.
      */
     @Test(expected = IllegalStateException.class)

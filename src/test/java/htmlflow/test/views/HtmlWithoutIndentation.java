@@ -6,10 +6,12 @@ import htmlflow.HtmlDoc;
 import htmlflow.HtmlView;
 
 import java.io.PrintStream;
+import java.util.function.Consumer;
 
 public class HtmlWithoutIndentation {
 
-    public static HtmlView bodyDivP = HtmlFlow.view(view -> view
+    public static Consumer<StringBuilder> bodyDivP = sb -> HtmlFlow.doc(sb)
+            .setIndented(false)
             .html()
                 .body()
                     .div()
@@ -18,20 +20,17 @@ public class HtmlWithoutIndentation {
                         .__() // p
                     .__() // div
                 .__() // body
-            .__() // html
-        )
-        .setIndented(false);
+            .__(); // html
 
-    public static HtmlView bodyPre = HtmlFlow.view(view -> view
+    public static Consumer<StringBuilder> bodyPre = sb -> HtmlFlow.doc(sb)
+            .setIndented(false)
             .html()
                 .body()
                     .pre()
                         .text("Some text")
                     .__() // pre
                 .__() // body
-            .__() // html
-        )
-        .setIndented(false);
+            .__(); // html
 
     public static HtmlPage hotBodyDivP(PrintStream out) {
         return HtmlFlow.doc(out)

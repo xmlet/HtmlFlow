@@ -40,9 +40,11 @@ public class TestIndentation {
      */
     @Test
     public void testBodyDivPElementsWithoutIndentation() {
-        String html = HtmlWithoutIndentation
-            .bodyDivP
-            .render();
+        StringBuilder output = new StringBuilder();
+        HtmlWithoutIndentation
+                .bodyDivP
+                .accept(output);
+        String html = output.toString();
         String expected = Utils
             .loadLines("htmlWithoutIndentationBodyDivP.html")
             .collect(joining());
@@ -66,9 +68,11 @@ public class TestIndentation {
      */
     @Test
     public void testBodyPreElementsWithoutIndentation() {
-        String html = HtmlWithoutIndentation
-            .bodyPre
-            .render();
+        StringBuilder output = new StringBuilder();
+        HtmlWithoutIndentation
+                .bodyPre
+                .accept(output);
+        String html = output.toString();
         String expected = Utils
             .loadLines("htmlWithoutIndentationBodyPre.html")
             .collect(joining());
