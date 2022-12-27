@@ -4,25 +4,25 @@ import htmlflow.exceptions.HtmlFlowAppendException;
 
 import java.io.IOException;
 
-public interface Tags {
-    char BEGIN_TAG = '<';
-    String BEGIN_CLOSE_TAG = "</";
-    String BEGIN_COMMENT_TAG = "<!-- ";
-    String END_COMMENT_TAG = " -->";
-    String ATTRIBUTE_MID = "=\"";
-    char FINISH_TAG = '>';
-    char SPACE = ' ';
-    char QUOTATION = '"';
+public class Tags {
+    static final char BEGIN_TAG = '<';
+    static final String BEGIN_CLOSE_TAG = "</";
+    static final String BEGIN_COMMENT_TAG = "<!-- ";
+    static final String END_COMMENT_TAG = " -->";
+    static final String ATTRIBUTE_MID = "=\"";
+    static final char FINISH_TAG = '>';
+    static final char SPACE = ' ';
+    static final char QUOTATION = '"';
 
-    Appendable out();
-
+    private Tags() {
+    }
     /**
      * Write {@code "<elementName"}.
      */
-    default void beginTag(String elementName) {
+    public static void beginTag(Appendable out, String elementName) {
         try {
-            out().append(BEGIN_TAG);
-            out().append(elementName);
+            out.append(BEGIN_TAG);
+            out.append(elementName);
         } catch (IOException e) {
             throw new HtmlFlowAppendException(e);
         }
@@ -31,11 +31,11 @@ public interface Tags {
     /**
      * Writes {@code "</elementName>"}.
      */
-    default void endTag(String elementName) {
+    public static void endTag(Appendable out, String elementName) {
         try {
-            out().append(BEGIN_CLOSE_TAG);     // </
-            out().append(elementName);         // </name
-            out().append(FINISH_TAG);          // </name>
+            out.append(BEGIN_CLOSE_TAG);     // </
+            out.append(elementName);         // </name
+            out.append(FINISH_TAG);          // </name>
         } catch (IOException e) {
             throw new HtmlFlowAppendException(e);
         }
@@ -44,13 +44,13 @@ public interface Tags {
     /**
      * Writes {@code "attributeName=attributeValue"}
      */
-    default void addAttribute(String attributeName, String attributeValue)  {
+    public static void addAttribute(Appendable out, String attributeName, String attributeValue)  {
         try {
-            out().append(SPACE);
-            out().append(attributeName);
-            out().append(ATTRIBUTE_MID);
-            out().append(attributeValue);
-            out().append(QUOTATION);
+            out.append(SPACE);
+            out.append(attributeName);
+            out.append(ATTRIBUTE_MID);
+            out.append(attributeValue);
+            out.append(QUOTATION);
         }catch (IOException e) {
             throw new HtmlFlowAppendException(e);
         }
@@ -59,11 +59,11 @@ public interface Tags {
     /**
      * Writes {@code "<!--s-->"}
      */
-    default void addComment(String comment) {
+    public static void addComment(Appendable out, String comment) {
         try {
-            out().append(BEGIN_COMMENT_TAG);   // <!--
-            out().append(comment);
-            out().append(END_COMMENT_TAG);     // -->
+            out.append(BEGIN_COMMENT_TAG);   // <!--
+            out.append(comment);
+            out.append(END_COMMENT_TAG);     // -->
         } catch (IOException e) {
             throw new HtmlFlowAppendException(e);
         }

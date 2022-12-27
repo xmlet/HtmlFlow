@@ -44,14 +44,15 @@ import org.xmlet.htmlapifaster.Text;
 
 import java.io.IOException;
 
+import static htmlflow.visitor.Tags.*;
+
 /**
- * This is the base implementation of the ElementVisitor (from HtmlApiFaster
- * library).
+ * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
  *
  * @author Miguel Gamboa
  *         created on 04-08-2022
  */
-public abstract class HtmlVisitor extends ElementVisitor implements Tags {
+public abstract class HtmlVisitor extends ElementVisitor {
     protected Appendable out;
     /**
      * keep track of current indentation.
@@ -146,7 +147,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     @Override
     public final void visitElement(Element element) {
         newlineAndIndent();
-        beginTag(element.getName()); // "<elementName"
+        beginTag(out, element.getName()); // "<elementName"
         isClosed = false;
     }
 
@@ -158,7 +159,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     public final void visitParent(Element element) {
         depth--;
         newlineAndIndent();
-        endTag(element.getName()); // </elementName>
+        endTag(out, element.getName()); // </elementName>
     }
     /**
      * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
@@ -174,7 +175,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
 
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
-        addAttribute(attributeName, attributeValue);
+        addAttribute(out, attributeName, attributeValue);
     }
 
     @Override
@@ -187,7 +188,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
         newlineAndIndent();
-        addComment(text.getValue());
+        addComment(out, text.getValue());
     }
 
     /*=========================================================================*/
