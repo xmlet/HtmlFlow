@@ -24,6 +24,7 @@
 
 package htmlflow.visitor;
 
+import htmlflow.exceptions.HtmlFlowAppendException;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -41,6 +42,8 @@ import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
+import java.io.IOException;
+
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster
  * library).
@@ -49,6 +52,7 @@ import org.xmlet.htmlapifaster.Text;
  *         created on 04-08-2022
  */
 public abstract class HtmlVisitor extends ElementVisitor implements Tags {
+    protected Appendable out;
     /**
      * keep track of current indentation.
      */
@@ -75,12 +79,38 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
         depth = v;
     }
 
-    public void setIsClosed(boolean isClosed) {
+    public final void setIsClosed(boolean isClosed) {
         this.isClosed = isClosed;
     }
 
-    HtmlVisitor(boolean isIndented) {
+    HtmlVisitor(Appendable out, boolean isIndented) {
+        this.out = out;
         this.isIndented = isIndented;
+    }
+
+    public final Appendable out() {
+        return out;
+    }
+
+    public final HtmlVisitor setAppendable(Appendable appendable) {
+        this.out = appendable;
+        return this;
+    }
+
+    public final void write(String text) {
+        try {
+            this.out.append(text);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
+    }
+
+    protected final void write(char c) {
+        try {
+            this.out.append(c);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
     }
 
     /**
@@ -163,19 +193,6 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
-    /**
-     * Writes the string text directly to the output.
-     */
-    public abstract void write(String text);
-    /**
-     * Writes the char c directly to the output.
-     */
-    protected abstract void write(char c);
-
-    /**
-     * Set the output.
-     */
-    public abstract HtmlVisitor setAppendable(Appendable appendable);
     /**
      * Processing output.
      */

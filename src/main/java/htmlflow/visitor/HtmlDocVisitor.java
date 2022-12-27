@@ -24,11 +24,9 @@
 
 package htmlflow.visitor;
 
-import htmlflow.exceptions.HtmlFlowAppendException;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-import java.io.IOException;
 import java.util.function.BiConsumer;
 
 /**
@@ -40,14 +38,12 @@ import java.util.function.BiConsumer;
  */
 public class HtmlDocVisitor extends HtmlVisitor {
 
-    private final Appendable out;
-
     public HtmlDocVisitor(Appendable out, boolean isIndented) {
         this(out, isIndented, 0);
     }
 
     public HtmlDocVisitor(Appendable out,boolean isIndented, int depth) {
-        super(isIndented);
+        super(out, isIndented);
         this.out = out;
         this.depth = depth;
     }
@@ -63,30 +59,6 @@ public class HtmlDocVisitor extends HtmlVisitor {
     }
 
     @Override
-    public final void write(String text) {
-        try {
-            out.append(text);
-        } catch (IOException e) {
-            throw new HtmlFlowAppendException(e);
-        }
-    }
-
-    @Override
-    protected final void write(char c) {
-        try {
-            out.append(c);
-        } catch (IOException e) {
-            throw new HtmlFlowAppendException(e);
-        }
-    }
-
-    @Override
-    public HtmlVisitor setAppendable(Appendable appendable) {
-        throw new UnsupportedOperationException("Cannot set output appendable! " +
-                "You must set output Appendable on creation of HtmlDoc!");
-    }
-
-    @Override
     public void resolve(Object model) {
         throw new UnsupportedOperationException("HTML has been already emitted on elements flow. " +
                 "resolve() is only available for HtmlView pages.");
@@ -97,8 +69,4 @@ public class HtmlDocVisitor extends HtmlVisitor {
         return new HtmlDocVisitor(this.out, isIndented);
     }
 
-    @Override
-    public Appendable out() {
-        return out;
-    }
 }

@@ -52,10 +52,6 @@ public class PreprocessingVisitor extends HtmlVisitor {
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
     /**
-     * The main StringBuilder.
-     */
-    private final StringBuilder sb = new StringBuilder();
-    /**
      * The internal String builder beginning index of a static HTML block.
      */
     private int staticBlockIndex = 0;
@@ -69,21 +65,18 @@ public class PreprocessingVisitor extends HtmlVisitor {
     private HtmlContinuation last;
 
     public PreprocessingVisitor(boolean isIndented) {
-        super(isIndented);
+        super(new StringBuilder(), isIndented);
     }
 
-    public HtmlContinuation getFirst() {
+    /**
+     * The main StringBuilder.
+     */
+    public final StringBuilder sb() {
+        return (StringBuilder) out;
+    }
+
+    public final HtmlContinuation getFirst() {
         return first;
-    }
-
-    @Override
-    public void write(String text) {
-        sb.append(text);
-    }
-
-    @Override
-    protected void write(char c) {
-        sb.append(c);
     }
 
     /**
@@ -125,7 +118,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
     }
 
     protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
-        String staticHtml = sb.substring(staticBlockIndex);
+        String staticHtml = sb().substring(staticBlockIndex);
         String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtmlTrimmed, this, nextContinuation);
         if(first == null) first = staticCont; // on first visit initializes the first pointer
@@ -135,7 +128,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
 
     protected final void indentAndAdvanceStaticBlockIndex() {
         newlineAndIndent();
-        staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
+        staticBlockIndex = sb().length(); // increment the staticBlockIndex to the end of internal string buffer.
     }
 
     /**
@@ -143,7 +136,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
      */
     @Override
     public void resolve(Object model) {
-        String staticHtml = sb.substring(staticBlockIndex);
+        String staticHtml = sb().substring(staticBlockIndex);
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtml.trim(), this, null);
         last = first == null
                 ? first = staticCont         // assign both first and last
@@ -151,21 +144,8 @@ public class PreprocessingVisitor extends HtmlVisitor {
     }
 
     @Override
-    public HtmlVisitor setAppendable(Appendable builder) {
-        /**
-         * !!!NOT USED!!!
-         */
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public final HtmlVisitor clone(boolean isIndented) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
-    }
-
-    @Override
-    public Appendable out() {
-        return sb;
     }
 
     @SuppressWarnings({"squid:S3011", "squid:S112"})

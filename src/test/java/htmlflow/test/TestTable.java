@@ -73,7 +73,7 @@ public class TestTable {
         /*
          * Assert
          */
-        System.out.println(html);
+        assertSimpleHtmlView(html.getBytes(), output);
     }
 
     @Test

@@ -25,11 +25,9 @@
 package htmlflow.visitor;
 
 import htmlflow.continuations.HtmlContinuation;
-import htmlflow.exceptions.HtmlFlowAppendException;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-import java.io.IOException;
 import java.util.function.BiConsumer;
 
 
@@ -43,16 +41,13 @@ import java.util.function.BiConsumer;
  *         created on 17-01-2018
  */
 public class HtmlViewVisitor extends HtmlVisitor {
-
-    protected Appendable out;
     /**
      * The first node to be processed.
      */
     protected final HtmlContinuation first;
 
     public HtmlViewVisitor(Appendable out, boolean isIndented, HtmlContinuation first) {
-        super(isIndented);
-        this.out = out;
+        super(out, isIndented);
         this.first = first.copy(this);
     }
 
@@ -62,35 +57,6 @@ public class HtmlViewVisitor extends HtmlVisitor {
     @Override
     public final void resolve(Object model) {
         first.execute(model);
-    }
-
-    @Override
-    public Appendable out() {
-        return out;
-    }
-
-    @Override
-    public final HtmlViewVisitor setAppendable(Appendable appendable) {
-        this.out = appendable;
-        return this;
-    }
-
-    @Override
-    public final void write(String text) {
-        try {
-            this.out.append(text);
-        } catch (IOException e) {
-            throw new HtmlFlowAppendException(e);
-        }
-    }
-
-    @Override
-    protected final void write(char c) {
-        try {
-            this.out.append(c);
-        } catch (IOException e) {
-            throw new HtmlFlowAppendException(e);
-        }
     }
 
     @Override
