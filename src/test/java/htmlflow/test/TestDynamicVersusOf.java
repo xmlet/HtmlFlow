@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 public class TestDynamicVersusOf {
 
     @Test
-    public void testRightDynamicWithTwoDifferentModels(){
+    public void testRenderRightDynamicWithTwoDifferentModels(){
         /*
          * First render with Stock.dummy3Items()
          */
@@ -51,6 +51,28 @@ public class TestDynamicVersusOf {
             .stocksViewOk
             .render(Stock.other3Items());
         assertLines("stocks3others.html", actual);
+    }
+
+    @Test
+    public void testWriteRightDynamicWithTwoDifferentModels(){
+        /*
+         * First render with Stock.dummy3Items()
+         */
+        StringBuilder actual1 = new StringBuilder();
+        HtmlDynamicStocks
+            .stocksViewOk
+            .setOut(actual1)
+            .write(Stock.dummy3Items());
+        assertLines("stocks3items.html", actual1.toString());
+        /*
+         * Then render with Stock.dummy5Items()
+         */
+        StringBuilder actual2 = new StringBuilder();
+        HtmlDynamicStocks
+            .stocksViewOk
+            .setOut(actual2)
+            .render(Stock.other3Items());
+        assertLines("stocks3others.html", actual2.toString());
     }
 
     private static void assertLines(String pathToExpected, String actual) {

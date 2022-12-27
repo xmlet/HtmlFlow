@@ -100,7 +100,10 @@ public class HtmlFlow {
      * @param template Function that consumes an HtmlView to produce HTML elements.
      */
     public static HtmlView view(HtmlTemplate template){
-        return view(new StringBuilder(), template);
+        PreprocessingVisitor pre = preprocessing(template);
+        return new HtmlView(
+                (() -> new HtmlViewVisitor(new StringBuilder(), true, pre.getFirst())),
+                false); // not thread safe by default
     }
     
     /**

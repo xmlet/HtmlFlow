@@ -86,6 +86,11 @@ public class HtmlView extends HtmlPage {
             : visitor;
     }
 
+    public final HtmlView setOut(Appendable out) {
+        getVisitor().setAppendable(out);
+        return this;
+    }
+
     @Override
     public String getName() {
         return "HtmlView";
@@ -96,10 +101,9 @@ public class HtmlView extends HtmlPage {
     }
 
     public String render(Object model) {
-        StringBuilder str = new StringBuilder();
-        getVisitor()
-                .setAppendable(str)
-                .resolve(model);
+        StringBuilder str = ((StringBuilder) getVisitor().out());
+        str.setLength(0);
+        getVisitor().resolve(model);
         return str.toString();
     }
 
