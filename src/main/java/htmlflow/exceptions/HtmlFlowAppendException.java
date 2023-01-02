@@ -19,4 +19,5 @@ public class HtmlFlowAppendException extends RuntimeException {
     public HtmlFlowAppendException(String message) {
         super(EXCEPTION_MESSAGE.apply(message));
     }
+
 }
