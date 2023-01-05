@@ -30,8 +30,6 @@ import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
 
-import java.io.PrintStream;
-
 /**
  * Factory to create HtmlDoc or HtmlView instances corresponding to static HTMl pages or dynamic pages.
  * HtmlView objects depend on a model.
@@ -109,13 +107,10 @@ public class HtmlFlow {
     /**
      * Creates a HtmlViewAsync corresponding to a dynamic HtmlPage with an asynchronous model.
      *
-     * @param out Output PrintStream.
      * @param template Function that consumes an HtmlView to produce HTML elements.
      */
-    public static HtmlViewAsync viewAsync(PrintStream out, HtmlTemplate template){
+    public static HtmlViewAsync viewAsync(HtmlTemplate template){
         PreprocessingVisitorAsync pre = preprocessingAsync(template);
-        return new HtmlViewAsync(
-                () -> new HtmlViewVisitorAsync(out, true, pre.getFirst()),
-                false);
+        return new HtmlViewAsync(new HtmlViewVisitorAsync(true, pre.getFirst()));
     }
 }

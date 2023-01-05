@@ -50,7 +50,7 @@ public class HtmlView extends HtmlPage {
      */
     @java.lang.SuppressWarnings("squid:S5164")
     private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
-    private final Supplier<HtmlVisitor> visitorSupplier;
+    protected final Supplier<HtmlVisitor> visitorSupplier;
     private final boolean threadSafe;
     /**
      * Auxiliary constructor used by clone().
@@ -75,7 +75,7 @@ public class HtmlView extends HtmlPage {
         return new Html<>(this);
     }
 
-    public final HtmlView threadSafe(){
+    public HtmlView threadSafe(){
         return clone(visitorSupplier, true);
     }
 
@@ -86,7 +86,7 @@ public class HtmlView extends HtmlPage {
             : visitor;
     }
 
-    public final HtmlView setOut(Appendable out) {
+    public HtmlView setOut(Appendable out) {
         getVisitor().setAppendable(out);
         return this;
     }

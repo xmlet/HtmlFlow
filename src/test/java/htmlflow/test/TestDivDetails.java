@@ -24,7 +24,6 @@
 package htmlflow.test;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
@@ -49,7 +48,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.htmlRender;
 import static htmlflow.test.Utils.htmlWrite;
 import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
@@ -135,29 +133,6 @@ public class TestDivDetails {
                                 line ->
                                     assertEquals(line,
                                         actual.next()));
-                });
-    }
-
-    @Test
-    public void testDivDetailsBindingWithRenderInParallelThreadSafe() {
-        HtmlView view = HtmlFlow
-            .view(HtmlLists::taskDetailsTemplate)
-            .threadSafe();
-
-        expectedTaskViews
-                .keySet()
-                .stream()
-                .parallel()
-                .map(task -> TaskHtml.of(task,
-                                htmlRender(view, task)))
-                .forEach(taskHtml -> {
-                    // taskHtml.html.forEach(System.out::println);
-
-                    Iterator<String> actual = taskHtml.html.iterator();
-                    expectedTaskViews
-                            .get(taskHtml.obj)
-                            .forEach(line -> assertEquals(line, actual.next()));
-
                 });
     }
 

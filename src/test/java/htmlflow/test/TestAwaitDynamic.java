@@ -8,8 +8,6 @@ import htmlflow.test.model.Student;
 import htmlflow.test.model.StudentWithGrade;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.reactivestreams.Publisher;
@@ -18,18 +16,14 @@ import reactor.core.publisher.Flux;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Pedro Fialho
@@ -67,9 +61,9 @@ public class TestAwaitDynamic {
 
         AsyncDynamicModel model = new AsyncDynamicModel(titles, studentAndGradesTitles, studentFlux, studentWithGradeStream);
 
-        HtmlViewAsync view = HtmlFlow.viewAsync(new PrintStream(mem), this::awaitAndDynamicTemplate);
+        HtmlViewAsync view = HtmlFlow.viewAsync(this::awaitAndDynamicTemplate);
 
-        final CompletableFuture<Void> writeAsync = view.writeAsync(model);
+        final CompletableFuture<Void> writeAsync = view.writeAsync(new PrintStream(mem), model);
 
         writeAsync.get();
 
