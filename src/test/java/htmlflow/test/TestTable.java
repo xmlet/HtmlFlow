@@ -65,7 +65,7 @@ public class TestTable {
          * Arrange
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
-        HtmlView<int[][]> view = HtmlFlow.view(HtmlTables::simpleTableView, int[][].class);
+        HtmlView view = HtmlFlow.view(HtmlTables::simpleTableView);
         /*
          * Act
          */
@@ -84,7 +84,7 @@ public class TestTable {
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlFlow
-            .view(new PrintStream(mem), HtmlTables::simpleTableView, int[][].class)
+            .view(new PrintStream(mem), HtmlTables::simpleTableView)
             .write(output);
         /*
          * Assert
@@ -119,7 +119,7 @@ public class TestTable {
         Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal, Status.Completed);
         Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High, Status.Deferred);
         List<Task> tasks = Arrays.asList(t1, t2, t3);
-        String html = HtmlFlow.view(HtmlTables::taskTableView, List.class, Task.class).render(tasks);
+        String html = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
         /*
          * Assert
          */
@@ -134,11 +134,9 @@ public class TestTable {
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlView<Iterable<Task>> view = HtmlFlow.view(
+        HtmlView view = HtmlFlow.view(
             new PrintStream(mem),
-            HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow),
-            List.class,
-            Task.class);
+            HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
         view.write(dataSource);
         validateBindingTable(mem.toString());
         mem.reset();
@@ -154,10 +152,7 @@ public class TestTable {
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
-        HtmlView<Iterable<Task>> view = HtmlFlow.view(
-            HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow),
-            List.class,
-            Task.class);
+        HtmlView view = HtmlFlow.view(HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
         validateBindingTable(view.render(dataSource));
         validateBindingTable(view.render(dataSource));
     }

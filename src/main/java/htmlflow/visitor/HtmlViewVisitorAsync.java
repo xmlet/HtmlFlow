@@ -1,58 +1,36 @@
 package htmlflow.visitor;
 
-import htmlflow.async.TerminationHtmlContinuationNode;
+import htmlflow.continuations.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuationAsyncTerminationNode;
 
-import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
 
-import static htmlflow.visitor.PreprocessingVisitorAsync.HtmlContinuationSetter.setNext;
+import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
+
 
 /**
  * @author Pedro Fialho
  **/
-public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> implements TagsToPrintStream {
+public class HtmlViewVisitorAsync extends HtmlViewVisitor {
     
-    private final PrintStream out;
-
     /**
      * The last node to be processed.
      */
-    protected final HtmlContinuation<T> last;
+    protected final HtmlContinuation last;
 
-    public HtmlViewVisitorAsync(PrintStream out, boolean isIndented, HtmlContinuation<T> first) {
-        super(isIndented, first);
+    public HtmlViewVisitorAsync(Appendable out, boolean isIndented, HtmlContinuation first) {
+        super(out, isIndented, first);
         this.last = findLast();
-        this.out = out;
     }
     
     @Override
-    protected String readAndReset() {
-        return null;
+    public HtmlVisitor clone(boolean isIndented) {
+        return new HtmlViewVisitorAsync(out, isIndented, first.copy(this));
     }
-    
-    @Override
-    public void write(String text) {
-        out.print(text);
-    }
-    
-    @Override
-    protected void write(char c) {
-        out.print(c);
-    }
-    
-    @Override
-    public HtmlVisitor clone(PrintStream out, boolean isIndented) {
-        return new HtmlViewVisitorAsync<>(out, isIndented, first.copy(this));
-    }
-    
-    @Override
-    public PrintStream out() {
-        return this.out;
-    }
-    
-    public CompletableFuture<Void> finishedAsync(T model) {
+
+    public CompletableFuture<Void> finishedAsync(Object model) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        TerminationHtmlContinuationNode<T> terminationNode = new TerminationHtmlContinuationNode<>(cf);
+        HtmlContinuationAsyncTerminationNode terminationNode = new HtmlContinuationAsyncTerminationNode(cf);
         /**
          * Chain terminationNode next to the last node.
          * Keep last pointing to the same node to replace the terminationNode on
@@ -63,14 +41,12 @@ public class HtmlViewVisitorAsync<T> extends HtmlViewVisitorContinuations<T> imp
          * Initializes render on first node.
          */
         this.first.execute(model);
-        /**
-         * Returns CF from terminationNode.
-         */
+
         return cf;
     }
 
-    private HtmlContinuation<T> findLast() {
-        HtmlContinuation<T> node = this.first;
+    private HtmlContinuation findLast() {
+        HtmlContinuation node = this.first;
 
         while (node.next != null){
             node = node.next;

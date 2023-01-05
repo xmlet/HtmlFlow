@@ -37,12 +37,9 @@ import org.xmlet.htmlapifaster.Tbody;
 
 public class HtmlDynamic {
 
-    public static HtmlView<Iterable<Stock>> stocksViewOk = HtmlFlow.view(
-        HtmlDynamic::templateStocksOk,
-        Iterable.class,
-        Stock.class);
+    public static HtmlView stocksViewOk = HtmlFlow.view(HtmlDynamic::templateStocksOk);
 
-    private static void templateStocksOk(HtmlPage<Iterable<Stock>> page) {
+    private static void templateStocksOk(HtmlPage page) {
         page
             .html()
                 .head()

@@ -23,6 +23,7 @@
  */
  package htmlflow.test;
 
+import htmlflow.HtmlFlow;
 import htmlflow.test.views.HtmlWithoutIndentation;
 import org.junit.Test;
 
@@ -40,9 +41,26 @@ public class TestIndentation {
      */
     @Test
     public void testBodyDivPElementsWithoutIndentation() {
-        String html = HtmlWithoutIndentation
-            .bodyDivP
-            .render();
+        StringBuilder output = new StringBuilder();
+        HtmlWithoutIndentation
+                .bodyDivP(output);
+        String html = output.toString();
+        String expected = Utils
+            .loadLines("htmlWithoutIndentationBodyDivP.html")
+            .collect(joining());
+        assertEquals(expected, html);
+    }
+
+    /**
+     * Check behavior reported on Issue:
+     * https://github.com/xmlet/HtmlFlow/issues/46
+     */
+    @Test
+    public void testBodyDivPElementsWithoutIndentationForView() {
+        String html = HtmlFlow
+                .view(HtmlWithoutIndentation::bodyDivPtemplate)
+                .setIndented(false)
+                .render();
         String expected = Utils
             .loadLines("htmlWithoutIndentationBodyDivP.html")
             .collect(joining());
@@ -66,9 +84,10 @@ public class TestIndentation {
      */
     @Test
     public void testBodyPreElementsWithoutIndentation() {
-        String html = HtmlWithoutIndentation
-            .bodyPre
-            .render();
+        StringBuilder output = new StringBuilder();
+        HtmlWithoutIndentation
+                .bodyPre(output);
+        String html = output.toString();
         String expected = Utils
             .loadLines("htmlWithoutIndentationBodyPre.html")
             .collect(joining());

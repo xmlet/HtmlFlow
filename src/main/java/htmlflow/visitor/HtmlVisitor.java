@@ -24,6 +24,7 @@
 
 package htmlflow.visitor;
 
+import htmlflow.exceptions.HtmlFlowAppendException;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -41,16 +42,18 @@ import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
-import java.io.PrintStream;
+import java.io.IOException;
+
+import static htmlflow.visitor.Tags.*;
 
 /**
- * This is the base implementation of the ElementVisitor (from HtmlApiFaster
- * library).
+ * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
  *
  * @author Miguel Gamboa
  *         created on 04-08-2022
  */
-public abstract class HtmlVisitor extends ElementVisitor implements Tags {
+public abstract class HtmlVisitor extends ElementVisitor {
+    protected Appendable out;
     /**
      * keep track of current indentation.
      */
@@ -77,17 +80,37 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
         depth = v;
     }
 
-    HtmlVisitor(boolean isIndented) {
+    public final void setIsClosed(boolean isClosed) {
+        this.isClosed = isClosed;
+    }
+
+    HtmlVisitor(Appendable out, boolean isIndented) {
+        this.out = out;
         this.isIndented = isIndented;
     }
-    /**
-     * Writes the {@code ">"} to output.
-     */
-    public final void closeBeginTag() {
-        if(!isClosed) {
-            write(FINISH_TAG);
-            isClosed = true;
-            depth++;
+
+    public final Appendable out() {
+        return out;
+    }
+
+    public final HtmlVisitor setAppendable(Appendable appendable) {
+        this.out = appendable;
+        return this;
+    }
+
+    public final void write(String text) {
+        try {
+            this.out.append(text);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
+        }
+    }
+
+    protected final void write(char c) {
+        try {
+            this.out.append(c);
+        } catch (IOException e) {
+            throw new HtmlFlowAppendException(e);
         }
     }
 
@@ -96,7 +119,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
      * Checks whether the parent element is still opened or not (!isClosed).
      * If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
-    final void newlineAndIndent(){
+    public final void newlineAndIndent(){
         if (isClosed){
             if(isIndented) {
                 write(Indentation.tabs(depth)); // \n\t\t\t\...
@@ -124,7 +147,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     @Override
     public final void visitElement(Element element) {
         newlineAndIndent();
-        beginTag(element.getName()); // "<elementName"
+        beginTag(out, element.getName()); // "<elementName"
         isClosed = false;
     }
 
@@ -136,7 +159,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     public final void visitParent(Element element) {
         depth--;
         newlineAndIndent();
-        endTag(element.getName()); // </elementName>
+        endTag(out, element.getName()); // </elementName>
     }
     /**
      * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
@@ -152,7 +175,7 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
 
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
-        addAttribute(attributeName, attributeValue);
+        addAttribute(out, attributeName, attributeValue);
     }
 
     @Override
@@ -165,27 +188,23 @@ public abstract class HtmlVisitor extends ElementVisitor implements Tags {
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {
         newlineAndIndent();
-        addComment(text.getValue());
+        addComment(out, text.getValue());
     }
 
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
     /**
-     * Writes the string text directly to the output.
+     * Processing output.
      */
-    public abstract void write(String text);
-    /**
-     * Writes the char c directly to the output.
-     */
-    protected abstract void write(char c);
+    public abstract void resolve(Object model);
     /**
      * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
      * existing HtmlVisitor instance with a different isIndented state.
      *
      * @param isIndented If the new visitor should indent HTML output or not.
      */
-    public abstract HtmlVisitor clone(PrintStream out, boolean isIndented);
+    public abstract HtmlVisitor clone(boolean isIndented);
 
     /*=========================================================================*/
     /*------------            Root Element Methods         --------------------*/

@@ -27,70 +27,22 @@ package htmlflow;
 import htmlflow.visitor.HtmlDocVisitor;
 import org.xmlet.htmlapifaster.Html;
 
-import java.io.PrintStream;
-
 /**
  * Static Html view.
  *
  * @author Miguel Gamboa, Luís Duare
  */
-public class HtmlDoc extends HtmlPage<Object> {
+public class HtmlDoc extends HtmlPage {
 
-    private static final String WRONG_USE_OF_RENDER_WITH_MODEL =
-             "Wrong use of StaticView! Model object not " +
-             "supported or you should use a dynamic view instead!";
-
-    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER =
-            "Use render() instead of write(). This HtmlDoc has already a " +
-            "HtmlVisitorStringBuilder that collects emitted HTML.";
-
-    private static final String WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM =
-            "Do not call write() on HtmlDoc with a PrintStream because HTML" +
-            "fragments have been already emitted on each element call." +
-            "Use write() only for reusable dynamic HtmlView.";
-
-
-    private final PrintStream out;
     private final HtmlDocVisitor visitor;
 
-    HtmlDoc(PrintStream out, HtmlDocVisitor visitor) {
-        this.out = out;
+    HtmlDoc(HtmlDocVisitor visitor) {
         this.visitor = visitor;
     }
 
-    public final Html<HtmlPage<Object>> html() {
+    public final Html<HtmlPage> html() {
         this.getVisitor().write(HEADER);
         return new Html<>(this);
-    }
-
-    //TODO remove finish and delete not needed related classes
-    @Override
-    public final String render() {
-        return getVisitor().finish();
-    }
-
-    @Override
-    public final String render(Object model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
-    }
-
-    @Override
-    public final void write() {
-        if(out == null)
-            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_STRING_BUILDER);
-        else
-            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_FOR_VISITOR_PRINT_STREAM);
-
-    }
-
-    @Override
-    public final void write(Object model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_MODEL);
-    }
-
-    @Override
-    public HtmlWriter<Object> setPrintStream(PrintStream out) {
-        throw new UnsupportedOperationException("Cannot change output PrintStream on HtmlDoc. only valid for HtmlView");
     }
 
     @Override
@@ -99,12 +51,12 @@ public class HtmlDoc extends HtmlPage<Object> {
     }
 
     @Override
-    public HtmlPage<Object> setIndented(boolean isIndented) {
-        return new HtmlDoc(out, (HtmlDocVisitor) getVisitor().clone(out, isIndented));
+    public HtmlPage setIndented(boolean isIndented) {
+        return new HtmlDoc(getVisitor().clone(isIndented));
     }
 
     @Override
-    public HtmlPage<Object> threadSafe() {
+    public HtmlPage threadSafe() {
         throw new IllegalStateException("HtmlDoc is not reusable and does not keep internal static blocks!" +
          "Thus it does not require thread safety!");
     }

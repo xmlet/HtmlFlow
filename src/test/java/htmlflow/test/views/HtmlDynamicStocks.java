@@ -36,12 +36,9 @@ import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
 public class HtmlDynamicStocks {
 
-    public static HtmlView<Iterable<Stock>> stocksViewOk = HtmlFlow.view(
-        HtmlDynamicStocks::templateStocksOk,
-        Iterable.class,
-        Stock.class);
+    public static HtmlView stocksViewOk = HtmlFlow.view(HtmlDynamicStocks::templateStocksOk);
 
-    private static void templateStocksOk(HtmlPage<Iterable<Stock>> page) {
+    private static void templateStocksOk(HtmlPage page) {
         page
             .html()
                 .head()

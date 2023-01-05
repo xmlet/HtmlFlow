@@ -25,12 +25,14 @@
 
 package htmlflow.visitor;
 
-import htmlflow.HtmlView;
+import htmlflow.continuations.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
+import htmlflow.continuations.HtmlContinuationSyncDynamic;
+import htmlflow.continuations.HtmlContinuationSyncStatic;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
@@ -39,28 +41,16 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  * This visitor is used to make a preprocessing resolution of an HtmlTemplate.
  * It will collect the resulting HTML from visiting static HTML elements into an auxiliary
  * StringBuilder that later is extracted to: String staticHtml = sb.substring(staticBlockIndex);
- * to create an HtmlContinuationStatic object.
+ * to create an HtmlContinuationSyncStatic object.
  * It also interleaves the creation of HtmlContinuationDynamic nodes that only store dynamicHtmlBlock
  * objects corresponding to a BiConsumer<E, U> (being E an element and U the model).
  * The U comes from external module HtmlApiFaster whose classes are not strongly typed with the Model.
  * Thus, only the dynamic() and visitDynamic() methods in HtmlApiFaster were made generic to carry
  * a type parameter U corresponding to the type of the Model.
- * Nevertheless, this U should be corresponding to this visitor T of model that is parametrized in HtmlView.
- *
- * @param <T> The type of the Model bound to a view.
  */
-public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsToStringBuilder {
+public class PreprocessingVisitor extends HtmlVisitor {
     private static final String NOT_SUPPORTED_ERROR =
         "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
-
-    /**
-     * Flag to avoid nested dynamic blocks.
-     */
-    boolean openDynamic = false;
-    /**
-     * The main StringBuilder.
-     */
-    private final StringBuilder sb = new StringBuilder();
     /**
      * The internal String builder beginning index of a static HTML block.
      */
@@ -68,38 +58,25 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
     /**
      * The first node to be processed.
      */
-    private HtmlContinuation<T> first;
+    private HtmlContinuation first;
     /**
      * The last HtmlContinuation
      */
-    private HtmlContinuation<T> last;
-    /**
-     * Used create a mocked instance of the model to be passed to dynamic HTML blocks.
-     */
-    private final Class<?> modelClass;
-    /**
-     * Generic type arguments of the Model.
-     */
-    private final Type[] genericTypeArgs;
+    private HtmlContinuation last;
 
-    public PreprocessingVisitor(boolean isIndented, Class<?> modelClass, Type... genericTypeArgs) {
-        super(isIndented);
-        this.modelClass = modelClass;
-        this.genericTypeArgs = genericTypeArgs;
+    public PreprocessingVisitor(boolean isIndented) {
+        super(new StringBuilder(), isIndented);
     }
 
-    public HtmlContinuation<T> getFirst() {
+    /**
+     * The main StringBuilder.
+     */
+    public final StringBuilder sb() {
+        return (StringBuilder) out;
+    }
+
+    public final HtmlContinuation getFirst() {
         return first;
-    }
-
-    @Override
-    public void write(String text) {
-        sb.append(text);
-    }
-
-    @Override
-    protected void write(char c) {
-        sb.append(c);
     }
 
     /**
@@ -118,58 +95,57 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
      */
     @Override
     public <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
-        if (openDynamic)
-            throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
-        openDynamic = true;
         /**
          * Creates an HtmlContinuation for the dynamic block.
          */
-        HtmlContinuation<T> dynamicCont = (HtmlContinuation<T>) new HtmlContinuationDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationCloseAndIndent(this));
+        HtmlContinuation dynamicCont = new HtmlContinuationSyncDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationSyncCloseAndIndent(this));
         /**
          * We are resolving this view for the first time.
          * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
          * which will be followed by the dynamicCont.
          */
-        String staticHtml = sb.substring(staticBlockIndex);
-        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtmlTrimmed, this, dynamicCont);
-        if(first == null) first = staticCont; // on first visit initializes the first pointer
-        else setNext(last, staticCont);       // else append the staticCont to existing chain
-        last = dynamicCont.next;              // advance last to point to the new HtmlContinuationCloseAndIndent
+        chainContinuationStatic(dynamicCont);
         /**
-         * We have to run dynamicContinuation to leave isClosed and indentation correct for
+         * We have to run newlineAndIndent to leave isClosed and indentation correct for
          * the next static HTML block.
          */
+        indentAndAdvanceStaticBlockIndex();
+    }
+
+    @Override
+    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E, M> asyncAction) {
+        throw new UnsupportedOperationException();
+    }
+
+    protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
+        String staticHtml = sb().substring(staticBlockIndex);
+        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
+        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtmlTrimmed, this, nextContinuation);
+        if(first == null) first = staticCont; // on first visit initializes the first pointer
+        else setNext(last, staticCont);       // else append the staticCont to existing chain
+        last = nextContinuation.next;         // advance last to point to the new HtmlContinuationCloseAndIndent
+    }
+
+    protected final void indentAndAdvanceStaticBlockIndex() {
         newlineAndIndent();
-        staticBlockIndex = sb.length(); // increment the staticBlockIndex to the end of internal string buffer.
-        openDynamic = false;
+        staticBlockIndex = sb().length(); // increment the staticBlockIndex to the end of internal string buffer.
     }
 
     /**
      * Creates the last static HTML block.
      */
     @Override
-    public String finish(T model, HtmlView... partials) {
-        String staticHtml = sb.substring(staticBlockIndex);
-        HtmlContinuation<T> staticCont = new HtmlContinuationStatic<>(staticHtml.trim(), this, null);
+    public void resolve(Object model) {
+        String staticHtml = sb().substring(staticBlockIndex);
+        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtml.trim(), this, null);
         last = first == null
-            ? first = staticCont         // assign both first and last
-            : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
-        /**
-         * We are just collecting static HTML blocks and the resulting HTML should be ignored.
-         * Intentionally return null to force a NullPointerException if someone intend to use this result.
-         */
-        return null;
+                ? first = staticCont         // assign both first and last
+                : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
     }
 
     @Override
-    public HtmlVisitor clone(PrintStream out, boolean isIndented) {
+    public final HtmlVisitor clone(boolean isIndented) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
-    }
-
-    @Override
-    public StringBuilder sb() {
-        return sb;
     }
 
     @SuppressWarnings({"squid:S3011", "squid:S112"})
@@ -186,7 +162,7 @@ public class PreprocessingVisitor<T> extends HtmlViewVisitor<T> implements TagsT
                 throw new RuntimeException(e);
             }
         }
-        static <Z> HtmlContinuation<Z> setNext(HtmlContinuation<Z> cont, HtmlContinuation<Z> next) {
+        static HtmlContinuation setNext(HtmlContinuation cont, HtmlContinuation next) {
             try {
                 fieldNext.set(cont, next);
                 return next;

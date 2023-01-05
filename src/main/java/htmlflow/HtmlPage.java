@@ -48,17 +48,10 @@ import static java.util.stream.Collectors.joining;
  * Instances of HtmlPage are immutable. Any change to its properties returns a new
  * instance of HtmlPage.
  *
- * @param <T> The type of domain object bound to this View.
- *
  * @author Miguel Gamboa, Luís Duare
  *         created on 29-03-2012
  */
-public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>, Element<?,?>> {
-    static final String WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS =
-            "Cannot use PrintStream output for thread-safe views!";
-
-    static final String WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM =
-            "Cannot set thread-safety for views with PrintStream output!";
+public abstract class HtmlPage implements Element<HtmlPage, Element<?,?>> {
 
     public  static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -80,13 +73,13 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
         }
     }
 
-    public abstract Html<HtmlPage<T>> html();
+    public abstract Html<HtmlPage> html();
 
-    public final Div<HtmlPage<T>> div() {
+    public final Div<HtmlPage> div() {
         return new Div<>(this);
     }
 
-    public final Tr<HtmlPage<T>> tr() {
+    public final Tr<HtmlPage> tr() {
         return new Tr<>(this);
     }
 
@@ -94,14 +87,14 @@ public abstract class HtmlPage<T> implements HtmlWriter<T>, Element<HtmlPage<T>,
      * Returns a new instance of HtmlFlow with the same properties of this object
      * but with indented set to the value of isIndented parameter.
      */
-    public abstract HtmlPage<T> setIndented(boolean isIndented);
+    public abstract HtmlPage setIndented(boolean isIndented);
 
     @Override
-    public final HtmlPage<T> self() {
+    public final HtmlPage self() {
         return this;
     }
 
-    public abstract HtmlPage<T> threadSafe();
+    public abstract HtmlPage threadSafe();
 
     @Override
     public Element __() {

@@ -25,14 +25,14 @@ public class HtmlPartials {
     static Consumer<Div<?>> footerView(Consumer<Footer<?>> banner) {
         return div -> div
             .footer()
-                .of(footer -> banner.accept(footer))
+                .of(banner::accept)
                 .p()
                     .text("Created with HtmFlow")
                 .__() // p
             .__(); // footer
     }
 
-    static HtmlTemplate<Stream<Track>> tracksTemplate(Consumer<Div<?>> footer) {
+    static HtmlTemplate tracksTemplate(Consumer<Div<?>> footer) {
         return view -> view
             .div()
                 .ul()
@@ -42,7 +42,7 @@ public class HtmlPartials {
                         .__() // li
                     ))
                 .__ () // ul
-                .of(div -> footer.accept(div))
+                .of(footer::accept)
             .__(); // div
     }
 
@@ -55,10 +55,7 @@ public class HtmlPartials {
     public void testPartials() {
 
         Stream<Track> tracks = Stream.of(new Track("Space Odyssey"), new Track("Bad"), new Track("Under Pressure"));
-        HtmlView<Stream<Track>> tracksView = HtmlFlow.view(
-            tracksTemplate(footerView(HtmlPartials::bbView)),
-            Stream.class,
-            Track.class);
+        HtmlView tracksView = HtmlFlow.view(tracksTemplate(footerView(HtmlPartials::bbView)));
         String html = tracksView.render(tracks);
         System.out.println(html);
     }

@@ -25,6 +25,7 @@ package htmlflow.test;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import htmlflow.test.views.HtmlLists;
@@ -115,8 +116,8 @@ public class TestDivDetails {
     @Test
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlPage<Task> view = HtmlFlow
-            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate, Task.class);
+        HtmlView view = HtmlFlow
+            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
                 .keySet()
@@ -139,8 +140,8 @@ public class TestDivDetails {
 
     @Test
     public void testDivDetailsBindingWithRenderInParallelThreadSafe() {
-        HtmlPage<Task> view = HtmlFlow
-            .view(HtmlLists::taskDetailsTemplate, Task.class)
+        HtmlView view = HtmlFlow
+            .view(HtmlLists::taskDetailsTemplate)
             .threadSafe();
 
         expectedTaskViews

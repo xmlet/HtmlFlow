@@ -25,9 +25,8 @@
 package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlView;
 import htmlflow.HtmlPage;
-import htmlflow.HtmlDoc;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumEnctypeType;
 import org.xmlet.htmlapifaster.EnumMethodType;
@@ -35,13 +34,11 @@ import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
-import java.io.PrintStream;
-
 public class HtmlLists {
     public static final String divClass = "divClass";
     public static final String divId = "divId";
 
-    public static HtmlPage taskView (PrintStream out) {
+    public static HtmlPage taskView (Appendable out) {
         return HtmlFlow.doc(out)
             .html()
                 .head()
@@ -68,7 +65,7 @@ public class HtmlLists {
             .__(); //html
     }
 
-    public static HtmlPage viewDetails = HtmlFlow.doc()
+    public static HtmlView viewDetails = HtmlFlow.view(view -> view
             .html()
                 .head()
                     .title().text("Task Details").__()
@@ -89,9 +86,9 @@ public class HtmlLists {
                         .text("Priority: HIGH")
                     .__() //div
                 .__() //body
-            .__(); //html
-
-    public static void taskDetailsTemplate(HtmlPage<Task> view) {
+            .__() //html
+        );
+    public static void taskDetailsTemplate(HtmlPage view) {
         view
             .html()
                 .head()

@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 
 public class HtmlDynamicChainTwiceOnTopgenius {
 
-    public static final HtmlView<Stream<Track>> toptracksOkOfWithDynamic = HtmlFlow
-        .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateOfAndDynamic, Stream.class, Track.class);
+    public static final HtmlView toptracksOkOfWithDynamic = HtmlFlow
+        .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateOfAndDynamic);
 
-    public static void toptracksTemplateDynamicTwice(HtmlPage<Stream<Track>> view) {
+    public static void toptracksTemplateDynamicTwice(HtmlPage view) {
         view
             .html()
                 .head()
@@ -56,7 +56,7 @@ public class HtmlDynamicChainTwiceOnTopgenius {
                 .__()
             .__();
     }
-    static void toptracksTemplateOfAndDynamic(HtmlPage<Stream<Track>> view) {
+    static void toptracksTemplateOfAndDynamic(HtmlPage view) {
         view
             .html()
                 .head()

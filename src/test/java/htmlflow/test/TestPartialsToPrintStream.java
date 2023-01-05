@@ -26,7 +26,7 @@ package htmlflow.test;
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
-import htmlflow.visitor.HtmlContinuation;
+import htmlflow.continuations.HtmlContinuation;
 import htmlflow.visitor.HtmlVisitor;
 import org.junit.Test;
 import org.xmlet.htmlapifaster.Div;
@@ -64,7 +64,7 @@ public class TestPartialsToPrintStream {
          * Act
          */
         HtmlFlow
-            .view(new PrintStream(mem), this::template, Stream.class, Penguin.class)
+            .view(new PrintStream(mem), this::template)
             .write(Stream.of(penguins));
         /**
          * Assert
@@ -96,17 +96,13 @@ public class TestPartialsToPrintStream {
          * Act
          */
         // Discards all bytes through the PrintStream.
-        HtmlView<Stream<Penguin>> view = HtmlFlow.view(
-            new PrintStream(nullOutputStream()),
-            this::template,
-            Stream.class,
-            Penguin.class);
+        HtmlView view = HtmlFlow.view(new PrintStream(nullOutputStream()), this::template);
         view.write(penguins);
         /**
          * Assert
          */
         HtmlVisitor visitor = view.getVisitor();
-        Field firstField = visitor.getClass().getSuperclass().getDeclaredField("first");
+        Field firstField = visitor.getClass().getDeclaredField("first");
         firstField.setAccessible(true);
         HtmlContinuation node = (HtmlContinuation) firstField.get(visitor);
         int count = 0;
@@ -140,7 +136,7 @@ public class TestPartialsToPrintStream {
         public String getDnaCode() { return dnaCode; }
     }
 
-    private void template(HtmlPage<Stream<Penguin>> page) {
+    private void template(HtmlPage page) {
         page.html()
                 .head()
                     .title().text("MyPenguinExample").__()

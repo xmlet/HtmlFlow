@@ -24,7 +24,8 @@
 
 package htmlflow.visitor;
 
-import static htmlflow.visitor.TagsToPrintStream.FINISH_TAG;
+
+import static htmlflow.visitor.Tags.FINISH_TAG;
 
 /**
  * @author Luís Duarte created on 9-09-2018

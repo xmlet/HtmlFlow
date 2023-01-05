@@ -24,32 +24,24 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Html;
 
-import java.io.PrintStream;
 import java.util.function.Supplier;
 
 /**
  * Dynamic views can be bound to a Model object.
  *
- * @param <T> The type of the Model bound to this View.
- *
  * @author Miguel Gamboa, Luís Duare
  */
-public class HtmlView<T> extends HtmlPage<T> {
-
-    private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
-             "Wrong use of HtmlView! You should provide a " +
-             "model parameter or use a static view instead!";
+public class HtmlView extends HtmlPage {
     /**
      * This field is like a union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
      * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
      * emit HTML to the output, and we use the threadLocalVisitor field instead.
      */
-    private final HtmlViewVisitor<T> visitor;
+    private final HtmlVisitor visitor;
     /**
      * This issue is regarding ThreadLocal variables that are supposed to be garbage collected.
      * The given example deals with a static field of ThreadLocal which persists beyond an instance.
@@ -57,25 +49,16 @@ public class HtmlView<T> extends HtmlPage<T> {
      * thread local instances during its entire life cycle.
      */
     @java.lang.SuppressWarnings("squid:S5164")
-    private final ThreadLocal<HtmlViewVisitor<T>> threadLocalVisitor;
-    private final Supplier<HtmlViewVisitor<T>> visitorSupplier;
+    private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
+    private final Supplier<HtmlVisitor> visitorSupplier;
     private final boolean threadSafe;
-    /**
-     * To check whether this view is emitting to PrintStream, or not.
-     * Notice since the PrintStream maybe shared by different views processing
-     * we cannot ensure thread safety, because concurrent threads maybe emitting
-     * different HTML to the same PrintStream.
-     */
-    private final PrintStream out;
     /**
      * Auxiliary constructor used by clone().
      */
     HtmlView(
-        PrintStream out,
-        Supplier<HtmlViewVisitor<T>> visitorSupplier,
+        Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe)
     {
-        this.out = out;
         this.visitorSupplier = visitorSupplier;
         this.threadSafe = threadSafe;
         if(threadSafe) {
@@ -87,39 +70,25 @@ public class HtmlView<T> extends HtmlPage<T> {
         }
     }
 
-    public final Html<HtmlPage<T>> html() {
+    public final Html<HtmlPage> html() {
         this.getVisitor().write(HEADER);
         return new Html<>(this);
     }
 
-    /**
-     * Returns a new instance of AbstractHtmlWriter with the same properties of this object
-     * but with a new HtmlVisitor set with the out PrintStream parameter.
-     */
-    @Override
-    public final HtmlWriter<T> setPrintStream(PrintStream out) {
-        if(threadSafe)
-            throw new IllegalArgumentException(WRONG_USE_OF_PRINTSTREAM_ON_THREADSAFE_VIEWS);
-        HtmlVisitor v = getVisitor();
-        return clone(() -> (HtmlViewVisitor<T>) v.clone(out, v.isIndented), false);
-    }
-
-    public final HtmlPage<T> threadSafe(){
-        /**
-         * PrintStream output is not viable in a multi-thread scenario,
-         * because different Visitor instances may share the same PrintStream.
-         */
-        if(out != null) {
-            throw new IllegalStateException(WRONG_USE_OF_THREADSAFE_ON_VIEWS_WITH_PRINTSTREAM);
-        }
+    public final HtmlView threadSafe(){
         return clone(visitorSupplier, true);
     }
 
     @Override
-    public HtmlViewVisitor getVisitor() {
+    public HtmlVisitor getVisitor() {
         return threadSafe
             ? threadLocalVisitor.get()
             : visitor;
+    }
+
+    public final HtmlView setOut(Appendable out) {
+        getVisitor().setAppendable(out);
+        return this;
     }
 
     @Override
@@ -127,24 +96,23 @@ public class HtmlView<T> extends HtmlPage<T> {
         return "HtmlView";
     }
 
-    @Override
     public String render() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
+        return render(null);
     }
 
-    @Override
-    public String render(T model) {
-        return getVisitor().finish(model);
+    public String render(Object model) {
+        StringBuilder str = ((StringBuilder) getVisitor().out());
+        str.setLength(0);
+        getVisitor().resolve(model);
+        return str.toString();
     }
 
-    @Override
+    public void write(Object model) {
+        getVisitor().resolve(model);
+    }
+
     public void write() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
-    }
-
-    @Override
-    public void write(T model) {
-        this.render(model);
+        write(null);
     }
 
     /**
@@ -154,11 +122,11 @@ public class HtmlView<T> extends HtmlPage<T> {
      * @param visitorSupplier
      * @param threadSafe
      */
-    protected final HtmlPage<T> clone(
-        Supplier<HtmlViewVisitor<T>> visitorSupplier,
+    protected final HtmlView clone(
+        Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe)
     {
-        return new HtmlView<>(out, visitorSupplier, threadSafe);
+        return new HtmlView(visitorSupplier, threadSafe);
     }
 
     /**
@@ -166,7 +134,7 @@ public class HtmlView<T> extends HtmlPage<T> {
      * but with indented set to the value of isIndented parameter.
      */
     @Override
-    public final HtmlPage<T> setIndented(boolean isIndented) {
-        return clone(() -> (HtmlViewVisitor<T>) getVisitor().clone(out, isIndented), false);
+    public final HtmlView setIndented(boolean isIndented) {
+        return clone(() -> getVisitor().clone(isIndented), false);
     }
 }

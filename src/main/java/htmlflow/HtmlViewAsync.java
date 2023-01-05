@@ -24,22 +24,18 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitor;
-import htmlflow.visitor.HtmlVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
+import htmlflow.visitor.HtmlVisitor;
 
-import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /**
  * Dynamic views can be bound to a domain object within an asynchronous context with the usage of {@link org.reactivestreams.Publisher}.
  *
- * @param <T> The type of async domain object bound to this View.
- *
  * @author Pedro Fialho
  */
-public class HtmlViewAsync<T> extends HtmlView<T> {
+public class HtmlViewAsync extends HtmlView {
     
     private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
             "Wrong use of HtmlViewAsync! You should provide a " +
@@ -54,13 +50,11 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
     /**
      * Auxiliary constructor used by clone().
      *
-     * @param out
      * @param visitorSupplier
      * @param threadSafe
      */
-    HtmlViewAsync(PrintStream out, Supplier<HtmlViewVisitor<T>> visitorSupplier,
-                  boolean threadSafe) {
-        super(out, visitorSupplier, threadSafe);
+    HtmlViewAsync(Supplier<HtmlVisitor> visitorSupplier, boolean threadSafe) {
+        super(visitorSupplier, threadSafe);
     }
     
     @Override
@@ -74,29 +68,23 @@ public class HtmlViewAsync<T> extends HtmlView<T> {
     }
     
     @Override
-    public final String render(T model) {
+    public final String render(Object model) {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_ASYNC_VIEW);
     }
     
     @Override
-    public final void write() {
+    public final void write(Object model) {
         throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
     }
     
-    @Override
-    public final void write(T model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
-    }
-    
-    public final CompletableFuture<Void> writeAsync(T model) {
+    public final CompletableFuture<Void> writeAsync(Object model) {
         final HtmlVisitor localVisitor = this.getVisitor();
         
         if (!(localVisitor instanceof HtmlViewVisitorAsync)) {
             throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
         }
-        
-        HtmlViewVisitorAsync<T> visitorAsync = (HtmlViewVisitorAsync<T>) localVisitor;
 
+        HtmlViewVisitorAsync visitorAsync = (HtmlViewVisitorAsync) localVisitor;
         return visitorAsync.finishedAsync(model);
     }
 }

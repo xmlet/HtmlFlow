@@ -23,8 +23,9 @@
  * SOFTWARE.
  */
 
-package htmlflow.visitor;
+package htmlflow.continuations;
 
+import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.ElementVisitor;
 
@@ -33,14 +34,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.function.BiConsumer;
 
 /**
- * @param <U> the type of the template's model.
+ * HtmlContinuation for a dynamic block (i.e. BiConsumer) depending of an object model.
+ *
+ * @param <E> the type of the parent HTML element received by the dynamic HTML block.
+ * @param <T> the type of the template's model.
  */
-public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuation<U> {
+public class HtmlContinuationSyncDynamic<E extends Element, T> extends HtmlContinuationSync {
 
     /**
      * The continuation that consumes the element and a model.
      */
-    final BiConsumer<E, U> consumer;
+    final BiConsumer<E, T> consumer;
     /**
      * The element passed to the continuation consumer.
      */
@@ -50,38 +54,25 @@ public class HtmlContinuationDynamic<E extends Element, U> extends HtmlContinuat
      * @param currentDepth Indentation depth associated to this block.
      * @param consumer     The continuation that consumes the element and a model.
      */
-    HtmlContinuationDynamic(
+    public HtmlContinuationSyncDynamic(
         int currentDepth,
         boolean isClosed,
-        E element, BiConsumer<E, U> consumer,
+        E element, BiConsumer<E, T> consumer,
         HtmlVisitor visitor,
-        HtmlContinuation<U> next
+        HtmlContinuation next
     ) {
         super(currentDepth, isClosed, visitor, next);
         this.element = element;
         this.consumer = consumer;
     }
-    
     @Override
-    public void execute(U model) {
-        if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
-        }
-        emitHtml(model);
-        if (next != null) {
-            next.execute(model);
-        }
-    }
-    
-    @Override
-    protected void emitHtml(U model) {
-        consumer.accept(element, model);
+    protected final void emitHtml(Object model) {
+        consumer.accept(element, (T) model);
     }
 
     @Override
-    protected HtmlContinuation<U> copy(HtmlVisitor v) {
-        return new HtmlContinuationDynamic<>(
+    public HtmlContinuation copy(HtmlVisitor v) {
+        return new HtmlContinuationSyncDynamic<>(
             currentDepth,
             isClosed,
             copyElement(v),
