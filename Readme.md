@@ -7,35 +7,33 @@
 
 [**HtmlFlow**](https://htmlflow.org/) is a Java DSL to write typesafe HTML
 documents in a fluent style.
-Use one of its `view()` factory methods to get started with HtmlFlow, such as the following sample,
-which produces the HTML on the right side.
-Use the utility `Flowifier.toFlow(url)` to get the HtmlFlow definition from the
-corresponding HTML source:
+You may use the utility `Flowifier.fromHtml(String html)` if you need the HtmlFlow definition for an
+existing HTML source:
 
 <table class="table">
     <tr>
         <td colspan="2" align="center">
-            <code>view.render()</code>&nbsp &#8628
+            <em>output</em>&nbsp &#8628
         </td>
     </tr>
     <tr class="row">
         <td>
 
 ```java
-HtmlView view = StaticHtml
-  .view()
-    .html()
+HtmlFlow
+  .doc(out)
+    .html() // HtmlPage
       .head()
         .title().text("HtmlFlow").__()
-      .__() //head
+      .__() // head
       .body()
         .div().attrClass("container")
           .h1().text("My first page with HtmlFlow").__()
           .img().attrSrc("http://bit.ly/2MoHwrU").__()
           .p().text("Typesafe is awesome! :-)").__()
-        .__() //div
-      .__() //body
-    .__(); //html
+        .__() // div
+      .__() // body
+    .__(); // html
 ```
 
 </td>
@@ -64,16 +62,20 @@ HtmlView view = StaticHtml
 </tr>
     <tr>
         <td colspan="2" align="center">
-            &#8632 &nbsp<code>Flowifier.toFlow(url)</code>
+            &#8632 &nbsp<code>Flowifier.fromHtml("...")</code>
         </td>
     </tr>
 </table>
+
+Beyond `doc()`, the `HtmlFlow` API also provides `view()` and `viewAsync()`, which build
+an `HtmlPage` with a `render(model)` or `renderAsync(model)` methods depending of a model
+(asynchronous for the latter).
 
 Finally HtmlFlow is the **most performant** engine among state of the art template
 engines like Velocity, Thymleaf, Mustache, etc and other DSL libraries for HTML such
 as j2Html and KotlinX Html.
 Check out the performance results in the most popular benchmarks at
-[spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines)
+[spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines#benchmarks-102019)
 and our fork of
 [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark).
 
@@ -84,9 +86,9 @@ You can find different kinds of dynamic views [there](https://github.com/xmlet/s
 
 Every general purpose language has its own [_template engine_](https://en.wikipedia.org/wiki/Template_processor). 
 Java has [several](https://en.wikipedia.org/wiki/Comparison_of_web_template_engines).
-Most of the time, template engines have templates that are defined in new
-_external DSL_.
-To allow them to produce a _view_ based on the templates files, they generally use
+Most of the time, templates are defined in a new templating language
+(i.e. [_external DSL_](https://en.wikipedia.org/wiki/Domain-specific_language#External_and_Embedded_Domain_Specific_Languages)).
+To allow template engines to produce a _view_ based on a template, they generally use
 the concept of [_model_](https://en.wikipedia.org/wiki/Data_model).
 
 One of the problems of this technic is that you will end up with a template that
@@ -94,13 +96,14 @@ won't be type checked.
 So if you have a typo inside your template, the compiler won't be able to help
 you before the template is rendered.
 
-HtmlFlow took a different approach. Templates are expressed in an _internal DSL_.
+HtmlFlow took a different approach. Templates are expressed in an
+[_internal DSL_](https://en.wikipedia.org/wiki/Domain-specific_language#External_and_Embedded_Domain_Specific_Languages).
 You will write normal Java code to produce your template. 
-So the full Java tool chain is at your disposal for templating. 
+So, the full Java toolchain is at your disposal for templating. 
 Put it simply, HtmlFlow templates are essentially plain Java functions.
 
 HtmlFlow is not the only one using this approach. But it's the fastest one.
-Bonus points it also produces only valid HTML document according to HTML 5.2.
+Bonus points it also produces only valid HTML according to HTML 5.2.
 
 ## Table of Contents
 
@@ -116,22 +119,19 @@ Bonus points it also produces only valid HTML document according to HTML 5.2.
 
 ## Installation
 
-First, in order to include it to your Maven project, simply add this dependency:
+First, in order to include it to your Gradle project, simply add the following dependency,
+or use any other form provided in [Maven Central Repository](https://search.maven.org/artifact/com.github.xmlet/htmlflow/4.0/jar):
 
 ```xml
-<dependency>
-    <groupId>com.github.xmlet</groupId>
-    <artifactId>htmlflow</artifactId>
-    <version>3.9</version>
-</dependency>
+implementation 'com.github.xmlet:htmlflow:4.0'
 ```
 
 You can also download the artifact directly from [Maven
-Central Repository](http://repo1.maven.org/maven2/com/github/xmlet/htmlflow/)
+Central Repository](https://repo1.maven.org/maven2/com/github/xmlet/htmlflow)
 
 ## Getting started
 
-All methods (such as `body()`, `div()`, `p()`, etc) return the created element,
+All builders (such as `body()`, `div()`, `p()`, etc) return the created element,
 except `text()` which returns its parent element (e.g. `.h1().text("...")` returns
 the `H1` parent object).
 The same applies to attribute methods - `attr<attribute name>()` - that also
@@ -149,96 +149,78 @@ The HtmlFlow API is according to HTML5.2 and is generated with the support
 of an automated framework ([xmlet](https://github.com/xmlet/)) based on an [XSD
 definition of the HTML5.2](https://github.com/xmlet/HtmlApiFaster/blob/master/src/main/resources/html_5_2.xsd)
 syntax.
-
 Thus, all attributes are strongly typed with enumerated types which restrict
 the set of accepted values.
+
 Finally, HtmlFlow also supports [_dynamic views_](#dynamic-views) with *data binders* that enable
 the same HTML view to be bound with different object models.
 
 ## Output approaches
 
-Consider the definition of the following view that is late rendered by the function
-passed to the `view()` method:
+When you build an `HtmlPage` with `HtmlFlow.doc(Appendable out)` you may use any kind of
+output compatible with `Appendable`, such as `Writer`, `PrintStream`, `StringBuilder`, or other
+(notice some streams, such as `PrintStream`, are not buffered and may degrade performance).
+
+HTML is emitted as builder methods are invoked (e.g. `.body()`, `.div()`, `.p()`, etc).
+
+However, if you build an `HtmlView` with `HtmlFlow.view(view -> view.html().head()...)`
+the HTML is only emitted when you call `render(model)` or `write(model)` on the resulting `HtmlView`.
+Then, you can get the resulting HTML in two different ways:
 
 ```java
-static HtmlView view = StaticHtml.view(v -> v
-            .html()
-                .body()
-                    .p().text("Typesafe is awesome! :-)").__()
-                .__() //body
-            .__()); // html
-```
-
-Thus you can get the resulting HTML in three different ways:
-1) get the resulting `String` through its `render()` method or
-2) directly write to any `Printstream` such as `System.out` or
-3) any other `PrintStream` chain such as `new PrintStream(new FileOutputStream(path))`.
-
-**NOTE**: `PrintStream` is not buffered, so you may need to interleave a `BufferedOutputStream`
-object to improve performance.
-On the other hand `render()` internally uses a `StringBuilder` which shows better speedup.
-
-```java
+HtmlView view = HtmlFlow.view(view -> view
+    .html()
+        .head()
+            ....
+);
 String html = view.render();        // 1) get a string with the HTML
 view
-    .setPrintStream(System.out)
+    .setOut(System.out)
     .write();                       // 2) print to the standard output
-view
-    .setPrintStream(new PrintStream(new FileOutputStream("details.html")))
-    .write();                       // 3) write to details.html file
-
-Desktop.getDesktop().browse(URI.create("details.html"));
 ```
 
-Regardless the output approach you will get the same formatted HTML document:
+Regardless the output approach you will get the same formatted HTML document.
 
-```html
-<!DOCTYPE html>
-<html>
-    <body>
-        <p>
-            Typesafe is awesome! :-)
-        </p>
-    </body>
-</html>
-```
+`HtmlView` does a preprocessing of the provided function (e.g. `view -> ...`) computing
+and storing all static HTML blocks for future render calls, avoiding useless concatenation 
+of text and HTML tags and improving performance.
 
 ## Dynamic Views
 
-A _dynamic view_ is based on a template function `BiConsumer<DynamicHtml<U>, U>`, i.e.
-a `void` function that receives a dynamic view (`DynamicHtml<U>`) and a domain object of type `U` --
-`(DynamicHtml<U>, U) => void`.
-Given the template function we can build a dynamic view through `DynamicHtml.view(templateFunction)`.
+`HtmlView` is a subclass of `HtmlPage`, built from a template function specified by the functional interface:
+
+```java
+interface HtmlTemplate { void resolve(HtmlPage page); }
+```
 
 Next we present an example of a view with a template (e.g. `taskDetailsTemplate`) that will be later
 bound to a domain object `Task`.
-Note the use of the method `dynamic()` inside the `taskDetailsTemplate` whenever we are
-binding properties from the domain object `Task`.
-This is a **mandatory issue** to enable dynamic bind of properties, otherwise those values are
-resolved as static HTML and the domain object `Task` will be ignored on further renders.
+Notice the use of the method `dynamic()` inside the `taskDetailsTemplate` whenever we need to 
+access the domain object `Task` (i.e. the _model_).
+This model will be passed later to the view through its method `render(model)` or `write(model)`.
 
 ``` java
-HtmlView<Task> view = DynamicHtml.view(HtmlLists::taskDetailsTemplate);
+HtmlView view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
 
-static void taskDetailsTemplate(DynamicHtml<Task> view, Task task) {
+public static void taskDetailsTemplate(HtmlPage view) {
     view
         .html()
             .head()
                 .title().text("Task Details").__()
             .__() //head
             .body()
-                .dynamic(body -> body.text("Title:").text(task.getTitle()))
+                .<Task>dynamic((body, task) -> body.text("Title:").text(task.getTitle()))
                 .br().__()
-                .dynamic(body -> body.text("Description:").text(task.getDescription()))
+                .<Task>dynamic((body, task) -> body.text("Description:").text(task.getDescription()))
                 .br().__()
-                .dynamic(body -> body.text("Priority:").text(task.getPriority()))
+                .<Task>dynamic((body, task) -> body.text("Priority:").text(task.getPriority()))
             .__() //body
         .__(); // html
 }
 ```
 
-Next we present an example binding this same view with different domain objects,
-producing different HTML documents.
+Next we present an example binding this same view with 3 different domain objects,
+producing 3 different HTML documents.
 
 ``` java
 List<Task> tasks = Arrays.asList(
@@ -253,16 +235,18 @@ for (Task task: tasks) {
 }
 ```
 
-Finally, an example of a dynamic HTML table binding to a list of tasks:
+Finally, an example of a dynamic HTML table binding to a stream of tasks.
+Notice, we  do not need any special templating feature to traverse the `Stream<Task>` and
+we simply take advantage of Java Stream API.
 
 ``` java
-static void tasksTableTemplate(DynamicHtml<Stream<Task>> view, Stream<Task> tasks) {
-    view
+static HtmlView tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
+
+static void tasksTableTemplate(HtmlPage page) {
+    page
         .html()
             .head()
-                .title()
-                    .text("Tasks Table")
-                .__()
+                .title().text("Tasks Table").__()
             .__()
             .body()
                 .table()
@@ -273,12 +257,12 @@ static void tasksTableTemplate(DynamicHtml<Stream<Task>> view, Stream<Task> task
                         .th().text("Priority").__()
                     .__()
                     .tbody()
-                        .dynamic(tbody ->
+                        .<Stream<Task>>dynamic((tbody, tasks) ->
                             tasks.forEach(task -> tbody
                                 .tr()
-                                    .td().dynamic(td -> td.text(task.getTitle())).__()
-                                    .td().dynamic(td -> td.text(task.getDescription())).__()
-                                    .td().dynamic(td -> td.text(task.getPriority().toString())).__()
+                                    .td().text(task.getTitle()).__()
+                                    .td().text(task.getDescription()).__()
+                                    .td().text(task.getPriority().toString()).__()
                                 .__() // tr
                             ) // forEach
                         ) // dynamic
@@ -287,23 +271,68 @@ static void tasksTableTemplate(DynamicHtml<Stream<Task>> view, Stream<Task> task
             .__() // body
         .__(); // html
 }
+```
 
-static HtmlView<Stream<Task>> tasksTableView = DynamicHtml.view(HtmlForReadme::tasksTableTemplate);
+## Asynchronous HTML Views
 
-public class App {
-    public static void main(String [] args)  throws IOException {
-        Stream<Task> tasks = Stream.of(
-            new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-            new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
-            new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
-        );
+`HtmlViewAsync` is another subclass of `HtmPage` also depending of an `HtmlTemplate` function, 
+which can be bind with both synchronous, or asynchronous models.
 
-        Path path = Paths.get("tasksTable.html");
-        Files.write(path, tasksTableView.render(tasks).getBytes());
-        Desktop.getDesktop().browse(path.toUri());
-    }
+Notice that calling `renderAsync()` returns immediately, without blocking, while the `HtmlTemplate`
+function is still processing, maybe awaiting for the asynchronous model completion.
+Thus, `renderAsync()` and `writeAsync()` return `CompletableFuture<String>` and 
+`CompletableFuture<Void>` allowing to follow up processing and completion.
+
+To ensure well-formed HTML, the HtmlFlow needs to observe the asynchronous models completion. 
+Otherwise, the text or HTML elements following an asynchronous model binding maybe emitted before 
+the HTML resulting from the asynchronous model.
+
+Thus, to bind an asynchronous model we should use the builder
+`.await(parent, model, onCompletion) -> ...)` where the `onCompletion` callback is used to signal 
+HtmFlow that can proceed to the next continuation, as presented in next sample:
+
+```java
+static HtmlViewAsync tasksTableViewAsync = HtmlFlow.viewAsync(HtmlForReadme::tasksTableTemplateAsync);
+
+static void tasksTableTemplateAsync(HtmlPage page) {
+    page
+        .html()
+            .head()
+                .title() .text("Tasks Table") .__()
+            .__()
+            .body()
+                .table().attrClass("table")
+                    .tr()
+                        .th().text("Title").__()
+                        .th().text("Description").__()
+                        .th().text("Priority").__()
+                    .__()
+                    .tbody()
+                    .<Flux<Task>>await((tbody, tasks, onCompletion) -> tasks
+                        .doOnNext(task -> tbody
+                            .tr()
+                                .td().text(task.getTitle()).__()
+                                .td().text(task.getDescription()).__()
+                                .td().text(task.getPriority().toString()).__()
+                            .__() // tr
+                        )
+                        .doOnComplete(onCompletion::finish)
+                        .subscribe()
+                    )
+                    .__() // tbody
+                .__() // table
+            .__() // body
+        .__(); // html
 }
 ```
+
+In previous example, the model is a
+[Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
+which is a Reactive Streams
+[`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with rx operators that emits 0 to N elements.
+
+HtmlFlow _await_ feature works regardless the type of asynchronous model and can be used with
+any kind of asynchronous API.
 
 ## References
 
