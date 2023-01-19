@@ -21,7 +21,7 @@ existing HTML source:
 
 ```java
 HtmlFlow
-  .doc(out)
+  .doc(System.out)
     .html() // HtmlPage
       .head()
         .title().text("HtmlFlow").__()
