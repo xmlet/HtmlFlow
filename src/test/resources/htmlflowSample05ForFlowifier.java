@@ -2,8 +2,8 @@ import htmlflow.*;
 import org.xmlet.htmlapifaster.*;
 
 public class Flowified {
-    public static HtmlPage get() {
-        final HtmlPage html = HtmlFlow.doc().setIndented(false)
+    public static void get(StringBuilder out) {
+        HtmlFlow.doc(out).setIndented(false)
             .html()
                 .head()
                     .title()
@@ -24,6 +24,5 @@ public class Flowified {
                 .__() //body
             .__() //html
             ;
-        return html;
     }
 }

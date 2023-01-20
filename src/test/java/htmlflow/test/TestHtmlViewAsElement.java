@@ -33,18 +33,18 @@ public class TestHtmlViewAsElement {
 
     @Test
     public void testSelf() {
-        HtmlDoc view = HtmlFlow.doc();
+        HtmlDoc view = HtmlFlow.doc(System.out);
         Assert.assertSame(view, view.self());
         Assert.assertEquals("HtmlDoc", view.getName());
     }
 
     @Test(expected = IllegalStateException.class)
     public void testWrong__use() {
-        HtmlFlow.doc().__();
+        HtmlFlow.doc(System.out).__();
     }
 
     @Test(expected = IllegalStateException.class)
     public void testWrongParentUse() {
-        HtmlFlow.doc().getParent();
+        HtmlFlow.doc(System.out).getParent();
     }
 }

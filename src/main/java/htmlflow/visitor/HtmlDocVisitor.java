@@ -26,10 +26,8 @@ package htmlflow.visitor;
 
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-import org.xmlet.htmlapifaster.async.OnCompletion;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * This is the implementation of the ElementVisitor (from HtmlApiFaster
@@ -38,10 +36,16 @@ import java.util.function.Consumer;
  * @author Miguel Gamboa
  *         created on 04-08-2022
  */
-public abstract class HtmlDocVisitor extends HtmlVisitor {
+public class HtmlDocVisitor extends HtmlVisitor {
 
-    HtmlDocVisitor(boolean isIndented) {
-        super(isIndented);
+    public HtmlDocVisitor(Appendable out, boolean isIndented) {
+        this(out, isIndented, 0);
+    }
+
+    public HtmlDocVisitor(Appendable out,boolean isIndented, int depth) {
+        super(out, isIndented);
+        this.out = out;
+        this.depth = depth;
     }
 
     @Override
@@ -54,8 +58,15 @@ public abstract class HtmlDocVisitor extends HtmlVisitor {
         throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
     }
 
-    /**
-     * Returns the accumulated output and clear it.
-     */
-    public abstract String finish();
+    @Override
+    public void resolve(Object model) {
+        throw new UnsupportedOperationException("HTML has been already emitted on elements flow. " +
+                "resolve() is only available for HtmlView pages.");
+    }
+
+    @Override
+    public final HtmlDocVisitor clone(boolean isIndented) {
+        return new HtmlDocVisitor(this.out, isIndented);
+    }
+
 }

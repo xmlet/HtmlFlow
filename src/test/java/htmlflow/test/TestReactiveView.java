@@ -51,11 +51,9 @@ public class TestReactiveView {
             .map(n -> n + 1)
             .take(5)
             .doOnComplete(() -> cf.complete(null));
-        HtmlView<Publisher<Long>> view = HtmlFlow.view(
+        HtmlView view = HtmlFlow.view(
             System.out,
-            TestReactiveView::rxViewWithListingFromObservable,
-            Publisher.class,
-            Long.class);
+            TestReactiveView::rxViewWithListingFromObservable);
         /**
          * Act
          */
@@ -63,7 +61,7 @@ public class TestReactiveView {
         cf.join();       // Wait for nrs emit completion
     }
 
-    private static void rxViewWithListingFromObservable(HtmlPage<Publisher<Long>> view) {
+    private static void rxViewWithListingFromObservable(HtmlPage view) {
         view
             .html()
                 .head().title().text("Reactive Test").__().__()

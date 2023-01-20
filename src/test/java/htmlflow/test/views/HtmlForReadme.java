@@ -26,15 +26,19 @@ package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
+import htmlflow.HtmlViewAsync;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import org.junit.Test;
+import reactor.core.publisher.Flux;
 
-import java.io.FileOutputStream;
+import java.awt.*;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -51,8 +55,8 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample01() {
-        String html= HtmlFlow
-            .doc()
+        HtmlFlow
+            .doc(System.out)
                 .html()
                     .head()
                         .title().text("HtmlFlow").__()
@@ -64,9 +68,7 @@ public class HtmlForReadme {
                             .p().text("Typesafe is awesome! :-)").__()
                         .__()
                     .__() //body
-                .__() //html
-            .render();
-        // System.out.println(html);
+                .__(); //html
     }
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -90,13 +92,13 @@ public class HtmlForReadme {
     }
 
 
-    static HtmlPage view = HtmlFlow.doc()
+    static HtmlView view = HtmlFlow.view(view -> view
                 .html()
                     .body()
                         .p().text("Typesafe is awesome! :-)").__()
                     .__() //body
-                .__(); // html
-
+                .__() // html
+            );
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -104,11 +106,11 @@ public class HtmlForReadme {
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
     public void testSample03() throws IOException {
-        HtmlPage<Task> view = HtmlFlow.view(HtmlLists::taskDetailsTemplate, Task.class);
+        HtmlView view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
 
         List<Task> tasks = Arrays.asList(
             new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-            new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
+            new Task(4, "Worldwide Vacation Trip", "Planning it!", Priority.Normal),
             new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
         );
         for (Task task: tasks) {
@@ -118,8 +120,7 @@ public class HtmlForReadme {
         }
     }
 
-    static HtmlPage<Stream<Task>> tasksTableView = HtmlFlow.view(
-        HtmlForReadme::tasksTableTemplate, Stream.class, Task.class);
+    static HtmlView tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
 
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
@@ -139,13 +140,29 @@ public class HtmlForReadme {
         // Desktop.getDesktop().browse(path.toUri());
     }
 
-    static void tasksTableTemplate(HtmlPage<Stream<Task>> page) {
+    static HtmlViewAsync tasksTableViewAsync = HtmlFlow.viewAsync(HtmlForReadme::tasksTableTemplateAsync);
+
+    /**
+     * This unit test does not contain any assertion because it is only a sample to use in README.md.
+     */
+    @java.lang.SuppressWarnings("squid:S2699")
+    @Test
+    public void testSample05() throws IOException {
+        Flux<Task> tasks = Flux.fromStream(Stream.of(
+                new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
+                new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
+                new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
+        ))
+                .delayElements(Duration.ofMillis(1000));
+
+        tasksTableViewAsync.writeAsync(System.out, tasks).join();
+    }
+
+    static void tasksTableTemplate(HtmlPage page) {
         page
             .html()
                 .head()
-                    .title()
-                        .text("Tasks Table")
-                    .__()
+                    .title().text("Tasks Table").__()
                 .__()
                 .body()
                     .table()
@@ -159,12 +176,43 @@ public class HtmlForReadme {
                             .<Stream<Task>>dynamic((tbody, tasks) ->
                                 tasks.forEach(task -> tbody
                                     .tr()
-                                        .td().of(td -> td.text(task.getTitle())).__()
-                                        .td().of(td -> td.text(task.getDescription())).__()
-                                        .td().of(td -> td.text(task.getPriority().toString())).__()
+                                        .td().text(task.getTitle()).__()
+                                        .td().text(task.getDescription()).__()
+                                        .td().text(task.getPriority().toString()).__()
                                     .__() // tr
                                 ) // forEach
                             ) // dynamic
+                        .__() // tbody
+                    .__() // table
+                .__() // body
+            .__(); // html
+    }
+
+    static void tasksTableTemplateAsync(HtmlPage page) {
+        page
+            .html()
+                .head()
+                    .title() .text("Tasks Table") .__()
+                .__()
+                .body()
+                    .table().attrClass("table")
+                        .tr()
+                            .th().text("Title").__()
+                            .th().text("Description").__()
+                            .th().text("Priority").__()
+                        .__()
+                        .tbody()
+                        .<Flux<Task>>await((tbody, tasks, onCompletion) -> tasks
+                            .doOnNext(task -> tbody
+                                .tr()
+                                    .td().text(task.getTitle()).__()
+                                    .td().text(task.getDescription()).__()
+                                    .td().text(task.getPriority().toString()).__()
+                                .__() // tr
+                            )
+                            .doOnComplete(onCompletion::finish)
+                            .subscribe()
+                        )
                         .__() // tbody
                     .__() // table
                 .__() // body

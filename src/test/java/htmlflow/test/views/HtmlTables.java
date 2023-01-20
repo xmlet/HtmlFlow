@@ -38,7 +38,7 @@ import java.util.function.BiConsumer;
 
 public class HtmlTables {
 
-    public static void simpleTableView(HtmlPage<int[][]> view){
+    public static void simpleTableView(HtmlPage view){
         view
             .html()
                 .head()
@@ -77,7 +77,7 @@ public class HtmlTables {
      * An example of a dynamic view with an Iterable<Task> as domain model and
      * an array with two partial views: a div heading and table row.
      */
-    public static HtmlTemplate<Iterable<Task>> taskListViewWithPartials(BiConsumer<Tbody<?>, Task> partial) {
+    public static HtmlTemplate taskListViewWithPartials(BiConsumer<Tbody<?>, Task> partial) {
         return view -> view
             .html()
                 .head()
@@ -115,7 +115,7 @@ public class HtmlTables {
             .__(); // html
     }
 
-    public static HtmlPage<?> taskListViewHeader(HtmlPage<?> view) {
+    public static HtmlPage taskListViewHeader(HtmlPage view) {
         return view
             .div()
                 .a().attrHref("https://github.com/fmcarvalho/HtmlFlow").text("HtmlFlow").__()
@@ -133,7 +133,7 @@ public class HtmlTables {
             .__(); // tr
     }
 
-    public static void taskTableView(HtmlPage<Iterable<Task>> view){
+    public static void taskTableView(HtmlPage view){
         view
             .html()
                 .head()
@@ -170,7 +170,7 @@ public class HtmlTables {
      * View with a nested table based on issue:
      *    https://github.com/xmlet/HtmlFlow/issues/18
      */
-    public static HtmlPage nestedTable = HtmlFlow.doc()
+    public static HtmlView nestedTable = HtmlFlow.view(view -> view
             .html()
                 .body()
                     .table()
@@ -200,5 +200,6 @@ public class HtmlTables {
                         .__() // tr
                     .__() // table
                 .__() // body
-            .__(); // html
+            .__() // html
+    );
 }

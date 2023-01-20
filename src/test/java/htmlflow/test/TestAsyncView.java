@@ -19,9 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.Math.toIntExact;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TestAsyncView {
@@ -39,8 +37,7 @@ class TestAsyncView {
     
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                this::testAsyncModel);
+        HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
         mem.reset();
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
@@ -59,8 +56,7 @@ class TestAsyncView {
 
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
 
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                this::testAsyncModel);
+        HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
         //
         // 2nd render
@@ -86,16 +82,15 @@ class TestAsyncView {
     
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                this::testAsyncModel);
+        HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
     }
 
     void write_and_assert_asyncview(String expectedHtml, ByteArrayOutputStream mem,
-                                    HtmlViewAsync<AsyncModel<String, Student>> view, AsyncModel<String, Student> asyncModel)
+                                    HtmlViewAsync view, AsyncModel<String, Student> asyncModel)
             throws ExecutionException, InterruptedException {
 
-        final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
+        final CompletableFuture<Void> writeAsync = view.writeAsync(new PrintStream(mem), asyncModel);
 
         writeAsync.get();
 
@@ -130,10 +125,9 @@ class TestAsyncView {
         
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(new PrintStream(mem),
-                this::testAsyncModel);
+        HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);
         
-        final CompletableFuture<Void> writeAsync = view.writeAsync(asyncModel);
+        final CompletableFuture<Void> writeAsync = view.writeAsync(new PrintStream(mem), asyncModel);
         
         writeAsync.get();
         
@@ -151,8 +145,8 @@ class TestAsyncView {
         assertFalse(actual.hasNext());
     }
     
-    void testAsyncModel(HtmlPage<AsyncModel<String, Student>> view) {
-        final HtmlPage<AsyncModel<String, Student>> thenable = view.html()
+    public static void testAsyncModel(HtmlPage view) {
+        final HtmlPage thenable = view.html()
                 .body()
                 .div()
                 .p()
@@ -195,7 +189,7 @@ class TestAsyncView {
         assertNotNull(thenable);
     }
     
-    private String randomNameGenerator(int nr) {
+    public static String randomNameGenerator(int nr) {
         String[] names = new String[]{
                 "Pedro", "Manuel", "Maria", "Clara", "Rafael",
                 "Ze", "Joan", "Gui", "Valery"

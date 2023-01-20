@@ -23,43 +23,40 @@
  * SOFTWARE.
  */
 
-package htmlflow.visitor;
+package htmlflow.continuations;
+
+import htmlflow.visitor.HtmlVisitor;
+
+import static java.lang.System.lineSeparator;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 
 /**
- * @param <U> the type of the template's model.
+ * HtmlContinuation for a static HTML block.
  */
-public class HtmlContinuationStatic<U> extends HtmlContinuation<U> {
+public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
     final String staticHtmlBlock;
     /**
      * Sets indentation to -1 to inform that visitor should continue with previous indentation.
      * The isClosed is useless because it just writes what it is in its staticHtmlBlock.
      */
-    HtmlContinuationStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation<U> next) {
+    public HtmlContinuationSyncStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation next) {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
         this.staticHtmlBlock = staticHtmlBlock;
     }
-    
+
     @Override
-    public void execute(U model) {
-        if (currentDepth >= 0) {
-            this.visitor.isClosed = isClosed;
-            this.visitor.depth = currentDepth;
-        }
-        emitHtml(model);
-        if (next != null) {
-            next.execute(model);
-        }
-    }
-    
-    @Override
-    protected void emitHtml(U model) {
+    protected final void emitHtml(Object model) {
         visitor.write(staticHtmlBlock);
     }
 
     @Override
-    protected HtmlContinuation<U> copy(HtmlVisitor v) {
-        return new HtmlContinuationStatic<>(
-            staticHtmlBlock,
+    public HtmlContinuation copy(HtmlVisitor v) {
+        String block = v.isIndented
+                ? staticHtmlBlock
+                : stream(staticHtmlBlock.split(lineSeparator())).map(String::trim).collect(joining());
+        return new HtmlContinuationSyncStatic(
+            block,
             v,
             next != null ? next.copy(v) : null); // call copy recursively
     }

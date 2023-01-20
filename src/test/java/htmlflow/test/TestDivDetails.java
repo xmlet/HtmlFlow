@@ -24,7 +24,7 @@
 package htmlflow.test;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
 import htmlflow.test.views.HtmlLists;
@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.htmlRender;
 import static htmlflow.test.Utils.htmlWrite;
 import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
@@ -115,8 +114,8 @@ public class TestDivDetails {
     @Test
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlPage<Task> view = HtmlFlow
-            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate, Task.class);
+        HtmlView view = HtmlFlow
+            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
                 .keySet()
@@ -134,29 +133,6 @@ public class TestDivDetails {
                                 line ->
                                     assertEquals(line,
                                         actual.next()));
-                });
-    }
-
-    @Test
-    public void testDivDetailsBindingWithRenderInParallelThreadSafe() {
-        HtmlPage<Task> view = HtmlFlow
-            .view(HtmlLists::taskDetailsTemplate, Task.class)
-            .threadSafe();
-
-        expectedTaskViews
-                .keySet()
-                .stream()
-                .parallel()
-                .map(task -> TaskHtml.of(task,
-                                htmlRender(view, task)))
-                .forEach(taskHtml -> {
-                    // taskHtml.html.forEach(System.out::println);
-
-                    Iterator<String> actual = taskHtml.html.iterator();
-                    expectedTaskViews
-                            .get(taskHtml.obj)
-                            .forEach(line -> assertEquals(line, actual.next()));
-
                 });
     }
 

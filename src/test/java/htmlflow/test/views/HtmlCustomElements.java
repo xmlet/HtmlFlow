@@ -1,12 +1,10 @@
 package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlPage;
-import htmlflow.HtmlDoc;
+import htmlflow.HtmlView;
 
 public class HtmlCustomElements {
-    public static HtmlPage customElements = HtmlFlow
-            .doc()
+    public static HtmlView customElements = HtmlFlow.view(view -> view
                 .html()
                     .head()
                         .script()
@@ -28,5 +26,6 @@ public class HtmlCustomElements {
                             .__() // alert-info
                         .__() // div
                     .__() // body
-                .__(); //html
+                .__() //html
+        );
 }

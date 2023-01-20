@@ -21,14 +21,9 @@ public class TestDynamicCases {
         Track [] tracks1 = {
                 new Track("Space Odyssey"),
                 new Track("Under Pressure")};
-
-        String html = HtmlFlow
-            .view(
-                HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice,
-                Stream.class,
-                Track.class)
-            .render(Stream.of(tracks1));
-        System.out.println(html);
+        HtmlFlow
+            .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice)
+                .render(of(tracks1));
     }
 
     @Test

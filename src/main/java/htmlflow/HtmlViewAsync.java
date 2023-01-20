@@ -24,79 +24,61 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitor;
-import htmlflow.visitor.HtmlVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
+import org.xmlet.htmlapifaster.Html;
 
-import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 /**
  * Dynamic views can be bound to a domain object within an asynchronous context with the usage of {@link org.reactivestreams.Publisher}.
  *
- * @param <T> The type of async domain object bound to this View.
- *
  * @author Pedro Fialho
  */
-public class HtmlViewAsync<T> extends HtmlView<T> {
-    
-    private static final String WRONG_USE_OF_RENDER_WITHOUT_MODEL =
-            "Wrong use of HtmlViewAsync! You should provide a " +
-                    "model parameter or use a static view instead!";
-    
-    private static final String WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR =
-            "Wrong use of HtmlViewAsync writeAsync! You should use the viewAsync creation instead!";
-    
-    private static final String WRONG_USE_OF_RENDER_WITH_ASYNC_VIEW =
-            "Wrong use of HtmlViewAsync! You should use the writeAsync method instead";
-    
-    /**
-     * Auxiliary constructor used by clone().
-     *
-     * @param out
-     * @param visitorSupplier
-     * @param threadSafe
-     */
-    HtmlViewAsync(PrintStream out, Supplier<HtmlViewVisitor<T>> visitorSupplier,
-                  boolean threadSafe) {
-        super(out, visitorSupplier, threadSafe);
+public class HtmlViewAsync extends HtmlPage {
+
+    private final HtmlViewVisitorAsync visitor;
+
+    HtmlViewAsync(HtmlViewVisitorAsync visitor) {
+        this.visitor = visitor;
     }
-    
+
+    @Override
+    public final Html<HtmlPage> html() {
+        visitor.write(HEADER);
+        return new Html<>(this);
+    }
+
+    @Override
+    public HtmlPage setIndented(boolean isIndented) {
+        return new HtmlViewAsync(visitor.clone(isIndented));
+    }
+
+    @Override
+    public HtmlViewVisitorAsync getVisitor() {
+        return visitor;
+    }
+
     @Override
     public String getName() {
         return "HtmlViewAsync";
     }
-    
-    @Override
-    public final String render() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
-    }
-    
-    @Override
-    public final String render(T model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITH_ASYNC_VIEW);
-    }
-    
-    @Override
-    public final void write() {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
-    }
-    
-    @Override
-    public final void write(T model) {
-        throw new UnsupportedOperationException(WRONG_USE_OF_RENDER_WITHOUT_MODEL);
-    }
-    
-    public final CompletableFuture<Void> writeAsync(T model) {
-        final HtmlVisitor localVisitor = this.getVisitor();
-        
-        if (!(localVisitor instanceof HtmlViewVisitorAsync)) {
-            throw new UnsupportedOperationException(WRONG_USE_OF_WRITE_ASYNC_WITHOUT_ASYNC_VISITOR);
-        }
-        
-        HtmlViewVisitorAsync<T> visitorAsync = (HtmlViewVisitorAsync<T>) localVisitor;
 
-        return visitorAsync.finishedAsync(model);
+    /**
+     * This implementation is always thread-safe since we create a new visitor on each resolution (i.e. render or write).
+     * Thus there is no shared visitors across concurrent resolutions.
+     * @return
+     */
+    @Override
+    public HtmlViewAsync threadSafe(){
+        return this;
+    }
+
+    public final CompletableFuture<Void> writeAsync(Appendable out, Object model) {
+        return visitor.clone(out).finishedAsync(model);
+    }
+
+    public final CompletableFuture<String> renderAsync(Object model) {
+        StringBuilder str = new StringBuilder();
+        return writeAsync(str, model).thenApply( nothing -> str.toString());
     }
 }

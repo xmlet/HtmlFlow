@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, mcarvalho (gamboa.pt) and lcduarte (github.com/lcduarte)
+ * Copyright (c) 2014-23, Miguel Gamboa (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package htmlflow.visitor;
+package htmlflow.test.model;
 
 /**
- * @author Miguel Gamboa, Luís Duare
+ * @author Miguel Gamboa
  */
-interface TagsToStringBuilder extends Tags {
+public class TaskDelayed extends Task {
 
-    StringBuilder sb();
-
-    default void beginTag(String elementName) {
-        sb().append(BEGIN_TAG);
-        sb().append(elementName);
+    public TaskDelayed(int id, String title, String description, Priority priority) {
+        super(id, title, description, priority);
     }
 
-    default void addAttribute(String attributeName, String attributeValue)  {
-        sb().append(SPACE);
-        sb().append(attributeName);
-        sb().append(ATTRIBUTE_MID);
-        sb().append(attributeValue);
-        sb().append(QUOTATION);
+    @Override public String getTitle() {
+        sleep(10);
+        return super.getTitle();
     }
 
-    default void addComment(String comment) {
-        sb().append(BEGIN_COMMENT_TAG);   // <!--
-        sb().append(comment);
-        sb().append(END_COMMENT_TAG);     // -->
+    @Override public String getDescription() {
+        sleep(10);
+        return super.getDescription();
     }
 
-    default void endTag(String elementName) {
-        sb().append(BEGIN_CLOSE_TAG);     // </
-        sb().append(elementName);         // </name
-        sb().append(FINISH_TAG);          // </name>
+    @Override public Priority getPriority() {
+        sleep(10);
+        return super.getPriority();
     }
+
+    private static void sleep(int delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

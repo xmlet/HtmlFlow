@@ -25,14 +25,13 @@
 package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlPage;
-import htmlflow.HtmlDoc;
+import htmlflow.HtmlView;
 import org.xmlet.htmlFaster.EnumTargetBrowsingContext;
 import org.xmlet.htmlapifaster.EnumShapeType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 public class HtmlVoidElements {
-    public static HtmlPage voidElements = HtmlFlow.doc()
+    public static HtmlView voidElements = HtmlFlow.view(view -> view
         .html()
             .head()
                 .title()
@@ -83,5 +82,6 @@ public class HtmlVoidElements {
                     .__()
                 .__()
             .__()
-        .__();
+        .__()
+    );
 }

@@ -22,12 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package htmlflow.visitor;
+package htmlflow.continuations;
+
+import htmlflow.visitor.HtmlVisitor;
 
 /**
- * @param <U> the type of the template's model.
+ * Base class for a linked list of nodes, corresponding to HtmlContinuation objects.
+ * HtmlContinuation is responsible for emitting an HTML block and call the next node.
  */
-public abstract class HtmlContinuation<U> {
+public abstract class HtmlContinuation {
     /**
      * A negative number means that should be ignored.
      */
@@ -45,19 +48,19 @@ public abstract class HtmlContinuation<U> {
     /**
      * Next HtmlContinuation
      */
-    final HtmlContinuation<U> next;
+    public final HtmlContinuation next;
 
     /**
      * @param currentDepth Indentation depth associated to this block.
      */
-    protected HtmlContinuation(int currentDepth, boolean isClosed, HtmlVisitor visitor, HtmlContinuation<U> next) {
+    protected HtmlContinuation(int currentDepth, boolean isClosed, HtmlVisitor visitor, HtmlContinuation next) {
         this.currentDepth = currentDepth;
         this.isClosed = isClosed;
         this.visitor = visitor;
         this.next = next;
     }
 
-    public HtmlContinuation<U> getNext() {
+    public HtmlContinuation getNext() {
         return next;
     }
     /**
@@ -65,18 +68,12 @@ public abstract class HtmlContinuation<U> {
      *
      * @param model
      */
-    public abstract void execute(U model);
-    /**
-     * Hook method to emit HTML.
-     *
-     * @param model
-     */
-    protected abstract void emitHtml(U model);
+    public abstract void execute(Object model);
     /**
      * Creates a copy of this HtmlContinuation with a new visitor
      *
      * @param visitor
      */
-    protected abstract HtmlContinuation<U> copy(HtmlVisitor visitor);
+    public abstract HtmlContinuation copy(HtmlVisitor visitor);
 
 }
