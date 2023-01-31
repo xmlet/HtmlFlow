@@ -35,8 +35,6 @@ public class Task {
     private final String description;
     private final Priority priority;
     private Status status;
-    private Date creationDate;
-    private Date completedDate;
 
     public Task(String title, String description, Priority priority) {
         this.title = title;
@@ -77,24 +75,11 @@ public class Task {
         return priority;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public Date getCompletedDate() {
-        return completedDate;
-    }
-
     @Override
     public String toString() {
         return "Task [id=" + id + ", title=" + title + ", description="
                 + description + ", priority=" + priority + ", status=" + status
-                + ", creationDate=" + creationDate + ", completedDate="
-                + completedDate + "]";
+                + "]";
     }
 
 }

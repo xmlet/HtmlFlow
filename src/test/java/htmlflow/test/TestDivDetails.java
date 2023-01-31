@@ -23,7 +23,7 @@
  */
 package htmlflow.test;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Task;
@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static htmlflow.test.Utils.htmlRender;
 import static htmlflow.test.Utils.htmlWrite;
 import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
@@ -115,7 +114,7 @@ public class TestDivDetails {
     @Test
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        HtmlView<Task> view = DynamicHtml
+        HtmlView view = HtmlFlow
             .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
@@ -137,25 +136,6 @@ public class TestDivDetails {
                 });
     }
 
-    @Test
-    public void testDivDetailsBindingWithRender() {
-        HtmlView<Task> view = DynamicHtml
-            .view(HtmlLists::taskDetailsTemplate)
-            .threadSafe();
-        expectedTaskViews
-                .keySet()
-                .stream()
-                .parallel()
-                .map(task -> TaskHtml.of(task,
-                                htmlRender(view, task)))
-                .forEach(taskHtml -> {
-                    Iterator<String> actual = taskHtml.html.iterator();
-                    expectedTaskViews
-                            .get(taskHtml.obj)
-                            .forEach(line -> assertEquals(line, actual.next()));
-                });
-    }
-
     private static class TaskHtml {
         final Task obj;
         final Stream<String> html;
@@ -172,9 +152,7 @@ public class TestDivDetails {
     public void testWritePartialViewToPrintStream() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlTables
-            .taskListViewHeader
-            .setPrintStream(new PrintStream(mem))
-            .write();
+            .taskListViewHeader(HtmlFlow.doc(new PrintStream(mem)));
 
         Iterator<String> iter = NEWLINE
             .splitAsStream(mem.toString())
@@ -184,16 +162,8 @@ public class TestDivDetails {
                 .loadLines("partialViewHeader.html")
                 .forEach(expected -> {
                     String actual = iter.next();
-                    // System.out.println(actual);
+                    System.out.println(actual);
                     assertEquals(expected, actual);
                 });
-
-        /**
-         * Clear PrintStream and place again a HtmlVisitorStringBuilder
-         * for firther uses of this partial view in other unit tests.
-         */
-        HtmlTables
-            .taskListViewHeader
-            .setPrintStream(null);
     }
 }

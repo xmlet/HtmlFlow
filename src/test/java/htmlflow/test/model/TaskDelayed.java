@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2014-18, mcarvalho (gamboa.pt)
+ * Copyright (c) 2014-23, Miguel Gamboa (gamboa.pt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,37 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package htmlflow.test.model;
 
-package htmlflow.util;
+/**
+ * @author Miguel Gamboa
+ */
+public class TaskDelayed extends Task {
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
-public class PrintStringBuilder extends PrintStream{
-
-    private final StringBuilder sb = new StringBuilder();
-
-    public PrintStringBuilder(OutputStream out) {
-        super(out);
+    public TaskDelayed(int id, String title, String description, Priority priority) {
+        super(id, title, description, priority);
     }
 
-    @Override
-    public void print(char c) {
-        super.print(c);
-        sb.append(c);
+    @Override public String getTitle() {
+        sleep(10);
+        return super.getTitle();
     }
 
-    @Override
-    public void print(String s) {
-        super.print(s);
-        sb.append(s);
+    @Override public String getDescription() {
+        sleep(10);
+        return super.getDescription();
     }
 
-    public String substring(int startingIndex) {
-        return sb.substring(startingIndex);
+    @Override public Priority getPriority() {
+        sleep(10);
+        return super.getPriority();
     }
 
-    public int length() {
-        return sb.length();
+    private static void sleep(int delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 }

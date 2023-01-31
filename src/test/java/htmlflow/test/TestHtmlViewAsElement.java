@@ -24,7 +24,8 @@
 
 package htmlflow.test;
 
-import htmlflow.StaticHtml;
+import htmlflow.HtmlDoc;
+import htmlflow.HtmlFlow;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,18 +33,18 @@ public class TestHtmlViewAsElement {
 
     @Test
     public void testSelf() {
-        StaticHtml view = StaticHtml.view();
+        HtmlDoc view = HtmlFlow.doc(System.out);
         Assert.assertSame(view, view.self());
-        Assert.assertEquals("HtmlView", view.getName());
+        Assert.assertEquals("HtmlDoc", view.getName());
     }
 
     @Test(expected = IllegalStateException.class)
     public void testWrong__use() {
-        StaticHtml.view().__();
+        HtmlFlow.doc(System.out).__();
     }
 
     @Test(expected = IllegalStateException.class)
     public void testWrongParentUse() {
-        StaticHtml.view().getParent();
+        HtmlFlow.doc(System.out).getParent();
     }
 }

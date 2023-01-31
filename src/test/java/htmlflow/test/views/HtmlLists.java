@@ -24,9 +24,9 @@
 
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumEnctypeType;
 import org.xmlet.htmlapifaster.EnumMethodType;
@@ -38,8 +38,8 @@ public class HtmlLists {
     public static final String divClass = "divClass";
     public static final String divId = "divId";
 
-    public static HtmlView taskView (StaticHtml view) {
-        return view
+    public static HtmlPage taskView (Appendable out) {
+        return HtmlFlow.doc(out)
             .html()
                 .head()
                     .script()
@@ -65,7 +65,7 @@ public class HtmlLists {
             .__(); //html
     }
 
-    public static HtmlView viewDetails = StaticHtml.view()
+    public static HtmlView viewDetails = HtmlFlow.view(view -> view
             .html()
                 .head()
                     .title().text("Task Details").__()
@@ -86,20 +86,20 @@ public class HtmlLists {
                         .text("Priority: HIGH")
                     .__() //div
                 .__() //body
-            .__(); //html
-
-    public static void taskDetailsTemplate(DynamicHtml<Task> view, Task task) {
+            .__() //html
+        );
+    public static void taskDetailsTemplate(HtmlPage view) {
         view
             .html()
                 .head()
                     .title().text("Task Details").__()
                 .__() //head
                 .body()
-                    .dynamic(body -> body.text("Title:").text(task.getTitle()))
+                    .<Task>dynamic((body, task) -> body.text("Title:").text(task.getTitle()))
                     .br().__()
-                    .dynamic(body -> body.text("Description:").text(task.getDescription()))
+                    .<Task>dynamic((body, task) -> body.text("Description:").text(task.getDescription()))
                     .br().__()
-                    .dynamic(body -> body.text("Priority:").text(task.getPriority()))
+                    .<Task>dynamic((body, task) -> body.text("Priority:").text(task.getPriority()))
                 .__() //body
             .__(); // html
     }

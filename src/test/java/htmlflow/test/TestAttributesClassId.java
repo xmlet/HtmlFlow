@@ -26,8 +26,9 @@
  */
 package htmlflow.test;
 
-import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlDoc;
 import htmlflow.test.views.HtmlLists;
 import org.junit.Test;
 import org.xmlet.htmlapifaster.Body;
@@ -54,33 +55,23 @@ public class TestAttributesClassId {
 
     @Test
     public void testGetElementName() {
-        Div<Body<Html<HtmlView<Object>>>> div = StaticHtml.view().html().body().div();
+        Div<Body<Html<HtmlPage>>> div = HtmlFlow.doc(System.out).html().body().div();
         assertEquals(DIV_NAME, div.getName());
     }
 
     @Test
-    public void testIdAndClassAttributeStaticHtmlWithConsumer() {
-        ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        StaticHtml
-            .view(new PrintStream(mem), HtmlLists::taskView)
-            .write();
-        assertHtml(mem.toString());
-    }
-
-    @Test
     public void testIdAndClassAttribute() {
-        String actual = HtmlLists
-            .taskView(StaticHtml.view())
-            .render();
-        assertHtml(actual);
+        StringBuilder actual = new StringBuilder();
+        HtmlLists
+            .taskView(actual);
+        assertHtml(actual.toString());
     }
 
     @Test
     public void testIdAndClassAttributeInViewWithPrintStream() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlLists
-            .taskView(StaticHtml.view(new PrintStream(mem)))
-            .write();
+            .taskView(new PrintStream(mem));
         assertHtml(mem.toString());
     }
 

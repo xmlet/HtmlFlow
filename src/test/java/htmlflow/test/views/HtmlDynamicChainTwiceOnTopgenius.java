@@ -1,6 +1,8 @@
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Track;
 import org.xmlet.htmlapifaster.EnumRelType;
 
@@ -8,13 +10,10 @@ import java.util.stream.Stream;
 
 public class HtmlDynamicChainTwiceOnTopgenius {
 
-    public static final DynamicHtml<Stream<Track>> toptracksWrongDynamicTwice = DynamicHtml
-        .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateDynamicTwice);
-
-    public static final DynamicHtml<Stream<Track>> toptracksOkOfWithDynamic = DynamicHtml
+    public static final HtmlView toptracksOkOfWithDynamic = HtmlFlow
         .view(HtmlDynamicChainTwiceOnTopgenius::toptracksTemplateOfAndDynamic);
 
-    static void toptracksTemplateDynamicTwice(DynamicHtml<Stream<Track>> view, Stream<Track> tracks) {
+    public static void toptracksTemplateDynamicTwice(HtmlPage view) {
         view
             .html()
                 .head()
@@ -34,21 +33,21 @@ public class HtmlDynamicChainTwiceOnTopgenius {
                                 .th().text("Track").__()
                                 .th().text("Listeners").__()
                             .__()
-                            .dynamic(table -> {
+                            .<Stream<Track>>dynamic((table, tracks) -> {
                                 int[] count = {1};
                                 tracks.forEach(track ->
                                     table
                                         .tr()
-                                            .td().dynamic(td -> td.text(count[0]++)).__()
+                                            .td().dynamic((td, obj) -> td.text(count[0]++)).__()
                                             .td()
-                                                .dynamic(td -> td
+                                                .<Track>dynamic((td, trk) -> td
                                                     .a()
                                                         .attrHref(track.getUrl())
                                                         .attrTarget("_blank")
                                                         .text(track.getName())
                                                     .__())
                                             .__()
-                                            .td().dynamic(td -> td.text(track.getListeners())).__()
+                                            .td().<Track>dynamic((td, trk) -> td.text(track.getListeners())).__()
                                         .__()
                                 );
                             })
@@ -57,7 +56,7 @@ public class HtmlDynamicChainTwiceOnTopgenius {
                 .__()
             .__();
     }
-    static void toptracksTemplateOfAndDynamic(DynamicHtml<Stream<Track>> view, Stream<Track> tracks) {
+    static void toptracksTemplateOfAndDynamic(HtmlPage view) {
         view
             .html()
                 .head()
@@ -77,23 +76,20 @@ public class HtmlDynamicChainTwiceOnTopgenius {
                                 .th().text("Track").__()
                                 .th().text("Listeners").__()
                             .__()
-                            // IF all bound tables have the same number of rows then
-                            // we may postpone dynamic for each individual field.
-                            .of(table -> {
+                            .<Stream<Track>>dynamic((table, tracks) -> {
                                 int[] count = {1};
                                 tracks.forEach(track ->
                                     table
                                         .tr()
-                                            .td().dynamic(td -> td.text(count[0]++)).__()
+                                            .td().text(count[0]++).__()
                                             .td()
-                                                .dynamic(td -> td
-                                                    .a()
-                                                        .attrHref(track.getUrl())
-                                                        .attrTarget("_blank")
-                                                        .text(track.getName())
-                                                    .__())
+                                                .a()
+                                                    .attrHref(track.getUrl())
+                                                    .attrTarget("_blank")
+                                                    .text(track.getName())
+                                                .__()
                                             .__()
-                                            .td().dynamic(td -> td.text(track.getListeners())).__()
+                                            .td().text(track.getListeners()).__()
                                         .__()
                                 );
                             })

@@ -23,7 +23,8 @@
  */
 package htmlflow.test;
 
-import htmlflow.DynamicHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
@@ -64,7 +65,7 @@ public class TestTable {
          * Arrange
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
-        DynamicHtml<int[][]> view = DynamicHtml.view(HtmlTables::simpleTableView);
+        HtmlView view = HtmlFlow.view(HtmlTables::simpleTableView);
         /*
          * Act
          */
@@ -82,7 +83,7 @@ public class TestTable {
          */
         int[][] output = {{1,2,3},{4,5,6}, {7,8,9}};
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        DynamicHtml
+        HtmlFlow
             .view(new PrintStream(mem), HtmlTables::simpleTableView)
             .write(output);
         /*
@@ -118,7 +119,7 @@ public class TestTable {
         Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal, Status.Completed);
         Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High, Status.Deferred);
         List<Task> tasks = Arrays.asList(t1, t2, t3);
-        String html = DynamicHtml.view(HtmlTables::taskTableView).render(tasks);
+        String html = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
         /*
          * Assert
          */
@@ -133,13 +134,13 @@ public class TestTable {
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-        DynamicHtml<Iterable<Task>> view = DynamicHtml.view(
+        HtmlView view = HtmlFlow.view(
             new PrintStream(mem),
-            HtmlTables::taskListViewWithPartials);
-        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
+            HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
+        view.write(dataSource);
         validateBindingTable(mem.toString());
         mem.reset();
-        view.write(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow);
+        view.write(dataSource);
         validateBindingTable(mem.toString());
     }
 
@@ -151,9 +152,9 @@ public class TestTable {
                 new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
                 new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
         );
-        DynamicHtml<Iterable<Task>> view = DynamicHtml.view(HtmlTables::taskListViewWithPartials);
-        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
-        validateBindingTable(view.render(dataSource, HtmlTables.taskListViewHeader, HtmlTables.taskListRow));
+        HtmlView view = HtmlFlow.view(HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
+        validateBindingTable(view.render(dataSource));
+        validateBindingTable(view.render(dataSource));
     }
 
     static void validateBindingTable(String actual){

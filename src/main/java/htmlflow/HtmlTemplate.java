@@ -24,8 +24,12 @@
 
 package htmlflow;
 
+/**
+ * The model of type T is obtained from view's render() method
+ * and passed to dynamic blocks.
+ */
 @FunctionalInterface
-public interface HtmlTemplate<T> {
+public interface HtmlTemplate {
 
-    void resolve(DynamicHtml<T> view, T model, HtmlView...partials);
+    void resolve(HtmlPage page);
 }

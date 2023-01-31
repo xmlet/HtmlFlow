@@ -25,7 +25,6 @@
 package htmlflow.test;
 
 import htmlflow.test.model.Stock;
-import htmlflow.test.views.HtmlDynamic;
 import htmlflow.test.views.HtmlDynamicStocks;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 public class TestDynamicVersusOf {
 
     @Test
-    public void testRightDynamicWithTwoDifferentModels(){
+    public void testRenderRightDynamicWithTwoDifferentModels(){
         /*
          * First render with Stock.dummy3Items()
          */
@@ -55,23 +54,25 @@ public class TestDynamicVersusOf {
     }
 
     @Test
-    public void testOfWrongUseWithTwoDifferentModels(){
+    public void testWriteRightDynamicWithTwoDifferentModels(){
         /*
          * First render with Stock.dummy3Items()
          */
-        String actual = HtmlDynamicStocks
-            .stocksViewWrong
-            .render(Stock.dummy3Items());
-        assertLines("stocks3items.html", actual);
+        StringBuilder actual1 = new StringBuilder();
+        HtmlDynamicStocks
+            .stocksViewOk
+            .setOut(actual1)
+            .write(Stock.dummy3Items());
+        assertLines("stocks3items.html", actual1.toString());
         /*
-         * Then render with Stock.dummy5Items() but it will return
-         * again the same previous 3 items that were stored in cache
-         * of stocksViewWrong due to its wrong use with of() instead of dynamic.
+         * Then render with Stock.dummy5Items()
          */
-        actual = HtmlDynamicStocks
-            .stocksViewWrong
-            .render(Stock.dummy5Items());
-        assertLines("stocks3items.html", actual);
+        StringBuilder actual2 = new StringBuilder();
+        HtmlDynamicStocks
+            .stocksViewOk
+            .setOut(actual2)
+            .render(Stock.other3Items());
+        assertLines("stocks3others.html", actual2.toString());
     }
 
     private static void assertLines(String pathToExpected, String actual) {

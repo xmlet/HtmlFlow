@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package htmlflow;
+package htmlflow.visitor;
 
-import static htmlflow.Tags.FINISH_TAG;
+
+import static htmlflow.visitor.Tags.FINISH_TAG;
 
 /**
  * @author Luís Duarte created on 9-09-2018

@@ -1,17 +1,15 @@
 package htmlflow.test.views;
 
-import htmlflow.DynamicHtml;
-import htmlflow.HtmlTemplate;
-import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
 
 import java.io.PrintStream;
-import java.util.function.Function;
 
 public class HtmlWithoutIndentation {
 
-    public static HtmlView bodyDivP = StaticHtml
-        .view()
+    public static void bodyDivP(StringBuilder out) {
+        HtmlFlow
+            .doc(out)
             .setIndented(false)
             .html()
                 .body()
@@ -22,9 +20,24 @@ public class HtmlWithoutIndentation {
                     .__() // div
                 .__() // body
             .__(); // html
+    }
 
-    public static HtmlView bodyPre = StaticHtml
-        .view()
+    public static void bodyDivPtemplate(HtmlPage view) {
+        view
+            .html()
+                .body()
+                    .div()
+                        .p()
+                            .text("Some dummy text!")
+                        .__() // p
+                    .__() // div
+                .__() // body
+            .__(); // html
+    }
+
+    public static void bodyPre(StringBuilder out) {
+        HtmlFlow
+            .doc(out)
             .setIndented(false)
             .html()
                 .body()
@@ -33,17 +46,20 @@ public class HtmlWithoutIndentation {
                     .__() // pre
                 .__() // body
             .__(); // html
+    }
 
-    public static StaticHtml hotBodyDivP = StaticHtml.view(view -> view
-        .setIndented(false)
-        .html()
-            .body()
-                .div()
-                    .p()
-                        .text("Some dummy text!")
-                    .__() // p
-                .__() // div
-            .__() // body
-        .__() // html
-    );
+    public static void hotBodyDivP(PrintStream out) {
+        HtmlFlow
+            .doc(out)
+            .setIndented(false)
+            .html()
+                .body()
+                    .div()
+                        .p()
+                            .text("Some dummy text!")
+                        .__() // p
+                    .__() // div
+                .__() // body
+            .__(); // html
+    }
 }
