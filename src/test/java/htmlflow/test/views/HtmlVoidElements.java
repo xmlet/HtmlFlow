@@ -26,7 +26,6 @@ package htmlflow.test.views;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
-import org.xmlet.htmlFaster.EnumTargetBrowsingContext;
 import org.xmlet.htmlapifaster.EnumShapeType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
@@ -73,7 +72,7 @@ public class HtmlVoidElements {
                     .attrShape(EnumShapeType.CIRCLE)
                     .attrCoords("130,136,60")
                     .attrHref("https://developer.mozilla.org/")
-                    .attrTarget(EnumTargetBrowsingContext._BLANK.toString())
+                    .attrTarget("_blank")
                     .attrAlt("MDN")
                 .__()
                 .object()
