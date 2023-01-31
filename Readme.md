@@ -111,8 +111,8 @@ Bonus points it also produces only valid HTML according to HTML 5.2.
 * [Get started](#getting-started)
 * [Output approaches](#output-approaches)
 * [Dynamic Views](#dynamic-views)
-* <a href="https://htmlflow.org/features/#partial-and-layout" target="_blank">Partial and Layouts</a>
-* <a href="https://htmlflow.org/news/" target="_blank">Changelog</a>
+* [Layout and partial views (aka _fragments_)](https://htmlflow.org/features#layout-and-partial-views-aka-fragments)
+* [Changelog](https://htmlflow.org/news)
 * [References](#references)
 * [License](#license)
 * [About](#about)
