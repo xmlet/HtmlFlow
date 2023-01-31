@@ -1,0 +1,2 @@
+# mydoctheme
+Demo for documentation

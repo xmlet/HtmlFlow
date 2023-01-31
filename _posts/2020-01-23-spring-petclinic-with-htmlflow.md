@@ -1,17 +1,13 @@
 ---
-layout: post
 title: Spring-based pet clinic app with HtmlFlow views
-date: 2020-01-23
-type: post
 published: true
-status: publish
-categories: []
 tags: []
-author:
-  login: MiguelGamboa
-  email: 
-  display_name: Miguel Gamboa
-  
+author: Miguel Gamboa
+permalink: 2020-01-23-spring-petclinic-with-htmlflow.html
+summary: >
+    spring-petclinic implementation of the sample Spring-based pet clinic web application 
+    integrated with HtmlFlow views.
+    Replaced the Thymeleaf template engine with HtmlFlow.
 ---
 
 We have provided in [github.com/xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic)

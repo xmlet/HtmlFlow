@@ -1,0 +1,81 @@
+# HtmlFlow sidebar
+
+entries:
+- title: sidebar
+  product: Version
+  version: 4.x
+  folders:
+
+  - title: Overview
+    output: web
+    folderitems:
+
+    - title: Index
+      url: /index.html
+      output: web
+      type: homepage
+
+
+    - title: Java DSL for HTML
+      url: index#java-dsl-for-html
+      output: web
+
+    - title: References
+      url: index#references
+      output: web
+
+  - title: Installation
+    output: web
+    url: install
+
+  - title: Features
+    output: web
+    folderitems:
+
+    - title: Features
+      url: /features
+      output: web
+
+    - title: Getting started
+      url: features#getting-started
+      output: web
+
+    - title: Output approaches
+      url: features#output-approaches
+      output: web
+
+    - title: Dynamic views
+      url: features#dynamic-views
+      output: web
+    
+    - title: Asynchronous HTML Views
+      url: features#asynchronous-html-views
+      output: web
+
+    - title: Layout and fragments
+      url: features#layout-and-partial-views-aka-fragments
+      output: web
+
+  - title: Version 3.x
+    output: web
+    folderitems:
+
+    - title: Features
+      url: /features_version3
+      output: web
+
+    - title: Getting started
+      url: features_version3#getting-started
+      output: web
+
+    - title: Output approaches
+      url: features_version3#output-approaches
+      output: web
+
+    - title: Dynamic views
+      url: features_version3#dynamic-views
+      output: web
+    
+    - title: Partial and Layout
+      url: features_version3#partial-and-layout
+      output: web
