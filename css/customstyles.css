@@ -723,7 +723,7 @@ ol.series li {
 #mysidebar {
     position: fixed;
     right: 0;
-    left: 0;
+    left: 20px;
 }
 
 .nav ul.series li {
