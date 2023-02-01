@@ -141,11 +141,13 @@ return their parent (e.g. `.img().attrSrc("...")` returns the `Img` parent objec
 
 There are also a couple of special builders:
 * `__()` - returns the parent element. This method is responsible for emitting the end tag of an element.
-* `.of(Consumer<E> cons)` - It returns the same element `E`, where `E` is the parent HTML element. 
+* `of(Consumer<E> cons)` - It returns the same element `E`, where `E` is the parent HTML element. 
 This is useful whenever you need to chain any Java statement fluently. For instance, when we need
-to chain a conditional expression, such as the following example where we may add, or not, the class `minus` to the element `td` depending on the value of the stock change:
-`….td().of(td -> { if (stock.getChange() < 0) td.attrClass("minus"); }).…`
-* `.dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional 
+to chain a conditional expression, such as the following example where we may add, or not, the class `minus` to the element `td` depending on the value of a stock change:
+```java
+….td().of(td -> { if (stock.getChange() < 0) td.attrClass("minus"); }).…
+```
+* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional 
 argument `M` corresponding to the model (i.e. context object) of `render(model)` or `write(model)`. 
 Read more in [dynamic views](#dynamic-views).
 
