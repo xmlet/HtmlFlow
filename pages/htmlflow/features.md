@@ -58,8 +58,20 @@ the `H1` parent object).
 The same applies to attribute methods - `attr<attribute name>()` - that also
 return their parent (e.g. `.img().attrSrc("...")` returns the `Img` parent object).
 
-There is also a special method `__()` which returns the parent element.
-This method is responsible for emitting the end tag of an element.
+There are also a couple of special builders:
+* `__()` - returns the parent element. This method is responsible for emitting the end tag of an element.
+* `of(Consumer<E> cons)` - It returns the same element `E`, where `E` is the parent HTML element. 
+This is useful whenever you need to chain any Java statement fluently. For instance, when we need
+to chain a conditional expression, such as the following example where we may add, or not, the class `minus` to the element `td` depending on the value of a stock change:
+```java
+….td().of(td -> { if (stock.getChange() < 0) td.attrClass("minus"); }).…
+```
+* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional 
+argument `M` corresponding to the model (i.e. context object) of `render(model)` or `write(model)`. 
+Read more in [dynamic views](#dynamic-views).
+
+These builders avoid special templating dialects and allow the use of any Java statement interleaved
+in the web template.
 
 The HTML resulting from HtmlFlow respects all HTML 5.2 rules (e.g. `h1().div()`
 gives a compilation error because it goes against the content
