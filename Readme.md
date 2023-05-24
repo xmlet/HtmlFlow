@@ -71,6 +71,9 @@ Beyond `doc()`, the `HtmlFlow` API also provides `view()` and `viewAsync()`, whi
 an `HtmlPage` with a `render(model)` or `renderAsync(model)` methods depending of a model
 (asynchronous for the latter).
 
+**NOTICE** for those migrating from legacy API <= 3.x read next about
+[Migrating from HtmlFlow 3.x to 4.x](https://htmlflow.org/2023-01-31-Release-4.0.html).
+
 Finally HtmlFlow is the **most performant** engine among state of the art template
 engines like Velocity, Thymleaf, Mustache, etc and other DSL libraries for HTML such
 as j2Html and KotlinX Html.
