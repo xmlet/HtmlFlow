@@ -24,9 +24,13 @@
 
 package htmlflow.test;
 
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlPage;
+import htmlflow.HtmlView;
 import htmlflow.test.model.Stock;
 import htmlflow.test.views.HtmlDynamic;
 import org.junit.Test;
+import org.xmlet.htmlapifaster.Div;
 
 import java.util.Iterator;
 
@@ -67,4 +71,36 @@ public class TestDynamicVersusOfWithPartials {
                 assertEquals(expected, line);
             });
     }
+
+    /**
+     * Main root HtmlView element cannot use dynamic.
+     * It should be used with inner element such as Div.
+     * Otherwise, it fails after preprocessing when it tries to clone the
+     * Continuation and its Element that is being instantiated through reflection.
+     * HtmlView as a different constructor and instantiated differently.
+     */
+    @Test(expected = ExceptionInInitializerError.class)
+    public void testFragmentWithMainRootView() {
+        HtmlLists.view.render(new HtmlLists.AModel());
+    }
+}
+
+class HtmlLists {
+    public static HtmlView view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
+
+    public static class AModel {}
+
+    public static void taskDetailsTemplate(HtmlPage view) {
+        view
+                .<AModel>dynamic((v, mod) -> v
+                        .div()
+                        .of(__ -> HtmlLists.taskDetailsTemplateFregment(v.div(), mod))
+                        .__()
+                );
+    }
+
+    public static void taskDetailsTemplateFregment(Div<?> view, AModel model ) {
+        view.p().text("test").__();
+    }
+
 }
