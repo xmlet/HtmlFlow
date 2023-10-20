@@ -13,5 +13,15 @@ or use any other form provided in [Maven Central Repository](https://search.mave
 implementation 'com.github.xmlet:htmlflow:4.0'
 ```
 
+If you are a maven person, add the following to your pom.xml
+
+```
+<dependency>
+  <groupId>com.github.xmlet</groupId>
+  <artifactId>htmlflow</artifactId>
+  <version>4.0</version>
+</dependency>
+```
+
 You can also download the artifact directly from [Maven
 Central Repository](https://repo1.maven.org/maven2/com/github/xmlet/htmlflow)
