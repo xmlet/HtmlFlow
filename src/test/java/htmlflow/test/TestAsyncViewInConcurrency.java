@@ -22,41 +22,45 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TestAsyncViewInConcurrency {
+    static final int NR_OF_TASKS = Runtime.getRuntime().availableProcessors();
+    static final Publisher<Student> studentFlux = Flux.range(1, 5)
+            .delayElements(Duration.ofMillis(10))
+            .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
+    static final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
+
     @Test
-    void check_asyncview_processing_in_concurrent_tasks() {
-        check_asyncview_processing_concurrently(false);
+    void check_asyncview_processing_in_sequential_tasks_and_unsafe_view() {
+        /**
+         * Arrange View
+         */
+        final HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel).threadUnsafe();
+        /**
+         * Act and Assert
+         * Since Stream is Lazy then there is a vertical processing and a sequential execution between tasks.
+         */
+        IntStream
+                .range(0, NR_OF_TASKS)
+                .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
+                .forEach(cf ->assertHtml(cf.join()));
     }
     @Test
     void check_asyncview_processing_in_concurrent_tasks_and_parallel_threads() {
-        check_asyncview_processing_concurrently(true);
-    }
-
-    void check_asyncview_processing_concurrently(boolean parallel) {
         /**
-         * Arrange Tasks
+         * Arrange View
          */
-        final int NR_OF_TASKS = Runtime.getRuntime().availableProcessors();
-        final IntStream tasks = parallel
-                ? IntStream.range(0, NR_OF_TASKS).parallel()
-                : IntStream.range(0, NR_OF_TASKS);
-        /**
-         * Arrange the Model and the View
-         */
-        final Publisher<Student> studentFlux = Flux.range(1, 5)
-                .delayElements(Duration.ofMillis(10))
-                .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
-        final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
-
-        final HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);
+        final HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel).threadSafe();
         /**
          * Act and Assert
+         * Collects to dispatch resolution through writeAsync() concurrently.
          */
-        tasks
-                .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
+        IntStream
+                .range(0, NR_OF_TASKS)
                 .parallel()
-                .collect(toList()) // Collects to dispatch resolution through writeAsync(().
+                .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
+                .collect(toList())
                 .forEach(cf ->assertHtml(cf.join()));
     }
+
 
     private static void assertHtml(String html) {
         Iterator<String> actual = Utils

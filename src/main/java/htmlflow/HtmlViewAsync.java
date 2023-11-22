@@ -38,8 +38,15 @@ public class HtmlViewAsync extends HtmlPage {
 
     private final HtmlViewVisitorAsync visitor;
 
+    private final boolean threadSafe;
+
     HtmlViewAsync(HtmlViewVisitorAsync visitor) {
+        this(visitor, true);
+    }
+
+    public HtmlViewAsync(HtmlViewVisitorAsync visitor, boolean safe) {
         this.visitor = visitor;
+        threadSafe = safe;
     }
 
     @Override
@@ -63,18 +70,22 @@ public class HtmlViewAsync extends HtmlPage {
         return "HtmlViewAsync";
     }
 
-    /**
-     * This implementation is always thread-safe since we create a new visitor on each resolution (i.e. render or write).
-     * Thus there is no shared visitors across concurrent resolutions.
-     * @return
-     */
     @Override
     public HtmlViewAsync threadSafe(){
-        return this;
+        return new HtmlViewAsync(visitor);
     }
 
+    public HtmlViewAsync threadUnsafe(){
+        return new HtmlViewAsync(visitor, false);
+    }
+
+
     public final CompletableFuture<Void> writeAsync(Appendable out, Object model) {
-        return visitor.clone(out).finishedAsync(model);
+        if (threadSafe) {
+            return visitor.clone(out).finishedAsync(model);
+        }
+        visitor.setAppendable(out);
+        return visitor.finishedAsync(model);
     }
 
     public final CompletableFuture<String> renderAsync(Object model) {
