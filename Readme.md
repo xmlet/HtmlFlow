@@ -3,6 +3,9 @@
 [![Build Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.xmlet%3Ahtmlflow)
 [![Maven Central Version](https://maven-badges.herokuapp.com/maven-central/com.github.xmlet/htmlflow/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
+[![javadoc HtmlApiFaster](https://img.shields.io/badge/javadocs-HtmlApiFaster-blue)](https://javadoc.io/doc/com.github.xmlet/htmlApiFaster/latest/org/xmlet/htmlapifaster/package-summary.html)
+[![javadoc HtmlFlow](https://img.shields.io/badge/javadocs-HtmlFlow-blue)](https://javadoc.io/doc/com.github.xmlet/htmlflow)
+
 [![Petclinic Sample](https://img.shields.io/badge/petclinic-Spring%20boot%20sample%20with%20HtmlFlow-blue)](https://github.com/xmlet/spring-petclinic)
 
 [**HtmlFlow**](https://htmlflow.org/) is a Java DSL to write typesafe HTML
