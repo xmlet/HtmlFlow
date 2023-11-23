@@ -28,7 +28,6 @@ package htmlflow.test;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
-import htmlflow.HtmlDoc;
 import htmlflow.test.views.HtmlLists;
 import org.junit.Test;
 import org.xmlet.htmlapifaster.Body;
