@@ -178,6 +178,18 @@ public abstract class HtmlVisitor extends ElementVisitor {
         addAttribute(out, attributeName, attributeValue);
     }
 
+    /**
+     * To distinguish boolean attributes from others.
+     *
+     * @param name Attribute name
+     * @param value Attribute value
+     */
+    @Override
+    public final void visitAttributeBoolean(String name, String value) {
+        if(!value.equals("false"))
+            addAttribute(out, name, value);
+    }
+
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
         newlineAndIndent();
