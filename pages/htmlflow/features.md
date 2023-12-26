@@ -251,71 +251,50 @@ HtmlView<List<Track>> playlistView = HtmlFlow.view(view -> view
 </div>
 </div>
 
-## Asynchronous HTML Views
+## Binding to Asynchronous data models
 
-`HtmlViewAsync` is another subclass of `HtmPage` also depending of an `HtmlTemplate` function, 
-which can be bind with both synchronous, or asynchronous models.
+To ensure well-formed HTML, HtmlFlow needs to observe the completion of
+asynchronous models. Otherwise, text or HTML elements following an asynchronous
+model binding may be emitted before the HTML resulting from the asynchronous
+model.
 
-Notice that calling `renderAsync()` returns immediately, without blocking, while the `HtmlTemplate`
-function is still processing, maybe awaiting for the asynchronous model completion.
-Thus, `renderAsync()` and `writeAsync()` return `CompletableFuture<String>` and 
-`CompletableFuture<Void>` allowing to follow up processing and completion.
+To bind an asynchronous model, one should use the builder
+`.await(parent, model, onCompletion) -> ...)`
+where the onCompletion callback signals to HtmlFlow that it can proceed to the
+next continuation.
 
-To ensure well-formed HTML, the HtmlFlow needs to observe the asynchronous models completion. 
-Otherwise, the text or HTML elements following an asynchronous model binding maybe emitted before 
-the HTML resulting from the asynchronous model.
+Next we present the asynchronous version of the playlist web template.
+Instead of a List<Track> we are binding to a [Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
+which is a Reactive Streams [`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with reactive operators that emits 0 to N elements.
 
-Thus, to bind an asynchronous model we should use the builder
-`.await(parent, model, onCompletion) -> ...)` where the `onCompletion` callback is used to signal 
-HtmFlow that can proceed to the next continuation, as presented in next sample:
 
-```java
-static HtmlViewAsync tasksTableViewAsync = HtmlFlow.viewAsync(HtmlForReadme::tasksTableTemplateAsync);
+{% highlight java %}
+HtmlViewAsync<Flux<Track>> playlistView = HtmlFlow.viewAsync(view -> view
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<Flux<Track>>await((table, tracks, onCompletion) -> tracks
+          .doOnComplete(onCompletion::finish)
+          .doOnNext( trk ->
+            table
+              .tr()
+                .td().text(trk.getArtist()).__()
+                .td().text(trk.getName()).__()
+              .__()
+        ))
+      .__() // table
+    .__() // body
+  .__() // html
+);
+{% endhighlight %}
 
-static void tasksTableTemplateAsync(HtmlPage page) {
-    page
-        .html()
-            .head()
-                .title() .text("Tasks Table") .__()
-            .__()
-            .body()
-                .table().attrClass("table")
-                    .tr()
-                        .th().text("Title").__()
-                        .th().text("Description").__()
-                        .th().text("Priority").__()
-                    .__()
-                    .tbody()
-                    .<Flux<Task>>await((tbody, tasks, onCompletion) -> tasks
-                        .doOnNext(task -> tbody
-                            .tr()
-                                .td().text(task.getTitle()).__()
-                                .td().text(task.getDescription()).__()
-                                .td().text(task.getPriority().toString()).__()
-                            .__() // tr
-                        )
-                        .doOnComplete(onCompletion::finish)
-                        .subscribe()
-                    )
-                    .__() // tbody
-                .__() // table
-            .__() // body
-        .__(); // html
-}
-```
-
-In previous example, the model is a
-[Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
-which is a Reactive Streams
-[`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with rx operators that emits 0 to N elements.
 
 HtmlFlow _await_ feature works regardless the type of asynchronous model and can be used with
 any kind of asynchronous API.
-
-## Fragments (aka Partials)
-
-A **fragment** is a piece of HTML intended to be added to a web page.
-In HtmFLow is simply a function receiving 
 
 ## Layout and partial views (aka _fragments_)
 
