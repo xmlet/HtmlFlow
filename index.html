@@ -1,5 +1,5 @@
 ---
-title: "Index"
+title: "Overview"
 keywords: sample
 sidebar: htmlflow_sidebar
 permalink: index.html
@@ -9,9 +9,10 @@ permalink: index.html
     Java DSL for HTML
 </h3>
 <p>
-    HtmlFlow is a Java HTML builder to write typesafe HTML documents in a fluent style.
-    Use one of its <code>view()</code> factory methods to get started with HtmlFlow,
-    such as the following sample, which produces the HTML on the right side.
+    HtmlFlow is a <strong>Java HTML builder</strong> to write <strong>typesafe HTML</strong> documents in a fluent style.
+</p>
+<p>
+    The Java code on the <strong>left</strong> produces the HTML on the <strong>right</strong>.
     Use the utility <code>Flowifier.fromHtml(html)</code> to get the HtmlFlow definition from the
     corresponding HTML source code.
 </p>
@@ -68,8 +69,21 @@ HtmlFlow
 HtmlFlow is the <strong>most performant</strong> engine among state of the art template
 engines like Velocity, Thymleaf, Mustache, etc and also other DSL libraries for HTML.
 Check out the performance results in our forks of the most popular benchmarks at
-<a href=https://github.com/xmlet/template-benchmark>xmlet/template-benchmark</a>
-and <a href=https://github.com/xmlet/spring-comparing-template-engines>xmlet/spring-comparing-template-engines</a>.
+<a href=https://github.com/xmlet/template-benchmark target="_blank">xmlet/template-benchmark</a>
+and <a href=https://github.com/xmlet/spring-comparing-template-engines target="_blank">xmlet/spring-comparing-template-engines</a>.
+</p>
+<p>
+The HTML resulting from HtmlFlow respects all HTML 5.2 rules (e.g. <code>h1().div()</code>
+gives a compilation error because it goes against the content
+allowed by <code>h1</code> according to HTML5.2). So, whenever you type <code>.</code> after an element
+the intelissense will just suggest the set of allowed elements and attributes.
+</p>
+<p>
+The HtmlFlow API is according to HTML5.2 and is generated with the support of an
+automated framework <strong>xmlet</strong> based on an XSD definition of the
+HTML5.2 syntax.
+Thus, all attributes are strongly typed with enumerated types which restrict
+the set of accepted values.
 </p>
 
 <h3>
@@ -77,6 +91,15 @@ and <a href=https://github.com/xmlet/spring-comparing-template-engines>xmlet/spr
 </h3>
 
 <ul>
+  <li>
+    2020, 
+    <a href="https://www.scitepress.org/Link.aspx?doi=10.5220/0012165300003584" target="blank">Enhancing SSR in Low-Thread Web Servers</a>,
+    <a href="http://www.webist.org/?y=2023" target="blank">19th WebIst</a>
+    conference, 2019, Rome - This paper highlights the HtmlFlow templating
+    approach that embraces any asynchronous AP I (e.g., Publisher, promises,
+    suspend functions, flow, etc.) and allows for multiple asynchronous data
+    sources.
+  </li>
   <li>
     2020, 
     <a href="https://link.springer.com/chapter/10.1007/978-3-030-61750-9_4" target="blank">Text Web Templates Considered Harmful</a>,

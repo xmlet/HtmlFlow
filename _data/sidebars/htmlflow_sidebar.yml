@@ -10,7 +10,7 @@ entries:
     output: web
     folderitems:
 
-    - title: Index
+    - title: Overview
       url: /index.html
       output: web
       type: homepage

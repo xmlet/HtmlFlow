@@ -5,88 +5,54 @@ sidebar: htmlflow_sidebar
 permalink: features
 ---
 
-<div class="row">
-<div class="col-md-7">
+## Core Concepts
 
-{% highlight java %}
-HtmlFlow
-  .doc(System.out)
-    .html() // HtmlPage
-      .head()
-        .title().text("HtmlFlow").__()
-      .__() // head
-      .body()
-        .div().attrClass("container")
-          .h1().text("My first HtmlFlow page").__()
-          .img().attrSrc("http://bit.ly/2MoHwrU").__()
-          .p().text("Typesafe is awesome! :-)").__()
-        .__() // div
-      .__() // body
-    .__(); // html
-{% endhighlight %}
+HtmlFlow builders:
+* element builders (such as `body()`, `div()`, `p()`, etc) return the **created element**
+* `text()` returns its **parent element** (e.g. `.h1().text("...")` returns the `H1` parent).
+* attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
+* `__()` returns the **parent element** and **emits the end tag** of an element.
+* `of(Consumer<E> cons)` returns the same element `E`, where `E` is the parent HTML element. 
+* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional argument `M` (model). 
 
-</div>
-<div class="col-md-5">
+HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML.
+This allows the `Appendable` to be provided either _beforehand_ or _later_ when
+the view is rendered.
+The `doc()` and `view()` factory methods follow each of theses approaches:
+<ul>
+    <li>
+{% highlight java %}/* eager */ HtmlFlow.doc(System.out).html().body().div().table()...{% endhighlight %}
+    </li>
+    <li>
+{% highlight java %}/* lazy */ var view = HtmlFlow.view(page -> page.html().body().div().table()...){% endhighlight %}
+    </li>
+</ul>
 
-{% highlight html %}
-<html>
-  <head>
-    <title>HtmlFlow</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1>My first HtmlFlow page</h1>
-      <img src="http://bit.ly/2MoHwrU">
-      <p>Typesafe is awesome! :-)</p>
-    </div>
-  </body>
-</html>
-{% endhighlight %}
+An `HtmlView` is more **performant** than an `HtmlDoc` when we need to bind
+the same template with different data **models**.
+In this scenario, **static HTML blocks are resolved only once**, during the first
+render.
 
-</div>
-</div>
+Given an `HtmlView` instance, e.g. `view`, we can render the HTML using one of the
+following approaches:
+<ul>
+    <li>
+{% highlight java %}String html = view.render(tracks){% endhighlight %}
+    </li>
+    <li>
+{% highlight java %}view.setOut(System.out).write(tracks){% endhighlight %}
+    </li>
+</ul>
 
-Beyond `doc()`, the `HtmlFlow` API also provides `view()` and `viewAsync()`, which build
-an `HtmlPage` with a `render(model)` or `renderAsync(model)` methods depending of a model
-(asynchronous for the latter).
+The `setOut()` method accepts any kind of `Appendable` object.
 
-## Getting started
+## Data Binding
 
-All builders (such as `body()`, `div()`, `p()`, etc) return the created element,
-except `text()` which returns its parent element (e.g. `.h1().text("...")` returns
-the `H1` parent object).
-The same applies to attribute methods - `attr<attribute name>()` - that also
-return their parent (e.g. `.img().attrSrc("...")` returns the `Img` parent object).
+**Unopinionated**
 
-There are also a couple of special builders:
-* `__()` - returns the parent element. This method is responsible for emitting the end tag of an element.
-* `of(Consumer<E> cons)` - It returns the same element `E`, where `E` is the parent HTML element. 
-This is useful whenever you need to chain any Java statement fluently. For instance, when we need
-to chain a conditional expression, such as the following example where we may add, or not, the class `minus` to the element `td` depending on the value of a stock change:
-```java
-….td().of(td -> { if (stock.getChange() < 0) td.attrClass("minus"); }).…
-```
-* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional 
-argument `M` corresponding to the model (i.e. context object) of `render(model)` or `write(model)`. 
-Read more in [dynamic views](#dynamic-views).
+## If/else
 
-These builders avoid special templating dialects and allow the use of any Java statement interleaved
-in the web template.
-
-The HTML resulting from HtmlFlow respects all HTML 5.2 rules (e.g. `h1().div()`
-gives a compilation error because it goes against the content
-allowed by `h1` according to HTML5.2). So, whenever you type `.` after an element
-the intelissense will just suggest the set of allowed elements and attributes.
-
-The HtmlFlow API is according to HTML5.2 and is generated with the support
-of an automated framework ([xmlet](https://github.com/xmlet/)) based on an [XSD
-definition of the HTML5.2](https://github.com/xmlet/HtmlApiFaster/blob/master/src/main/resources/html_5_2.xsd)
-syntax.
-Thus, all attributes are strongly typed with enumerated types which restrict
-the set of accepted values.
-
-Finally, HtmlFlow also supports [_dynamic views_](#dynamic-views) with *data binders* that enable
-the same HTML view to be bound with different object models.
+## For/Each 
 
 ## Output approaches
 
