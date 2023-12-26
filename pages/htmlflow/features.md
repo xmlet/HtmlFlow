@@ -5,6 +5,16 @@ sidebar: htmlflow_sidebar
 permalink: features
 ---
 
+
+HtmlFlow is **unopinionated** and eliminates the need for a special templating
+dialect. All control flow is executed through the host language (i.e., Java),
+fluently chained with HtmlFlow blocks using the `of()` or `dynamic()` builders.
+
+After introducing the core concepts of HtmlFlow, we present a couple of examples
+demonstrating some of the most common usages with HtmlFlow. However, it's
+important to **note** that there are **no limitations on the use of Java within HtmlFlow**.
+
+
 ## Core Concepts
 
 HtmlFlow builders:
@@ -12,13 +22,11 @@ HtmlFlow builders:
 * `text()` returns its **parent element** (e.g. `.h1().text("...")` returns the `H1` parent).
 * attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
 * `__()` returns the **parent element** and **emits the end tag** of an element.
-* `of(Consumer<E> cons)` returns the same element `E`, where `E` is the parent HTML element. 
-* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional argument `M` (model). 
 
 HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML.
 This allows the `Appendable` to be provided either _beforehand_ or _later_ when
 the view is rendered.
-The `doc()` and `view()` factory methods follow each of theses approaches:
+The `doc()` and `view()` factory methods follow each of these approaches:
 <ul>
     <li>
 {% highlight java %}/* eager */ HtmlFlow.doc(System.out).html().body().div().table()...{% endhighlight %}
@@ -30,8 +38,7 @@ The `doc()` and `view()` factory methods follow each of theses approaches:
 
 An `HtmlView` is more **performant** than an `HtmlDoc` when we need to bind
 the same template with different data **models**.
-In this scenario, **static HTML blocks are resolved only once**, during the first
-render.
+In this scenario, **static HTML blocks are resolved only once**, on `HtmlView` instantiation.
 
 Given an `HtmlView` instance, e.g. `view`, we can render the HTML using one of the
 following approaches:
@@ -48,11 +55,202 @@ The `setOut()` method accepts any kind of `Appendable` object.
 
 ## Data Binding
 
-**Unopinionated**
+_Web templates_ in HtmlFlow are defined using functions (or methods in Java). The
+**model** (or _context object_) may be passed as arguments to such functions.
+Next, we have an example of a dynamic web page binding to a `Track` object.
+
+<div>	
+<ul  class="nav nav-tabs">
+    <li class="active">
+        <a  href="#exBind01" data-toggle="tab">HtmlDoc</a>
+    </li>
+    <li>
+        <a href="#exBind02" data-toggle="tab">HtmlView</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="exBind01">
+
+{% highlight java %}
+void trackDoc(Appendable out, Track track) {
+  HtmlFlow.doc(out)
+    .html()
+      .body()
+        .ul()
+          .li()
+            .of((li) -> li
+              .text(format("Artist: %s", track.getArtist())))
+          .__() // li
+          .li()
+            .of((li) -> li
+              .text(format("Track: %s", track.getName())))
+          .__() // li
+        .__() // ul
+      .__() // body
+    .__(); // html
+}
+...
+trackDoc(System.out, new Track("David Bowie", "Space Oddity"));
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exBind02">
+
+{% highlight java %}
+HtmlView<Track> trackView = HtmlFlow.view(view -> view
+  .html()
+    .body()
+      .ul()
+        .li()
+          .<Track>dynamic((li, track) -> li
+            .text(format("Artist: %s", track.getArtist())))
+        .__() // li
+        .li()
+          .<Track>dynamic((li, track) -> li
+            .text(format("Track: %s", track.getName())))
+        .__() // li
+      .__() // ul
+    .__() // body
+  .__() // html
+);
+...
+trackView.setOut(System.out).write(new Track("David Bowie", "Space Oddity"));
+{% endhighlight %}
+
+    </div>
+</div>
+</div>
+
+The `of()` and `dynamic()` builders in `HtmlDoc` and `HtmlView`, respectively,
+are utilized to chain Java code in the definition of web templates:
+
+* `of(Consumer<E> cons)` returns the same element `E`, where `E` is the parent HTML element. 
+* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional argument `M` (model). 
 
 ## If/else
 
-## For/Each 
+Regarding the previous template of `tracksDoc` or `tracksView`, consider, for
+example, that you would like to display the **year of the artist's death** for cases
+where the artist has already passed away.
+Considering that `Track` has a property `diedDate` of type `LocalDate`, we can interleave
+the following HtmlFlow snippet within the `ul` to achieve this purpose:
+
+
+<div>	
+<ul  class="nav nav-tabs">
+    <li class="active">
+        <a  href="#exIf01" data-toggle="tab">HtmlDoc</a>
+    </li>
+    <li>
+        <a href="#exIf02" data-toggle="tab">HtmlView</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="exIf01">
+
+{% highlight java %}
+void trackDoc(Appendable out, Track track) {
+    ...
+      .ul()
+        ...
+        .of(ul -> {
+          if(track.getDiedDate() != null)
+            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
+        })
+
+}
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exIf02">
+
+{% highlight java %}
+HtmlView<Track> trackView = HtmlFlow.view(view -> view
+    ...
+      .ul()
+        ...
+        .<Track>dynamic((ul, track) -> {
+          if(track.getDiedDate() != null)
+            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
+        })
+        ...
+{% endhighlight %}
+
+    </div>
+</div>
+</div>
+
+
+## Loops
+
+You can utilize any Java loop statement in your web template definition. Next,
+we present an example that takes advantage of the `forEach` loop method of
+`Iterable`:
+
+<div>	
+<ul  class="nav nav-tabs">
+    <li class="active">
+        <a  href="#exLoop01" data-toggle="tab">HtmlDoc</a>
+    </li>
+    <li>
+        <a href="#exLoop02" data-toggle="tab">HtmlView</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="exLoop01">
+
+{% highlight java %}
+void playlistDoc(Appendable out, List<Track> tracks) {
+  HtmlFlow.doc(out)
+    .html()
+      .body()
+        .table()
+          .tr()
+            .th().text("Artist").__()
+            .th().text("Track").__()
+          .__() // tr
+          .of(table -> tracks.forEach( trk ->
+            table
+              .tr()
+                .td().text(trk.getArtist()).__()
+                .td().text(trk.getName()).__()
+              .__() // tr
+          ))
+        .__() // table
+      .__() // body
+    .__(); // html
+}
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exLoop02">
+
+{% highlight java %}
+HtmlView<List<Track>> playlistView = HtmlFlow.view(view -> view
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<List<Track>>dynamic((table, tracks) -> tracks.forEach( trk ->
+          table
+            .tr()
+              .td().text(trk.getArtist()).__()
+              .td().text(trk.getName()).__()
+            .__() // tr
+          ))
+      .__() // table
+    .__() // body
+  .__() // html
+);
+{% endhighlight %}
+
+    </div>
+</div>
+</div>
+
 
 ## Output approaches
 
@@ -234,6 +432,10 @@ which is a Reactive Streams
 HtmlFlow _await_ feature works regardless the type of asynchronous model and can be used with
 any kind of asynchronous API.
 
+## Fragments (aka Partials)
+
+A **fragment** is a piece of HTML intended to be added to a web page.
+In HtmFLow is simply a function receiving 
 
 ## Layout and partial views (aka _fragments_)
 
