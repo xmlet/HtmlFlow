@@ -48,7 +48,7 @@ public class HtmlFlow {
      */
     private static PreprocessingVisitor preprocessing(HtmlTemplate template) {
         PreprocessingVisitor pre = new PreprocessingVisitor(true);
-        HtmlView preView = new HtmlView(() -> pre, false);
+        HtmlView<?> preView = new HtmlView<>(() -> pre, false);
         template.resolve(preView);
         /**
          * NO problem with null model. We are just preprocessing static HTML blocks.
@@ -60,7 +60,7 @@ public class HtmlFlow {
     
     private static PreprocessingVisitorAsync preprocessingAsync(HtmlTemplate template) {
         PreprocessingVisitorAsync pre = new PreprocessingVisitorAsync(true);
-        HtmlView preView = new HtmlView(() -> pre, false);
+        HtmlView<?> preView = new HtmlView<>(() -> pre, false);
         template.resolve(preView);
         /**
          * NO problem with null model. We are just preprocessing static HTML blocks.
@@ -85,10 +85,11 @@ public class HtmlFlow {
      *
      * @param out Output PrintStream.
      * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param <M> Type of the model rendered with this view.
      */
-    public static HtmlView view(Appendable out, HtmlTemplate template){
+    public static <M> HtmlView<M> view(Appendable out, HtmlTemplate template){
         PreprocessingVisitor pre = preprocessing(template);
-        return new HtmlView(
+        return new HtmlView<>(
             (() -> new HtmlViewVisitor(out, true, pre.getFirst())),
             false); // not thread safe by default
     }
@@ -96,10 +97,11 @@ public class HtmlFlow {
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
      *
      * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param <M> Type of the model rendered with this view.
      */
-    public static HtmlView view(HtmlTemplate template){
+    public static <M> HtmlView<M> view(HtmlTemplate template){
         PreprocessingVisitor pre = preprocessing(template);
-        return new HtmlView(
+        return new HtmlView<>(
                 (() -> new HtmlViewVisitor(new StringBuilder(), true, pre.getFirst())),
                 false); // not thread safe by default
     }
@@ -108,9 +110,10 @@ public class HtmlFlow {
      * Creates a HtmlViewAsync corresponding to a dynamic HtmlPage with an asynchronous model.
      *
      * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param <M> Type of the model rendered with this view.
      */
-    public static HtmlViewAsync viewAsync(HtmlTemplate template){
+    public static <M> HtmlViewAsync<M> viewAsync(HtmlTemplate template){
         PreprocessingVisitorAsync pre = preprocessingAsync(template);
-        return new HtmlViewAsync(new HtmlViewVisitorAsync(true, pre.getFirst()));
+        return new HtmlViewAsync<>(new HtmlViewVisitorAsync(true, pre.getFirst()));
     }
 }

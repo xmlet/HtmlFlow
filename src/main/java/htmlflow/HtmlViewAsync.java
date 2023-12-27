@@ -32,9 +32,11 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Dynamic views can be bound to a domain object within an asynchronous context with the usage of {@link org.reactivestreams.Publisher}.
  *
+ *  @param <M> Type of the model rendered with this view.
+ *
  * @author Pedro Fialho
  */
-public class HtmlViewAsync extends HtmlPage {
+public class HtmlViewAsync<M> extends HtmlPage {
 
     private final HtmlViewVisitorAsync visitor;
 
@@ -57,7 +59,7 @@ public class HtmlViewAsync extends HtmlPage {
 
     @Override
     public HtmlPage setIndented(boolean isIndented) {
-        return new HtmlViewAsync(visitor.clone(isIndented));
+        return new HtmlViewAsync<M>(visitor.clone(isIndented));
     }
 
     @Override
@@ -71,16 +73,16 @@ public class HtmlViewAsync extends HtmlPage {
     }
 
     @Override
-    public HtmlViewAsync threadSafe(){
-        return new HtmlViewAsync(visitor);
+    public HtmlViewAsync<M> threadSafe(){
+        return new HtmlViewAsync<>(visitor);
     }
 
-    public HtmlViewAsync threadUnsafe(){
-        return new HtmlViewAsync(visitor, false);
+    public HtmlViewAsync<M> threadUnsafe(){
+        return new HtmlViewAsync<>(visitor, false);
     }
 
 
-    public final CompletableFuture<Void> writeAsync(Appendable out, Object model) {
+    public final CompletableFuture<Void> writeAsync(Appendable out, M model) {
         if (threadSafe) {
             return visitor.clone(out).finishedAsync(model);
         }
@@ -88,7 +90,7 @@ public class HtmlViewAsync extends HtmlPage {
         return visitor.finishedAsync(model);
     }
 
-    public final CompletableFuture<String> renderAsync(Object model) {
+    public final CompletableFuture<String> renderAsync(M model) {
         StringBuilder str = new StringBuilder();
         return writeAsync(str, model).thenApply( nothing -> str.toString());
     }
