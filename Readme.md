@@ -125,10 +125,10 @@ Bonus points it also produces only valid HTML according to HTML 5.2.
 ## Installation
 
 First, in order to include it to your Gradle project, simply add the following dependency,
-or use any other form provided in [Maven Central Repository](https://search.maven.org/artifact/com.github.xmlet/htmlflow/4.1/jar):
+or use any other form provided in [Maven Central Repository](https://search.maven.org/artifact/com.github.xmlet/htmlflow/4.2/jar):
 
 ```xml
-implementation 'com.github.xmlet:htmlflow:4.1'
+implementation 'com.github.xmlet:htmlflow:4.2'
 ```
 
 You can also download the artifact directly from [Maven
