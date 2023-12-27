@@ -38,6 +38,10 @@ import java.util.function.Supplier;
  */
 public class HtmlView<M> extends HtmlPage {
     /**
+     * Function that consumes an HtmlView to produce HTML elements.
+     */
+    private final HtmlTemplate template;
+    /**
      * This field is like a union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
      * On the other-hand, in thread-safe scenarios each thread must have its own visitor to
@@ -59,9 +63,11 @@ public class HtmlView<M> extends HtmlPage {
      */
     HtmlView(
         Supplier<HtmlVisitor> visitorSupplier,
+        HtmlTemplate template,
         boolean threadSafe)
     {
         this.visitorSupplier = visitorSupplier;
+        this.template = template;
         this.threadSafe = threadSafe;
         if(threadSafe) {
             this.visitor = null;
@@ -128,7 +134,7 @@ public class HtmlView<M> extends HtmlPage {
         Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe)
     {
-        return new HtmlView<>(visitorSupplier, threadSafe);
+        return new HtmlView<>(visitorSupplier, template, threadSafe);
     }
 
     /**
@@ -137,6 +143,6 @@ public class HtmlView<M> extends HtmlPage {
      */
     @Override
     public final HtmlView<M> setIndented(boolean isIndented) {
-        return clone(() -> getVisitor().clone(isIndented), false);
+        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe);
     }
 }

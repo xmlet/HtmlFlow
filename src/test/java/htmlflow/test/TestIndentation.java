@@ -24,16 +24,75 @@
  package htmlflow.test;
 
 import htmlflow.HtmlFlow;
+import htmlflow.HtmlView;
+import htmlflow.HtmlViewAsync;
 import htmlflow.test.views.HtmlWithoutIndentation;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
 
 public class TestIndentation {
+
+    static final String expected = "<div><textarea>Sample text" + lineSeparator() +
+            "foo" + lineSeparator() +
+            "bar</textarea><script>// some comment" + lineSeparator() +
+            "console.log('Hello world');</script></div>";
+
+    @Test
+    public void docWithNoIndent() {
+        StringBuilder sb = new StringBuilder();
+        HtmlFlow.doc(sb).setIndented(false)
+                .div()
+                    .textarea()
+                        .text("Sample text\nfoo\nbar")
+                    .__()
+                    .script()
+                    .text("// some comment" + lineSeparator() +
+                        "console.log('Hello world');")
+                .__() // script
+                .__(); // div
+
+        String actual = sb.toString();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void viewWithNoIndent() {
+        HtmlView<?> view = HtmlFlow.view(page -> page
+                .div()
+                .textarea()
+                .text("Sample text\nfoo\nbar")
+                .__()
+                .script()
+                .text("// some comment" + lineSeparator() +
+                        "console.log('Hello world');")
+                .__() // script
+                .__()); // div
+
+        String actual = view.setIndented(false).render();
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void viewAsyncWithNoIndent() {
+        HtmlViewAsync<?> view = HtmlFlow.viewAsync(page -> page
+                .div()
+                .textarea()
+                .text("Sample text\nfoo\nbar")
+                .__()
+                .script()
+                .text("// some comment" + lineSeparator() +
+                        "console.log('Hello world');")
+                .__() // script
+                .__()); // div
+
+        String actual = view.setIndented(false).renderAsync().join();
+        assertEquals(expected, actual);
+    }
 
     /**
      * Check behavior reported on Issue:
