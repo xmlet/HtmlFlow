@@ -10,7 +10,7 @@ entries:
     output: web
     folderitems:
 
-    - title: Index
+    - title: Overview
       url: /index.html
       output: web
       type: homepage
@@ -36,20 +36,24 @@ entries:
       url: /features
       output: web
 
-    - title: Getting started
-      url: features#getting-started
+    - title: Core Concepts
+      url: features#core-concepts
       output: web
 
-    - title: Output approaches
-      url: features#output-approaches
+    - title: Data Binding
+      url: features#data-binding
       output: web
 
-    - title: Dynamic views
-      url: features#dynamic-views
+    - title: If/else
+      url: features#ifelse
       output: web
     
-    - title: Asynchronous HTML Views
-      url: features#asynchronous-html-views
+    - title: Loops
+      url: features#loops
+      output: web
+
+    - title: Binding to Asynchronous Data Models
+      url: features#binding-to-asynchronous-data-models
       output: web
 
     - title: Layout and fragments

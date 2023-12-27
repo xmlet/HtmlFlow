@@ -5,269 +5,296 @@ sidebar: htmlflow_sidebar
 permalink: features
 ---
 
-<div class="row">
-<div class="col-md-7">
+
+HtmlFlow is **unopinionated** and eliminates the need for a special templating
+dialect. All control flow is executed through the host language (i.e., Java),
+fluently chained with HtmlFlow blocks using the `of()` or `dynamic()` builders.
+
+After introducing the core concepts of HtmlFlow, we present a couple of examples
+demonstrating some of the most common usages with HtmlFlow. However, it's
+important to **note** that there are **no limitations on the use of Java within HtmlFlow**.
+
+
+## Core Concepts
+
+HtmlFlow builders:
+* element builders (such as `body()`, `div()`, `p()`, etc) return the **created element**
+* `text()` returns its **parent element** (e.g. `.h1().text("...")` returns the `H1` parent).
+* attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
+* `__()` returns the **parent element** and **emits the end tag** of an element.
+
+HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML.
+This allows the `Appendable` to be provided either _beforehand_ or _later_ when
+the view is rendered.
+The `doc()` and `view()` factory methods follow each of these approaches:
+<ul>
+    <li>
+{% highlight java %}/* eager */ HtmlFlow.doc(System.out).html().body().div().table()...{% endhighlight %}
+    </li>
+    <li>
+{% highlight java %}/* lazy */ var view = HtmlFlow.view(page -> page.html().body().div().table()...){% endhighlight %}
+    </li>
+</ul>
+
+An `HtmlView` is more **performant** than an `HtmlDoc` when we need to bind
+the same template with different data **models**.
+In this scenario, **static HTML blocks are resolved only once**, on `HtmlView` instantiation.
+
+Given an `HtmlView` instance, e.g. `view`, we can render the HTML using one of the
+following approaches:
+<ul>
+    <li>
+{% highlight java %}String html = view.render(tracks){% endhighlight %}
+    </li>
+    <li>
+{% highlight java %}view.setOut(System.out).write(tracks){% endhighlight %}
+    </li>
+</ul>
+
+The `setOut()` method accepts any kind of `Appendable` object.
+
+## Data Binding
+
+_Web templates_ in HtmlFlow are defined using functions (or methods in Java). The
+**model** (or _context object_) may be passed as arguments to such functions.
+Next, we have an example of a dynamic web page binding to a `Track` object.
+
+<div>	
+<ul  class="nav nav-tabs">
+    <li class="active">
+        <a  href="#exBind01" data-toggle="tab">HtmlDoc</a>
+    </li>
+    <li>
+        <a href="#exBind02" data-toggle="tab">HtmlView</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="exBind01">
 
 {% highlight java %}
-HtmlFlow
-  .doc(System.out)
-    .html() // HtmlPage
-      .head()
-        .title().text("HtmlFlow").__()
-      .__() // head
+void trackDoc(Appendable out, Track track) {
+  HtmlFlow.doc(out)
+    .html()
       .body()
-        .div().attrClass("container")
-          .h1().text("My first HtmlFlow page").__()
-          .img().attrSrc("http://bit.ly/2MoHwrU").__()
-          .p().text("Typesafe is awesome! :-)").__()
-        .__() // div
+        .ul()
+          .li()
+            .of((li) -> li
+              .text(format("Artist: %s", track.getArtist())))
+          .__() // li
+          .li()
+            .of((li) -> li
+              .text(format("Track: %s", track.getName())))
+          .__() // li
+        .__() // ul
       .__() // body
     .__(); // html
+}
+...
+trackDoc(System.out, new Track("David Bowie", "Space Oddity"));
 {% endhighlight %}
 
-</div>
-<div class="col-md-5">
-
-{% highlight html %}
-<html>
-  <head>
-    <title>HtmlFlow</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1>My first HtmlFlow page</h1>
-      <img src="http://bit.ly/2MoHwrU">
-      <p>Typesafe is awesome! :-)</p>
     </div>
-  </body>
-</html>
+    <div class="tab-pane" id="exBind02">
+
+{% highlight java %}
+HtmlView<Track> trackView = HtmlFlow.view(view -> view
+  .html()
+    .body()
+      .ul()
+        .li()
+          .<Track>dynamic((li, track) -> li
+            .text(format("Artist: %s", track.getArtist())))
+        .__() // li
+        .li()
+          .<Track>dynamic((li, track) -> li
+            .text(format("Track: %s", track.getName())))
+        .__() // li
+      .__() // ul
+    .__() // body
+  .__() // html
+);
+...
+trackView.setOut(System.out).write(new Track("David Bowie", "Space Oddity"));
 {% endhighlight %}
 
+    </div>
 </div>
 </div>
 
-Beyond `doc()`, the `HtmlFlow` API also provides `view()` and `viewAsync()`, which build
-an `HtmlPage` with a `render(model)` or `renderAsync(model)` methods depending of a model
-(asynchronous for the latter).
+The `of()` and `dynamic()` builders in `HtmlDoc` and `HtmlView`, respectively,
+are utilized to chain Java code in the definition of web templates:
 
-## Getting started
+* `of(Consumer<E> cons)` returns the same element `E`, where `E` is the parent HTML element. 
+* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional argument `M` (model). 
 
-All builders (such as `body()`, `div()`, `p()`, etc) return the created element,
-except `text()` which returns its parent element (e.g. `.h1().text("...")` returns
-the `H1` parent object).
-The same applies to attribute methods - `attr<attribute name>()` - that also
-return their parent (e.g. `.img().attrSrc("...")` returns the `Img` parent object).
+## If/else
 
-There are also a couple of special builders:
-* `__()` - returns the parent element. This method is responsible for emitting the end tag of an element.
-* `of(Consumer<E> cons)` - It returns the same element `E`, where `E` is the parent HTML element. 
-This is useful whenever you need to chain any Java statement fluently. For instance, when we need
-to chain a conditional expression, such as the following example where we may add, or not, the class `minus` to the element `td` depending on the value of a stock change:
-```java
-….td().of(td -> { if (stock.getChange() < 0) td.attrClass("minus"); }).…
-```
-* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional 
-argument `M` corresponding to the model (i.e. context object) of `render(model)` or `write(model)`. 
-Read more in [dynamic views](#dynamic-views).
+Regarding the previous template of `trackDoc` or `trackView`, consider, for
+example, that you would like to display the **year of the artist's death** for cases
+where the artist has already passed away.
+Considering that `Track` has a property `diedDate` of type `LocalDate`, we can interleave
+the following HtmlFlow snippet within the `ul` to achieve this purpose:
 
-These builders avoid special templating dialects and allow the use of any Java statement interleaved
-in the web template.
 
-The HTML resulting from HtmlFlow respects all HTML 5.2 rules (e.g. `h1().div()`
-gives a compilation error because it goes against the content
-allowed by `h1` according to HTML5.2). So, whenever you type `.` after an element
-the intelissense will just suggest the set of allowed elements and attributes.
+<div>	
+<ul  class="nav nav-tabs">
+    <li class="active">
+        <a  href="#exIf01" data-toggle="tab">HtmlDoc</a>
+    </li>
+    <li>
+        <a href="#exIf02" data-toggle="tab">HtmlView</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="exIf01">
 
-The HtmlFlow API is according to HTML5.2 and is generated with the support
-of an automated framework ([xmlet](https://github.com/xmlet/)) based on an [XSD
-definition of the HTML5.2](https://github.com/xmlet/HtmlApiFaster/blob/master/src/main/resources/html_5_2.xsd)
-syntax.
-Thus, all attributes are strongly typed with enumerated types which restrict
-the set of accepted values.
+{% highlight java %}
+void trackDoc(Appendable out, Track track) {
+    ...
+      .ul()
+        ...
+        .of(ul -> {
+          if(track.getDiedDate() != null)
+            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
+        })
 
-Finally, HtmlFlow also supports [_dynamic views_](#dynamic-views) with *data binders* that enable
-the same HTML view to be bound with different object models.
+}
+{% endhighlight %}
 
-## Output approaches
+    </div>
+    <div class="tab-pane" id="exIf02">
 
-When you build an `HtmlPage` with `HtmlFlow.doc(Appendable out)` you may use any kind of
-output compatible with `Appendable`, such as `Writer`, `PrintStream`, `StringBuilder`, or other
-(notice some streams, such as `PrintStream`, are not buffered and may degrade performance).
+{% highlight java %}
+HtmlView<Track> trackView = HtmlFlow.view(view -> view
+    ...
+      .ul()
+        ...
+        .<Track>dynamic((ul, track) -> {
+          if(track.getDiedDate() != null)
+            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
+        })
+        ...
+{% endhighlight %}
 
-HTML is emitted as builder methods are invoked (e.g. `.body()`, `.div()`, `.p()`, etc).
+    </div>
+</div>
+</div>
 
-However, if you build an `HtmlView` with `HtmlFlow.view(view -> view.html().head()...)`
-the HTML is only emitted when you call `render(model)` or `write(model)` on the resulting `HtmlView`.
-Then, you can get the resulting HTML in two different ways:
 
-```java
-HtmlView view = HtmlFlow.view(view -> view
+## Loops
+
+You can utilize any Java loop statement in your web template definition. Next,
+we present an example that takes advantage of the `forEach` loop method of
+`Iterable`:
+
+<div>	
+<ul  class="nav nav-tabs">
+    <li class="active">
+        <a  href="#exLoop01" data-toggle="tab">HtmlDoc</a>
+    </li>
+    <li>
+        <a href="#exLoop02" data-toggle="tab">HtmlView</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="exLoop01">
+
+{% highlight java %}
+void playlistDoc(Appendable out, List<Track> tracks) {
+  HtmlFlow.doc(out)
     .html()
-        .head()
-            ....
+      .body()
+        .table()
+          .tr()
+            .th().text("Artist").__()
+            .th().text("Track").__()
+          .__() // tr
+          .of(table -> tracks.forEach( trk ->
+            table
+              .tr()
+                .td().text(trk.getArtist()).__()
+                .td().text(trk.getName()).__()
+              .__() // tr
+          ))
+        .__() // table
+      .__() // body
+    .__(); // html
+}
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exLoop02">
+
+{% highlight java %}
+HtmlView<List<Track>> playlistView = HtmlFlow.view(view -> view
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<List<Track>>dynamic((table, tracks) -> tracks.forEach( trk ->
+          table
+            .tr()
+              .td().text(trk.getArtist()).__()
+              .td().text(trk.getName()).__()
+            .__() // tr
+          ))
+      .__() // table
+    .__() // body
+  .__() // html
 );
-String html = view.render();        // 1) get a string with the HTML
-view
-    .setOut(System.out)
-    .write();                       // 2) print to the standard output
-```
+{% endhighlight %}
 
-Regardless the output approach you will get the same formatted HTML document.
+    </div>
+</div>
+</div>
 
-`HtmlView` does a preprocessing of the provided function (e.g. `view -> ...`) computing
-and storing all static HTML blocks for future render calls, avoiding useless concatenation 
-of text and HTML tags and improving performance.
+## Binding to Asynchronous data models
+
+To ensure well-formed HTML, HtmlFlow needs to observe the completion of
+asynchronous models. Otherwise, text or HTML elements following an asynchronous
+model binding may be emitted before the HTML resulting from the asynchronous
+model.
+
+To bind an asynchronous model, one should use the builder
+`.await(parent, model, onCompletion) -> ...)`
+where the `onCompletion` callback signals to HtmlFlow that it can proceed to the
+next continuation.
+
+Next we present the asynchronous version of the playlist web template.
+Instead of a `List<Track>` we are binding to a [Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
+which is a Reactive Streams [`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with reactive operators that emits 0 to N elements.
 
 
-## Dynamic Views
-
-`HtmlView` is a subclass of `HtmlPage`, built from a template function specified by the functional interface:
-
-```java
-interface HtmlTemplate { void resolve(HtmlPage page); }
-```
-
-Next we present an example of a view with a template (e.g. `taskDetailsTemplate`) that will be later
-bound to a domain object `Task`.
-Notice the use of the method `dynamic()` inside the `taskDetailsTemplate` whenever we need to 
-access the domain object `Task` (i.e. the _model_).
-This model will be passed later to the view through its method `render(model)` or `write(model)`.
-
-``` java
-HtmlView view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
-
-public static void taskDetailsTemplate(HtmlPage view) {
-    view
-        .html()
-            .head()
-                .title().text("Task Details").__()
-            .__() //head
-            .body()
-                .<Task>dynamic((body, task) -> body.text("Title:").text(task.getTitle()))
-                .br().__()
-                .<Task>dynamic((body, task) -> body.text("Description:").text(task.getDescription()))
-                .br().__()
-                .<Task>dynamic((body, task) -> body.text("Priority:").text(task.getPriority()))
-            .__() //body
-        .__(); // html
-}
-```
-
-Next we present an example binding this same view with 3 different domain objects,
-producing 3 different HTML documents.
-
-``` java
-List<Task> tasks = Arrays.asList(
-    new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-    new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
-    new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
+{% highlight java %}
+HtmlViewAsync<Flux<Track>> playlistView = HtmlFlow.viewAsync(view -> view
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<Flux<Track>>await((table, tracks, onCompletion) -> tracks
+          .doOnComplete(onCompletion::finish)
+          .doOnNext( trk ->
+            table
+              .tr()
+                .td().text(trk.getArtist()).__()
+                .td().text(trk.getName()).__()
+              .__()
+        ))
+      .__() // table
+    .__() // body
+  .__() // html
 );
-for (Task task: tasks) {
-    Path path = Paths.get("task" + task.getId() + ".html");
-    Files.write(path, view.render(task).getBytes());
-    Desktop.getDesktop().browse(path.toUri());
-}
-```
+{% endhighlight %}
 
-Finally, an example of a dynamic HTML table binding to a stream of tasks.
-Notice, we  do not need any special templating feature to traverse the `Stream<Task>` and
-we simply take advantage of Java Stream API.
-
-``` java
-static HtmlView tasksTableView = HtmlFlow.view(HtmlForReadme::tasksTableTemplate);
-
-static void tasksTableTemplate(HtmlPage page) {
-    page
-        .html()
-            .head()
-                .title().text("Tasks Table").__()
-            .__()
-            .body()
-                .table()
-                    .attrClass("table")
-                    .tr()
-                        .th().text("Title").__()
-                        .th().text("Description").__()
-                        .th().text("Priority").__()
-                    .__()
-                    .tbody()
-                        .<Stream<Task>>dynamic((tbody, tasks) ->
-                            tasks.forEach(task -> tbody
-                                .tr()
-                                    .td().text(task.getTitle()).__()
-                                    .td().text(task.getDescription()).__()
-                                    .td().text(task.getPriority().toString()).__()
-                                .__() // tr
-                            ) // forEach
-                        ) // dynamic
-                    .__() // tbody
-                .__() // table
-            .__() // body
-        .__(); // html
-}
-```
-
-## Asynchronous HTML Views
-
-`HtmlViewAsync` is another subclass of `HtmPage` also depending of an `HtmlTemplate` function, 
-which can be bind with both synchronous, or asynchronous models.
-
-Notice that calling `renderAsync()` returns immediately, without blocking, while the `HtmlTemplate`
-function is still processing, maybe awaiting for the asynchronous model completion.
-Thus, `renderAsync()` and `writeAsync()` return `CompletableFuture<String>` and 
-`CompletableFuture<Void>` allowing to follow up processing and completion.
-
-To ensure well-formed HTML, the HtmlFlow needs to observe the asynchronous models completion. 
-Otherwise, the text or HTML elements following an asynchronous model binding maybe emitted before 
-the HTML resulting from the asynchronous model.
-
-Thus, to bind an asynchronous model we should use the builder
-`.await(parent, model, onCompletion) -> ...)` where the `onCompletion` callback is used to signal 
-HtmFlow that can proceed to the next continuation, as presented in next sample:
-
-```java
-static HtmlViewAsync tasksTableViewAsync = HtmlFlow.viewAsync(HtmlForReadme::tasksTableTemplateAsync);
-
-static void tasksTableTemplateAsync(HtmlPage page) {
-    page
-        .html()
-            .head()
-                .title() .text("Tasks Table") .__()
-            .__()
-            .body()
-                .table().attrClass("table")
-                    .tr()
-                        .th().text("Title").__()
-                        .th().text("Description").__()
-                        .th().text("Priority").__()
-                    .__()
-                    .tbody()
-                    .<Flux<Task>>await((tbody, tasks, onCompletion) -> tasks
-                        .doOnNext(task -> tbody
-                            .tr()
-                                .td().text(task.getTitle()).__()
-                                .td().text(task.getDescription()).__()
-                                .td().text(task.getPriority().toString()).__()
-                            .__() // tr
-                        )
-                        .doOnComplete(onCompletion::finish)
-                        .subscribe()
-                    )
-                    .__() // tbody
-                .__() // table
-            .__() // body
-        .__(); // html
-}
-```
-
-In previous example, the model is a
-[Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
-which is a Reactive Streams
-[`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with rx operators that emits 0 to N elements.
 
 HtmlFlow _await_ feature works regardless the type of asynchronous model and can be used with
 any kind of asynchronous API.
-
 
 ## Layout and partial views (aka _fragments_)
 
