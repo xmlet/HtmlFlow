@@ -33,7 +33,7 @@ class TestAsyncViewInConcurrency {
         /**
          * Arrange View
          */
-        final HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel).threadUnsafe();
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).threadUnsafe();
         /**
          * Act and Assert
          * Since Stream is Lazy then there is a vertical processing and a sequential execution between tasks.
@@ -48,7 +48,7 @@ class TestAsyncViewInConcurrency {
         /**
          * Arrange View
          */
-        final HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel).threadSafe();
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).threadSafe();
         /**
          * Act and Assert
          * Collects to dispatch resolution through writeAsync() concurrently.
@@ -60,7 +60,6 @@ class TestAsyncViewInConcurrency {
                 .collect(toList())
                 .forEach(cf ->assertHtml(cf.join()));
     }
-
 
     private static void assertHtml(String html) {
         Iterator<String> actual = Utils
@@ -75,6 +74,5 @@ class TestAsyncViewInConcurrency {
                     assertEquals(expected, next);
                 });
         assertFalse(actual.hasNext());
-
     }
 }
