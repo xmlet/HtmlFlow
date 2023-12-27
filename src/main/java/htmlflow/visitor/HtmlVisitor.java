@@ -175,6 +175,8 @@ public abstract class HtmlVisitor extends ElementVisitor {
 
     @Override
     public final void visitAttribute(String attributeName, String attributeValue) {
+        if(isClosed)
+            throw new IllegalStateException("Cannot add attributes after!!!");
         addAttribute(out, attributeName, attributeValue);
     }
 
