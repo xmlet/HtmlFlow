@@ -129,7 +129,7 @@ are utilized to chain Java code in the definition of web templates:
 
 ## If/else
 
-Regarding the previous template of `tracksDoc` or `tracksView`, consider, for
+Regarding the previous template of `trackDoc` or `trackView`, consider, for
 example, that you would like to display the **year of the artist's death** for cases
 where the artist has already passed away.
 Considering that `Track` has a property `diedDate` of type `LocalDate`, we can interleave
@@ -260,11 +260,11 @@ model.
 
 To bind an asynchronous model, one should use the builder
 `.await(parent, model, onCompletion) -> ...)`
-where the onCompletion callback signals to HtmlFlow that it can proceed to the
+where the `onCompletion` callback signals to HtmlFlow that it can proceed to the
 next continuation.
 
 Next we present the asynchronous version of the playlist web template.
-Instead of a List<Track> we are binding to a [Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
+Instead of a `List<Track>` we are binding to a [Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
 which is a Reactive Streams [`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with reactive operators that emits 0 to N elements.
 
 
