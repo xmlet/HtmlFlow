@@ -32,9 +32,15 @@ import java.util.function.Supplier;
 /**
  * Dynamic views can be bound to a Model object.
  *
+ * @param <M> Type of the model rendered with this view.
+ *
  * @author Miguel Gamboa, Luís Duare
  */
-public class HtmlView extends HtmlPage {
+public class HtmlView<M> extends HtmlPage {
+    /**
+     * Function that consumes an HtmlView to produce HTML elements.
+     */
+    private final HtmlTemplate template;
     /**
      * This field is like a union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
@@ -57,9 +63,11 @@ public class HtmlView extends HtmlPage {
      */
     HtmlView(
         Supplier<HtmlVisitor> visitorSupplier,
+        HtmlTemplate template,
         boolean threadSafe)
     {
         this.visitorSupplier = visitorSupplier;
+        this.template = template;
         this.threadSafe = threadSafe;
         if(threadSafe) {
             this.visitor = null;
@@ -75,7 +83,7 @@ public class HtmlView extends HtmlPage {
         return new Html<>(this);
     }
 
-    public HtmlView threadSafe(){
+    public HtmlView<M> threadSafe(){
         return clone(visitorSupplier, true);
     }
 
@@ -86,7 +94,7 @@ public class HtmlView extends HtmlPage {
             : visitor;
     }
 
-    public HtmlView setOut(Appendable out) {
+    public HtmlView<M> setOut(Appendable out) {
         getVisitor().setAppendable(out);
         return this;
     }
@@ -100,14 +108,14 @@ public class HtmlView extends HtmlPage {
         return render(null);
     }
 
-    public String render(Object model) {
+    public String render(M model) {
         StringBuilder str = ((StringBuilder) getVisitor().out());
         str.setLength(0);
         getVisitor().resolve(model);
         return str.toString();
     }
 
-    public void write(Object model) {
+    public void write(M model) {
         getVisitor().resolve(model);
     }
 
@@ -122,11 +130,11 @@ public class HtmlView extends HtmlPage {
      * @param visitorSupplier
      * @param threadSafe
      */
-    protected final HtmlView clone(
+    protected final HtmlView<M> clone(
         Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe)
     {
-        return new HtmlView(visitorSupplier, threadSafe);
+        return new HtmlView<>(visitorSupplier, template, threadSafe);
     }
 
     /**
@@ -134,7 +142,7 @@ public class HtmlView extends HtmlPage {
      * but with indented set to the value of isIndented parameter.
      */
     @Override
-    public final HtmlView setIndented(boolean isIndented) {
-        return clone(() -> getVisitor().clone(isIndented), false);
+    public final HtmlView<M> setIndented(boolean isIndented) {
+        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe);
     }
 }

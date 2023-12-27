@@ -27,10 +27,6 @@ package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
 
-import static java.lang.System.lineSeparator;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
-
 /**
  * HtmlContinuation for a static HTML block.
  */
@@ -52,11 +48,8 @@ public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
 
     @Override
     public HtmlContinuation copy(HtmlVisitor v) {
-        String block = v.isIndented
-                ? staticHtmlBlock
-                : stream(staticHtmlBlock.split(lineSeparator())).map(String::trim).collect(joining());
         return new HtmlContinuationSyncStatic(
-            block,
+            staticHtmlBlock,
             v,
             next != null ? next.copy(v) : null); // call copy recursively
     }
