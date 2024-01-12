@@ -11,21 +11,21 @@ import java.util.function.Supplier;
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 
-public class TestAsyncViewInConcurInMultpleThreads {
+class TestAsyncViewInConcurInMultpleThreads {
 
     @Test
-    public void testMultipleThreadsInViewAsync() throws InterruptedException {
+    void testMultipleThreadsInViewAsync() throws InterruptedException {
         HtmlViewAsync<Object> view = HtmlFlow.viewAsync(TestAsyncViewInConcurInMultpleThreads::template).threadSafe();
         checkRender(() -> view.renderAsync().join());
     }
 
     @Test
-    public void testMultipleThreadsInView() throws InterruptedException {
+    void testMultipleThreadsInView() throws InterruptedException {
         HtmlView<Object> view = HtmlFlow.view(TestAsyncViewInConcurInMultpleThreads::template).threadSafe();
         checkRender(() -> view.render());
     }
 
-    public void checkRender(Supplier<String> render) throws InterruptedException {
+    private void checkRender(Supplier<String> render) throws InterruptedException {
         // out.println("start");
         final int threadCount = 50;
         // AtomicInteger left = new AtomicInteger(threadCount);
@@ -52,6 +52,7 @@ public class TestAsyncViewInConcurInMultpleThreads {
         // out.println("end");
     }
 
+    @SuppressWarnings("squid:S2925")
     static void template(HtmlPage view) {
         view.div().span().of(span -> {
                     try {
