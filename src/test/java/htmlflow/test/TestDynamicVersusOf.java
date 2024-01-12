@@ -71,7 +71,7 @@ public class TestDynamicVersusOf {
         HtmlDynamicStocks
             .stocksViewOk
             .setOut(actual2)
-            .render(Stock.other3Items());
+            .write(Stock.other3Items());
         assertLines("stocks3others.html", actual2.toString());
     }
 
