@@ -38,7 +38,7 @@ public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
      */
     public HtmlContinuationSyncStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation next) {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
-        this.staticHtmlBlock = staticHtmlBlock;
+        this.staticHtmlBlock = staticHtmlBlock.intern(); // Maybe intern() here is useless and implicit by VM
     }
 
     @Override
