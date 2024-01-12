@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow</artifactId>
-    <version>4.3</version>
+    <version>4.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
@@ -29,7 +29,7 @@
         <connection>scm:git:git@github.com:xmlet/HtmlFlow.git</connection>
         <developerConnection>scm:git:git@github.com:xmlet/HtmlFlow.git</developerConnection>
         <url>git@github.com:xmlet/HtmlFlow.git</url>
-        <tag>htmlflow-4.3</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
@@ -142,17 +142,6 @@
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
                     <pushChanges>false</pushChanges>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
