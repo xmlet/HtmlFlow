@@ -52,6 +52,11 @@ following approaches:
 </ul>
 
 The `setOut()` method accepts any kind of `Appendable` object.
+The resulting `HtmDoc` or `HtmlView` from `HtmlFlow.doc()` or `HtmlFlow.view()` is configurable with the following options:
+* `setIndent(boolean)`: Enables or disables indentation. It is on by default.
+* `threadSafe()`: Enables the use of the view in multi-threaded scenarios. It is off by default.
+
+**Note** that `HtmDoc` and `HtmlView` are **immutable**, and the aforementioned methods return new instances.
 
 ## Data Binding
 
