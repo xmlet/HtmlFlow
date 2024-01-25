@@ -62,8 +62,8 @@ class TestKotlinSuspend {
     }
 }
 
-private val taskViewTableSuspendAwait: HtmlViewAsync<CompletableFuture<Task>> = HtmlFlow.viewAsync { page -> page
-    .html()
+private val taskViewTableSuspendAwait: HtmlViewAsync<CompletableFuture<Task>> = viewAsync {
+    html()
     .head().title().text("Dummy Table").l
     .l
     .body()
