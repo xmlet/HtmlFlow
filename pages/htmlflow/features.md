@@ -19,7 +19,7 @@ important to **note** that there are **no limitations on the use of Java within 
 
 HtmlFlow builders:
 * element builders (such as `body()`, `div()`, `p()`, etc) return the **created element**
-* `text()` returns its **parent element** (e.g. `.h1().text("...")` returns the `H1` parent).
+* `text()` and `raw()` return the **parent element** (e.g. `.h1().text("...")` returns the `H1` parent). `text()`escapes HTML, while `raw()` doesn't.
 * attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
 * `__()` returns the **parent element** and **emits the end tag** of an element.
 
