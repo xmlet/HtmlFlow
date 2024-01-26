@@ -52,7 +52,7 @@ public class TestIndentation {
                         .text("Sample text\nfoo\nbar")
                     .__()
                     .script()
-                    .text("// some comment" + lineSeparator() +
+                    .raw("// some comment" + lineSeparator() +
                         "console.log('Hello world');")
                 .__() // script
                 .__(); // div
@@ -69,7 +69,7 @@ public class TestIndentation {
                 .text("Sample text\nfoo\nbar")
                 .__()
                 .script()
-                .text("// some comment" + lineSeparator() +
+                .raw("// some comment" + lineSeparator() +
                         "console.log('Hello world');")
                 .__() // script
                 .__()); // div
@@ -85,7 +85,7 @@ public class TestIndentation {
                 .text("Sample text\nfoo\nbar")
                 .__()
                 .script()
-                .text("// some comment" + lineSeparator() +
+                .raw("// some comment" + lineSeparator() +
                         "console.log('Hello world');")
                 .__() // script
                 .__()); // div
