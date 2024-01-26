@@ -125,10 +125,10 @@ Bonus points it also produces only valid HTML according to HTML 5.2.
 ## Installation
 
 First, in order to include it to your Gradle project, simply add the following dependency,
-or use any other form provided in [Maven Central Repository](https://search.maven.org/artifact/com.github.xmlet/htmlflow/4.2/jar):
+or use any other form provided in [Maven Central Repository](https://search.maven.org/artifact/com.github.xmlet/htmlflow/4.4/jar):
 
 ```xml
-implementation 'com.github.xmlet:htmlflow:4.3'
+implementation 'com.github.xmlet:htmlflow:4.4'
 ```
 
 You can also download the artifact directly from [Maven
@@ -138,7 +138,7 @@ Central Repository](https://repo1.maven.org/maven2/com/github/xmlet/htmlflow)
 
 HtmlFlow builders:
 * element builders (such as `body()`, `div()`, `p()`, etc) return the **created element**
-* `text()` returns its **parent element** (e.g. `.h1().text("...")` returns the `H1` parent).
+* `text()` and `raw()` return the **parent element** (e.g. `.h1().text("...")` returns the `H1` parent). `.text()`escapes HTML, while `raw()` doesn't.
 * attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
 * `__()` returns the **parent element** and **emits the end tag** of an element.
 
