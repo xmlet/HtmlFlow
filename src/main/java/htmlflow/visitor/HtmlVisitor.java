@@ -45,6 +45,7 @@ import org.xmlet.htmlapifaster.Text;
 import java.io.IOException;
 
 import static htmlflow.visitor.Tags.*;
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
@@ -195,7 +196,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
         newlineAndIndent();
-        write(text.getValue());
+        write(escapeHtml4(text.getValue()));
     }
 
 
