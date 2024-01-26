@@ -7,18 +7,18 @@ public class Flowified {
             .html()
                 .head()
                     .title()
-                        .text("HtmlFlow")
+                        .raw("HtmlFlow")
                     .__() //title
                 .__() //head
                 .body()
                     .div().attrClass("container")
                         .h1()
-                            .text("My first page with HtmlFlow")
+                            .raw("My first page with HtmlFlow")
                         .__() //h1
                         .img().attrSrc("https://avatars1.githubusercontent.com/u/35267172")
                         .__() //img
                         .p()
-                            .text("Typesafe is awesome! :-)")
+                            .raw("Typesafe is awesome! :-)")
                         .__() //p
                     .__() //div
                 .__() //body

@@ -295,13 +295,13 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
                 }
                 if (node instanceof TextNode) {
                     final TextNode textNode = (TextNode) node;
-                    appendable.append(".text(").append(
+                    appendable.append(".raw(").append(
                             convertJavaStringContentToJavaDeclarableString(Entities.escape(textNode.getWholeText())))
                             .append(")").append("\n");
                     textNode.toString();
                 } else if (node instanceof DataNode) {
                     final DataNode dataNode = (DataNode) node;
-                    appendable.append(".text(")
+                    appendable.append(".raw(")
                             .append(convertJavaStringContentToJavaDeclarableString(dataNode.getWholeData())).append(")")
                             .append("\n");
                 } else if (node instanceof Comment) {

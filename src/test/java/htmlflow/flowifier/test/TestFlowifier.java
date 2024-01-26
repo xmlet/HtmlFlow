@@ -25,7 +25,6 @@ package htmlflow.flowifier.test;
 
 import htmlflow.flowifier.Flowifier;
 import htmlflow.test.Utils;
-import htmlflow.util.HtmlUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Assert;
@@ -177,7 +176,7 @@ public class TestFlowifier {
             // Produces the HTML output from the HtmlDoc
             StringBuilder out = new StringBuilder();
             getHtmlViewMethod.invoke(null, out);
-            final String generatedHtmlSourceCode = HtmlUtils.htmlUnescape(out.toString());
+            final String generatedHtmlSourceCode = out.toString();
             Logger.getLogger("htmlflow.flowifier.test").info(generatedHtmlSourceCode);
             // gets the original HTML document
             final Document doc = Jsoup.connect(url).get();
