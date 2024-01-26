@@ -24,6 +24,7 @@
 
 package htmlflow.visitor;
 
+import com.google.common.html.HtmlEscapers;
 import htmlflow.exceptions.HtmlFlowAppendException;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
@@ -195,9 +196,17 @@ public abstract class HtmlVisitor extends ElementVisitor {
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
         newlineAndIndent();
+        write(HtmlEscapers.htmlEscaper().escape(text.getValue()));
+    }
+    /**
+     * To distinguish from text() that escapes HTML by default.
+     * This raw() acts like text() but keeping text as it is.
+     */
+    @Override
+    public final <R> void visitRaw(Text<? extends Element, R> text) {
+        newlineAndIndent();
         write(text.getValue());
     }
-
 
     @Override
     public final <R> void visitComment(Text<? extends Element, R> text) {

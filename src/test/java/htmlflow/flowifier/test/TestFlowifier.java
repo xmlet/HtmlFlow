@@ -23,8 +23,6 @@
  */
 package htmlflow.flowifier.test;
 
-import htmlflow.HtmlPage;
-import htmlflow.HtmlView;
 import htmlflow.flowifier.Flowifier;
 import htmlflow.test.Utils;
 import org.jsoup.Jsoup;
