@@ -22,7 +22,7 @@ class TestKotlinSuspend {
     fun doc_with_illegal_use_of_suspending() {
         HtmlFlow.doc(System.out)
             .html().body().div()
-            .suspending { div, model: String -> div.p().text(model).l.l}
+            .suspending { model: String -> p().text(model).l.l}
             .l.l.l
     }
     @Test(expected = IllegalStateException::class)
@@ -31,7 +31,7 @@ class TestKotlinSuspend {
             .html().body().div()
             .of { div ->
                 runBlocking {
-                    div.suspending { div -> div.p().text("test").l.l }
+                    div.suspending { -> div.p().text("test").l.l }
                 }
             }
             .l.l.l
@@ -76,15 +76,14 @@ private val taskViewTableSuspendAwait: HtmlViewAsync<CompletableFuture<Task>> = 
     .th().text("Description").l
     .th().text("Priority").l
     .l // tr
-    .suspending { table, cf: CompletableFuture<Task> ->
+    .suspending { cf: CompletableFuture<Task> ->
         val task = cf.await()
         delay(1000)
-        table
-            .tr()
-            .td().text(task.title).l
-            .td().text(task.description).l
-            .td().text(task.priority).l
-            .l // tr
+        tr()
+          .td().text(task.title).l
+          .td().text(task.description).l
+          .td().text(task.priority).l
+        .l // tr
 
     }
     .l
@@ -109,15 +108,14 @@ private suspend fun taskDocTableSuspendAwait(out: Appendable, cf: CompletableFut
         .th().text("Description").l
         .th().text("Priority").l
         .l // tr
-        .suspending { table ->
+        .suspending { ->
             val task = cf.await()
             delay(1000)
-            table
-                .tr()
+            tr()
                 .td().text(task.title).l
                 .td().text(task.description).l
                 .td().text(task.priority).l
-                .l // tr
+            .l // tr
 
         }
         .l

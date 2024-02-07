@@ -9,7 +9,7 @@ import java.lang.IllegalStateException
 /**
  * @param E This HTML element
  */
-suspend fun <E: Element<*,*>> E.suspending(block: suspend (E) -> Unit): E {
+suspend fun <E: Element<*,*>> E.suspending(block: suspend E.() -> Unit): E {
     if(lookForRootElement() !is HtmlDoc) {
         throw IllegalStateException("Illegal use of suspending. Using .suspending { elem -> ...} without a model, is only valid in HtmlDoc.")
     }
@@ -21,7 +21,7 @@ suspend fun <E: Element<*,*>> E.suspending(block: suspend (E) -> Unit): E {
  * @param E This HTML element
  * @param M The type of model.
  */
-fun <E: Element<*,*>, M> E.suspending(block: SuspendConsumer<E, M>) : E {
+fun <E: Element<*,*>, M> E.suspending(block: suspend E.(M) -> Unit) : E {
     /*
      * This verification is made in preprocessing using a dummy HtmlView for both sync and async cases.
      */
@@ -44,4 +44,4 @@ fun <E: Element<*,*>> E.lookForRootElement() : HtmlPage {
     return this.parent.lookForRootElement()
 }
 
-typealias SuspendConsumer<E, M> = suspend (E, M) -> Unit
+typealias SuspendConsumer<E, M> = suspend E.(M) -> Unit
