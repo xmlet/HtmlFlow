@@ -1,9 +1,6 @@
 package htmlflow.test
 
-import htmlflow.HtmlFlow
-import htmlflow.dyn
-import htmlflow.l
-import htmlflow.view
+import htmlflow.*
 import org.junit.Test
 import org.xmlet.htmlapifaster.EnumBorderType
 import kotlin.test.assertEquals
@@ -33,21 +30,22 @@ private val weatherView = view<Weather> {
     html()
         .head()
         .title().dyn { weather: Weather ->
-            text(weather.country)
+            +weather.country
         }
         .l // title
         .l // head
         .body()
         .table().attrBorder(EnumBorderType._1)
         .tr()
-        .th().text("City").l
+        .th().add { +"City" }.l
         .th().text("Temperature").l
         .l // tr
         .dyn { weather: Weather ->
             weather.locations.forEach{ loc ->
-                tr()
-                    .td().text(loc.city).l
-                    .td().text(loc.celsius).l
+                tr().add {
+                    td().text(loc.city).l
+                    td().text(loc.celsius).l
+                }
                 .l // tr
             }
         }

@@ -2,15 +2,21 @@ package htmlflow
 
 import org.xmlet.htmlapifaster.Element
 
-val <T : Element<*,*>, Z : Element<*,*>> Element<T, Z>.l: Z
+inline val <T : Element<*, Z>, Z : Element<*,*>> T.l: Z
     get() = this.`__`()
+
+inline fun <T : Element<*, Z>, Z : Element<*,*>> T.add(block: T.() -> Unit): T {
+    block()
+    return this
+}
+
 
 /**
  * @param T type of the Element receiver
  * @param Z type of the parent Element of the receiver
  * @param M type of the model (aka context object)
  */
-fun <T : Element<*,*>, Z : Element<*,*>, M> Element<T, Z>.dyn(cons: T.(M) -> Unit): T {
+inline fun <T : Element<*,*>, Z : Element<*,*>, M> Element<T, Z>.dyn(crossinline cons: T.(M) -> Unit): T {
     this.dynamic<M> { elem, model ->
         elem.cons(model)
     }
