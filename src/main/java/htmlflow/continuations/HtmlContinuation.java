@@ -25,12 +25,17 @@
 package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.ElementVisitor;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Base class for a linked list of nodes, corresponding to HtmlContinuation objects.
  * HtmlContinuation is responsible for emitting an HTML block and call the next node.
  */
-public abstract class HtmlContinuation {
+public abstract class HtmlContinuation extends HtmlContinuationSuspendable {
     /**
      * A negative number means that should be ignored.
      */
@@ -76,4 +81,16 @@ public abstract class HtmlContinuation {
      */
     public abstract HtmlContinuation copy(HtmlVisitor visitor);
 
+    @SuppressWarnings("squid:S3011")
+    public static <E extends Element> E copyElement(E element, HtmlVisitor v) {
+        try {
+            Constructor<E> ctor = ((Class<E>) element
+                    .getClass())
+                    .getDeclaredConstructor(Element.class, ElementVisitor.class, boolean.class);
+            ctor.setAccessible(true);
+            return ctor.newInstance(element.getParent(), v, false); // false to not dispatch visit now
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
 }

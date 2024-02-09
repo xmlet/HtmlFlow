@@ -17,8 +17,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuation {
     
-    private final E element;
-    private final AwaitConsumer<E,T> consumer;
+    final E element;
+    final AwaitConsumer<E,T> consumer;
 
     public HtmlContinuationAsync(int currentDepth,
                                  boolean isClosed,
@@ -49,22 +49,9 @@ public class HtmlContinuationAsync<E extends Element, T> extends HtmlContinuatio
         return new HtmlContinuationAsync<>(
                 currentDepth,
                 isClosed,
-                copyElement(v),
+                copyElement(element, v),
                 consumer,
                 v,
                 next != null ? next.copy(v) : null); // call copy recursively
-    }
-    
-    @SuppressWarnings("squid:S3011")
-    public E copyElement(HtmlVisitor v) {
-        try {
-            Constructor<E> ctor = ((Class<E>) element
-                    .getClass())
-                    .getDeclaredConstructor(Element.class, ElementVisitor.class, boolean.class);
-            ctor.setAccessible(true);
-            return ctor.newInstance(element.getParent(), v, false); // false to not dispatch visit now
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-            throw new IllegalStateException(ex);
-        }
     }
 }
