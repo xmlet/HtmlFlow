@@ -35,24 +35,7 @@ class HtmlViewVisitorSuspend(
         return HtmlViewVisitorSuspend(out, isIndented, first)
     }
 
-    suspend fun finished(model: Any?) {
-        /**
-         * !!!!! Enhance => We are not instantiating new CompletableFuture and can reuse the TerminationNode
-         */
-        val terminationNode = HtmlContinuationSuspendableTerminationNode()
-        /**
-         * Chain terminationNode next to the last node.
-         * Keep last pointing to the same node to replace the terminationNode on
-         * others render async.
-         */
-        HtmlContinuationSetter.setNext(last, terminationNode)
-        /**
-         * Initializes render on first node.
-         */
-        first.executeSuspending(model)
-    }
-
-    private fun findLast(): HtmlContinuation? {
+    fun findLast(): HtmlContinuation? {
         var node = first
         while (node.next != null) {
             node = node.next

@@ -18,7 +18,7 @@ class HtmlViewSuspend<M>(
     private var threadSafe: Boolean = true
 ) : HtmlPage() {
     override fun html(): Html<HtmlPage> {
-        visitor!!.write(HEADER)
+        visitor.write(HEADER)
         return Html(this)
     }
 
@@ -45,10 +45,10 @@ class HtmlViewSuspend<M>(
 
     suspend fun write(out: Appendable, model: M?) {
         if (threadSafe) {
-            visitor.clone(out).finished(model)
+            visitor.clone(out).first.executeSuspending(model)
         } else {
             visitor.setAppendable(out)
-            visitor.finished(model)
+            visitor.first.executeSuspending(model)
         }
     }
 

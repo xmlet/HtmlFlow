@@ -12,8 +12,11 @@ class HtmlContinuationSuspendableTerminationNode : HtmlContinuation(-1, false, n
         throw UnsupportedOperationException("Illegal use of suspending terminal node! Only valid in HtmlViewSuspend.")
     }
 
-
-    override fun copy(visitor: HtmlVisitor?): HtmlContinuationAsyncTerminationNode? {
-        throw UnsupportedOperationException("Used once and never copied!")
+    /**
+     * Since this Node is used only to signal completion, and we do not use the visitor,
+     * then we van reuse it.
+     */
+    override fun copy(visitor: HtmlVisitor?): HtmlContinuationSuspendableTerminationNode {
+        return this
     }
 }

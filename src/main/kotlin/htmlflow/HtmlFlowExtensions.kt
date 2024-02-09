@@ -1,5 +1,7 @@
 package htmlflow
 
+import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
+import htmlflow.visitor.PreprocessingVisitor
 import org.xmlet.htmlapifaster.Element
 
 inline val <T : Element<*, Z>, Z : Element<*,*>> T.l: Z
@@ -60,6 +62,11 @@ fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, t
         isIndented = isIndented,
         first = pre.first
     )
+    /**
+     * Chain terminationNode next to the last node.
+     */
+    val terminationNode = HtmlContinuationSuspendableTerminationNode()
+    PreprocessingVisitor.HtmlContinuationSetter.setNext(visitor.findLast(), terminationNode)
     return HtmlViewSuspend(template, visitor, threadSafe)
 }
 
