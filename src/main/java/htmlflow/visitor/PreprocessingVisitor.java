@@ -30,6 +30,7 @@ import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import htmlflow.continuations.HtmlContinuationSyncDynamic;
 import htmlflow.continuations.HtmlContinuationSyncStatic;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 import java.lang.reflect.Field;
@@ -54,15 +55,15 @@ public class PreprocessingVisitor extends HtmlVisitor {
     /**
      * The internal String builder beginning index of a static HTML block.
      */
-    private int staticBlockIndex = 0;
+    protected int staticBlockIndex = 0;
     /**
      * The first node to be processed.
      */
-    private HtmlContinuation first;
+    protected HtmlContinuation first;
     /**
      * The last HtmlContinuation
      */
-    private HtmlContinuation last;
+    protected HtmlContinuation last;
 
     public PreprocessingVisitor(boolean isIndented) {
         super(new StringBuilder(), isIndented);
@@ -117,6 +118,11 @@ public class PreprocessingVisitor extends HtmlVisitor {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
+        throw new UnsupportedOperationException();
+    }
+
     protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
         String staticHtml = sb().substring(staticBlockIndex);
         String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
@@ -149,7 +155,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
     }
 
     @SuppressWarnings({"squid:S3011", "squid:S112"})
-    static class HtmlContinuationSetter {
+    public static class HtmlContinuationSetter {
         private HtmlContinuationSetter() {
         }
 
@@ -162,7 +168,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
                 throw new RuntimeException(e);
             }
         }
-        static HtmlContinuation setNext(HtmlContinuation cont, HtmlContinuation next) {
+        public static HtmlContinuation setNext(HtmlContinuation cont, HtmlContinuation next) {
             try {
                 fieldNext.set(cont, next);
                 return next;

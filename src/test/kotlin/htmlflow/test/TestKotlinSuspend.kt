@@ -52,17 +52,15 @@ class TestKotlinSuspend {
         assertEquals(expectedHtmlTable, out.toString())
     }
     @Test
-    fun view_with_suspend_function_awaiting() {
+    fun view_with_suspend_function_awaiting() = runBlocking {
         val out = StringBuilder()
         val swim = completedFuture(Task("Swim", "Sea open water", "High"))
-        val cf = taskViewTableSuspendAwait.writeAsync(out, swim)
-        assertEquals(expectedHtmlTablePart1, out.toString())
-        cf.join() // wait for completion
+        taskViewTableSuspendAwait.write(out, swim)
         assertEquals(expectedHtmlTable, out.toString())
     }
 }
 
-private val taskViewTableSuspendAwait: HtmlViewAsync<CompletableFuture<Task>> = viewAsync {
+private val taskViewTableSuspendAwait: HtmlViewSuspend<CompletableFuture<Task>> = viewSuspend {
     html()
     .head().title().text("Dummy Table").l
     .l
