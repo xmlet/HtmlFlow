@@ -27,10 +27,7 @@ package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.ElementVisitor;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.function.BiConsumer;
 
 /**

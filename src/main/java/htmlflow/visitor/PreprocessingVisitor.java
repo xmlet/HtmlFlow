@@ -115,12 +115,12 @@ public class PreprocessingVisitor extends HtmlVisitor {
 
     @Override
     public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E, M> asyncAction) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Await not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage an asynchronous view.");
     }
 
     @Override
     public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Suspend not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage an asynchronous view.");
     }
 
     protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {

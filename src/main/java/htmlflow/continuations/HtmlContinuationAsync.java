@@ -2,11 +2,7 @@ package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.ElementVisitor;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * HtmlContinuation for an asynchronous block (i.e. AwaitConsumer) depending of an asynchronous object model.
