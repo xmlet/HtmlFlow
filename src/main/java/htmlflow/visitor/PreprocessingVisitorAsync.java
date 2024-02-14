@@ -4,6 +4,7 @@ import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationAsync;
 import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 
@@ -39,5 +40,10 @@ public class PreprocessingVisitorAsync extends PreprocessingVisitor {
          * the next static HTML block.
          */
         indentAndAdvanceStaticBlockIndex();
+    }
+
+    @Override
+    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
+        throw new UnsupportedOperationException("Illegal use of suspending builder. To use it you should create a HtmlViewSuspend.");
     }
 }

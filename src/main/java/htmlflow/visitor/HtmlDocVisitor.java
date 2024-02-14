@@ -25,6 +25,7 @@
 package htmlflow.visitor;
 
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 import java.util.function.BiConsumer;
@@ -55,7 +56,12 @@ public class HtmlDocVisitor extends HtmlVisitor {
 
     @Override
     public final <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
-        throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlView to produce an async view.");
+        throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlViewAsync to produce an async view.");
+    }
+
+    @Override
+    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
+        throw new IllegalStateException("Wrong use of suspending() in a static view! Use HtmlViewSuspend to produce an async view.");
     }
 
     @Override

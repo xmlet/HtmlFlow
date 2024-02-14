@@ -50,7 +50,7 @@ public class HtmlFlow {
     private static PreprocessingVisitor preprocessing(HtmlTemplate template, boolean isIndented) {
         PreprocessingVisitor pre = new PreprocessingVisitor(isIndented);
         HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
-        template.resolve(preView);
+        template.resolve(preView); // ?????? Why ????? This is not the same as next statement ????
         /**
          * NO problem with null model. We are just preprocessing static HTML blocks.
          * Thus, dynamic blocks which depend on model are not invoked.
@@ -66,7 +66,7 @@ public class HtmlFlow {
     private static PreprocessingVisitorAsync preprocessingAsync(HtmlTemplate template, boolean isIndented) {
         PreprocessingVisitorAsync pre = new PreprocessingVisitorAsync(isIndented);
         HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
-        template.resolve(preView);
+        template.resolve(preView); //  ?????? Why  ????? This is not the same as next statement ????
         /**
          * NO problem with null model. We are just preprocessing static HTML blocks.
          * Thus, dynamic blocks which depend on model are not invoked.
