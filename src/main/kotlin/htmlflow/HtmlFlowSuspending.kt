@@ -1,10 +1,7 @@
 package htmlflow
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.xmlet.htmlapifaster.Element
-import org.xmlet.htmlapifaster.async.AwaitConsumer
-import java.lang.IllegalStateException
+import org.xmlet.htmlapifaster.SuspendConsumer
 
 /**
  * @param E This HTML element
@@ -28,10 +25,10 @@ fun <E: Element<*,*>, M> E.suspending(block: suspend E.(M) -> Unit) : E {
     if(lookForRootElement() is HtmlDoc) {
         throw IllegalStateException("Illegal use of suspending in HtmlDoc. Using .suspending { elem, model -> ...} is only valid in HtmlViewAsync.")
     }
-    this.visitor.visitAwait(this, AwaitConsumer<E, M> { e, model, cb ->
-        GlobalScope.launch {
-            block(e, model as M)
-            cb.finish()
+
+    this.visitor.visitSuspending(this, object : SuspendConsumer<E,M> {
+        override suspend fun E.accept(model: M) {
+            block(this, model as M)
         }
     })
     return this
@@ -43,5 +40,3 @@ fun <E: Element<*,*>> E.lookForRootElement() : HtmlPage {
     }
     return this.parent.lookForRootElement()
 }
-
-typealias SuspendConsumer<E, M> = suspend E.(M) -> Unit

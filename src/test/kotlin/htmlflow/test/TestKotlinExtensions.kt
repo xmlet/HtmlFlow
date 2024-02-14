@@ -54,7 +54,7 @@ private val weatherView = view<Weather> {
         .l // html
 }
 
-const val expectedPortugalWeather = """<!DOCTYPE html>
+private const val expectedPortugalWeather = """<!DOCTYPE html>
 <html>
 	<head>
 		<title>
