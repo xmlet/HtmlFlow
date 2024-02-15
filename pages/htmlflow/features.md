@@ -23,7 +23,13 @@ HtmlFlow builders:
 * attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
 * `__()` returns the **parent element** and **emits the end tag** of an element.
 
-HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML.
+HtmlFlow offers two way of producing html result, each targeting a dinstinct usecase.
+To decide between both way you should decide if you intend to reuse the same view ( aka template) over and over.
+In a web app environement it's generally the case. Then HtmlView are what you are looking for.
+
+Or on the other hand, if the views are called a handfull of times, Maybe your are building a text preprocessor (like github's jekyll)
+And you want your ouput right a way. Then what you are looking for is HtmlDoc.
+
 This allows the `Appendable` to be provided either _beforehand_ or _later_ when
 the view is rendered.
 The `doc()` and `view()` factory methods follow each of these approaches:
