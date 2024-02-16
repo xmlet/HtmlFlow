@@ -23,7 +23,15 @@ HtmlFlow builders:
 * attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
 * `__()` returns the **parent element** and **emits the end tag** of an element.
 
-HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML.
+HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML. 
+
+The eager approach is best suited for cases where views (templates) are used only a handful of times. 
+Maybe you are building a text processor like GitHub's Jekyll. This approach is called eager because data and templates are merged right away.
+
+With the lazy approach, we expect views (templates) to be called repeatedly. 
+The most obvious use case is web applications. This approach is called lazy because the view (template) 
+is not immediately attached to a data model. This binding is rather delayed.
+
 This allows the `Appendable` to be provided either _beforehand_ or _later_ when
 the view is rendered.
 The `doc()` and `view()` factory methods follow each of these approaches:
@@ -35,10 +43,6 @@ The `doc()` and `view()` factory methods follow each of these approaches:
 {% highlight java %}/* lazy */ var view = HtmlFlow.view(page -> page.html().body().div().table()...){% endhighlight %}
     </li>
 </ul>
-
-An `HtmlView` is more **performant** than an `HtmlDoc` when we need to bind
-the same template with different data **models**.
-In this scenario, **static HTML blocks are resolved only once**, on `HtmlView` instantiation.
 
 Given an `HtmlView` instance, e.g. `view`, we can render the HTML using one of the
 following approaches:
