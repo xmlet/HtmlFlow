@@ -43,16 +43,16 @@
     </distributionManagement>
     <dependencies>
         <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-          <version>2.0.3</version>
-          <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-simple</artifactId>
-          <version>2.0.3</version>
-          <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.xmlet</groupId>
@@ -118,6 +118,16 @@
             <artifactId>guava</artifactId>
             <version>33.0.0-jre</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>kotlinpoet-jvm</artifactId>
+            <version>1.16.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -130,6 +140,24 @@
     </properties>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>htmlflow.propertiesGenerator.ReflectionKt</mainClass>
+                    <includeProjectDependencies>true</includeProjectDependencies>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>teste</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

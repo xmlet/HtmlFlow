@@ -1,8 +1,11 @@
 package htmlflow
 
 import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
+import htmlflow.visitor.HtmlVisitor
 import htmlflow.visitor.PreprocessingVisitor
-import org.xmlet.htmlapifaster.Element
+//import jdk.internal.org.jline.utils.ShutdownHooks
+import org.xmlet.htmlapifaster.*
+import java.util.concurrent.CompletableFuture
 
 inline val <T : Element<*, Z>, Z : Element<*,*>> T.l: Z
     get() = this.`__`()
@@ -11,6 +14,31 @@ inline fun <T : Element<*, Z>, Z : Element<*,*>> T.add(block: T.() -> Unit): T {
     block()
     return this
 }
+
+
+public inline val HtmlPage.html: Html<HtmlPage>
+    get() {
+        (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
+        return Html(self())
+    }
+
+inline fun <T : Element<*, Z>, Z : Element<*,*>> HtmlPage.html(block : Html<HtmlPage>.() -> Html<T>) : T{
+    (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
+    return Html(self()).block().l
+}
+
+inline var <T : Element<T,Z>, Z : Element<*,*>> T.text : T
+    get() = self()
+    set(value) {
+        visitor.visitText(
+            Text(
+                self(),
+                visitor,
+                value,
+            )
+        )
+    }
+
 
 
 /**
