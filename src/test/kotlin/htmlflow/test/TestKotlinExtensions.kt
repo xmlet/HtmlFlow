@@ -376,66 +376,30 @@ class TestKotlinExtensions {
                         }
                         nav {
                             ul {
-                                li {
-                                    a {
-                                        attrHref("#section1")
-                                        text("Section 1")
-                                    }
-                                }
-                                li {
-                                    a {
-                                        attrHref("#section2")
-                                        text("Section 2")
-                                    }
-                                }
-                                li {
-                                    a {
-                                        attrHref("#section3")
-                                        text("Section 3")
-                                    }
-                                }
+                                li.a.attrHref("#section1").text("Section 1").l.l
+                                li.a.attrHref("#section2").text("Section 2").l.l
+                                li.a.attrHref("#section3").text("Section 3").l.l
                             }
                         }
                     }
                     main {
                         section {
                             attrId("section1")
-                            h2 {
-                                text("Section 1")
-                            }
-                            p {
-                                text("This is the first section.")
-                            }
-                            img {
-                                attrSrc("image1.jpg")
-                                attrAlt("Image 1")
-                            }
+                            h2.text("Section 1").l
+                            p.text("This is the first section.").l
+                            img.attrSrc("image1.jpg").attrAlt("Image 1").l
                         }
                         section {
                             attrId("section2")
-                            h2 {
-                                text("Section 2")
-                            }
-                            p {
-                                text("This is the second section.")
-                            }
-                            img {
-                                attrSrc("image2.jpg")
-                                attrAlt("Image 2")
-                            }
+                            h2.text("Section 2").l
+                            p.text("This is the second section.").l
+                            img.attrSrc("image2.jpg").attrAlt("Image 2").l
                         }
                         section {
                             attrId("section3")
-                            h2 {
-                                text("Section 3")
-                            }
-                            p {
-                                text("This is the third section.")
-                            }
-                            img {
-                                attrSrc("image3.jpg")
-                                attrAlt("Image 3")
-                            }
+                            h2.text("Section 3").l
+                            p.text("This is the third section.").l
+                            img.attrSrc("image3.jpg").attrAlt("Image 3").l
                         }
                     }
                     footer {
@@ -481,11 +445,10 @@ private val weatherView = view<Weather> {
                 } // tr
                 .dyn { weather: Weather ->
                     weather.locations.forEach { loc ->
-                        tr.add {
+                        tr {
                             td.text(loc.city).l
                             td.text(loc.celsius).l
                         }
-                            .l // tr
                     }
                 }
                 .l // table
@@ -504,16 +467,15 @@ private val weatherView1 = view<Weather> {
         .body {
             table.attrBorder(EnumBorderType._1)
                 .tr
-                .th.add { +"City" }.l
+                .th.text("City").l
                 .th.text("Temperature").l
                 .l // tr
                 .dyn { weather: Weather ->
                     weather.locations.forEach { loc ->
-                        tr.add {
+                        tr {
                             td.text(loc.city).l
                             td.text(loc.celsius).l
                         }
-                            .l // tr
                     }
                 }
                 .l // table
