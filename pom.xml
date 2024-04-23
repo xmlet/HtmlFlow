@@ -122,11 +122,13 @@
             <groupId>com.squareup</groupId>
             <artifactId>kotlinpoet-jvm</artifactId>
             <version>1.16.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <properties>
@@ -147,6 +149,7 @@
                 <configuration>
                     <mainClass>htmlflow.propertiesGenerator.ReflectionKt</mainClass>
                     <includeProjectDependencies>true</includeProjectDependencies>
+                    <classpathScope>compile</classpathScope>
                 </configuration>
                 <executions>
                     <execution>
