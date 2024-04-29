@@ -122,11 +122,13 @@
             <groupId>com.squareup</groupId>
             <artifactId>kotlinpoet-jvm</artifactId>
             <version>1.16.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <properties>
@@ -147,6 +149,7 @@
                 <configuration>
                     <mainClass>htmlflow.propertiesGenerator.ReflectionKt</mainClass>
                     <includeProjectDependencies>true</includeProjectDependencies>
+                    <classpathScope>compile</classpathScope>
                 </configuration>
                 <executions>
                     <execution>
@@ -234,7 +237,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
