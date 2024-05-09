@@ -71,19 +71,13 @@ public class HtmlPartials {
     /**
      * Sample showcase of data binding with HtmlDoc
      */
-    public void trackDoc(Appendable out, Track track) {
+    private void trackDoc(Appendable out, Track track) {
         HtmlFlow.doc(out)
                 .html()
                     .body()
                         .ul()
-                            .li()
-                                .of((li) -> li
-                                    .text(format("Artist: %s", track.getArtist())))
-                            .__() // li
-                            .li()
-                                .of((li) -> li
-                                    .text(format("Track: %s", track.getName())))
-                            .__() // li
+                            .li().text(format("Artist: %s", track.getArtist())).__()
+                            .li().text(format("Track: %s", track.getName())).__() // li
                             .of(ul -> {
                                 if(track.getDiedDate() != null)
                                     ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
@@ -102,15 +96,10 @@ public class HtmlPartials {
                 .html()
                     .body()
                         .ul()
-                            .li()
-                                .<Track>dynamic((li, track) -> li
-                                    .text(format("Artist: %s", track.getArtist())))
-                            .__() // li
-                            .li()
-                                .<Track>dynamic((li, track) -> li
-                                    .text(format("Track: %s", track.getName())))
-                            .__() // li
                             .<Track>dynamic((ul, track) -> {
+                                ul
+                                    .li().text(format("Artist: %s", track.getArtist())).__()
+                                    .li().text(format("Track: %s", track.getName())).__();
                                 if(track.getDiedDate() != null)
                                     ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
                             })
@@ -125,7 +114,7 @@ public class HtmlPartials {
         // trackView.setOut(System.out).write(spaceOddity);
     }
 
-    public void playlistDoc(Appendable out, List<Track> tracks) {
+    private void playlistDoc(Appendable out, List<Track> tracks) {
         HtmlFlow.doc(out)
             .html()
                 .body()
