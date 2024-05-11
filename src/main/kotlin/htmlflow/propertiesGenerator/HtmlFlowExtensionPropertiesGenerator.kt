@@ -57,9 +57,11 @@ class HtmlFlowExtensionPropertiesGenerator {
                     .addTypeVariable(type)
                     .addParameter("block", LambdaTypeName.get(
                         receiver = typeVariable,
-                        returnType = typeVariable,
+                        returnType = ClassName("kotlin", "Unit"),
                     ))
-                    .addStatement("return %T(%L).block().l", clazz, "this")
+                    .addStatement("val elem =  %T(%L)", clazz, "this")
+                    .addStatement("elem.block()")
+                    .addStatement("return elem.l", clazz, "this")
                     .build()
             )
         }

@@ -27,9 +27,9 @@ public inline val HtmlPage.html: Html<HtmlPage>
         return Html(self())
     }
 
-inline fun <T : Element<*, Z>, Z : Element<*,*>> HtmlPage.html(block : Html<HtmlPage>.() -> Html<T>) : T{
+inline fun HtmlPage.html(block : Html<HtmlPage>.() -> Unit) : HtmlPage {
     (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
-    return Html(self()).block().l
+    return Html(self()).also { it.block() }.l
 }
 
 inline var <T : Element<T,Z>, Z : Element<*,*>> T.text : T
