@@ -1,0 +1,95 @@
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exBind01" data-toggle="tab">HtmlDoc</a>
+        </li>
+        <li>
+            <a href="#exBind02" data-toggle="tab">HtmlView</a>
+        </li>
+        <li>
+            <a href="#exBind03" data-toggle="tab">Kotlin doc</a>
+        </li>
+        <li>
+            <a href="#exBind04" data-toggle="tab">Kotlin view</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exBind01">
+    
+{% highlight java %}
+void trackDoc(Appendable out, Track track) {
+  HtmlFlow.doc(out)
+    .html()
+      .body()
+        .ul()
+          .li().text(format("Artist: %s", track.getArtist())).__()
+          .li().text(format("Track: %s", track.getName())).__()
+        .__() // ul
+      .__() // body
+    .__(); // html
+}
+...
+trackDoc(System.out, new Track("David Bowie", "Space Oddity"));
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exBind02">
+
+{% highlight java %}
+HtmlView<Track> trackView = HtmlFlow.view(view -> view
+  .html()
+    .body()
+      .ul()
+      .<Track>dynamic((ul, track) -> ul
+        .li().text(format("Artist: %s", track.getArtist())).__()
+        .li().text(format("Track: %s", track.getName())).__()
+      )
+      .__() // ul
+    .__() // body
+  .__() // html
+);
+...
+trackView.setOut(System.out).write(new Track("David Bowie", "Space Oddity"));
+{% endhighlight %}
+    
+      </div>
+      <div class="tab-pane" id="exBind03">
+
+{% highlight kotlin %}
+import htmlflow.*
+
+fun Appendable.trackDoc(track: Track) {
+  doc {
+    html {
+      body {
+        ul {
+          li { text(format("Artist: %s", track.artist)) }
+          li { text(format("Track: %s", track.name)) }
+        } // ul
+      } // body
+    } // html
+  } // doc
+}
+{% endhighlight %}
+            
+      </div>
+      <div class="tab-pane" id="exBind04">
+
+{% highlight kotlin %}
+val trackView = view<Track> {
+  html {
+    body {
+      ul {
+        dyn { track: Track ->
+          li { text(format("Artist: %s", track.artist)) }
+          li { text(format("Track: %s", track.name)) }
+        }
+      } // ul
+    } // body
+  } // html
+}
+{% endhighlight %}
+            
+      </div>
+    </div>
+</div>

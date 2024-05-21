@@ -1,0 +1,65 @@
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exLayout01" data-toggle="tab">Java Layout</a>
+        </li>
+        <li>
+            <a href="#exLayout02" data-toggle="tab">Kotlin Layout</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exLayout01">
+  
+{% highlight java %}
+
+public class Layout {
+  public static HtmlView view(Consumer<Nav> navbar, Consumer<Div> content) {
+    return HtmlFlow.view(page -> page
+        .html()
+            .head()
+                .title()
+                    .text("PetClinic :: a Spring Framework demonstration")
+                .__() //title
+                .link().attrRel(EnumRelType.STYLESHEET).attrHref("/resources/css/petclinic.css")
+                .__() //link
+            .__() //head
+            .body()
+                .nav()
+                    .of(navbar::accept)
+                .__() //nav
+                .div().attrClass("container xd-container")
+                    .of(content::accept)
+                .__() //div
+            .__() //body
+        .__() //html
+    ); // view
+  }
+}
+{% endhighlight %}
+  
+      </div>
+      <div class="tab-pane" id="exLayout02">
+  
+{% highlight kotlin %}
+fun ownerView(navbar: (Nav<*>) -> Unit, content: Div<*>.() -> Unit): HtmlView<Owner> {
+    return view<Owner> {
+        html {
+            head {
+                title { text("PetClinic :: a Spring Framework demonstration") }
+                link { attrRel(EnumRelType.STYLESHEET).attrHref("/resources/css/petclinic.css") }
+            }
+            body {
+                nav { navbar(this) }
+                div {
+                    attrClass("container xd-container")
+                    content(this)
+                } // div
+            } // body
+        } // html
+    } // view
+}
+{% endhighlight %}
+        
+            </div>
+    </div>
+</div>

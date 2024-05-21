@@ -1,0 +1,62 @@
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exIf01" data-toggle="tab">HtmlDoc</a>
+        </li>
+        <li>
+            <a href="#exIf02" data-toggle="tab">HtmlView</a>
+        </li>
+        <li>
+            <a href="#exIf03" data-toggle="tab">Kotlin</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exIf01">
+    
+{% highlight java %}
+void trackDoc(Appendable out, Track track) {
+    ...
+        .ul()
+        ...
+        .of(ul -> {
+            if(track.getDiedDate() != null)
+            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
+        })
+
+}
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exIf02">
+
+{% highlight java %}
+HtmlView<Track> trackView = HtmlFlow.view(view -> view
+    ...
+        .ul()
+        ...
+        .<Track>dynamic((ul, track) -> {
+            if(track.getDiedDate() != null)
+            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
+        })
+        ...
+{% endhighlight %}
+    
+        </div>
+        <div class="tab-pane" id="exIf03">
+
+{% highlight kotlin%}
+  ...
+  ul {
+    ...
+    if (track.diedDate != null) {
+      li { text(format("Died in %d", track.diedDate.year)) }
+    }
+    ...
+  }
+  ...
+{% endhighlight %}
+
+        </div>
+    </div>
+</div>
+    

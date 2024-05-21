@@ -1,0 +1,92 @@
+<div>	
+  <ul  class="nav nav-tabs">
+      <li class="active">
+          <a  href="#exAsync01" data-toggle="tab">Java viewAsync</a>
+      </li>
+      <li>
+          <a href="#exAsync02" data-toggle="tab">Kotlin viewAsync</a>
+      </li>
+      <li>
+          <a href="#exAsync03" data-toggle="tab">Kotlin viewSuspend</a>
+      </li>
+  </ul>
+  <div class="tab-content">
+      <div class="tab-pane active" id="exAsync01">
+
+{% highlight java %}
+HtmlViewAsync<Flux<Track>> playlistView = HtmlFlow.viewAsync(view -> view
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<Flux<Track>>await((table, tracks, onCompletion) -> tracks
+          .doOnComplete(onCompletion::finish)
+          .doOnNext( trk ->
+            table
+              .tr()
+                .td().text(trk.getArtist()).__()
+                .td().text(trk.getName()).__()
+              .__()
+        ))
+      .__() // table
+    .__() // body
+  .__() // html
+);
+{% endhighlight %}
+
+      </div>
+      <div class="tab-pane" id="exAsync02">
+
+{% highlight kotlin %}
+val playlistView = viewAsync<Flux<Track>> {
+  html {
+      body {
+          table {
+              tr {
+                  th { text("Artist") }
+                  th { text("Track") }
+              }
+              await { tracks: Flux<Track>, resume -> tracks
+                  .doOnComplete(resume)
+                  .doOnNext{ track ->
+                      tr { td { text(track.artist) } }
+                      tr { td { text(track.name) } }
+                  }
+              }
+          } // table
+      } // body
+  } // html
+}
+{% endhighlight %}
+
+      </div>
+      <div class="tab-pane" id="exAsync03">
+
+{% highlight kotlin %}
+val playlistView = viewSuspend<Flux<Track>> {
+  html {
+      body {
+          table {
+              tr {
+                  th { text("Artist") }
+                  th { text("Track") }
+              }
+              suspending { tracks: Flux<Track> -> tracks
+                  .asFlow()
+                  .collect { track ->
+                      tr { td { text(track.artist) } }
+                      tr { td { text(track.name) } }
+                  }
+              }
+          } // table
+      } // body
+  } // html
+}
+{% endhighlight %}
+        
+      </div>
+  </div>
+</div>
