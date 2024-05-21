@@ -1,0 +1,61 @@
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exBind01" data-toggle="tab">HtmlDoc</a>
+        </li>
+        <li>
+            <a href="#exBind02" data-toggle="tab">HtmlView</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exBind01">
+    
+{% highlight java %}
+void trackDoc(Appendable out, Track track) {
+  HtmlFlow.doc(out)
+    .html()
+      .body()
+        .ul()
+          .li()
+            .of((li) -> li
+              .text(format("Artist: %s", track.getArtist())))
+          .__() // li
+          .li()
+            .of((li) -> li
+              .text(format("Track: %s", track.getName())))
+          .__() // li
+        .__() // ul
+      .__() // body
+    .__(); // html
+}
+...
+trackDoc(System.out, new Track("David Bowie", "Space Oddity"));
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exBind02">
+
+{% highlight java %}
+HtmlView<Track> trackView = HtmlFlow.view(view -> view
+  .html()
+    .body()
+      .ul()
+        .li()
+          .<Track>dynamic((li, track) -> li
+            .text(format("Artist: %s", track.getArtist())))
+        .__() // li
+        .li()
+          .<Track>dynamic((li, track) -> li
+            .text(format("Track: %s", track.getName())))
+        .__() // li
+      .__() // ul
+    .__() // body
+  .__() // html
+);
+...
+trackView.setOut(System.out).write(new Track("David Bowie", "Space Oddity"));
+{% endhighlight %}
+    
+        </div>
+    </div>
+</div>

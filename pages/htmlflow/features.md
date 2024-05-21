@@ -64,67 +64,7 @@ _Web templates_ in HtmlFlow are defined using functions (or methods in Java). Th
 **model** (or _context object_) may be passed as arguments to such functions.
 Next, we have an example of a dynamic web page binding to a `Track` object.
 
-<div>	
-<ul  class="nav nav-tabs">
-    <li class="active">
-        <a  href="#exBind01" data-toggle="tab">HtmlDoc</a>
-    </li>
-    <li>
-        <a href="#exBind02" data-toggle="tab">HtmlView</a>
-    </li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane active" id="exBind01">
-
-{% highlight java %}
-void trackDoc(Appendable out, Track track) {
-  HtmlFlow.doc(out)
-    .html()
-      .body()
-        .ul()
-          .li()
-            .of((li) -> li
-              .text(format("Artist: %s", track.getArtist())))
-          .__() // li
-          .li()
-            .of((li) -> li
-              .text(format("Track: %s", track.getName())))
-          .__() // li
-        .__() // ul
-      .__() // body
-    .__(); // html
-}
-...
-trackDoc(System.out, new Track("David Bowie", "Space Oddity"));
-{% endhighlight %}
-
-    </div>
-    <div class="tab-pane" id="exBind02">
-
-{% highlight java %}
-HtmlView<Track> trackView = HtmlFlow.view(view -> view
-  .html()
-    .body()
-      .ul()
-        .li()
-          .<Track>dynamic((li, track) -> li
-            .text(format("Artist: %s", track.getArtist())))
-        .__() // li
-        .li()
-          .<Track>dynamic((li, track) -> li
-            .text(format("Track: %s", track.getName())))
-        .__() // li
-      .__() // ul
-    .__() // body
-  .__() // html
-);
-...
-trackView.setOut(System.out).write(new Track("David Bowie", "Space Oddity"));
-{% endhighlight %}
-
-    </div>
-</div>
-</div>
+{% include example01_bind.html %}
 
 The `of()` and `dynamic()` builders in `HtmlDoc` and `HtmlView`, respectively,
 are utilized to chain Java code in the definition of web templates:
@@ -140,51 +80,7 @@ where the artist has already passed away.
 Considering that `Track` has a property `diedDate` of type `LocalDate`, we can interleave
 the following HtmlFlow snippet within the `ul` to achieve this purpose:
 
-
-<div>	
-<ul  class="nav nav-tabs">
-    <li class="active">
-        <a  href="#exIf01" data-toggle="tab">HtmlDoc</a>
-    </li>
-    <li>
-        <a href="#exIf02" data-toggle="tab">HtmlView</a>
-    </li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane active" id="exIf01">
-
-{% highlight java %}
-void trackDoc(Appendable out, Track track) {
-    ...
-      .ul()
-        ...
-        .of(ul -> {
-          if(track.getDiedDate() != null)
-            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
-        })
-
-}
-{% endhighlight %}
-
-    </div>
-    <div class="tab-pane" id="exIf02">
-
-{% highlight java %}
-HtmlView<Track> trackView = HtmlFlow.view(view -> view
-    ...
-      .ul()
-        ...
-        .<Track>dynamic((ul, track) -> {
-          if(track.getDiedDate() != null)
-            ul.li().text(format("Died in %d", track.getDiedDate().getYear())).__();
-        })
-        ...
-{% endhighlight %}
-
-    </div>
-</div>
-</div>
-
+{% include example02_if_else.html %}
 
 ## Loops
 
@@ -192,69 +88,7 @@ You can utilize any Java loop statement in your web template definition. Next,
 we present an example that takes advantage of the `forEach` loop method of
 `Iterable`:
 
-<div>	
-<ul  class="nav nav-tabs">
-    <li class="active">
-        <a  href="#exLoop01" data-toggle="tab">HtmlDoc</a>
-    </li>
-    <li>
-        <a href="#exLoop02" data-toggle="tab">HtmlView</a>
-    </li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane active" id="exLoop01">
-
-{% highlight java %}
-void playlistDoc(Appendable out, List<Track> tracks) {
-  HtmlFlow.doc(out)
-    .html()
-      .body()
-        .table()
-          .tr()
-            .th().text("Artist").__()
-            .th().text("Track").__()
-          .__() // tr
-          .of(table -> tracks.forEach( trk ->
-            table
-              .tr()
-                .td().text(trk.getArtist()).__()
-                .td().text(trk.getName()).__()
-              .__() // tr
-          ))
-        .__() // table
-      .__() // body
-    .__(); // html
-}
-{% endhighlight %}
-
-    </div>
-    <div class="tab-pane" id="exLoop02">
-
-{% highlight java %}
-HtmlView<List<Track>> playlistView = HtmlFlow.view(view -> view
-  .html()
-    .body()
-      .table()
-        .tr()
-          .th().text("Artist").__()
-          .th().text("Track").__()
-        .__() // tr
-        .<List<Track>>dynamic((table, tracks) -> tracks.forEach( trk ->
-          table
-            .tr()
-              .td().text(trk.getArtist()).__()
-              .td().text(trk.getName()).__()
-            .__() // tr
-          ))
-      .__() // table
-    .__() // body
-  .__() // html
-);
-{% endhighlight %}
-
-    </div>
-</div>
-</div>
+{% include example03_loops.html %}
 
 ## Binding to Asynchronous data models
 
@@ -272,31 +106,7 @@ Next we present the asynchronous version of the playlist web template.
 Instead of a `List<Track>` we are binding to a [Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
 which is a Reactive Streams [`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with reactive operators that emits 0 to N elements.
 
-
-{% highlight java %}
-HtmlViewAsync<Flux<Track>> playlistView = HtmlFlow.viewAsync(view -> view
-  .html()
-    .body()
-      .table()
-        .tr()
-          .th().text("Artist").__()
-          .th().text("Track").__()
-        .__() // tr
-        .<Flux<Track>>await((table, tracks, onCompletion) -> tracks
-          .doOnComplete(onCompletion::finish)
-          .doOnNext( trk ->
-            table
-              .tr()
-                .td().text(trk.getArtist()).__()
-                .td().text(trk.getName()).__()
-              .__()
-        ))
-      .__() // table
-    .__() // body
-  .__() // html
-);
-{% endhighlight %}
-
+{% include example04_async.html %}
 
 HtmlFlow _await_ feature works regardless the type of asynchronous model and can be used with
 any kind of asynchronous API.
@@ -318,39 +128,7 @@ The fragment template may receive additional arguments for auxiliary model objec
 Consider the following example from [Spring Petclinic](https://github.com/xmlet/spring-petclinic),
 which creates a fragment for a `div` containing a `label` and an `input`.
 
-```java
-static void partialInputField(Div<?> container, String label, String id, Object value) {
-    container
-        .div().attrClass("form-group")
-            .label()
-                .text(label)
-            .__() //label
-            .input()
-                .attrClass("form-control")
-                .attrType(EnumTypeInputType.TEXT)
-                .attrId(id)
-                .attrName(id)
-                .attrValue(value.toString())
-            .__() // input
-        .__(); // div
-}
-```
-
-This partial could be used inside another template.
-
-```java
-static void ownerTemplate(Div<?> container) {
-  container
-    .h2()
-      .text("Owner")
-    .__() //h2
-    .form()
-      .attrMethod(EnumMethodType.POST)
-      .div().attrClass("form-group has-feedback")
-        .<Owner>dynamic((div, owner) -> partialInputField(div, "Name", "name", owner.getName()))
-        .<Owner>dynamic((div, owner) -> partialInputField(div, "Address", "address", owner.getAddress()))
-    ...
-```
+{% include example05_partials01_partial.html %}
 
 Notice, the function `ownerTemplate` is in turn another fragment that receives a `Div` element.
 
@@ -368,31 +146,7 @@ those fragments arguments.
 
 For example, the following layout uses an auxiliary `navbar` and `content` fragments to build the end view. 
 
-```java
-public class Layout {
-    public static HtmlView view(Consumer<Nav> navbar, Consumer<Div> content) {
-        return HtmlFlow.view(page -> page
-            .html()
-                .head()
-                    .title()
-                        .text("PetClinic :: a Spring Framework demonstration")
-                    .__() //title
-                    .link().attrRel(EnumRelType.STYLESHEET).attrHref("/resources/css/petclinic.css")
-                    .__() //link
-                  .__() //head
-                .body()
-                    .nav()
-                        .of(navbar::accept)
-                    .__() //nav
-                    .div().attrClass("container xd-container")
-                        .of(content::accept)
-                    .__() //div
-                .__() //body
-            .__() //html
-        ); // return view
-    }
-}
-```
+{% include example05_partials02_layout.html %}
 
 To chain the call of fragments fluently we take advantage of the auxiliary HtmlFlow builder `of()` that let us chain a consumer of the last created element.
 Notice `.of(navbar::accept)` is equivalent to write in Java `.of(nav -> navbar.accept(nav))`.
@@ -400,23 +154,4 @@ Notice `.of(navbar::accept)` is equivalent to write in Java `.of(nav -> navbar.a
 Once defined the layout and considering the previous example of the `ownerTemplate` we may build
 a owner view with:
 
-```java
-public class OwnerView {
-
-    static final HtmlView view = Layout
-        .view(Navbar::navbarFragment, OwnerView::ownerTemplate);
-...
-}
-```
-
-Given this view we may render it with a `Owner` object.
-For example, the `OwnerController` edit handler may be defined as:
-
-```java
-@GetMapping("/owners/{ownerId}/edit")
-@ResponseBody
-public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId) {
-    Owner owner = ownersRepository.findById(ownerId);
-    return OwnerView.view.render(owner);
-}
-```
+{% include example05_partials03_view.html %}

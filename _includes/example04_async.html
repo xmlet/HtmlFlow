@@ -1,0 +1,23 @@
+{% highlight java %}
+HtmlViewAsync<Flux<Track>> playlistView = HtmlFlow.viewAsync(view -> view
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<Flux<Track>>await((table, tracks, onCompletion) -> tracks
+          .doOnComplete(onCompletion::finish)
+          .doOnNext( trk ->
+            table
+              .tr()
+                .td().text(trk.getArtist()).__()
+                .td().text(trk.getName()).__()
+              .__()
+        ))
+      .__() // table
+    .__() // body
+  .__() // html
+);
+{% endhighlight %}

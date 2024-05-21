@@ -1,0 +1,20 @@
+```java
+public class OwnerView {
+
+    static final HtmlView view = Layout
+        .view(Navbar::navbarFragment, OwnerView::ownerTemplate);
+...
+}
+```
+
+Given this view we may render it with a `Owner` object.
+For example, the `OwnerController` edit handler may be defined as:
+
+```java
+@GetMapping("/owners/{ownerId}/edit")
+@ResponseBody
+public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId) {
+    Owner owner = ownersRepository.findById(ownerId);
+    return OwnerView.view.render(owner);
+}
+```

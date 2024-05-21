@@ -1,0 +1,25 @@
+```java
+public class Layout {
+    public static HtmlView view(Consumer<Nav> navbar, Consumer<Div> content) {
+        return HtmlFlow.view(page -> page
+            .html()
+                .head()
+                    .title()
+                        .text("PetClinic :: a Spring Framework demonstration")
+                    .__() //title
+                    .link().attrRel(EnumRelType.STYLESHEET).attrHref("/resources/css/petclinic.css")
+                    .__() //link
+                  .__() //head
+                .body()
+                    .nav()
+                        .of(navbar::accept)
+                    .__() //nav
+                    .div().attrClass("container xd-container")
+                        .of(content::accept)
+                    .__() //div
+                .__() //body
+            .__() //html
+        ); // return view
+    }
+}
+```
