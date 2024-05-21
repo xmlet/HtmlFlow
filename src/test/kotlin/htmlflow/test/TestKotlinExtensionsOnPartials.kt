@@ -22,10 +22,9 @@ class TestKotlinExtensionsOnPartials {
     /**
      * Sample showcase of data binding with HtmlDoc
      */
-    private fun trackDoc(out: Appendable, track: Track) {
-        HtmlFlow
-            .doc(out)
-            .html {
+    private fun Appendable.trackDoc(track: Track) {
+        doc {
+            html {
                 body {
                     ul {
                         li { text(format("Artist: %s", track.artist)) }
@@ -33,9 +32,10 @@ class TestKotlinExtensionsOnPartials {
                         if (track.diedDate != null) {
                             li { text(format("Died in %d", track.diedDate.year)) }
                         }
-                    }
-                }
-            }
+                    } // ul
+                } // body
+            } // html
+        } // doc
     }
 
     /**
@@ -60,7 +60,7 @@ class TestKotlinExtensionsOnPartials {
         }
         val spaceOddity = Track("David Bowie", "Space Oddity", LocalDate.of(2016, 1, 10))
         val actual = StringBuilder()
-        trackDoc(actual, spaceOddity)
+        actual.trackDoc(spaceOddity)
         assertEquals(actual.toString(), trackView.render(spaceOddity))
 //        trackView.setOut(System.out).write(spaceOddity);
     }
@@ -68,10 +68,9 @@ class TestKotlinExtensionsOnPartials {
     /**
      * Sample showcase of loop with HtmlDoc
      */
-    private fun playlistDoc(out: Appendable, tracks: List<Track>) {
-        HtmlFlow
-            .doc(out)
-            .html {
+    private fun Appendable.playlistDoc(tracks: List<Track>) {
+        doc {
+            html {
                 body {
                     table {
                         tr {
@@ -85,6 +84,7 @@ class TestKotlinExtensionsOnPartials {
                     } // table
                 } // body
             } // html
+        } // doc
     }
 
     /**
@@ -116,7 +116,7 @@ class TestKotlinExtensionsOnPartials {
             Track("Queen", "Under Pressure")
         )
         val actual = StringBuilder()
-        playlistDoc(actual, tracks)
+        actual.playlistDoc(tracks)
         assertEquals(actual.toString(), playlistView.render(tracks))
 //        playlistView.setOut(System.out).write(tracks);
     }
@@ -153,7 +153,7 @@ class TestKotlinExtensionsOnPartials {
             .fromIterable(tracks)
             .delayElements(Duration.ofMillis(10))
         val expected = StringBuilder()
-        playlistDoc(expected, tracks)
+        expected.playlistDoc(tracks)
         playlistView.renderAsync(tracksFlux).thenAccept { actual: String? ->
             assertEquals(
                 expected.toString(),
@@ -194,7 +194,7 @@ class TestKotlinExtensionsOnPartials {
             .fromIterable(tracks)
             .delayElements(Duration.ofMillis(10))
         val expected = StringBuilder()
-        playlistDoc(expected, tracks)
+        expected.playlistDoc(tracks)
         runBlocking {
             val actual = playlistView.render(tracksFlux)
             assertEquals(
@@ -203,39 +203,37 @@ class TestKotlinExtensionsOnPartials {
             )
         }
     }
-    private fun partialInputField(container: Div<*>, label: String, id: String, value: Any) {
-        container
-            .div {
-                attrClass("form-group")
-                label { text(label) }
-                input {
-                    attrClass("form-control")
-                    attrType(EnumTypeInputType.TEXT)
-                    attrId(id)
-                    attrName(id)
-                    attrValue(value.toString())
-                }
-            }
+    private fun Div<*>.partialInputField(label: String, id: String, value: Any) {
+        div {
+            attrClass("form-group")
+            label { text(label) }
+            input {
+                attrClass("form-control")
+                attrType(EnumTypeInputType.TEXT)
+                attrId(id)
+                attrName(id)
+                attrValue(value.toString())
+            } // input
+        } // div
     }
-    private fun ownerTemplate(container: Div<*>) {
-        container
-            .h2 { text("Owner") }
-            .form {
-                attrMethod(EnumMethodType.POST)
-                div {
-                    attrClass("form-group has-feedback")
-                    dyn { owner: Owner ->
-                        partialInputField(this, "Name", "name", owner.name)
-                        partialInputField(this, "Address", "address", owner.address)
-                    }
+    private fun Div<*>.partialOwner() {
+        h2 { text("Owner") }
+        form {
+            attrMethod(EnumMethodType.POST)
+            div {
+                attrClass("form-group has-feedback")
+                dyn { owner: Owner ->
+                    partialInputField("Name", "name", owner.name)
+                    partialInputField("Address", "address", owner.address)
                 }
-            }
+            } // div
+        } // form
     }
     private fun navbarFragment(nav: Nav<*>) {
 
     }
 
-    private fun ownerView(navbar: (Nav<*>) -> Unit, content: (Div<*>) -> Unit): HtmlView<Owner> {
+    private fun ownerView(navbar: (Nav<*>) -> Unit, content: Div<*>.() -> Unit): HtmlView<Owner> {
         return view<Owner> {
             html {
                 head {
@@ -254,7 +252,7 @@ class TestKotlinExtensionsOnPartials {
     }
 
     @Test fun testOwnerView() {
-        val view = ownerView(::navbarFragment, ::ownerTemplate)
+        val view = ownerView(::navbarFragment) { partialOwner() }
         // view.setOut(System.out).write(Owner("Ze Manel", "Rua da Alfandega"))
     }
 

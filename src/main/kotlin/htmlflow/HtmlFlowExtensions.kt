@@ -1,37 +1,39 @@
 package htmlflow
 
+//import jdk.internal.org.jline.utils.ShutdownHooks
 import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
 import htmlflow.visitor.HtmlVisitor
 import htmlflow.visitor.PreprocessingVisitor
-//import jdk.internal.org.jline.utils.ShutdownHooks
-import org.xmlet.htmlapifaster.*
-import java.util.concurrent.CompletableFuture
+import org.xmlet.htmlapifaster.Element
+import org.xmlet.htmlapifaster.Html
+import org.xmlet.htmlapifaster.Text
 
+/**
+ * Alternative close tag function for `__()`.
+ */
 inline val <T : Element<*, Z>, Z : Element<*,*>> T.l: Z
     get() = this.`__`()
 
-
 /**
- * Experimental extension to check the behavior of HTML builders for lambdas with an Element receiver.
- * After the AutoDsl2kt automatically generate Kotlin extensions maybe this funcion is useless.
+ * Root property of HTML element.
  */
-inline fun <T : Element<*, Z>, Z : Element<*,*>> T.add(block: T.() -> Unit): T {
-    block()
-    return this
-}
-
-
-public inline val HtmlPage.html: Html<HtmlPage>
+inline val HtmlPage.html: Html<HtmlPage>
     get() {
         (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
         return Html(self())
     }
 
+/**
+ * Root builder of HTML element with lambda with receiver.
+ */
 inline fun HtmlPage.html(block : Html<HtmlPage>.() -> Unit) : HtmlPage {
     (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
     return Html(self()).also { it.block() }.l
 }
 
+/**
+ * Text node property.
+ */
 inline var <T : Element<T,Z>, Z : Element<*,*>> T.text : T
     get() = self()
     set(value) {
@@ -43,8 +45,6 @@ inline var <T : Element<T,Z>, Z : Element<*,*>> T.text : T
             )
         )
     }
-
-
 
 /**
  * @param T type of the Element receiver
@@ -69,6 +69,11 @@ inline fun <T : Element<*,*>, Z : Element<*,*>, M> Element<T, Z>.await(crossinli
     }
     return this.self()
 }
+
+/**
+ * Appendable extension to build an HtmlDoc.
+ */
+fun Appendable.doc(block: HtmlDoc.() -> Unit): HtmlDoc = HtmlFlow.doc(this).also(block)
 
 /**
  * @param M type of the model (aka context object)
