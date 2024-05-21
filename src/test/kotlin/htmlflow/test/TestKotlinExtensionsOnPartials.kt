@@ -19,6 +19,25 @@ import java.util.*
  * and HtmlFlow site examples.
  */
 class TestKotlinExtensionsOnPartials {
+
+    private fun testOpeningExampleOfReadme() {
+        System.out.doc {
+            html {
+                head {
+                    title { text("HtmlFlow") }
+                }
+                body  {
+                    div {
+                        attrClass("container")
+                        h1 { text("My first HtmlFlow page") }
+                        img { attrSrc("http://bit.ly/2MoHwrU") }
+                        p { text("Typesafe is awesome! :-)") }
+                    }
+                }// body
+            } //html
+        } // doc
+    }
+
     /**
      * Sample showcase of data binding with HtmlDoc
      */
