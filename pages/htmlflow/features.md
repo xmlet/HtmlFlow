@@ -21,7 +21,7 @@ HtmlFlow builders:
 * element builders (such as `body()`, `div()`, `p()`, etc) return the **created element**
 * `text()` and `raw()` return the **parent element** (e.g. `.h1().text("...")` returns the `H1` parent). `text()`escapes HTML, while `raw()` doesn't.
 * attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
-* `__()` returns the **parent element** and **emits the end tag** of an element.
+* `__()` in Java or `l` in Kolin - returns the **parent element** and **emits the end tag** of an element.
 
 HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML.
 This allows the `Appendable` to be provided either _beforehand_ or _later_ when

@@ -9,7 +9,7 @@ permalink: index.html
     Java DSL for HTML
 </h3>
 <p>
-    HtmlFlow is a <strong>Java HTML builder</strong> to write <strong>typesafe HTML</strong> documents in a fluent style.
+    HtmlFlow is a <strong>Java HTML builder</strong> to write <strong>typesafe HTML</strong> documents in a fluent style, in both <strong>Java or Kotlin</strong>.
 </p>
 <p>
     The Java code on the <strong>left</strong> produces the HTML on the <strong>right</strong>.
@@ -18,10 +18,22 @@ permalink: index.html
 </p>
 
 
+  <div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exIntro01" data-toggle="tab">Java</a>
+        </li>
+        <li>
+            <a href="#exIntro02" data-toggle="tab">Kotlin</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exIntro01">
+
 <p>&nbsp;</p>
 <div class="row">
 <div class="col-md-7">
-
+          
 {% highlight java %}
 HtmlFlow
   .doc(System.out)
@@ -38,6 +50,7 @@ HtmlFlow
       .__() // body
     .__(); // html
 {% endhighlight %}
+
 
 </div>
 <div class="col-md-5">
@@ -62,6 +75,62 @@ HtmlFlow
 &#8598 &nbsp<code>Flowifier.fromHtml("...")</code>
 
 </div>
+</div>
+
+          </div>
+          <div class="tab-pane" id="exIntro02">
+
+<p>&nbsp;</p>
+<div class="row">
+<div class="col-md-7">
+          
+{% highlight kotlin %}
+System.out.doc {
+  html {
+    head {
+      title { text("HtmlFlow") }
+    }
+    body  {
+      div {
+        attrClass("container")
+        h1 { text("My first HtmlFlow page") }
+        img { attrSrc("http://bit.ly/2MoHwrU") }
+        p { text("Typesafe is awesome! :-)") }
+      }
+    }// body
+  } //html
+} // doc
+{% endhighlight %}
+
+
+</div>
+<div class="col-md-5">
+
+<em>output</em>&nbsp &#8628
+
+{% highlight html %}
+<html>
+  <head>
+    <title>HtmlFlow</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>My first HtmlFlow page</h1>
+      <img src="http://bit.ly/2MoHwrU">
+      <p>Typesafe is awesome! :-)</p>
+    </div>
+  </body>
+</html>
+{% endhighlight %}
+
+&#8598 &nbsp<code>Flowifier.fromHtml("...")</code>
+
+</div>
+</div>
+            
+
+          </div>
+  </div>
 </div>
 
 <p>&nbsp</p>
