@@ -1,7 +1,7 @@
 # HtmlFlow
 
 [![Build Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.xmlet%3Ahtmlflow)
-[![Maven Central Version](https://maven-badges.herokuapp.com/maven-central/com.github.xmlet/htmlflow/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cxmlet%20htmlflow)
+[![Maven Central Version](https://maven-badges.herokuapp.com/maven-central/com.github.xmlet/htmlflow/badge.svg)](https://search.maven.org/artifact/com.github.xmlet/htmlflow)
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
 [![javadoc HtmlApiFaster](https://img.shields.io/badge/javadocs-HtmlApiFaster-blue)](https://javadoc.io/doc/com.github.xmlet/htmlApiFaster/latest/org/xmlet/htmlapifaster/package-summary.html)
 [![javadoc HtmlFlow](https://img.shields.io/badge/javadocs-HtmlFlow-blue)](https://javadoc.io/doc/com.github.xmlet/htmlflow)
@@ -9,7 +9,7 @@
 [![Petclinic Sample](https://img.shields.io/badge/petclinic-Spring%20boot%20sample%20with%20HtmlFlow-blue)](https://github.com/xmlet/spring-petclinic)
 
 [**HtmlFlow**](https://htmlflow.org/) is a Java DSL to write **typesafe HTML**
-in a fluent style.
+in a fluent style, in both **Java** or **Kotlin** (for Kotlin check the [examples](https://htmlflow.org/features#data-binding))
 You may use the utility `Flowifier.fromHtml(String html)` if you need the HtmlFlow definition for an
 existing HTML source:
 
@@ -125,10 +125,10 @@ Bonus points it also produces only valid HTML according to HTML 5.2.
 ## Installation
 
 First, in order to include it to your Gradle project, simply add the following dependency,
-or use any other form provided in [Maven Central Repository](https://search.maven.org/artifact/com.github.xmlet/htmlflow/4.4/jar):
+or use any other form provided in [Maven Central Repository](https://search.maven.org/artifact/com.github.xmlet/htmlflow/4.6/jar):
 
 ```xml
-implementation 'com.github.xmlet:htmlflow:4.4'
+implementation 'com.github.xmlet:htmlflow:4.6'
 ```
 
 You can also download the artifact directly from [Maven

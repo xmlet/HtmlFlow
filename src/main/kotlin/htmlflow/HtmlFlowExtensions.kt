@@ -1,17 +1,50 @@
 package htmlflow
 
+//import jdk.internal.org.jline.utils.ShutdownHooks
 import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
+import htmlflow.visitor.HtmlVisitor
 import htmlflow.visitor.PreprocessingVisitor
 import org.xmlet.htmlapifaster.Element
+import org.xmlet.htmlapifaster.Html
+import org.xmlet.htmlapifaster.Text
 
+/**
+ * Alternative close tag function for `__()`.
+ */
 inline val <T : Element<*, Z>, Z : Element<*,*>> T.l: Z
     get() = this.`__`()
 
-inline fun <T : Element<*, Z>, Z : Element<*,*>> T.add(block: T.() -> Unit): T {
-    block()
-    return this
+/**
+ * Root property of HTML element.
+ */
+inline val HtmlPage.html: Html<HtmlPage>
+    get() {
+        (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
+        return Html(self())
+    }
+
+/**
+ * Root builder of HTML element with lambda with receiver.
+ */
+inline fun HtmlPage.html(block : Html<HtmlPage>.() -> Unit) : HtmlPage {
+    (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
+    return Html(self()).also { it.block() }.l
 }
 
+/**
+ * Text node property.
+ */
+inline var <T : Element<T,Z>, Z : Element<*,*>> T.text : T
+    get() = self()
+    set(value) {
+        visitor.visitText(
+            Text(
+                self(),
+                visitor,
+                value,
+            )
+        )
+    }
 
 /**
  * @param T type of the Element receiver
@@ -36,6 +69,11 @@ inline fun <T : Element<*,*>, Z : Element<*,*>, M> Element<T, Z>.await(crossinli
     }
     return this.self()
 }
+
+/**
+ * Appendable extension to build an HtmlDoc.
+ */
+fun Appendable.doc(block: HtmlDoc.() -> Unit): HtmlDoc = HtmlFlow.doc(this).also(block)
 
 /**
  * @param M type of the model (aka context object)
