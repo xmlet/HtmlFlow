@@ -68,6 +68,8 @@ HtmlView<List<Track>> playlistView = HtmlFlow.view(view -> view
         <div class="tab-pane" id="exLoop03">
 
 {% highlight kotlin %}
+import htmlflow.*
+
 fun Appendable.playlistDoc(tracks: List<Track>) {
   doc {
     .html {
@@ -92,6 +94,8 @@ fun Appendable.playlistDoc(tracks: List<Track>) {
         <div class="tab-pane" id="exLoop04">
 
 {% highlight kotlin %}
+import htmlflow.*
+
 val playlistView = view<List<Track>> {
   html {
     body {

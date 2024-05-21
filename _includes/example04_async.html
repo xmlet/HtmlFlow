@@ -41,6 +41,8 @@ HtmlViewAsync<Flux<Track>> playlistView = HtmlFlow.viewAsync(view -> view
       <div class="tab-pane" id="exAsync02">
 
 {% highlight kotlin %}
+import htmlflow.*
+
 val playlistView = viewAsync<Flux<Track>> {
   html {
       body {
@@ -66,6 +68,8 @@ val playlistView = viewAsync<Flux<Track>> {
       <div class="tab-pane" id="exAsync03">
 
 {% highlight kotlin %}
+import htmlflow.*
+
 val playlistView = viewSuspend<Flux<Track>> {
   html {
       body {

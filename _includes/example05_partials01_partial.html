@@ -32,6 +32,8 @@ static void partialInputField(Div<?> container, String label, String id, Object 
     <div class="tab-pane" id="exPartial02">
 
 {% highlight kotlin %}
+import htmlflow.*
+
 fun Div<*>.partialInputField(label: String, id: String, value: Any) {
     div {
         attrClass("form-group")

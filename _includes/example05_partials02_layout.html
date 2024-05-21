@@ -41,6 +41,8 @@ public class Layout {
       <div class="tab-pane" id="exLayout02">
   
 {% highlight kotlin %}
+import htmlflow.*
+
 fun ownerView(navbar: (Nav<*>) -> Unit, content: Div<*>.() -> Unit): HtmlView<Owner> {
     return view<Owner> {
         html {
