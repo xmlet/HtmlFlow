@@ -1,5 +1,16 @@
+<div>	
+  <ul  class="nav nav-tabs">
+      <li class="active">
+          <a  href="#exPartial01" data-toggle="tab">Java Partial</a>
+      </li>
+      <li>
+          <a href="#exPartial02" data-toggle="tab">Kotlin Partial</a>
+      </li>
+  </ul>
+  <div class="tab-content">
+      <div class="tab-pane active" id="exPartial01">
 
-```java
+{% highlight java %}
 static void partialInputField(Div<?> container, String label, String id, Object value) {
     container
         .div().attrClass("form-group")
@@ -15,12 +26,47 @@ static void partialInputField(Div<?> container, String label, String id, Object 
             .__() // input
         .__(); // div
 }
-```
+{% endhighlight %}
 
-This partial could be used inside another template.
+    </div>
+    <div class="tab-pane" id="exPartial02">
 
-```java
-static void ownerTemplate(Div<?> container) {
+{% highlight kotlin %}
+fun Div<*>.partialInputField(label: String, id: String, value: Any) {
+    div {
+        attrClass("form-group")
+        label { text(label) }
+        input {
+            attrClass("form-control")
+            attrType(EnumTypeInputType.TEXT)
+            attrId(id)
+            attrName(id)
+            attrValue(value.toString())
+        } // input
+    } // div
+}
+{% endhighlight %}
+      
+          </div>
+  </div>
+</div>
+
+This partial could be used inside another partial.
+
+<div>	
+  <ul  class="nav nav-tabs">
+      <li class="active">
+          <a  href="#exPartial01div" data-toggle="tab">Java Partial</a>
+      </li>
+      <li>
+          <a href="#exPartial02div" data-toggle="tab">Kotlin Partial</a>
+      </li>
+  </ul>
+  <div class="tab-content">
+      <div class="tab-pane active" id="exPartial01div">
+
+{% highlight java %}
+static void partialOwner(Div<?> container) {
   container
     .h2()
       .text("Owner")
@@ -31,4 +77,27 @@ static void ownerTemplate(Div<?> container) {
         .<Owner>dynamic((div, owner) -> partialInputField(div, "Name", "name", owner.getName()))
         .<Owner>dynamic((div, owner) -> partialInputField(div, "Address", "address", owner.getAddress()))
     ...
-```
+{% endhighlight %}
+
+    </div>
+    <div class="tab-pane" id="exPartial02div">
+
+{% highlight kotlin %}
+fun Div<*>.partialOwner() {
+    h2 { text("Owner") }
+    form {
+        attrMethod(EnumMethodType.POST)
+        div {
+            attrClass("form-group has-feedback")
+            dyn { owner: Owner ->
+                partialInputField("Name", "name", owner.name)
+                partialInputField("Address", "address", owner.address)
+            }
+        } // div
+    } // form
+}
+{% endhighlight %}
+      
+          </div>
+  </div>
+</div>

@@ -1,20 +1,77 @@
-```java
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exView01" data-toggle="tab">Java View</a>
+        </li>
+        <li>
+            <a href="#exView02" data-toggle="tab">Kotlin View</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exView01">
+  
+{% highlight java %}
 public class OwnerView {
 
-    static final HtmlView view = Layout
-        .view(Navbar::navbarFragment, OwnerView::ownerTemplate);
-...
+  static final HtmlView view = Layout
+    .view(Navbar::navbarFragment, OwnerView::partialOwner);
+  ...
 }
-```
+{% endhighlight %}
+  
+      </div>
+      <div class="tab-pane" id="exView02">
+  
+{% highlight kotlin %}
+class OwnerView {
+
+    val view = ownerView(::navbarFragment) { partialOwner() }
+    ...
+}
+{% endhighlight %}
+        
+            </div>
+    </div>
+  </div>
+  
 
 Given this view we may render it with a `Owner` object.
 For example, the `OwnerController` edit handler may be defined as:
 
-```java
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exRender01" data-toggle="tab">Java View</a>
+        </li>
+        <li>
+            <a href="#exRender02" data-toggle="tab">Kotlin View</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exRender1">
+  
+{% highlight java %}
 @GetMapping("/owners/{ownerId}/edit")
 @ResponseBody
 public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId) {
     Owner owner = ownersRepository.findById(ownerId);
     return OwnerView.view.render(owner);
 }
-```
+{% endhighlight %}
+  
+      </div>
+      <div class="tab-pane" id="exRender02">
+  
+{% highlight kotlin %}
+@GetMapping("/owners/{ownerId}/edit")
+@ResponseBody
+fun initUpdateOwnerForm(@PathVariable("ownerId") ownerId: Int) {
+    val owner = ownersRepository.findById(ownerId);
+    return view.render(owner);
+}
+
+{% endhighlight %}
+    
+        </div>
+</div>
+</div>

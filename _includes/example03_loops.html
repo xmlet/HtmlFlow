@@ -6,6 +6,12 @@
         <li>
             <a href="#exLoop02" data-toggle="tab">HtmlView</a>
         </li>
+        <li>
+            <a href="#exLoop03" data-toggle="tab">Kotlin doc</a>
+        </li>
+        <li>
+            <a href="#exLoop04" data-toggle="tab">Kotlin view</a>
+        </li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="exLoop01">
@@ -59,5 +65,53 @@ HtmlView<List<Track>> playlistView = HtmlFlow.view(view -> view
 {% endhighlight %}
     
         </div>
+        <div class="tab-pane" id="exLoop03">
+
+{% highlight kotlin %}
+fun Appendable.playlistDoc(tracks: List<Track>) {
+  doc {
+    .html {
+      body {
+        table {
+          tr {
+            th { text("Artist") }
+            th { text("Track") }
+          }
+          tracks.forEach { track ->
+            tr { td { text(track.artist) } }
+            tr { td { text(track.name) } }
+          }
+        } // table
+      } // body
+    } // html
+  } // doc
+}
+{% endhighlight %}
+              
+        </div>          
+        <div class="tab-pane" id="exLoop04">
+
+{% highlight kotlin %}
+val playlistView = view<List<Track>> {
+  html {
+    body {
+      table {
+        tr {
+          th { text("Artist") }
+          th { text("Track") }
+        }
+        dyn { tracks: List<Track> -> tracks
+          .forEach { track ->
+              tr { td { text(track.artist) } }
+              tr { td { text(track.name) } }
+          }
+        }
+      } // table
+    } // body
+  } // html
+}
+{% endhighlight %}
+                        
+        </div>                    
     </div>
 </div>    

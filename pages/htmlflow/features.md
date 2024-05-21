@@ -8,7 +8,7 @@ permalink: features
 
 HtmlFlow is **unopinionated** and eliminates the need for a special templating
 dialect. All control flow is executed through the host language (i.e., Java),
-fluently chained with HtmlFlow blocks using the `of()` or `dynamic()` builders.
+fluently chained with HtmlFlow blocks using the `of()` or `dynamic()` builders (or `dyn` for Kotlin).
 
 After introducing the core concepts of HtmlFlow, we present a couple of examples
 demonstrating some of the most common usages with HtmlFlow. However, it's
@@ -66,11 +66,11 @@ Next, we have an example of a dynamic web page binding to a `Track` object.
 
 {% include example01_bind.html %}
 
-The `of()` and `dynamic()` builders in `HtmlDoc` and `HtmlView`, respectively,
+The `of()` and `dynamic()` builders (or `dyn` for Kotlin) in `HtmlDoc` and `HtmlView`, respectively,
 are utilized to chain Java code in the definition of web templates:
 
 * `of(Consumer<E> cons)` returns the same element `E`, where `E` is the parent HTML element. 
-* `dynamic(BiConsumer<E, M> cons)` - similar to `.of()` but the consumer receives an additional argument `M` (model). 
+* `dynamic(BiConsumer<E, M> cons)` (or `E.dyn(cons: E.(M) -> Unit): E` for Kotlin)- similar to `.of()` but the consumer receives an additional argument `M` (model). 
 
 ## If/else
 
@@ -102,6 +102,11 @@ To bind an asynchronous model, one should use the builder
 where the `onCompletion` callback signals to HtmlFlow that it can proceed to the
 next continuation.
 
+Alternatively, with Kotlin, you can avoid using the `onCompletion` callback.
+Instead, you can use a suspending lambda with the `suspending` builder. This
+allows your code to **pause** at the suspension point and **resume**
+automatically when ready.
+
 Next we present the asynchronous version of the playlist web template.
 Instead of a `List<Track>` we are binding to a [Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html),
 which is a Reactive Streams [`Publisher`](https://www.reactive-streams.org/reactive-streams-1.0.3-javadoc/org/reactivestreams/Publisher.html?is-external=true) with reactive operators that emits 0 to N elements.
@@ -130,7 +135,7 @@ which creates a fragment for a `div` containing a `label` and an `input`.
 
 {% include example05_partials01_partial.html %}
 
-Notice, the function `ownerTemplate` is in turn another fragment that receives a `Div` element.
+Notice, the function `partialOwner` is in turn another fragment that receives a `Div` element.
 
 **Remember** when calling a fragment to use a `dynamic()` block to avoid storing it internally as a static HTML block and make it render whenever you call it with a model. Do not use the builder `of()` to include a dynamic fragment.
 
@@ -151,7 +156,7 @@ For example, the following layout uses an auxiliary `navbar` and `content` fragm
 To chain the call of fragments fluently we take advantage of the auxiliary HtmlFlow builder `of()` that let us chain a consumer of the last created element.
 Notice `.of(navbar::accept)` is equivalent to write in Java `.of(nav -> navbar.accept(nav))`.
 
-Once defined the layout and considering the previous example of the `ownerTemplate` we may build
+Once defined the layout and considering the previous example of the `partialOwner` we may build
 a owner view with:
 
 {% include example05_partials03_view.html %}
