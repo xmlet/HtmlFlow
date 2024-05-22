@@ -28,11 +28,57 @@ This allows the `Appendable` to be provided either _beforehand_ or _later_ when
 the view is rendered.
 The `doc()` and `view()` factory methods follow each of these approaches:
 <ul>
-    <li>
-{% highlight java %}/* eager */ HtmlFlow.doc(System.out).html().body().div().table()...{% endhighlight %}
+    <li><strong>Eager</strong>
+
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exEager01" data-toggle="tab">Java</a>
+        </li>
+        <li>
+            <a  href="#exEager02" data-toggle="tab">Kotlin</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exEager01">
+
+{% highlight java %}HtmlFlow.doc(System.out).html().body().h1().text("Welcome").__().table().tr()...{% endhighlight %}
+
+        </div>
+        <div class="tab-pane" id="exEager02">
+
+{% highlight kotlin %}System.out.doc { html { body { h1.text("Welcome").l.table { tr {...} } } } }{% endhighlight %}
+
+        </div>
+    </div>
+</div>
+
     </li>
-    <li>
-{% highlight java %}/* lazy */ var view = HtmlFlow.view(page -> page.html().body().div().table()...){% endhighlight %}
+    <li><strong>Lazy</strong>
+
+<div>	
+    <ul  class="nav nav-tabs">
+        <li class="active">
+            <a  href="#exLazy01" data-toggle="tab">Java</a>
+        </li>
+        <li>
+            <a  href="#exLazy02" data-toggle="tab">Kotlin</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="exLazy01">
+
+{% highlight java %}var view = HtmlFlow.<Model>view(page -> page.html().body().text("Welcome").__().table().tr()...){% endhighlight %}
+
+        </div>
+        <div class="tab-pane" id="exLazy02">
+
+{% highlight kotlin %}val view = view<Model> { html { body { h1.text("Welcome").l.table { tr {...} } } } }{% endhighlight %}
+
+        </div>
+    </div>
+</div>
+
     </li>
 </ul>
 
