@@ -146,10 +146,22 @@ HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTM
 This allows the `Appendable` to be provided either _beforehand_ or _later_ when
 the view is rendered.
 The `doc()` and `view()` factory methods follow each of these approaches:
-* eager: `HtmlFlow.doc(System.out).html().body().h1().text("Welcome").__().table().tr()...`
-* eager in Kotlin: `System.out.doc { html { body { h1.text("Welcome").l.table { tr {...} } } } }`
-* lazy: `var view = HtmlFlow.<Model>view(page -> page.html().body().text("Welcome").__().table().tr()...)`
-* lazy in Kotlin: `val view = view<Model> { html { body { h1.text("Welcome").l.table { tr {...} } } } }`
+* **eager**:
+  ```java
+  HtmlFlow.doc(System.out).html().body().h1().text("Welcome").__().table().tr()...
+  ```
+* **eager in Kotlin**:
+  ```kotlin
+  System.out.doc { html { body { h1.text("Welcome").l.table { tr {...} } } } }
+  ```
+* **lazy**:
+  ```java
+  var view = HtmlFlow.<Model>view(page -> page.html().body().text("Welcome").__().table().tr()...)
+  ```
+* **lazy in Kotlin**:
+  ```kotlin
+  val view = view<Model> { html { body { h1.text("Welcome").l.table { tr {...} } } } }
+  ```
 
 An `HtmlView` is more **performant** than an `HtmlDoc` when we need to bind
 the same template with different data **models**.
