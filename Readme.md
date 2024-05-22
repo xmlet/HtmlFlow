@@ -140,14 +140,16 @@ HtmlFlow builders:
 * element builders (such as `body()`, `div()`, `p()`, etc) return the **created element**
 * `text()` and `raw()` return the **parent element** (e.g. `.h1().text("...")` returns the `H1` parent). `.text()`escapes HTML, while `raw()` doesn't.
 * attribute builders - `attr<attribute name>()` - return their parent (e.g. `.img().attrSrc("...")` returns the `Img`).
-* `__()` returns the **parent element** and **emits the end tag** of an element.
+* `__()` or `l` in Kotlin, returns the **parent element** and **emits the end tag** of an element.
 
 HtmlFlow provides both an **_eager_** and a **_lazy_** approach for building HTML.
 This allows the `Appendable` to be provided either _beforehand_ or _later_ when
 the view is rendered.
 The `doc()` and `view()` factory methods follow each of these approaches:
-* eager: `HtmlFlow.doc(System.out).html().body().div().table()...`
-* lazy: `var view = HtmlFlow.view(page -> page.html().body().div().table()...)`
+* eager: `HtmlFlow.doc(System.out).html().body().h1().text("Welcome").__().table().tr()...`
+* eager in Kotlin: `System.out.doc { html { body { h1.text("Welcome").l.table { tr {...} } } } }`
+* lazy: `var view = HtmlFlow.<Model>view(page -> page.html().body().text("Welcome").__().table().tr()...)`
+* lazy in Kotlin: `val view = view<Model> { html { body { h1.text("Welcome").l.table { tr {...} } } } }`
 
 An `HtmlView` is more **performant** than an `HtmlDoc` when we need to bind
 the same template with different data **models**.
