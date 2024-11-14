@@ -77,6 +77,23 @@ public class TestIndentation {
         String actual = view.setIndented(false).render();
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void viewWithTextAreaAndIndent() {
+        HtmlView<?> view = HtmlFlow.view(page -> page
+                .div()
+                .textarea()
+                .text("Sample text\nfoo\nbar")
+                .__()
+                .script()
+                .raw("// some comment" + lineSeparator() +
+                        "console.log('Hello world');")
+                .__() // script
+                .__()); // div
+
+        String actual = view.setIndented(true).render();
+        assertEquals(expected, actual);
+    }
     @Test
     public void viewAsyncWithNoIndent() {
         HtmlViewAsync<?> view = HtmlFlow.viewAsync(page -> page
