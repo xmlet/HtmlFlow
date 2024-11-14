@@ -91,8 +91,21 @@ public class TestIndentation {
                 .__() // script
                 .__()); // div
 
+
+        String expectedResult = 
+        "<div>" + lineSeparator() +
+        "    <textarea>" + lineSeparator() +
+        "Sample text" + lineSeparator() +
+        "foo" + lineSeparator() +
+        "bar" + lineSeparator() +
+        "    </textarea>" + lineSeparator() + 
+        "    <script>// some comment" + lineSeparator() +
+        "        console.log('Hello world');" + lineSeparator()+
+        "    </script>" + lineSeparator() +
+        "</div>";
+
         String actual = view.setIndented(true).render();
-        assertEquals(expected, actual);
+        assertEquals(expectedResult, actual);
     }
     @Test
     public void viewAsyncWithNoIndent() {
