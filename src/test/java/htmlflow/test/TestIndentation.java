@@ -94,14 +94,14 @@ public class TestIndentation {
 
         String expectedResult = 
         "<div>" + lineSeparator() +
-        "    <textarea>" + lineSeparator() +
+        "\t<textarea>"+lineSeparator() +
         "Sample text" + lineSeparator() +
         "foo" + lineSeparator() +
-        "bar" + lineSeparator() +
-        "    </textarea>" + lineSeparator() + 
-        "    <script>// some comment" + lineSeparator() +
-        "        console.log('Hello world');" + lineSeparator()+
-        "    </script>" + lineSeparator() +
+        "bar</textarea>" + lineSeparator() +
+        "\t<script>" + lineSeparator() +
+        "\t\t// some comment" + lineSeparator() +
+        "console.log('Hello world');" + lineSeparator() +
+        "\t</script>" + lineSeparator() +
         "</div>";
 
         String actual = view.setIndented(true).render();
