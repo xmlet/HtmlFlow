@@ -13,8 +13,12 @@
 {% highlight java %}
 public class OwnerView {
 
-  static final HtmlView view = Layout
+  private static final HtmlView view = Layout
     .view(Navbar::navbarFragment, OwnerView::partialOwner);
+  
+  public static String render(Owner owner){
+    return view.render(owner);
+  }
   ...
 }
 {% endhighlight %}
@@ -55,7 +59,7 @@ For example, the `OwnerController` edit handler may be defined as:
 @ResponseBody
 public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId) {
     Owner owner = ownersRepository.findById(ownerId);
-    return OwnerView.view.render(owner);
+    return OwnerView.render(owner);
 }
 {% endhighlight %}
   
