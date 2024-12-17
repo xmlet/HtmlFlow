@@ -313,12 +313,14 @@ HtmlFlow _await_ feature works regardless the type of asynchronous model and can
 any kind of asynchronous API.
 
 ## References
+
+* 2024 [Progressive Server-Side Rendering with Suspendable Web Templates](background/wise-2024-pssr-async-await.pdf), 25th edition of [WISE](https://wise2024-qatar.com/), Doha, Qatar, ([slides](https://gamboa.pt/img/my-papers/wise-2024-slides.pdf)).
 * 2023,
   [Enhancing SSR in Low-Thread Web Servers](https://www.scitepress.org/Link.aspx?doi=10.5220/0012165300003584),
   [19th WebIst](http://www.webist.org/?y=2023) conference, 2013, Rome - This paper highlights the HtmlFlow templating
   approach that embraces any asynchronous AP I (e.g., Publisher, promises,
   suspend functions, flow, etc.) and allows for multiple asynchronous data
-  sources.
+  sources ([slides](https://gamboa.pt/img/my-papers/webist-2023-slides.pdf)).
 * 2020, [Text Web Templates Considered Harmful](https://link.springer.com/chapter/10.1007/978-3-030-61750-9_4),
   Part of the Lecture Notes in Business Information Processing book series (LNBIP, volume 399).
   This paper shows how a DSL for HTML (such as HtmlFlow or Kotlinx.Html)
