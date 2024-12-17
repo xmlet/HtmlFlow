@@ -314,7 +314,7 @@ any kind of asynchronous API.
 
 ## References
 
-* 2024 [Progressive Server-Side Rendering with Suspendable Web Templates](https://gamboa.pt/img/my-papers/wise-2024-pssr-async-await.pdf), 25th edition of [WISE](https://wise2024-qatar.com/), Doha, Qatar, ([slides](https://gamboa.pt/img/my-papers/wise-2024-slides.pdf)).
+* 2024, [Progressive Server-Side Rendering with Suspendable Web Templates](https://gamboa.pt/img/my-papers/wise-2024-pssr-async-await.pdf), 25th edition of [WISE](https://wise2024-qatar.com/), Doha, Qatar, ([slides](https://gamboa.pt/img/my-papers/wise-2024-slides.pdf)).
 * 2023,
   [Enhancing SSR in Low-Thread Web Servers](https://www.scitepress.org/Link.aspx?doi=10.5220/0012165300003584),
   [19th WebIst](http://www.webist.org/?y=2023) conference, 2013, Rome - This paper highlights the HtmlFlow templating
