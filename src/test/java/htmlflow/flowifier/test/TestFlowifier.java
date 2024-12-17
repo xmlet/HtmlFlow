@@ -90,8 +90,8 @@ public class TestFlowifier {
     }
 
     @Test
-    public void testFlowifierWithJavasyncOrg() throws Exception {
-        testFlowifier("https://javasync.org");
+    public void testFlowifierWithGamboa() throws Exception {
+        testFlowifier("https://gamboa.pt/");
     }
 
     @Test
