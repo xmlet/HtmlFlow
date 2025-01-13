@@ -14,7 +14,7 @@ public class Student {
     
     @Override
     public String toString() {
-        return String.format("Student nr " + nr + " with name " + name);
+        return String.format("Student nr %d with name %s",nr, name);
     }
     
     public long getNr() {

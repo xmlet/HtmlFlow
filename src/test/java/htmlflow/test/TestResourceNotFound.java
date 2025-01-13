@@ -36,6 +36,7 @@ import java.lang.reflect.Field;
  *  resource for HTML template.
  *  To that end we use a custom ClassLoader, the ClassLoaderGw, that
  *  will fail to load resources.
+ *  We load it and access it via Reflection to avoid Jitter fall in default ClassLoader.
  *
  * @author Miguel Gamboa
  *         created on 20-09-2017
@@ -49,7 +50,7 @@ public class TestResourceNotFound {
         Class<?> klassView = gw.loadClass("htmlflow.HtmlPage");
         Field f = klassView.getDeclaredField("HEADER");
         f.setAccessible(true);
-        Object header = f.get(null);
+        f.get(null);
     }
 }
 
@@ -59,6 +60,7 @@ class ClassLoaderGw extends ClassLoader {
         super(null);
     }
 
+    @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
         try{
             InputStream classData = ClassLoader.getSystemResourceAsStream(name.replace('.', '/') + ".class");

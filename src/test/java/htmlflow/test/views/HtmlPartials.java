@@ -111,7 +111,6 @@ public class HtmlPartials {
         final StringBuilder actual = new StringBuilder();
         trackDoc(actual, spaceOddity);
         assertEquals(actual.toString(), trackView.render(spaceOddity));
-        // trackView.setOut(System.out).write(spaceOddity);
     }
 
     private void playlistDoc(Appendable out, List<Track> tracks) {
@@ -162,7 +161,6 @@ public class HtmlPartials {
         final StringBuilder actual = new StringBuilder();
         playlistDoc(actual, tracks);
         assertEquals(actual.toString(), playlistView.render(tracks));
-        // playlistView.setOut(System.out).write(tracks);
     }
 
     /**

@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class TestBooleanAttributes {
-    static final String expectedNoAttribute = "" +
+    static final String EXPECTED_NO_ATTRIBUTE = "" +
             "<!DOCTYPE html>" +
             "<html>" +
             "<body>" +
@@ -30,10 +30,10 @@ public class TestBooleanAttributes {
                 .__() // button
                 .__() // body
                 .__(); // html
-        assertEquals(expectedNoAttribute, buffer.toString());
+        assertEquals(EXPECTED_NO_ATTRIBUTE, buffer.toString());
     }
 
-    static final String expectedAttribute = "" +
+    static final String EXPECTED_ATTRIBUTE = "" +
             "<!DOCTYPE html>" +
             "<html>" +
             "<body>" +
@@ -57,7 +57,7 @@ public class TestBooleanAttributes {
                 .__() // button
                 .__() // body
                 .__(); // html
-        assertEquals(expectedAttribute, buffer.toString());
+        assertEquals(EXPECTED_ATTRIBUTE, buffer.toString());
     }
 
 }

@@ -42,11 +42,9 @@ import org.xmlet.htmlapifaster.Tr;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
@@ -56,11 +54,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestTable {
 
-    private static final Logger LOGGER = Logger.getLogger("htmlflow.test");
     private static final Pattern NEWLINE = Pattern.compile("\n");
 
     @Test
-    public void testSimpleTableRender() throws IOException{
+    public void testSimpleTableRender() {
         /*
          * Arrange
          */
@@ -77,7 +74,7 @@ public class TestTable {
     }
 
     @Test
-    public void testSimpleTableWrite() throws IOException{
+    public void testSimpleTableWrite() {
         /*
          * Arrange and Act
          */
@@ -111,13 +108,13 @@ public class TestTable {
     }
 
     @Test
-    public void testTableWithBinding() throws IOException{
+    public void testTableWithBinding() {
         /*
          * Act
          */
-        Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High, Status.Progress);
-        Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.Normal, Status.Completed);
-        Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High, Status.Deferred);
+        Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH, Status.PROGRESS);
+        Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.NORMAL, Status.COMPLETED);
+        Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.HIGH, Status.DEFERRED);
         List<Task> tasks = Arrays.asList(t1, t2, t3);
         String html = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
         /*
@@ -129,9 +126,9 @@ public class TestTable {
     @Test
     public void testTableWithPartialsBindingTwiceToPrintStream() {
         List<Task> dataSource = Arrays.asList(
-                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-                new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
-                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH),
+                new Task("Special dinner", "Have dinner with someone!", Priority.NORMAL),
+                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.HIGH)
         );
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlView view = HtmlFlow.view(
@@ -148,9 +145,9 @@ public class TestTable {
     @Test
     public void testTableWithPartialsBindingTwice() {
         List<Task> dataSource = Arrays.asList(
-                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-                new Task("Special dinner", "Have dinner with someone!", Priority.Normal),
-                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.High)
+                new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH),
+                new Task("Special dinner", "Have dinner with someone!", Priority.NORMAL),
+                new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.HIGH)
         );
         HtmlView view = HtmlFlow.view(HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
         validateBindingTable(view.render(dataSource));
@@ -165,13 +162,12 @@ public class TestTable {
                 .loadLines("TaskList.html")
                 .forEach(expected -> {
                     String line = iter.next();
-                    // System.out.println(line);
                     assertEquals(expected, line);
                 });
 
     }
 
-    private static void assertTaskHtmlView(byte[] html, List<Task> output) throws UnsupportedEncodingException {
+    private static void assertTaskHtmlView(byte[] html, List<Task> output) {
         org.w3c.dom.Element elem = Utils.getRootElement(html);
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
@@ -201,10 +197,9 @@ public class TestTable {
             String prio = tr.getChildNodes().item(5).getFirstChild().getNodeValue().trim();
             assertEquals(output.get(i).getPriority().toString(), prio);
         }
-        // LOGGER.log(Level.INFO, mem.toString());
     }
 
-    private static void assertSimpleHtmlView(byte[] html, int[][] output) throws UnsupportedEncodingException {
+    private static void assertSimpleHtmlView(byte[] html, int[][] output) {
         org.w3c.dom.Element elem = Utils.getRootElement(html);
         assertEquals(Html.class.getSimpleName().toLowerCase(), elem.getNodeName());
         NodeList childNodes = elem.getChildNodes();
@@ -225,6 +220,5 @@ public class TestTable {
                 assertEquals(output[i][j], Integer.parseInt(val));
             }
         }
-        // LOGGER.log(Level.INFO, mem.toString());
     }
 }

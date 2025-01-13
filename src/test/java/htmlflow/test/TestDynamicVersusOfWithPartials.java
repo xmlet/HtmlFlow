@@ -67,7 +67,6 @@ public class TestDynamicVersusOfWithPartials {
             .map(String::toLowerCase)
             .forEach(expected -> {
                 String line = iter.next();
-                // System.out.println(line);
                 assertEquals(expected, line);
             });
     }
@@ -94,12 +93,12 @@ class HtmlLists {
         view
                 .<AModel>dynamic((v, mod) -> v
                         .div()
-                        .of(__ -> HtmlLists.taskDetailsTemplateFregment(v.div(), mod))
+                        .of(ignore -> HtmlLists.taskDetailsTemplateFregment(v.div()))
                         .__()
                 );
     }
 
-    public static void taskDetailsTemplateFregment(Div<?> view, AModel model ) {
+    public static void taskDetailsTemplateFregment(Div<?> view ) {
         view.p().text("test").__();
     }
 

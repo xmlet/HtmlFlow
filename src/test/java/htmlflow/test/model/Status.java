@@ -27,5 +27,5 @@ package htmlflow.test.model;
  * @author Miguel Gamboa
  */
 public enum Status {
-    Unstarted, Progress, Completed, Deferred
+    UNSTARTED, PROGRESS, COMPLETED, DEFERRED
 }

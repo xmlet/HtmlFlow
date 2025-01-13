@@ -37,7 +37,6 @@ import org.xmlet.htmlapifaster.Html;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 import static htmlflow.test.Utils.NEWLINE;
 import static org.junit.Assert.assertEquals;
@@ -49,7 +48,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestAttributesClassId {
 
-    private static final Logger LOGGER = Logger.getLogger("htmlflow.test");
     private static final String DIV_NAME = Div.class.getSimpleName().toLowerCase();
 
     @Test
@@ -75,11 +73,10 @@ public class TestAttributesClassId {
     }
 
     private void assertHtml(String actual){
-        // System.out.println(result);
         assertTrue(actual.contains("<div"));
         assertTrue(actual.contains("</div>"));
-        assertTrue(actual.contains(HtmlLists.divClass));
-        assertTrue(actual.contains(HtmlLists.divId));
+        assertTrue(actual.contains(HtmlLists.DIV_CLASS));
+        assertTrue(actual.contains(HtmlLists.DIV_ID));
         assertTrue(actual.contains("toto=\"tutu\""));
         assertTrue("should contains <script type=\"text/javascript\" src=\"test.css\">",
             actual.contains("<script type=\"text/javascript\" src=\"test.css\">"));

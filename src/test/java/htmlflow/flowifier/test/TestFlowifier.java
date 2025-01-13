@@ -38,7 +38,6 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -90,8 +89,8 @@ public class TestFlowifier {
     }
 
     @Test
-    public void testFlowifierWithJavasyncOrg() throws Exception {
-        testFlowifier("https://javasync.org");
+    public void testFlowifierWithGamboa() throws Exception {
+        testFlowifier("https://gamboa.pt/");
     }
 
     @Test
@@ -100,7 +99,7 @@ public class TestFlowifier {
     }
 
     @Test
-    public void testSample05ForFlowifier() throws IOException {
+    public void testSample05ForFlowifier() {
         String src = "<!DOCTYPE html>" +
             "<html>" +
             "<head><title>HtmlFlow</title></head>" +

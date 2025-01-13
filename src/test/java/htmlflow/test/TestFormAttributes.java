@@ -28,8 +28,6 @@ import htmlflow.HtmlPage;
 import htmlflow.HtmlViewAsync;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -59,7 +57,6 @@ public class TestFormAttributes {
                 .__()
                 .__());
         view.writeAsync(System.out, null).join();
-        // view.setIndented(false).writeAsync(System.out, null).join();
     }
 
     /**
@@ -82,7 +79,7 @@ public class TestFormAttributes {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testCheckTextInterleavedInFormWithinAttributes() throws IOException {
+    public void testCheckTextInterleavedInFormWithinAttributes() {
         final String style = "width: 89%; height: 77px;";
         HtmlFlow
                 .doc(System.out)

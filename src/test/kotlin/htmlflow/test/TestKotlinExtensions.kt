@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 import htmlflow.HtmlFlow.doc
 import org.xmlet.htmlapifaster.EnumRelType
 import htmlflow.*
-
+import org.xmlet.htmlapifaster.*
 
 data class Weather(val country: String, val locations: Iterable<Location>)
 data class Location(val city: String, val desc: String, val celsius: Int)

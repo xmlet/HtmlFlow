@@ -40,7 +40,6 @@ import org.xmlet.htmlapifaster.Link;
 import org.xmlet.htmlapifaster.Title;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
@@ -66,10 +65,10 @@ public class TestDivDetails {
     public TestDivDetails() {
         this.expectedTaskViews =
                 Stream.of(
-                        new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-                        new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
-                        new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High),
-                        new Task(9, "Web Summit 2018", "Sir Tim Berners-Lee", Priority.High)
+                        new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH),
+                        new Task(4, "Special dinner", "Moonlight dinner!", Priority.NORMAL),
+                        new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.HIGH),
+                        new Task(9, "Web Summit 2018", "Sir Tim Berners-Lee", Priority.HIGH)
                 ).collect(Collectors.toMap(
                         identity(),
                         task -> loadLines(format("task%d.html", task.getId()))
@@ -77,20 +76,11 @@ public class TestDivDetails {
     }
 
     @Test
-    public void testDivDetailsWithoutBinding() throws IOException {
+    public void testDivDetailsWithoutBinding() {
         //
         // Produces an HTML document
         //
         String html = HtmlLists.viewDetails.render();
-
-        /*
-        HtmlLists   // 2) print to the standard output
-            .viewDetails(HtmlView.html(System.out));
-
-        HtmlView view = HtmlView.html(new PrintStream(new FileOutputStream("details.html")));
-        HtmlLists   // 3) write to details.html file
-            .viewDetails(view);
-        */
         /*
          * Assert HTML document main structure
          */
