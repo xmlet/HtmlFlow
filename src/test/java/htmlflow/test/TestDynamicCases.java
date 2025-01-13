@@ -6,7 +6,6 @@ import htmlflow.test.views.HtmlDynamicChainTwiceOnTopgenius;
 import org.junit.Test;
 
 import java.util.Iterator;
-import java.util.stream.Stream;
 
 import static htmlflow.test.Utils.NEWLINE;
 import static htmlflow.test.views.HtmlDynamicChainTwiceOnTopgenius.toptracksOkOfWithDynamic;

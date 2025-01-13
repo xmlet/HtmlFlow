@@ -35,8 +35,8 @@ import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
 public class HtmlLists {
-    public static final String divClass = "divClass";
-    public static final String divId = "divId";
+    public static final String DIV_CLASS = "divClass";
+    public static final String DIV_ID = "divId";
 
     public static HtmlPage taskView (Appendable out) {
         return HtmlFlow.doc(out)
@@ -52,8 +52,8 @@ public class HtmlLists {
                         .comment("A simple dummy comment")
                     .__() //div
                     .div()
-                        .attrId(divId)
-                        .attrClass(divClass)
+                        .attrId(DIV_ID)
+                        .attrClass(DIV_CLASS)
                         .addAttr("toto", "tutu")
                         .form()
                             .attrAction("/action.do")

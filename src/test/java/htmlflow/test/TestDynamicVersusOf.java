@@ -85,7 +85,6 @@ public class TestDynamicVersusOf {
             .map(String::toLowerCase)
             .forEach(expected -> {
                 String line = iter.next();
-                // System.out.println(line);
                 assertEquals(expected, line);
             });
     }

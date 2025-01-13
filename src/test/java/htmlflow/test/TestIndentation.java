@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestIndentation {
 
-    static final String expected = "<div><textarea>Sample text" + lineSeparator() +
+    static final String EXPECTED = "<div><textarea>Sample text" + lineSeparator() +
             "foo" + lineSeparator() +
             "bar</textarea><script>// some comment" + lineSeparator() +
             "console.log('Hello world');</script></div>";
@@ -58,7 +58,7 @@ public class TestIndentation {
                 .__(); // div
 
         String actual = sb.toString();
-        assertEquals(expected, actual);
+        assertEquals(EXPECTED, actual);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class TestIndentation {
                 .__()); // div
 
         String actual = view.setIndented(false).render();
-        assertEquals(expected, actual);
+        assertEquals(EXPECTED, actual);
     }
     @Test
     public void viewAsyncWithNoIndent() {
@@ -91,7 +91,7 @@ public class TestIndentation {
                 .__()); // div
 
         String actual = view.setIndented(false).renderAsync().join();
-        assertEquals(expected, actual);
+        assertEquals(EXPECTED, actual);
     }
 
     /**

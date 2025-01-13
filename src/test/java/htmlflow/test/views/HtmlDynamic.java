@@ -90,7 +90,7 @@ public class HtmlDynamic {
                     .__() // table
                 .__() // body
             .__(); // html
-    };
+    }
 
     static final void tableRowView(Tbody<?> tbody, Stock stock) {
             tbody

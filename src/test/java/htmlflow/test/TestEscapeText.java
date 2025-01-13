@@ -3,6 +3,7 @@ package htmlflow.test;
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
 import org.junit.Test;
+import org.xmlet.htmlapifaster.TextGroup;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +21,7 @@ public class TestEscapeText {
         HtmlView<String> view = HtmlFlow.<String>view(page -> page
                         .html()
                             .body()
-                                .<String>dynamic((el, model) -> el.text(model))
+                                .<String>dynamic(TextGroup::text)
                             .__()
                         .__()
                 )

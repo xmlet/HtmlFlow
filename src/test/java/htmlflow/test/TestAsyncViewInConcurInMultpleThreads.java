@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Supplier;
 
-import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 
 class TestAsyncViewInConcurInMultpleThreads {
@@ -22,21 +21,18 @@ class TestAsyncViewInConcurInMultpleThreads {
     @Test
     void testMultipleThreadsInView() throws InterruptedException {
         HtmlView<Object> view = HtmlFlow.view(TestAsyncViewInConcurInMultpleThreads::template).threadSafe();
-        checkRender(() -> view.render());
+        checkRender(view::render);
     }
 
     private void checkRender(Supplier<String> render) throws InterruptedException {
-        // out.println("start");
         final int threadCount = 50;
-        // AtomicInteger left = new AtomicInteger(threadCount);
-        Thread thread[] = new Thread[threadCount];
-        String html[] = new String[threadCount];
+        Thread[] thread = new Thread[threadCount];
+        String[] html = new String[threadCount];
         for (int i = 0; i < threadCount; i++) {
             final int threadNumber = i;
             thread[i] = new Thread(() -> {
                 try {
                     html[threadNumber] = render.get();
-                    // out.println("Thread " + threadNumber + " exited, remaining: " + left.decrementAndGet());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -47,9 +43,8 @@ class TestAsyncViewInConcurInMultpleThreads {
         }
         for (int i = 0; i < threadCount; i++) {
             thread[i].join();
-            assertEquals(expectedHtml, html[i]);
+            assertEquals(EXPECTED_HTML, html[i]);
         }
-        // out.println("end");
     }
 
     @SuppressWarnings("squid:S2925")
@@ -72,7 +67,7 @@ class TestAsyncViewInConcurInMultpleThreads {
                 .__();
     }
 
-    final static String expectedHtml = "<div>\n" +
+    static final String EXPECTED_HTML = "<div>\n" +
             "\t<span>\n" +
             "\t\t<a href=\"link\">\n" +
             "\t\t\ttext\n" +

@@ -33,7 +33,6 @@ import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
 import org.xmlet.htmlapifaster.Tbody;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class HtmlTables {
@@ -92,7 +91,7 @@ public class HtmlTables {
                 .__()
                 .body()
                     .attrClass("container")
-                    .of(__ -> // ignore body argument because we don't need it here
+                    .of(ignore -> // ignore body argument because we don't need it here
                         HtmlTables.taskListViewHeader(view)
                     )
                     .hr().__()

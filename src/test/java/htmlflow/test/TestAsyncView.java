@@ -102,7 +102,6 @@ class TestAsyncView {
                 .loadLines(expectedHtml)
                 .forEach(expected -> {
                     final String next = actual.next();
-                    // System.out.println(next);
                     assertEquals(expected, next);
                 });
         assertFalse(actual.hasNext());

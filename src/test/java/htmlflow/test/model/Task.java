@@ -23,8 +23,6 @@
  */
 package htmlflow.test.model;
 
-import java.util.Date;
-
 /**
  * @author Miguel Gamboa
  */

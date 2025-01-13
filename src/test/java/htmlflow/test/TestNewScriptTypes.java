@@ -7,7 +7,7 @@ import org.xmlet.htmlapifaster.EnumTypeScriptType;
 import static org.junit.Assert.assertEquals;
 
 public class TestNewScriptTypes {
-    static final String expectedScriptModule = "" +
+    static final String EXPECTED_SCRIPT_MODULE = "" +
             "<!DOCTYPE html>" +
             "<html>" +
             "<head>" +
@@ -26,7 +26,7 @@ public class TestNewScriptTypes {
                         .script().attrType(EnumTypeScriptType.MODULE).__()
                     .__() //head
                 .__(); // html
-        assertEquals(expectedScriptModule, buffer.toString());
+        assertEquals(EXPECTED_SCRIPT_MODULE, buffer.toString());
     }
 
 }

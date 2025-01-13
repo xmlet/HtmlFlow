@@ -33,9 +33,7 @@ import htmlflow.test.model.Task;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 
-import java.awt.*;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -75,10 +73,9 @@ public class HtmlForReadme {
      */
     @SuppressWarnings("squid:S2699")
     @Test
-    public void testSample02() throws IOException {
+    public void testSample02() {
         String html = view.render();        // 1) Get a string with the HTML
 
-        // System.out.println(html);
         /*
         view
             .setPrintStream(System.out)
@@ -105,13 +102,13 @@ public class HtmlForReadme {
      */
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
-    public void testSample03() throws IOException {
+    public void testSample03() {
         HtmlView view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
 
         List<Task> tasks = Arrays.asList(
-            new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-            new Task(4, "Worldwide Vacation Trip", "Planning it!", Priority.Normal),
-            new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
+            new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH),
+            new Task(4, "Worldwide Vacation Trip", "Planning it!", Priority.NORMAL),
+            new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.HIGH)
         );
         for (Task task: tasks) {
             Path path = Paths.get("task" + task.getId() + ".html");
@@ -127,11 +124,11 @@ public class HtmlForReadme {
      */
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
-    public void testSample04() throws IOException {
+    public void testSample04() {
         Stream<Task> tasks = Stream.of(
-            new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-            new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
-            new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
+            new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH),
+            new Task(4, "Special dinner", "Moonlight dinner!", Priority.NORMAL),
+            new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.HIGH)
         );
 
         Path path = Paths.get("tasksTable.html");
@@ -147,11 +144,11 @@ public class HtmlForReadme {
      */
     @java.lang.SuppressWarnings("squid:S2699")
     @Test
-    public void testSample05() throws IOException {
+    public void testSample05() {
         Flux<Task> tasks = Flux.fromStream(Stream.of(
-                new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-                new Task(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
-                new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High)
+                new Task(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH),
+                new Task(4, "Special dinner", "Moonlight dinner!", Priority.NORMAL),
+                new Task(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.HIGH)
         ))
                 .delayElements(Duration.ofMillis(1000));
 

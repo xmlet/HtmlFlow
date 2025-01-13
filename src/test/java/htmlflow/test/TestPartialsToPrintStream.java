@@ -37,9 +37,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
-import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -48,7 +46,7 @@ import static org.junit.Assert.assertFalse;
 
 public class TestPartialsToPrintStream {
 
-    final static int MB = 1024*1024;
+    static final int MB = 1024*1024;
 
     @Test
     public void testAddPartialAndCheckParentPrintStream() {
@@ -114,12 +112,12 @@ public class TestPartialsToPrintStream {
     }
 
     static  String getSaltString(int length) {
-        char[] SALTCHARS= "ABCDEFGHIJKLMNOPQRSTUVWXYZ ".toCharArray();
+        char[] saltChars= "ABCDEFGHIJKLMNOPQRSTUVWXYZ ".toCharArray();
         StringBuilder salt = new StringBuilder();
         Random rnd = new Random();
         while (salt.length() < length) { // length of the random string.
-            int index = rnd.nextInt(SALTCHARS.length);
-            salt.append(SALTCHARS[index]);
+            int index = rnd.nextInt(saltChars.length);
+            salt.append(saltChars[index]);
         }
         return salt.toString();
     }
@@ -178,8 +176,8 @@ public class TestPartialsToPrintStream {
             }
 
             @Override
-            public void write(byte b[], int off, int len) throws IOException {
-                checkFromIndexSize(off, len, b.length, null);
+            public void write(byte[] b, int off, int len) throws IOException {
+                checkFromIndexSize(off, len, b.length);
                 ensureOpen();
             }
 
@@ -190,8 +188,7 @@ public class TestPartialsToPrintStream {
         };
     }
     public static <X extends RuntimeException>
-    int checkFromIndexSize(int fromIndex, int size, int length,
-                           BiFunction<String, List<Integer>, X> oobef) {
+    int checkFromIndexSize(int fromIndex, int size, int length) {
         if ((length | fromIndex | size) < 0 || size > length - fromIndex)
             throw new IndexOutOfBoundsException();
         return fromIndex;

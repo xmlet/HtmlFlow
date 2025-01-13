@@ -1,8 +1,13 @@
 package htmlflow.test
 
-import htmlflow.*
+import htmlflow.HtmlPage
+import htmlflow.HtmlViewSuspend
+import htmlflow.await
+import htmlflow.l
+import htmlflow.suspending
 import htmlflow.test.model.AsyncModel
 import htmlflow.test.model.Student
+import htmlflow.viewSuspend
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
@@ -102,7 +107,6 @@ class TestSuspendableView {
             .loadLines(expectedHtml)
             .forEach { expected: String? ->
                 val next = actual.next()
-                // System.out.println(next);
                 Assertions.assertEquals(expected, next)
             }
         Assertions.assertFalse(actual.hasNext())

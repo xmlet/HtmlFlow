@@ -51,10 +51,10 @@ import static org.junit.Assert.assertEquals;
 public class TestDivDetailsInConcurrency {
 
     private static final List<TaskDelayed> models = asList(
-            new TaskDelayed(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.High),
-            new TaskDelayed(4, "Special dinner", "Moonlight dinner!", Priority.Normal),
-            new TaskDelayed(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.High),
-            new TaskDelayed(9, "Web Summit 2018", "Sir Tim Berners-Lee", Priority.High));
+            new TaskDelayed(3, "ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH),
+            new TaskDelayed(4, "Special dinner", "Moonlight dinner!", Priority.NORMAL),
+            new TaskDelayed(5, "US Open Final 2018", "Juan Martin del Potro VS  Novak Djokovic", Priority.HIGH),
+            new TaskDelayed(9, "Web Summit 2018", "Sir Tim Berners-Lee", Priority.HIGH));
 
     private static final Map<TaskDelayed, List<String>> expectedViews = models
             .stream()
@@ -87,8 +87,6 @@ public class TestDivDetailsInConcurrency {
             .parallel()
             .map(task -> ModelAndView.of(task, htmlRender(view, task)))
             .forEach(taskHtml -> {
-                // taskHtml.html.forEach(System.out::println);
-
                 Iterator<String> actual = taskHtml.html.iterator();
                 expectedViews
                         .get(taskHtml.obj)
