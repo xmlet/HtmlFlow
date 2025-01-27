@@ -1,7 +1,7 @@
 # HtmlFlow
 
 [![Build Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.xmlet%3Ahtmlflow)
-![Maven Central Version](https://img.shields.io/maven-central/v/com.github.xmlet/htmlflow)
+[![Maven Central Version](https://img.shields.io/maven-central/v/com.github.xmlet/htmlflow)](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow)
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.xmlet%3Ahtmlflow&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.xmlet%3Ahtmlflow&metric=Coverage)
 [![javadoc HtmlApiFaster](https://img.shields.io/badge/javadocs-HtmlApiFaster-blue)](https://javadoc.io/doc/com.github.xmlet/htmlApiFaster/latest/org/xmlet/htmlapifaster/package-summary.html)
 [![javadoc HtmlFlow](https://img.shields.io/badge/javadocs-HtmlFlow-blue)](https://javadoc.io/doc/com.github.xmlet/htmlflow)
