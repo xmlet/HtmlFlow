@@ -27,6 +27,7 @@ package htmlflow;
 import htmlflow.visitor.HtmlDocVisitor;
 import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
+import htmlflow.visitor.PreprocessingCheckMatchingTags;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
 
@@ -48,6 +49,9 @@ public class HtmlFlow {
      * @param isIndented Set indentation on or off.
      */
     private static PreprocessingVisitor preprocessing(HtmlTemplate template, boolean isIndented) {
+        PreprocessingCheckMatchingTags preCheck = new PreprocessingCheckMatchingTags();
+        HtmlView<?> preCheckView = new HtmlView<>(() -> preCheck, template, false);
+
         PreprocessingVisitor pre = new PreprocessingVisitor(isIndented);
         HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
         template.resolve(preView); // ?????? Why ????? This is not the same as next statement ????
