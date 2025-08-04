@@ -24,8 +24,8 @@
 
 package htmlflow.visitor;
 
-import com.google.common.html.HtmlEscapers;
 import htmlflow.exceptions.HtmlFlowAppendException;
+import htmlflow.visitor.escape.HtmlEscapers;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;

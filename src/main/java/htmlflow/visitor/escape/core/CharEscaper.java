@@ -1,5 +1,37 @@
+/*
+ * Copyright (C) 2009 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package htmlflow.visitor.escape.core;
 
+/**
+ * An abstract class that provides a base implementation for character escaping.
+ * <p>
+ *     This class defines the structure for escaping characters in a string,
+ *     allowing subclasses to implement specific escaping logic.
+ * </p>
+ * <p>
+ *     Derived and adapted from Guava's CharEscaper class:
+ *     <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/escape/CharEscaper.java">guava</a>
+ * </p>
+ *
+ * <p>
+ *     Modified by Arthur Oliveira on 04-08-2025
+ * </p>
+ *
+ * @author Arthur Oliveira
+ * @author The Guava Authors
+ */
 abstract class CharEscaper extends Escaper{
 
     /**
@@ -7,12 +39,22 @@ abstract class CharEscaper extends Escaper{
      */
     private static final int ESCAPE_PAD_MULTIPLIER = 2;
 
+    /**
+     * Exception message for null code input.
+     */
+    public static final String NULL_CODE_EXCEPTION_MESSAGE = "Code cannot be null";
+
+    /**
+     * Exception message for negative size in buffer growth.
+     */
+    public static final String NEGATIVE_SIZE_EXCEPTION_MESSAGE = "Size cannot be negative: ";
+
     protected CharEscaper() {}
 
     @Override
-    public String escape(String code) {
+    public String escape(String code) throws NullPointerException {
         if (code == null) {
-            throw new NullPointerException("Code cannot be null");
+            throw new NullPointerException(NULL_CODE_EXCEPTION_MESSAGE);
         }
         int length = code.length();
         for (int idx = 0; idx < length; idx++) {
@@ -27,9 +69,6 @@ abstract class CharEscaper extends Escaper{
      * Escapes a single character.
      * <p>
      *     This method is called for each character in the input string.
-     *     If the character needs to be escaped,
-     *     it should return a character array representing the escaped form.
-     *     If the character does not need to be escaped, it should return null.
      * @param c the character to escape
      * @return a character array representing the escaped form of the character,
      *         or null if the character does not need to be escaped
@@ -108,7 +147,7 @@ abstract class CharEscaper extends Escaper{
      */
     private static char[] growBuffer(char[] buffer, int idx, int size) {
         if (size < 0) {
-            throw new IllegalArgumentException("Size cannot be negative: " + size);
+            throw new IllegalArgumentException(NEGATIVE_SIZE_EXCEPTION_MESSAGE + size);
         }
         char[] newBuffer = new char[size];
         if (idx > 0) {
