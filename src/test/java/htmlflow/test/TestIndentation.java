@@ -38,9 +38,9 @@ import static org.junit.Assert.assertEquals;
 
 public class TestIndentation {
 
-    static final String EXPECTED = "<div><textarea>Sample text" + lineSeparator() +
+    static final String EXPECTED = "<div><textarea>Sample text\n" +
             "foo" + lineSeparator() +
-            "bar</textarea><script>// some comment" + lineSeparator() +
+            "bar</textarea><script>// some comment\n" +
             "console.log('Hello world');</script></div>";
 
     @Test
@@ -52,7 +52,7 @@ public class TestIndentation {
                         .text("Sample text\nfoo\nbar")
                     .__()
                     .script()
-                    .raw("// some comment" + lineSeparator() +
+                    .raw("// some comment\n" +
                         "console.log('Hello world');")
                 .__() // script
                 .__(); // div
@@ -69,7 +69,7 @@ public class TestIndentation {
                 .text("Sample text\nfoo\nbar")
                 .__()
                 .script()
-                .raw("// some comment" + lineSeparator() +
+                .raw("// some comment\n" +
                         "console.log('Hello world');")
                 .__() // script
                 .__()); // div
@@ -85,7 +85,7 @@ public class TestIndentation {
                 .text("Sample text\nfoo\nbar")
                 .__()
                 .script()
-                .raw("// some comment" + lineSeparator() +
+                .raw("// some comment\n" +
                         "console.log('Hello world');")
                 .__() // script
                 .__()); // div
