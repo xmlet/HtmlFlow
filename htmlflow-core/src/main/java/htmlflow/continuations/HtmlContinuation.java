@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
  * Base class for a linked list of nodes, corresponding to HtmlContinuation objects.
  * HtmlContinuation is responsible for emitting an HTML block and call the next node.
  */
-public abstract class HtmlContinuation extends HtmlContinuationSuspendable {
+public abstract class HtmlContinuation {
     /**
      * A negative number means that should be ignored.
      */
