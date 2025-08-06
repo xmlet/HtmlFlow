@@ -36,7 +36,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class TestReactiveView {
 
-    @java.lang.SuppressWarnings("squid:S2699")
+    @SuppressWarnings("squid:S2699")
     @Test
     public void testInconsistentHtmlUsingDynamicWithReactiveModel() {
         /**

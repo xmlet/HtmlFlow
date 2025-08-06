@@ -32,15 +32,14 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertEquals;
 
 public class TestIndentation {
 
-    static final String EXPECTED = "<div><textarea>Sample text" + lineSeparator() +
-            "foo" + lineSeparator() +
-            "bar</textarea><script>// some comment" + lineSeparator() +
+    static final String EXPECTED = "<div><textarea>Sample text\n" +
+            "foo\n" +
+            "bar</textarea><script>// some comment\n" +
             "console.log('Hello world');</script></div>";
 
     @Test
@@ -52,7 +51,7 @@ public class TestIndentation {
                         .text("Sample text\nfoo\nbar")
                     .__()
                     .script()
-                    .raw("// some comment" + lineSeparator() +
+                    .raw("// some comment\n" +
                         "console.log('Hello world');")
                 .__() // script
                 .__(); // div
@@ -69,7 +68,7 @@ public class TestIndentation {
                 .text("Sample text\nfoo\nbar")
                 .__()
                 .script()
-                .raw("// some comment" + lineSeparator() +
+                .raw("// some comment\n" +
                         "console.log('Hello world');")
                 .__() // script
                 .__()); // div
@@ -85,7 +84,7 @@ public class TestIndentation {
                 .text("Sample text\nfoo\nbar")
                 .__()
                 .script()
-                .raw("// some comment" + lineSeparator() +
+                .raw("// some comment\n" +
                         "console.log('Hello world');")
                 .__() // script
                 .__()); // div

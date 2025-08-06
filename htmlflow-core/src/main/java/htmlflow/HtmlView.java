@@ -54,7 +54,7 @@ public class HtmlView<M> extends HtmlPage {
      * In this case the ThreadLocal is hold in an instance field and should stay with all
      * thread local instances during its entire life cycle.
      */
-    @java.lang.SuppressWarnings("squid:S5164")
+    @SuppressWarnings("squid:S5164")
     private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
     protected final Supplier<HtmlVisitor> visitorSupplier;
     private final boolean threadSafe;

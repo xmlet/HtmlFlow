@@ -47,6 +47,8 @@ import java.io.IOException;
 
 import static htmlflow.visitor.Tags.*;
 
+import java.lang.Object;
+
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
  *

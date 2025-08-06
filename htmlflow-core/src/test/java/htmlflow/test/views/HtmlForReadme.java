@@ -33,7 +33,6 @@ import htmlflow.test.model.Task;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -50,7 +49,7 @@ public class HtmlForReadme {
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
      */
-    @java.lang.SuppressWarnings("squid:S2699")
+    @SuppressWarnings("squid:S2699")
     @Test
     public void testSample01() {
         HtmlFlow
@@ -100,7 +99,7 @@ public class HtmlForReadme {
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
      */
-    @java.lang.SuppressWarnings("squid:S2699")
+    @SuppressWarnings("squid:S2699")
     @Test
     public void testSample03() {
         HtmlView view = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
@@ -122,7 +121,7 @@ public class HtmlForReadme {
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
      */
-    @java.lang.SuppressWarnings("squid:S2699")
+    @SuppressWarnings("squid:S2699")
     @Test
     public void testSample04() {
         Stream<Task> tasks = Stream.of(
@@ -142,7 +141,7 @@ public class HtmlForReadme {
     /**
      * This unit test does not contain any assertion because it is only a sample to use in README.md.
      */
-    @java.lang.SuppressWarnings("squid:S2699")
+    @SuppressWarnings("squid:S2699")
     @Test
     public void testSample05() {
         Flux<Task> tasks = Flux.fromStream(Stream.of(
