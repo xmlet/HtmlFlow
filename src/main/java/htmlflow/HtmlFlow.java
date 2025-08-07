@@ -25,6 +25,7 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlDocVisitor;
+import htmlflow.visitor.HtmlViewHotVisitor;
 import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.PreprocessingVisitor;
@@ -104,12 +105,21 @@ public class HtmlFlow {
      * @param threadSafe Enable the use for thread safety.
      * @param <M> Type of the model rendered with this view.
      */
+    public static boolean hotReload = false;
+
     static <M> HtmlView<M> view(Appendable out, HtmlTemplate template, boolean isIndented, boolean threadSafe){
-        PreprocessingVisitor pre = preprocessing(template, isIndented);
-        return new HtmlView<>(
-            (() -> new HtmlViewVisitor(out, isIndented, pre.getFirst())),
-            template,
-            threadSafe);
+        if(hotReload){
+            return new HtmlViewHot<>(
+                    () -> new HtmlViewHotVisitor(out, isIndented),
+                    template,
+                    threadSafe);
+        } else {
+            PreprocessingVisitor pre = preprocessing(template, isIndented);
+            return new HtmlView<>(
+                    (() -> new HtmlViewVisitor(out, isIndented, pre.getFirst())),
+                    template,
+                    threadSafe);
+        }
     }
     /**
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model and
@@ -130,11 +140,18 @@ public class HtmlFlow {
      * @param <M> Type of the model rendered with this view.
      */
     static <M> HtmlView<M> view(HtmlTemplate template, boolean isIndented, boolean threadSafe){
-        PreprocessingVisitor pre = preprocessing(template, isIndented);
-        return new HtmlView<>(
-                (() -> new HtmlViewVisitor(new StringBuilder(), isIndented, pre.getFirst())),
-                template,
-                threadSafe);
+        if(hotReload){
+            return new HtmlViewHot<>(
+                    () -> new HtmlViewHotVisitor(new StringBuilder(), isIndented),
+                    template,
+                    threadSafe);
+        } else {
+            PreprocessingVisitor pre = preprocessing(template, isIndented);
+            return new HtmlView<>(
+                    (() -> new HtmlViewVisitor(new StringBuilder(), isIndented, pre.getFirst())),
+                    template,
+                    threadSafe);
+        }
     }
     /**
      * Creates a HtmlViewAsync corresponding to a dynamic HtmlPage with an asynchronous model and

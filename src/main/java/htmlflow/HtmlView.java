@@ -40,7 +40,7 @@ public class HtmlView<M> extends HtmlPage {
     /**
      * Function that consumes an HtmlView to produce HTML elements.
      */
-    private final HtmlTemplate template;
+    protected final HtmlTemplate template;
     /**
      * This field is like a union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.

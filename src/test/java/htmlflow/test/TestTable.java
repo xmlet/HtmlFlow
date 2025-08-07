@@ -116,6 +116,7 @@ public class TestTable {
         Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.NORMAL, Status.COMPLETED);
         Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.HIGH, Status.DEFERRED);
         List<Task> tasks = Arrays.asList(t1, t2, t3);
+        HtmlFlow.hotReload = false;
         String html = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
         /*
          * Assert
