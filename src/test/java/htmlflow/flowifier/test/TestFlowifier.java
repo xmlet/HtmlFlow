@@ -85,7 +85,7 @@ public class TestFlowifier {
 
     @Test
     public void testFlowifierTuerSourceforgeHomepage() throws Exception {
-        testFlowifier("http://tuer.sourceforge.net/en/");
+        testFlowifier("https://tuer.sourceforge.io/en/");
     }
 
     @Test
