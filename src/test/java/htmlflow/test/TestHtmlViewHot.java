@@ -28,7 +28,7 @@ public class TestHtmlViewHot {
         assertEquals("HtmlViewHot", view.getName());
 
         Object visitor = view.getVisitor();
-        assertTrue(visitor instanceof HtmlViewVisitorHot, "Should use HtmlViewVisitorHot");
+        assertInstanceOf(HtmlViewVisitorHot.class, visitor, "Should use HtmlViewVisitorHot");
     }
 
     @Test

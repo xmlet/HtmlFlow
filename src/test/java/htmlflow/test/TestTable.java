@@ -40,14 +40,16 @@ import org.xmlet.htmlapifaster.Table;
 import org.xmlet.htmlapifaster.Tr;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Miguel Gamboa
@@ -116,12 +118,99 @@ public class TestTable {
         Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.NORMAL, Status.COMPLETED);
         Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.HIGH, Status.DEFERRED);
         List<Task> tasks = Arrays.asList(t1, t2, t3);
-        HtmlFlow.hotReload = false;
         String html = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
         /*
          * Assert
          */
         assertTaskHtmlView(html.getBytes(), tasks);
+    }
+
+    @Test
+    public void testTableWithHotReloadBuilder() {
+        /*
+         * Arrange
+         */
+        Task t1 = new Task("ISEL MPD project", "A Java library for serializing objects in HTML.", Priority.HIGH, Status.PROGRESS);
+        Task t2 = new Task("Special dinner", "Have dinner with someone!", Priority.NORMAL, Status.COMPLETED);
+        Task t3 = new Task("Manchester City - Sporting", "1/8 Final UEFA Europa League. VS. Manchester City - Sporting!", Priority.HIGH, Status.DEFERRED);
+        List<Task> tasks = Arrays.asList(t1, t2, t3);
+        
+        /*
+         * Act - Test both regular view and hot reload view
+         */
+        String regularHtml = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
+        String hotReloadHtml = HtmlFlow.builder()
+                .caching(false)
+                .indented(true)
+                .build()
+                .view(HtmlTables::taskTableView)
+                .render(tasks);
+        
+        /*
+         * Assert - Both should produce the same HTML output
+         */
+        assertTaskHtmlView(regularHtml.getBytes(), tasks);
+        assertTaskHtmlView(hotReloadHtml.getBytes(), tasks);
+        assertEquals("Hot reload should produce same output as regular view", regularHtml, hotReloadHtml);
+    }
+
+    @Test
+    public void testTableWithBuilderPattern() {
+        /*
+         * Test various builder configurations
+         */
+        Task t1 = new Task("Test task", "Test description", Priority.HIGH, Status.PROGRESS);
+        List<Task> tasks = Collections.singletonList(t1);
+        
+        // Test builder with custom output stream and hot reload
+        String html = HtmlFlow.builder()
+                .threadSafe(false)
+                .indented(false)
+                .build()
+                .view(HtmlTables::taskTableView)
+                .render(tasks);
+        
+        assertNotNull("HTML should not be null", html);
+        assertTrue("HTML should contain task content", html.contains("Test task"));
+        assertTrue("HTML should contain table structure", html.contains("<table"));
+    }
+
+    @Test
+    public void testViewBuilderFlexibility() {
+        /*
+         * Test that a single ViewBuilder can create multiple different views
+         */
+        Task t1 = new Task("Task 1", "First task", Priority.HIGH, Status.PROGRESS);
+        Task t2 = new Task("Task 2", "Second task", Priority.LOW, Status.COMPLETED);
+        List<Task> tasks = Arrays.asList(t1, t2);
+        
+        // Create a configured builder
+        HtmlFlow.Builder builder = HtmlFlow.builder()
+                .indented(true)
+                .threadSafe(false);
+        
+        // Build an engine
+        HtmlFlow.Engine engine = builder.build();
+        
+        // Use the same engine to create different views
+        HtmlView<List<Task>> tableView = engine.view(HtmlTables::taskTableView);
+        HtmlView<List<Task>> listView = engine.view(HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
+    
+        
+        // Test that all views can render
+        String tableHtml = tableView.render(tasks);
+        String listHtml = listView.render(tasks);
+        
+        assertNotNull("Table HTML should not be null", tableHtml);
+        assertNotNull("List HTML should not be null", listHtml);
+
+        // Test withOutput method
+        StringBuilder customOutput = new StringBuilder();
+        HtmlView<List<Task>> customOutputView = engine.view(customOutput, HtmlTables::taskTableView);
+        customOutputView.render(tasks);
+        
+        assertNotNull("Custom output should not be null", customOutput.toString());
+        assertTrue("Custom output should contain content", customOutput.length() > 0);
     }
 
     @Test

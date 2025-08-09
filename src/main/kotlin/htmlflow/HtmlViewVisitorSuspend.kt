@@ -1,4 +1,4 @@
-package htmlflow;
+package htmlflow
 
 import htmlflow.continuations.HtmlContinuation
 import htmlflow.visitor.HtmlVisitorSuspending

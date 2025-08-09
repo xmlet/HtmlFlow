@@ -24,7 +24,6 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitorAsync;
 import htmlflow.visitor.HtmlVisitorAsync;
 import org.xmlet.htmlapifaster.Html;
 

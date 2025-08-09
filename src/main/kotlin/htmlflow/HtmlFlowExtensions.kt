@@ -91,21 +91,50 @@ fun <M : Any?> viewAsync(template: HtmlPage.() -> Unit) = HtmlFlow.viewAsync<M>(
 fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit) = viewSuspend<M>(
     template,
     isIndented = true,
-    threadSafe = false
+    threadSafe = false,
+    caching = true
 )
 
-fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean): HtmlViewSuspend<M> {
-    val pre = preprocessingSuspend(template, isIndented)
-    val visitor = HtmlViewVisitorSuspend(
-        isIndented = isIndented,
-        first = pre.first
-    )
-    /**
-     * Chain terminationNode next to the last node.
-     */
-    val terminationNode = HtmlContinuationSuspendableTerminationNode()
-    PreprocessingVisitor.HtmlContinuationSetter.setNext(visitor.findLast(), terminationNode)
-    return HtmlViewSuspend(template, visitor, threadSafe)
+fun <M: Any?> viewSuspend(caching: Boolean, template: HtmlPage.() -> Unit) : HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, caching = caching)
+}
+
+fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, caching: Boolean): HtmlViewSuspend<M> {
+    return if (caching) {
+        val pre = preprocessingSuspend(template, isIndented)
+        val visitor = HtmlViewVisitorSuspend(
+            isIndented = isIndented,
+            first = pre.first,
+        )
+        /**
+         * Chain terminationNode next to the last node.
+         */
+        val terminationNode = HtmlContinuationSuspendableTerminationNode()
+        PreprocessingVisitor.HtmlContinuationSetter.setNext(visitor.findLast(), terminationNode)
+        HtmlViewSuspend(template, visitor, threadSafe)
+    } else {
+        val visitor = HtmlViewVisitorSuspendHot(
+            isIndented = isIndented,
+            template = template,
+        )
+        HtmlViewSuspendHot(template, visitor, threadSafe)
+    }
+}
+
+fun <M: Any?> HtmlFlow.Engine.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = isIndented, threadSafe = threadSafe, caching = caching)
+}
+
+fun <M: Any?> HtmlFlow.viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, caching: Boolean): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented, threadSafe, caching)
+}
+
+fun <M: Any?> HtmlFlow.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, caching = true)
+}
+
+fun <M: Any?> HtmlFlow.viewSuspend(caching: Boolean, template: HtmlPage.() -> Unit,): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, caching = caching)
 }
 
 /**

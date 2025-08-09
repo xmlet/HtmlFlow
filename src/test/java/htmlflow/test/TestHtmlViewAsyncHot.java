@@ -28,7 +28,7 @@ public class TestHtmlViewAsyncHot {
         assertEquals("HtmlViewAsyncHot", view.getName());
 
         Object visitor = view.getVisitor();
-        assertTrue(visitor instanceof HtmlViewVisitorAsyncHot, "Should use HtmlViewVisitorAsyncHot");
+        assertInstanceOf(HtmlViewVisitorAsyncHot.class, visitor, "Should use HtmlViewVisitorAsyncHot");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class TestHtmlViewAsyncHot {
         assertEquals("HtmlViewAsync", view.getName());
 
         Object visitor = view.getVisitor();
-        assertTrue(visitor instanceof HtmlViewVisitorAsync, "Should use HtmlViewVisitorAsync");
+        assertInstanceOf(HtmlViewVisitorAsync.class, visitor, "Should use HtmlViewVisitorAsync");
     }
 
     @Test

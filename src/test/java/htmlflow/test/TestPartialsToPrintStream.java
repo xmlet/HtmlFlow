@@ -89,7 +89,7 @@ public class TestPartialsToPrintStream {
          */
         Stream<Penguin> penguins = IntStream
             .range(0, 128)
-            .mapToObj(n -> new Penguin("Albert" + n, getSaltString(1 * MB)));
+            .mapToObj(n -> new Penguin("Albert" + n, getSaltString(MB)));
         /**
          * Act
          */
