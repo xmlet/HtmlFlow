@@ -1,5 +1,6 @@
 package htmlflow
 
+import htmlflow.visitor.HtmlVisitorSuspending
 import org.xmlet.htmlapifaster.Html
 
 /**
@@ -9,12 +10,12 @@ import org.xmlet.htmlapifaster.Html
  *
  * @author Miguel Gamboa
  */
-class HtmlViewSuspend<M>(
+open class HtmlViewSuspend<M>(
     /**
      * Function that consumes an HtmlPage to produce HTML elements.
      */
     private val template: HtmlPage.() -> Unit,
-    private val visitor: HtmlViewVisitorSuspend,
+    private val visitor: HtmlVisitorSuspending,
     private var threadSafe: Boolean = true
 ) : HtmlPage() {
     override fun html(): Html<HtmlPage> {
@@ -23,10 +24,10 @@ class HtmlViewSuspend<M>(
     }
 
     override fun setIndented(isIndented: Boolean): HtmlViewSuspend<M>? {
-        return viewSuspend<M>(template, isIndented, threadSafe)
+        return viewSuspend<M>(template, isIndented, threadSafe, true)
     }
 
-    override fun getVisitor(): HtmlViewVisitorSuspend {
+    override fun getVisitor(): HtmlVisitorSuspending {
         return visitor
     }
 
@@ -38,23 +39,26 @@ class HtmlViewSuspend<M>(
         return HtmlViewSuspend(template, visitor)
     }
 
-    fun threadUnsafe(): HtmlViewSuspend<M> {
+    open fun threadUnsafe(): HtmlViewSuspend<M> {
         return HtmlViewSuspend(template, visitor, false)
     }
 
+    fun setCaching(caching: Boolean): HtmlViewSuspend<M> {
+        return viewSuspend(template, visitor.isIndented, threadSafe, caching)
+    }
 
-    suspend fun write(out: Appendable, model: M?) {
+    open suspend fun write(out: Appendable, model: M?) {
         if (threadSafe) {
-            visitor.clone(out).first.executeSuspending(model)
+            visitor.clone(out).executeSuspending(model)
         } else {
             visitor.setAppendable(out)
-            visitor.first.executeSuspending(model)
+            visitor.executeSuspending(model)
         }
     }
 
-    suspend fun render(): String = render(null)
+    open suspend fun render(): String = render(null)
 
-    suspend fun render(model: M?) = StringBuilder().let {
+    open suspend fun render(model: M?) = StringBuilder().let {
         write(it, model)
         it.toString()
     }

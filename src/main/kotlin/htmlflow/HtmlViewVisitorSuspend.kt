@@ -1,9 +1,11 @@
 package htmlflow;
 
 import htmlflow.continuations.HtmlContinuation
-import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
-import htmlflow.visitor.HtmlViewVisitor
-import htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter
+import htmlflow.visitor.HtmlVisitorSuspending
+import org.xmlet.htmlapifaster.Element
+import org.xmlet.htmlapifaster.SuspendConsumer
+import org.xmlet.htmlapifaster.async.AwaitConsumer
+import java.util.function.BiConsumer
 
 /**
  * Intentionally pass null to out Appendable.
@@ -11,28 +13,29 @@ import htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter
  * clone it on each resolution (i.e. finishAsync()) to avoid sharing continuations across
  * different tasks and set a new out Appendable.
  */
-class HtmlViewVisitorSuspend(
+open class HtmlViewVisitorSuspend(
     out: Appendable? = null,
     isIndented: Boolean,
-    first: HtmlContinuation?
-) : HtmlViewVisitor (
-    out, isIndented, first
+    first: HtmlContinuation
+) : HtmlVisitorSuspending (
+    out, isIndented
 ) {
-    /**
-     * The last node to be processed.
-     */
-    private var last: HtmlContinuation? = null
+    private val first: HtmlContinuation = first.copy(this)
 
-    init {
-        last = findLast()
+    override fun resolve(model: Any?) {
+        first.execute(model)
     }
 
     override fun clone(isIndented: Boolean): HtmlViewVisitorSuspend {
         return HtmlViewVisitorSuspend(out, isIndented, first)
     }
 
-    fun clone(out: Appendable): HtmlViewVisitorSuspend {
+    override fun clone(out: Appendable): HtmlViewVisitorSuspend {
         return HtmlViewVisitorSuspend(out, isIndented, first)
+    }
+
+    override suspend fun executeSuspending(model: Any?) {
+        first.executeSuspending(model)
     }
 
     fun findLast(): HtmlContinuation? {
@@ -41,6 +44,27 @@ class HtmlViewVisitorSuspend(
             node = node.next
         }
         return node
+    }
+
+    override fun <E : Element<*, *>?, U : Any?> visitDynamic(
+        element: E?,
+        consumer: BiConsumer<E?, U?>?
+    ) {
+        throw IllegalStateException("Illegal use of visitDynamic in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend.")
+    }
+
+    override fun <M : Any?, E : Element<*, *>?> visitAwait(
+        element: E?,
+        asyncAction: AwaitConsumer<E?, M?>?
+    ) {
+        throw IllegalStateException("Illegal use of visitAwait in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend.")
+    }
+
+    override fun <M : Any?, E : Element<*, *>?> visitSuspending(
+        element: E?,
+        suspendAction: SuspendConsumer<E?, M?>?
+    ) {
+        throw IllegalStateException("Illegal use of visitSuspending in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend.")
     }
 
 }
