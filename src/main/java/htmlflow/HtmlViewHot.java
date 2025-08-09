@@ -25,8 +25,6 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlVisitor;
-import org.xmlet.htmlapifaster.Html;
-
 import java.util.function.Supplier;
 
 /**
@@ -50,27 +48,41 @@ public class HtmlViewHot<M> extends HtmlView<M> {
         super(visitorSupplier, template, threadSafe);
     }
 
+    @Override
+    public String getName() {
+        return "HtmlViewHot";
+    }
+
     public String render() {
         return render(null);
     }
 
     public String render(M model) {
-        HtmlVisitor visitor = getVisitor();
-        StringBuilder str = ((StringBuilder) visitor.out());
-        str.setLength(0); // clear buffer
-        visitor.resolve(model); // passes the model to the Visitor to then be passed to the dynamic blocks
-        this.template.resolve(this); // processing template which emits HTML
+        StringBuilder str = ((StringBuilder) getVisitor().out());
+        str.setLength(0);
+        getVisitor().resolve(model);
+        this.template.resolve(this);
         return str.toString();
     }
 
     public void write(M model) {
-        HtmlVisitor visitor = getVisitor();
-        visitor.resolve(model); // passes the model to the Visitor to then be passed to the dynamic blocks
-        this.template.resolve(this); // processing template which emits HTML
+        getVisitor().resolve(model);
+        this.template.resolve(this);
     }
 
     public void write() {
         write(null);
     }
 
+    protected HtmlView<M> clone(
+            Supplier<HtmlVisitor> visitorSupplier,
+            boolean threadSafe)
+    {
+        return new HtmlViewHot<>(visitorSupplier, template, threadSafe);
+    }
+
+    @Override
+    public HtmlView<M> setIndented(boolean isIndented) {
+        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe, false);
+    }
 }

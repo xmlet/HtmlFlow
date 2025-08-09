@@ -57,7 +57,8 @@ public class HtmlView<M> extends HtmlPage {
     @java.lang.SuppressWarnings("squid:S5164")
     private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
     protected final Supplier<HtmlVisitor> visitorSupplier;
-    private final boolean threadSafe;
+    protected final boolean threadSafe;
+
     /**
      * Auxiliary constructor used by clone().
      */
@@ -130,9 +131,9 @@ public class HtmlView<M> extends HtmlPage {
      * @param visitorSupplier
      * @param threadSafe
      */
-    protected final HtmlView<M> clone(
-        Supplier<HtmlVisitor> visitorSupplier,
-        boolean threadSafe)
+    protected HtmlView<M> clone(
+            Supplier<HtmlVisitor> visitorSupplier,
+            boolean threadSafe)
     {
         return new HtmlView<>(visitorSupplier, template, threadSafe);
     }
@@ -142,7 +143,18 @@ public class HtmlView<M> extends HtmlPage {
      * but with indented set to the value of isIndented parameter.
      */
     @Override
-    public final HtmlView<M> setIndented(boolean isIndented) {
-        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe);
+    public HtmlView<M> setIndented(boolean isIndented) {
+        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe, true);
+    }
+
+    /**
+     * Returns a new instance of HtmlView with the same properties of this object
+     * but with caching set to the value of isCaching parameter.
+     *
+     * @param isCaching If true, the view will cache static HTML blocks.
+     */
+    public HtmlView<M> setCaching(boolean isCaching) {
+        HtmlVisitor visitor = getVisitor();
+        return HtmlFlow.view(visitor.out(), template, visitor.isIndented, threadSafe, isCaching);
     }
 }

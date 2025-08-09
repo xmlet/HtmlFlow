@@ -56,7 +56,7 @@ public class HtmlViewVisitor extends HtmlVisitor {
      * Processing output through invocation of HtmlContinuation objects chain.
      */
     @Override
-    public final void resolve(Object model) {
+    public void resolve(Object model) {
         first.execute(model);
     }
 
@@ -73,7 +73,7 @@ public class HtmlViewVisitor extends HtmlVisitor {
      * @param dynamicHtmlBlock The continuation that consumes the element and a model.
      */
     @Override
-    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
+    public <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
         /**
          * After first resolution we will only invoke the dynamicHtmlBlock consumer and no more visits
          * to dynamic can happen.
