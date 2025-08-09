@@ -2,8 +2,12 @@ package htmlflow.visitor;
 
 import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationAsyncTerminationNode;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.SuspendConsumer;
+import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
 
@@ -11,8 +15,12 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
 /**
  * @author Pedro Fialho
  **/
-public class HtmlViewVisitorAsync extends HtmlViewVisitor {
-    
+public class HtmlViewVisitorAsync extends HtmlVisitorAsync {
+
+    /**
+     * The first node to be processed.
+     */
+    protected final HtmlContinuation first;
     /**
      * The last node to be processed.
      */
@@ -31,9 +39,15 @@ public class HtmlViewVisitorAsync extends HtmlViewVisitor {
     /**
      * Auxiliary for clone.
      */
-    private HtmlViewVisitorAsync(Appendable out, boolean isIndented, HtmlContinuation copy) {
-        super(out, isIndented, copy);
+    private HtmlViewVisitorAsync(Appendable out, boolean isIndented, HtmlContinuation first) {
+        super(out, isIndented);
+        this.first = first.copy(this);
         this.last = findLast();
+    }
+
+    @Override
+    public void resolve(Object model) {
+        first.execute(model);
     }
 
     @Override
@@ -41,6 +55,7 @@ public class HtmlViewVisitorAsync extends HtmlViewVisitor {
         return new HtmlViewVisitorAsync(out, isIndented, first);
     }
 
+    @Override
     public HtmlViewVisitorAsync clone(Appendable out) {
         return new HtmlViewVisitorAsync(out, isIndented, first);
     }
@@ -70,5 +85,20 @@ public class HtmlViewVisitorAsync extends HtmlViewVisitor {
         }
 
         return node;
+    }
+
+    @Override
+    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
+        throw new IllegalStateException("Wrong use of visitDynamic() in a HtmlViewAsync! Preprocessing visitor should have already visited");
+    }
+
+    @Override
+    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
+        throw new IllegalStateException("Wrong use of visitAwait() in a HtmlViewAsync! Preprocessing visitor should have already visited");
+    }
+
+    @Override
+    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
+        throw new IllegalStateException("Wrong use of suspending() in a HtmlViewAsync! Use HtmlFlow.viewSuspend() to produce a suspendable view.");
     }
 }
