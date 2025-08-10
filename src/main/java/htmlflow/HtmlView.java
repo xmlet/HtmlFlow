@@ -63,9 +63,9 @@ public class HtmlView<M> extends HtmlPage {
      * Auxiliary constructor used by clone().
      */
     HtmlView(
-        Supplier<HtmlVisitor> visitorSupplier,
-        HtmlTemplate template,
-        boolean threadSafe)
+            Supplier<HtmlVisitor> visitorSupplier,
+            HtmlTemplate template,
+            boolean threadSafe)
     {
         this.visitorSupplier = visitorSupplier;
         this.template = template;
@@ -155,6 +155,6 @@ public class HtmlView<M> extends HtmlPage {
      */
     public HtmlView<M> setCaching(boolean isCaching) {
         HtmlVisitor visitor = getVisitor();
-        return HtmlFlow.view(visitor.out(), template, visitor.isIndented, threadSafe, isCaching);
+        return HtmlFlow.view(template, visitor.isIndented, threadSafe, isCaching);
     }
 }

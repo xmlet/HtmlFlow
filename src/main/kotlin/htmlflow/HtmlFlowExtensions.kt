@@ -106,16 +106,11 @@ fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, t
             isIndented = isIndented,
             first = pre.first,
         )
-        /**
-         * Chain terminationNode next to the last node.
-         */
-        val terminationNode = HtmlContinuationSuspendableTerminationNode()
-        PreprocessingVisitor.HtmlContinuationSetter.setNext(visitor.findLast(), terminationNode)
         HtmlViewSuspend(template, visitor, threadSafe)
     } else {
         val visitor = HtmlViewVisitorSuspendHot(
             isIndented = isIndented,
-            template = template,
+            continuationSupplier = { preprocessingSuspend(template, isIndented) },
         )
         HtmlViewSuspendHot(template, visitor, threadSafe)
     }
@@ -150,5 +145,7 @@ private fun preprocessingSuspend(template: HtmlTemplate, isIndented: Boolean): P
      * Thus, dynamic blocks which depend on model are not invoked.
      */
     preView.visitor.resolve(null)
+    val terminationNode = HtmlContinuationSuspendableTerminationNode()
+    PreprocessingVisitor.HtmlContinuationSetter.setNext(pre.findLast(), terminationNode)
     return pre
 }

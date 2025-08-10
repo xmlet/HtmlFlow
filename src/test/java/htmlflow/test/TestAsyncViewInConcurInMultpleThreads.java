@@ -24,6 +24,18 @@ class TestAsyncViewInConcurInMultpleThreads {
         checkRender(view::render);
     }
 
+    @Test
+    void testMultipleThreadsInViewAsyncHot() throws InterruptedException {
+        HtmlViewAsync<Object> view = HtmlFlow.viewAsync(TestAsyncViewInConcurInMultpleThreads::template).setCaching(false).threadSafe();
+        checkRender(() -> view.renderAsync().join());
+    }
+
+    @Test
+    void testMultipleThreadsInViewHot() throws InterruptedException {
+        HtmlView<Object> view = HtmlFlow.view(TestAsyncViewInConcurInMultpleThreads::template).setCaching(false).threadSafe();
+        checkRender(view::render);
+    }
+
     private void checkRender(Supplier<String> render) throws InterruptedException {
         final int threadCount = 50;
         Thread[] thread = new Thread[threadCount];

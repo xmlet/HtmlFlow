@@ -102,7 +102,7 @@ public class HtmlViewAsync<M> extends HtmlPage {
         return renderAsync(null);
     }
 
-    public final CompletableFuture<String> renderAsync(M model) {
+    public CompletableFuture<String> renderAsync(M model) {
         StringBuilder str = new StringBuilder();
         return writeAsync(str, model).thenApply( nothing -> str.toString());
     }

@@ -1,8 +1,6 @@
 package htmlflow
 
-import htmlflow.visitor.HtmlViewVisitorHot
 import htmlflow.visitor.HtmlVisitorSuspending
-import org.xmlet.htmlapifaster.Html
 
 /**
  * Suspendable hot reload views can be bound to a domain object with suspending functions based API.
@@ -31,7 +29,7 @@ class HtmlViewSuspendHot<M>(
 ) : HtmlViewSuspend<M>(template, visitor, threadSafe) {
 
     override fun setIndented(isIndented: Boolean): HtmlViewSuspendHot<M> {
-        return HtmlViewSuspendHot(template, HtmlViewVisitorSuspendHot(null, isIndented, template), threadSafe)
+        return HtmlViewSuspendHot(template, visitor, threadSafe)
     }
 
     override fun getVisitor(): HtmlVisitorSuspending {
@@ -51,15 +49,12 @@ class HtmlViewSuspendHot<M>(
     }
 
     override suspend fun write(out: Appendable, model: M?) {
-        val visitorHot = visitor as HtmlViewVisitorSuspendHot
-        visitorHot.template = template
         val currentVisitor = if (threadSafe) {
-            visitorHot.clone(out)
+            visitor.clone(out)
         } else {
-            visitorHot.setAppendable(out)
+            visitor.setAppendable(out)
             visitor
         }
-        currentVisitor.resolve(model)
         currentVisitor.executeSuspending(model)
     }
 }

@@ -25,7 +25,6 @@ public class HtmlViewAsyncHot<M> extends HtmlViewAsync<M> {
     /**
      * Auxiliary constructor used by clone().
      *
-     * @param visitorSupplier
      * @param template
      * @param threadSafe
      */
@@ -45,8 +44,6 @@ public class HtmlViewAsyncHot<M> extends HtmlViewAsync<M> {
         } else {
             visitor.setAppendable(out);
         }
-        visitor.resolve(model);
-        this.template.resolve(this);
         return visitor.finishedAsync(model);
     }
 
@@ -63,5 +60,11 @@ public class HtmlViewAsyncHot<M> extends HtmlViewAsync<M> {
     @Override
     public HtmlViewAsync<M> setIndented(boolean isIndented) {
         return HtmlFlow.viewAsync(template, isIndented, threadSafe, false);
+    }
+
+    @Override
+    public final CompletableFuture<String> renderAsync(M model) {
+        StringBuilder str = new StringBuilder();
+        return writeAsync(str, model).thenApply( nothing -> str.toString().trim());
     }
 }

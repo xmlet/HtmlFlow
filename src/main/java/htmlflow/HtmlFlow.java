@@ -216,7 +216,7 @@ public class HtmlFlow {
             PreprocessingVisitorAsync pre = preprocessingAsync(template, isIndented);
             return new HtmlViewAsync<>(new HtmlViewVisitorAsync(isIndented, pre.getFirst()), template, threadSafe);
         } else {
-            return new HtmlViewAsyncHot<>(new HtmlViewVisitorAsyncHot(isIndented), template, threadSafe);
+            return new HtmlViewAsyncHot<>(new HtmlViewVisitorAsyncHot(isIndented, () -> preprocessingAsync(template, isIndented)), template, threadSafe);
         }
     }
 

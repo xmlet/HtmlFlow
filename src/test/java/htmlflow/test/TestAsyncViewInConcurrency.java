@@ -61,6 +61,40 @@ class TestAsyncViewInConcurrency {
                 .forEach(cf ->assertHtml(cf.join()));
     }
 
+    @Test
+    void check_asyncview_processing_in_concurrent_tasks_and_parallel_threads_hot() {
+        /**
+         * Arrange View
+         */
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setCaching(false).threadSafe();
+        /**
+         * Act and Assert
+         * Collects to dispatch resolution through writeAsync() concurrently.
+         */
+        IntStream
+                .range(0, NR_OF_TASKS)
+                .parallel()
+                .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
+                .collect(toList())
+                .forEach(cf ->assertHtml(cf.join()));
+    }
+
+    @Test
+    void check_asyncview_processing_in_concurrent_tasks_and_parallel_threads_hot_unsafe() {
+        /**
+         * Arrange View
+         */
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setCaching(false).threadUnsafe();
+        /**
+         * Act and Assert
+         * Since Stream is Lazy then there is a vertical processing and a sequential execution between tasks.
+         */
+        IntStream
+                .range(0, NR_OF_TASKS)
+                .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
+                .forEach(cf ->assertHtml(cf.join()));
+    }
+
     private static void assertHtml(String html) {
         Iterator<String> actual = Utils
                 .NEWLINE

@@ -38,14 +38,6 @@ open class HtmlViewVisitorSuspend(
         first.executeSuspending(model)
     }
 
-    fun findLast(): HtmlContinuation? {
-        var node = first
-        while (node.next != null) {
-            node = node.next
-        }
-        return node
-    }
-
     override fun <E : Element<*, *>?, U : Any?> visitDynamic(
         element: E?,
         consumer: BiConsumer<E?, U?>?

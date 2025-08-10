@@ -1,9 +1,6 @@
 package htmlflow
 
-import htmlflow.continuations.HtmlContinuation
-import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
 import htmlflow.visitor.HtmlVisitorSuspending
-import htmlflow.visitor.PreprocessingVisitor
 import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlapifaster.SuspendConsumer
 import org.xmlet.htmlapifaster.async.AwaitConsumer
@@ -17,10 +14,20 @@ import java.util.function.BiConsumer
 class HtmlViewVisitorSuspendHot(
     out: Appendable? = null,
     isIndented: Boolean,
-    var template: HtmlPage.() -> Unit
+    private val continuationSupplier: () -> PreprocessingVisitorSuspend
 ) : HtmlVisitorSuspending(out, isIndented) {
 
-    private var continuationProcessor: PreprocessingVisitorSuspend? = null
+    override fun resolve(model: Any?) {
+        // no-op
+    }
+
+    override fun clone(isIndented: Boolean): HtmlViewVisitorSuspendHot {
+        return HtmlViewVisitorSuspendHot(out, isIndented, continuationSupplier)
+    }
+
+    override fun clone(out: Appendable): HtmlViewVisitorSuspendHot {
+        return HtmlViewVisitorSuspendHot(out, isIndented, continuationSupplier)
+    }
 
     /**
      * Creates a new continuation chain for each render.
@@ -29,48 +36,23 @@ class HtmlViewVisitorSuspendHot(
      * cannot immediately execute the suspending block, we build a continuation chain
      * that is executed after the template is resolved and all the elements are visited.
      *
-     * This allows us to handle suspending operations in a hot reload context
-     * without storing static HTML blocks.
+     * Using continuations also allows us to have well-formed HTML and correct suspending/async behavior.
      */
-    override fun resolve(model: Any?) {
-        continuationProcessor = PreprocessingVisitorSuspend(isIndented)
-        val preView = HtmlView<Any>({ continuationProcessor!! }, template, false)
-        preView.template.resolve(preView)
-        preView.visitor.resolve(null)
-        val terminationNode = HtmlContinuationSuspendableTerminationNode()
-        PreprocessingVisitor.HtmlContinuationSetter.setNext(findLast(), terminationNode)
-    }
-
-    override fun clone(isIndented: Boolean): HtmlViewVisitorSuspendHot {
-        return HtmlViewVisitorSuspendHot(out, isIndented, template)
-    }
-
-    override fun clone(out: Appendable): HtmlViewVisitorSuspendHot {
-        return HtmlViewVisitorSuspendHot(out, isIndented, template)
-    }
-
     override suspend fun executeSuspending(model: Any?) {
-        continuationProcessor!!.setAppendable(out)
-        continuationProcessor!!.first.executeSuspending(model)
+        val continuationProcessor = continuationSupplier.invoke()
+        continuationProcessor.setAppendable(out)
+        continuationProcessor.first.executeSuspending(model)
     }
 
     override fun <E : Element<*, *>, U> visitDynamic(e: E, biConsumer: BiConsumer<E, U>) {
-        continuationProcessor?.visitDynamic(e, biConsumer)
+        throw IllegalStateException("Illegal use of visitDynamic in HtmlViewVisitorSuspendHot. Use continuation processor")
     }
 
     override fun <M, E : Element<*, *>> visitAwait(e: E, awaitConsumer: AwaitConsumer<E, M?>) {
-        continuationProcessor?.visitAwait(e, awaitConsumer)
+        throw IllegalStateException("Illegal use of visitAwait in HtmlViewVisitorSuspendHot. Use continuation processor")
     }
 
     override fun <M, E : Element<*, *>> visitSuspending(e: E, suspendConsumer: SuspendConsumer<E, M?>) {
-        continuationProcessor?.visitSuspending(e, suspendConsumer)
-    }
-
-    fun findLast(): HtmlContinuation? {
-        var node = continuationProcessor?.first ?: return null
-        while (node.next != null) {
-            node = node.next
-        }
-        return node
+        throw IllegalStateException("Illegal use of visitSuspending in HtmlViewVisitorSuspendHot. Use continuation processor")
     }
 }

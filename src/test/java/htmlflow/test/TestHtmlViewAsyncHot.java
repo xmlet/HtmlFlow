@@ -145,4 +145,23 @@ public class TestHtmlViewAsyncHot {
         assertInstanceOf(HtmlViewAsync.class, view2, "New view should be HtmlViewAsync");
         assertInstanceOf(HtmlViewVisitorAsync.class, newVisitor, "New visitor should be HtmlViewVisitorAsync");
     }
+
+    @Test
+    public void should_support_thread_safety() {
+        HtmlViewAsync<Object> view = viewAsyncHot(v -> {
+            v.html()
+                    .body()
+                    .h1().text("Thread Safety Test").__()
+                    .__()
+                    .__();
+        });
+
+        HtmlViewAsync<Object> threadSafeView = view.threadSafe();
+        String result = threadSafeView.renderAsync("Thread Safe").join();
+        assertTrue(result.contains("Thread Safety Test"), "Thread-safe view should render correctly");
+
+        HtmlViewAsync<Object> threadUnsafeView = view.threadUnsafe();
+        String unsafeResult = threadUnsafeView.renderAsync("Thread Unsafe").join();
+        assertTrue(unsafeResult.contains("Thread Safety Test"), "Thread-unsafe view should render correctly");
+    }
 }

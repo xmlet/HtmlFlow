@@ -25,6 +25,7 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlVisitor;
+
 import java.util.function.Supplier;
 
 /**
@@ -58,11 +59,11 @@ public class HtmlViewHot<M> extends HtmlView<M> {
     }
 
     public String render(M model) {
-        StringBuilder str = ((StringBuilder) getVisitor().out());
-        str.setLength(0);
+        StringBuilder out = (StringBuilder) getVisitor().out();
+        out.setLength(0);
         getVisitor().resolve(model);
-        this.template.resolve(this);
-        return str.toString();
+        template.resolve(this);
+        return out.toString().trim();
     }
 
     public void write(M model) {
