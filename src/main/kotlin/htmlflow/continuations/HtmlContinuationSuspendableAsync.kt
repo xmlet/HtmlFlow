@@ -16,6 +16,8 @@ class HtmlContinuationSuspendableAsync<E : Element<*, *>, T>(
     visitor: HtmlVisitor,
     next: HtmlContinuation?,
 ) : HtmlContinuation(currentDepth, isClosed, visitor, next) {
+
+    @Suppress("UNCHECKED_CAST")
     override suspend fun executeSuspending(model: Any?) {
         if (currentDepth >= 0) {
             visitor.setIsClosed(isClosed)

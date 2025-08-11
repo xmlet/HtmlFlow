@@ -15,6 +15,7 @@ class HtmlContinuationSuspendableSyncDynamic<E : Element<*, *>, T>(
     visitor: HtmlVisitor,
     next: HtmlContinuation?,
 ) : HtmlContinuationSuspendableSync(currentDepth, isClosed, visitor, next) {
+    @Suppress("UNCHECKED_CAST")
     override fun emitHtml(model: Any?) {
         consumer.accept(element, model as T)
     }
