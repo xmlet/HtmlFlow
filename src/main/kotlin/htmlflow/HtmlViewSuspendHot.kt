@@ -7,17 +7,11 @@ import htmlflow.visitor.HtmlVisitorSuspending
  * Dynamic views are unoptimized and do not store static HTML blocks, recalculating HTML on every rendering.
  * This makes them suitable for development scenarios where template changes need immediate reflection.
  *
- * <p><strong>Features:</strong>
- * <ul>
- *   <li>Supports suspending operations (visitSuspending)</li>
- *   <li>Supports async operations (visitAwait)</li>
- *   <li>Creates fresh continuation chains on each render</li>
- *   <li>No preprocessing - direct template execution with dynamic continuations</li>
- * </ul>
+ * They are not recommended for production use due to performance overhead.
  *
  *  @param <M> Type of the model rendered with this view.
  *
- * @author Your Name
+ * @author Bernardo Pereira
  */
 class HtmlViewSuspendHot<M>(
     /**

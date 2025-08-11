@@ -116,7 +116,7 @@ fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, t
     }
 }
 
-fun <M: Any?> HtmlFlow.Engine.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
+fun <M: Any?> HtmlFlow.ViewFactory.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
     return viewSuspend(template, isIndented = isIndented, threadSafe = threadSafe, preEncoding = preEncoding)
 }
 

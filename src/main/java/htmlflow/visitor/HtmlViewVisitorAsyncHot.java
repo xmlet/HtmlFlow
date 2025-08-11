@@ -9,8 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
-
 /**
  * Hot reload visitor that processes templates without preprocessing optimization.
  * This visitor recalculates the entire HTML on every rendering, making it suitable
@@ -24,6 +22,8 @@ import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNe
  * </ul>
  *
  * @see HtmlViewVisitorAsync for optimized visitor with preprocessing
+ *
+ * @author Bernardo Pereira
  */
 public class HtmlViewVisitorAsyncHot extends HtmlVisitorAsync {
 
@@ -68,8 +68,6 @@ public class HtmlViewVisitorAsyncHot extends HtmlVisitorAsync {
      * <p>
      * As such, this uses PreprocessingVisitorAsync to create a chain of continuations that will be created and
      * executed on each rendering of the template.
-     *
-     * @param model
      */
     @Override
     public CompletableFuture<Void> finishedAsync(Object model) {
@@ -91,23 +89,19 @@ public class HtmlViewVisitorAsyncHot extends HtmlVisitorAsync {
                 "This should have been called in the continuation processor (PreprocessingVisitorAsync) ");
     }
 
+    /**
+     * To ensure well-formed HTML and enable asynchronous rendering of templates we rely on continuations.
+     * The PreprocessingVisitorAsync builds a chain of continuations for each template rendering,
+     * allowing each part of the template to execute in sequence without blocking threads and ensuring
+     * that the next continuation is only executed after the current one finishes.
+     * <p>
+     * As such, this method is not implemented here and should be called in the continuation processor
+     * instead.
+     */
     @Override
     public <M, E extends Element> void visitAwait(E e, AwaitConsumer<E, M> awaitConsumer) {
         throw new IllegalStateException("Invalid use of visitAwait() in HtmlViewVisitorAsyncHot! " +
                 "This should have been called in the continuation processor (PreprocessingVisitorAsync)");
-        // 1. This would cause malformed HTML due to the next visits emitting HTML
-        // before this consumer is completed.
-        // awaitConsumer.accept(e, null, () -> {
-        //
-        // });
-
-        // 2. This would create well-formed HTML, but it would block the thread until the consumer is completed.
-        // Which defeats the purpose of async processing. It would also prevent progressive rendering.
-        // CompletableFuture<Void> cf = new CompletableFuture<>();
-        // awaitConsumer.accept(e, null, () -> {
-        //    cf.complete(null);
-        // });
-        // cf.join();
     }
 
     @Override

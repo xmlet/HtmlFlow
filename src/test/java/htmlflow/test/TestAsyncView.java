@@ -210,7 +210,7 @@ class TestAsyncView {
     
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.ViewFactory.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
         mem.reset();
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
@@ -229,7 +229,7 @@ class TestAsyncView {
 
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
 
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.ViewFactory.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
         //
         // 2nd render
@@ -255,7 +255,7 @@ class TestAsyncView {
     
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.ViewFactory.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
     }
 
@@ -276,7 +276,7 @@ class TestAsyncView {
         
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         
-        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
+        HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.ViewFactory.builder().preEncoding(false).build().viewAsync(TestAsyncView::testAsyncModel);
         
         final CompletableFuture<Void> writeAsync = view.writeAsync(new PrintStream(mem), asyncModel);
         

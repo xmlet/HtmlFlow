@@ -235,83 +235,83 @@ public class HtmlFlow {
     }
 
     /**
-     * Creates a Builder to configure HtmlView creation with fluent API.
-     * The returned builder can be used to configure settings and build an Engine
-     * that creates views with those settings.
-     *
-     * @return Builder instance for configuring views
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Builder pattern for creating Engine instances with flexible configuration.
-     * Once configured, call build() to get an immutable Engine that creates views.
-     */
-    public static class Builder {
-        private boolean isIndented = true;
-        private boolean threadSafe = false;
-        private boolean preEncoding = true;
-
-        Builder() {
-        }
-
-        /**
-         * Configure whether HTML output should be indented.
-         *
-         * @param indented true for indented output, false for compact output
-         * @return this builder instance
-         */
-        public Builder indented(boolean indented) {
-            this.isIndented = indented;
-            return this;
-        }
-
-        /**
-         * Configure thread safety for the view.
-         *
-         * @param threadSafe true for thread-safe operation, false for single-threaded use
-         * @return this builder instance
-         */
-        public Builder threadSafe(boolean threadSafe) {
-            this.threadSafe = threadSafe;
-            return this;
-        }
-
-        /**
-         * Enable or disable preEncoding/preprocessing optimization.
-         * When disabled, hot reload mode bypasses preprocessing for dynamic development scenarios.
-         *
-         * @param preEncoding true for preEncoding/preprocessing, false for hot reload mode
-         * @return this builder instance
-         */
-        public Builder preEncoding(boolean preEncoding) {
-            this.preEncoding = preEncoding;
-            return this;
-        }
-
-        /**
-         * Build an immutable Engine with the current configuration.
-         * The Engine can be used to create multiple views with the same settings.
-         *
-         * @return Engine instance configured with current settings
-         */
-        public Engine build() {
-            return new Engine(isIndented, threadSafe, preEncoding);
-        }
-    }
-
-    /**
      * Immutable Engine for creating HtmlView instances with pre-configured settings.
      * Use the Builder to create Engine instances.
      */
-    public static class Engine {
+    public static class ViewFactory {
         public final boolean isIndented;
         public final boolean threadSafe;
         public final boolean preEncoding;
 
-        Engine(boolean isIndented, boolean threadSafe, boolean preEncoding) {
+        /**
+         * Creates a Builder to configure HtmlView creation with fluent API.
+         * The returned builder can be used to configure settings and build an Engine
+         * that creates views with those settings.
+         *
+         * @return Builder instance for configuring views
+         */
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        /**
+         * Builder pattern for creating Engine instances with flexible configuration.
+         * Once configured, call build() to get an immutable Engine that creates views.
+         */
+        public static class Builder {
+            private boolean isIndented = true;
+            private boolean threadSafe = false;
+            private boolean preEncoding = true;
+
+            Builder() {
+            }
+
+            /**
+             * Configure whether HTML output should be indented.
+             *
+             * @param indented true for indented output, false for compact output
+             * @return this builder instance
+             */
+            public Builder indented(boolean indented) {
+                this.isIndented = indented;
+                return this;
+            }
+
+            /**
+             * Configure thread safety for the view.
+             *
+             * @param threadSafe true for thread-safe operation, false for single-threaded use
+             * @return this builder instance
+             */
+            public Builder threadSafe(boolean threadSafe) {
+                this.threadSafe = threadSafe;
+                return this;
+            }
+
+            /**
+             * Enable or disable preEncoding/preprocessing optimization.
+             * When disabled, hot reload mode bypasses preprocessing for dynamic development scenarios.
+             *
+             * @param preEncoding true for preEncoding/preprocessing, false for hot reload mode
+             * @return this builder instance
+             */
+            public Builder preEncoding(boolean preEncoding) {
+                this.preEncoding = preEncoding;
+                return this;
+            }
+
+            /**
+             * Build an immutable Engine with the current configuration.
+             * The Engine can be used to create multiple views with the same settings.
+             *
+             * @return Engine instance configured with current settings
+             */
+            public ViewFactory build() {
+                return new ViewFactory(isIndented, threadSafe, preEncoding);
+            }
+        }
+
+        ViewFactory(boolean isIndented, boolean threadSafe, boolean preEncoding) {
             this.isIndented = isIndented;
             this.threadSafe = threadSafe;
             this.preEncoding = preEncoding;

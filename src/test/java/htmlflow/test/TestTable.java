@@ -139,7 +139,7 @@ public class TestTable {
          * Act - Test both regular view and hot reload view
          */
         String regularHtml = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
-        String hotReloadHtml = HtmlFlow.builder()
+        String hotReloadHtml = HtmlFlow.ViewFactory.builder()
                 .preEncoding(false)
                 .indented(true)
                 .build()
@@ -163,7 +163,7 @@ public class TestTable {
         List<Task> tasks = Collections.singletonList(t1);
         
         // Test builder with custom output stream and hot reload
-        String html = HtmlFlow.builder()
+        String html = HtmlFlow.ViewFactory.builder()
                 .threadSafe(false)
                 .indented(false)
                 .build()
@@ -185,16 +185,16 @@ public class TestTable {
         List<Task> tasks = Arrays.asList(t1, t2);
         
         // Create a configured builder
-        HtmlFlow.Builder builder = HtmlFlow.builder()
+        HtmlFlow.ViewFactory.Builder builder = HtmlFlow.ViewFactory.builder()
                 .indented(true)
                 .threadSafe(false);
         
         // Build an engine
-        HtmlFlow.Engine engine = builder.build();
+        HtmlFlow.ViewFactory viewFactory = builder.build();
         
         // Use the same engine to create different views
-        HtmlView<List<Task>> tableView = engine.view(HtmlTables::taskTableView);
-        HtmlView<List<Task>> listView = engine.view(HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
+        HtmlView<List<Task>> tableView = viewFactory.view(HtmlTables::taskTableView);
+        HtmlView<List<Task>> listView = viewFactory.view(HtmlTables.taskListViewWithPartials(HtmlTables::taskListRow));
     
         
         // Test that all views can render
@@ -206,7 +206,7 @@ public class TestTable {
 
         // Test withOutput method
         StringBuilder customOutput = new StringBuilder();
-        HtmlView<List<Task>> customOutputView = engine.view(customOutput, HtmlTables::taskTableView);
+        HtmlView<List<Task>> customOutputView = viewFactory.view(customOutput, HtmlTables::taskTableView);
         customOutputView.render(tasks);
         
         assertNotNull("Custom output should not be null", customOutput.toString());

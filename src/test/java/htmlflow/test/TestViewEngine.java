@@ -60,11 +60,11 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderDefaultConfiguration() {
-        HtmlFlow.Builder builder = HtmlFlow.builder();
-        HtmlFlow.Engine engine = builder.build();
-        HtmlView<String> view = engine.view(SIMPLE_TEMPLATE);
+        HtmlFlow.ViewFactory.Builder builder = HtmlFlow.ViewFactory.builder();
+        HtmlFlow.ViewFactory viewFactory = builder.build();
+        HtmlView<String> view = viewFactory.view(SIMPLE_TEMPLATE);
         
-        assertNotNull("Builder should create an engine", engine);
+        assertNotNull("Builder should create an engine", viewFactory);
         assertNotNull("Engine should create a view", view);
         
         String html = view.render();
@@ -74,13 +74,13 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderFluentChaining() {
-        HtmlFlow.Engine engine = HtmlFlow.builder()
+        HtmlFlow.ViewFactory viewFactory = HtmlFlow.ViewFactory.builder()
                 .indented(false)
                 .threadSafe(true)
                 .preEncoding(false)
                 .build();
         
-        HtmlView<String> view = engine.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view = viewFactory.view(SIMPLE_TEMPLATE);
         assertNotNull("Fluent chaining should create a view", view);
         
         String html = view.render();
@@ -89,15 +89,15 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderToEnginePattern() {
-        HtmlFlow.Builder builder = HtmlFlow.builder()
+        HtmlFlow.ViewFactory.Builder builder = HtmlFlow.ViewFactory.builder()
                 .indented(false)
                 .preEncoding(true)
                 .threadSafe(false);
         
-        HtmlFlow.Engine engine = builder.build();
+        HtmlFlow.ViewFactory viewFactory = builder.build();
         
-        HtmlView<String> view1 = engine.view(SIMPLE_TEMPLATE);
-        HtmlView<String> view2 = engine.view(DYNAMIC_TEMPLATE);
+        HtmlView<String> view1 = viewFactory.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view2 = viewFactory.view(DYNAMIC_TEMPLATE);
         
         assertNotNull("Engine should create first view", view1);
         assertNotNull("Engine should create second view", view2);
@@ -111,7 +111,7 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderIndentedConfiguration() {
-        HtmlView<String> indentedView = HtmlFlow.builder()
+        HtmlView<String> indentedView = HtmlFlow.ViewFactory.builder()
                 .indented(true)
                 .build()
                 .view(SIMPLE_TEMPLATE);
@@ -119,7 +119,7 @@ public class TestViewEngine {
         String indentedHtml = indentedView.render();
         assertTrue("Indented view should contain newlines", indentedHtml.contains("\n"));
         
-        HtmlView<String> compactView = HtmlFlow.builder()
+        HtmlView<String> compactView = HtmlFlow.ViewFactory.builder()
                 .indented(false)
                 .build()
                 .view(SIMPLE_TEMPLATE);
@@ -130,14 +130,14 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderThreadSafeConfiguration() {
-        HtmlView<String> threadSafeView = HtmlFlow.builder()
+        HtmlView<String> threadSafeView = HtmlFlow.ViewFactory.builder()
                 .threadSafe(true)
                 .build()
                 .view(SIMPLE_TEMPLATE);
         
         assertNotNull("Thread-safe view should be created", threadSafeView);
         
-        HtmlView<String> singleThreadView = HtmlFlow.builder()
+        HtmlView<String> singleThreadView = HtmlFlow.ViewFactory.builder()
                 .threadSafe(false)
                 .build()
                 .view(SIMPLE_TEMPLATE);
@@ -147,12 +147,12 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderCachingVsHotReload() {
-        HtmlView<String> cachedView = HtmlFlow.builder()
+        HtmlView<String> cachedView = HtmlFlow.ViewFactory.builder()
                 .preEncoding(true)
                 .build()
                 .view(DYNAMIC_TEMPLATE);
         
-        HtmlView<String> hotView = HtmlFlow.builder()
+        HtmlView<String> hotView = HtmlFlow.ViewFactory.builder()
                 .preEncoding(false)
                 .build()
                 .view(DYNAMIC_TEMPLATE);
@@ -176,7 +176,7 @@ public class TestViewEngine {
     public void testEngineWithAppendableOutput() {
         StringWriter writer = new StringWriter();
         
-        HtmlView<String> view = HtmlFlow.builder()
+        HtmlView<String> view = HtmlFlow.ViewFactory.builder()
                 .indented(false)
                 .build()
                 .view(writer, SIMPLE_TEMPLATE);
@@ -191,14 +191,14 @@ public class TestViewEngine {
 
     @Test
     public void testEngineReuseability() {
-        HtmlFlow.Engine engine = HtmlFlow.builder()
+        HtmlFlow.ViewFactory viewFactory = HtmlFlow.ViewFactory.builder()
                 .indented(true)
                 .threadSafe(false)
                 .preEncoding(true)
                 .build();
         
-        HtmlView<String> view1 = engine.view(SIMPLE_TEMPLATE);
-        HtmlView<String> view2 = engine.view(DYNAMIC_TEMPLATE);
+        HtmlView<String> view1 = viewFactory.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view2 = viewFactory.view(DYNAMIC_TEMPLATE);
         
         assertNotNull("First view should be created", view1);
         assertNotNull("Second view should be created", view2);
@@ -217,7 +217,7 @@ public class TestViewEngine {
         for (boolean indented : boolValues) {
             for (boolean threadSafe : boolValues) {
                 for (boolean caching : boolValues) {
-                    HtmlView<String> view = HtmlFlow.builder()
+                    HtmlView<String> view = HtmlFlow.ViewFactory.builder()
                             .indented(indented)
                             .threadSafe(threadSafe)
                             .preEncoding(caching)
@@ -239,7 +239,7 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderHotReloadBehavior() {
-        HtmlView<String> hotView = HtmlFlow.builder()
+        HtmlView<String> hotView = HtmlFlow.ViewFactory.builder()
                 .preEncoding(false)
                 .build()
                 .view(DYNAMIC_TEMPLATE);
@@ -254,13 +254,13 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderWithDifferentTemplates() {
-        HtmlFlow.Engine engine = HtmlFlow.builder().indented(false).build();
+        HtmlFlow.ViewFactory viewFactory = HtmlFlow.ViewFactory.builder().indented(false).build();
         
         HtmlTemplate template1 = view -> view.html().body().h1().text("Template 1").__().__();
         HtmlTemplate template2 = view -> view.html().body().h2().text("Template 2").__().__();
         
-        HtmlView<String> view1 = engine.view(template1);
-        HtmlView<String> view2 = engine.view(template2);
+        HtmlView<String> view1 = viewFactory.view(template1);
+        HtmlView<String> view2 = viewFactory.view(template2);
         
         String html1 = view1.render();
         String html2 = view2.render();
@@ -271,14 +271,14 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderReuseAfterBuild() {
-        HtmlFlow.Builder builder = HtmlFlow.builder().indented(true);
+        HtmlFlow.ViewFactory.Builder builder = HtmlFlow.ViewFactory.builder().indented(true);
         
-        HtmlFlow.Engine engine1 = builder.build();
+        HtmlFlow.ViewFactory viewFactory1 = builder.build();
         
-        HtmlFlow.Engine engine2 = builder.indented(false).build();
+        HtmlFlow.ViewFactory viewFactory2 = builder.indented(false).build();
         
-        HtmlView<String> view1 = engine1.view(SIMPLE_TEMPLATE);
-        HtmlView<String> view2 = engine2.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view1 = viewFactory1.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view2 = viewFactory2.view(SIMPLE_TEMPLATE);
         
         String html1 = view1.render();
         String html2 = view2.render();
@@ -289,16 +289,16 @@ public class TestViewEngine {
 
     @Test
     public void testBuilderErrorHandling() {
-        HtmlFlow.Engine engine = HtmlFlow.builder().build();
+        HtmlFlow.ViewFactory viewFactory = HtmlFlow.ViewFactory.builder().build();
         
         try {
-            engine.view(null);
+            viewFactory.view(null);
             fail("Should throw exception for null template");
         } catch (Exception e) {
         }
         
         try {
-            engine.view(null, SIMPLE_TEMPLATE).render();
+            viewFactory.view(null, SIMPLE_TEMPLATE).render();
             fail("Should throw exception for null appendable");
         } catch (Exception e) {
         }
@@ -306,16 +306,16 @@ public class TestViewEngine {
 
     @Test
     public void testEngineImmutability() {
-        HtmlFlow.Builder builder = HtmlFlow.builder()
+        HtmlFlow.ViewFactory.Builder builder = HtmlFlow.ViewFactory.builder()
                 .indented(true)
                 .threadSafe(false)
                 .preEncoding(true);
         
-        HtmlFlow.Engine engine = builder.build();
+        HtmlFlow.ViewFactory viewFactory = builder.build();
         
         builder.indented(false).threadSafe(true).preEncoding(false);
         
-        HtmlView<String> view = engine.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view = viewFactory.view(SIMPLE_TEMPLATE);
         String html = view.render();
         
         assertTrue("Engine should be immutable and retain original indented=true", html.contains("\n"));
@@ -325,15 +325,15 @@ public class TestViewEngine {
 
     @Test
     public void testMultipleEnginesFromSameBuilder() {
-        HtmlFlow.Builder builder = HtmlFlow.builder().indented(false);
+        HtmlFlow.ViewFactory.Builder builder = HtmlFlow.ViewFactory.builder().indented(false);
         
-        HtmlFlow.Engine engine1 = builder.preEncoding(true).build();
-        HtmlFlow.Engine engine2 = builder.preEncoding(false).build();
-        HtmlFlow.Engine engine3 = builder.threadSafe(true).preEncoding(true).build();
+        HtmlFlow.ViewFactory viewFactory1 = builder.preEncoding(true).build();
+        HtmlFlow.ViewFactory viewFactory2 = builder.preEncoding(false).build();
+        HtmlFlow.ViewFactory viewFactory3 = builder.threadSafe(true).preEncoding(true).build();
         
-        HtmlView<String> view1 = engine1.view(SIMPLE_TEMPLATE);
-        HtmlView<String> view2 = engine2.view(SIMPLE_TEMPLATE);
-        HtmlView<String> view3 = engine3.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view1 = viewFactory1.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view2 = viewFactory2.view(SIMPLE_TEMPLATE);
+        HtmlView<String> view3 = viewFactory3.view(SIMPLE_TEMPLATE);
         
         assertNotNull("First engine should create view", view1);
         assertNotNull("Second engine should create view", view2);
