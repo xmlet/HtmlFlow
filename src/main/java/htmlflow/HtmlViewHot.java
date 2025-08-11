@@ -41,9 +41,9 @@ public class HtmlViewHot<M> extends HtmlView<M> {
     /**
      * Auxiliary constructor used by clone().
      *
-     * @param visitorSupplier
-     * @param template
-     * @param threadSafe
+     * @param visitorSupplier Supplier that provides a new instance of HtmlVisitor.
+     * @param template Function that consumes an HtmlView to produce HTML elements.
+     * @param threadSafe If true, the view is thread-safe and uses a ThreadLocal visitor.
      */
     HtmlViewHot(Supplier<HtmlVisitor> visitorSupplier, HtmlTemplate template, boolean threadSafe) {
         super(visitorSupplier, template, threadSafe);
@@ -75,15 +75,16 @@ public class HtmlViewHot<M> extends HtmlView<M> {
         write(null);
     }
 
-    protected HtmlView<M> clone(
+    protected HtmlViewHot<M> clone(
             Supplier<HtmlVisitor> visitorSupplier,
             boolean threadSafe)
     {
         return new HtmlViewHot<>(visitorSupplier, template, threadSafe);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public HtmlView<M> setIndented(boolean isIndented) {
-        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe, false);
+    public HtmlViewHot<M> setIndented(boolean isIndented) {
+        return (HtmlViewHot<M>) HtmlFlow.view(template, isIndented, threadSafe, false);
     }
 }

@@ -23,7 +23,7 @@ class HtmlViewSuspendHot<M>(
 ) : HtmlViewSuspend<M>(template, visitor, threadSafe) {
 
     override fun setIndented(isIndented: Boolean): HtmlViewSuspendHot<M> {
-        return HtmlViewSuspendHot(template, visitor, threadSafe)
+        return viewSuspend<M>(template, isIndented, threadSafe, false) as HtmlViewSuspendHot<M>
     }
 
     override fun getVisitor(): HtmlVisitorSuspending {
@@ -34,11 +34,11 @@ class HtmlViewSuspendHot<M>(
         return "HtmlViewSuspendHot"
     }
 
-    override fun threadSafe(): HtmlViewSuspend<M> {
+    override fun threadSafe(): HtmlViewSuspendHot<M> {
         return HtmlViewSuspendHot(template, visitor, true)
     }
 
-    override fun threadUnsafe(): HtmlViewSuspend<M> {
+    override fun threadUnsafe(): HtmlViewSuspendHot<M> {
         return HtmlViewSuspendHot(template, visitor, false)
     }
 

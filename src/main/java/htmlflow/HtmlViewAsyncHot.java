@@ -25,8 +25,8 @@ public class HtmlViewAsyncHot<M> extends HtmlViewAsync<M> {
     /**
      * Auxiliary constructor used by clone().
      *
-     * @param template
-     * @param threadSafe
+     * @param template the HTML template to be used for rendering
+     * @param threadSafe indicates whether the view should be thread-safe
      */
     HtmlViewAsyncHot(HtmlVisitorAsync visitor, HtmlTemplate template, boolean threadSafe) {
         super(visitor, template, threadSafe);
@@ -48,18 +48,19 @@ public class HtmlViewAsyncHot<M> extends HtmlViewAsync<M> {
     }
 
     @Override
-    public HtmlViewAsync<M> threadSafe(){
+    public HtmlViewAsyncHot<M> threadSafe(){
         return new HtmlViewAsyncHot<>(visitor, template, true);
     }
 
     @Override
-    public HtmlViewAsync<M> threadUnsafe(){
+    public HtmlViewAsyncHot<M> threadUnsafe(){
         return new HtmlViewAsyncHot<>(visitor, template, false);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public HtmlViewAsync<M> setIndented(boolean isIndented) {
-        return HtmlFlow.viewAsync(template, isIndented, threadSafe, false);
+    public HtmlViewAsyncHot<M> setIndented(boolean isIndented) {
+        return (HtmlViewAsyncHot<M>) HtmlFlow.viewAsync(template, isIndented, threadSafe, false);
     }
 
     @Override
