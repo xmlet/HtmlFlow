@@ -24,10 +24,7 @@
 
 package htmlflow;
 
-import org.xmlet.htmlapifaster.Div;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Tr;
+import static java.util.stream.Collectors.joining;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -36,36 +33,41 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URL;
-
-import static java.util.stream.Collectors.joining;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Tr;
 
 /**
- * The root container for HTML elements.
- * It is responsible for managing the {@code org.xmlet.htmlapi.ElementVisitor}
- * implementation, which is responsible for printing the tree of elements and
- * attributes.
+ * The root container for HTML elements. It is responsible for managing the {@code
+ * org.xmlet.htmlapi.ElementVisitor} implementation, which is responsible for printing the tree of
+ * elements and attributes.
  *
- * Instances of HtmlPage are immutable. Any change to its properties returns a new
- * instance of HtmlPage.
+ * <p>Instances of HtmlPage are immutable. Any change to its properties returns a new instance of
+ * HtmlPage.
  *
- * @author Miguel Gamboa, Luís Duare
- *         created on 29-03-2012
+ * @author Miguel Gamboa, Luís Duare created on 29-03-2012
  */
-public abstract class HtmlPage implements Element<HtmlPage, Element<?,?>> {
+public abstract class HtmlPage implements Element<HtmlPage, Element<?, ?>> {
 
-    public  static final String HEADER;
+    public static final String HEADER;
     private static final String NEWLINE = System.getProperty("line.separator");
-    private static final String HEADER_TEMPLATE = "templates/HtmlView-Header.txt";
+    private static final String HEADER_TEMPLATE =
+        "templates/HtmlView-Header.txt";
 
     static {
         try {
-            URL headerUrl = HtmlPage.class
-                    .getClassLoader()
-                    .getResource(HEADER_TEMPLATE);
-            if(headerUrl == null)
-                throw new FileNotFoundException(HEADER_TEMPLATE);
+            URL headerUrl =
+                HtmlPage.class.getClassLoader().getResource(HEADER_TEMPLATE);
+            if (headerUrl == null) throw new FileNotFoundException(
+                HEADER_TEMPLATE
+            );
             InputStream headerStream = headerUrl.openStream();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(headerStream))) {
+            try (
+                BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(headerStream)
+                )
+            ) {
                 HEADER = reader.lines().collect(joining(NEWLINE));
             }
         } catch (IOException e) {
@@ -84,8 +86,8 @@ public abstract class HtmlPage implements Element<HtmlPage, Element<?,?>> {
     }
 
     /**
-     * Returns a new instance of HtmlFlow with the same properties of this object
-     * but with indented set to the value of isIndented parameter.
+     * Returns a new instance of HtmlFlow with the same properties of this object but with indented
+     * set to the value of isIndented parameter.
      */
     public abstract HtmlPage setIndented(boolean isIndented);
 
@@ -98,11 +100,15 @@ public abstract class HtmlPage implements Element<HtmlPage, Element<?,?>> {
 
     @Override
     public Element __() {
-        throw new IllegalStateException(getName() + " is the root of Html tree and it has not any parent.");
+        throw new IllegalStateException(
+            getName() + " is the root of Html tree and it has not any parent."
+        );
     }
 
     @Override
     public Element getParent() {
-        throw new IllegalStateException(getName() + " is the root of Html tree and it has not any parent.");
+        throw new IllegalStateException(
+            getName() + " is the root of Html tree and it has not any parent."
+        );
     }
 }

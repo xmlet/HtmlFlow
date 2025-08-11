@@ -25,21 +25,18 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlVisitorAsync;
-import org.xmlet.htmlapifaster.Html;
-
 import java.util.concurrent.CompletableFuture;
+import org.xmlet.htmlapifaster.Html;
 
 /**
  * Asynchronous views can be bound to a domain object with an asynchronous API.
  *
- *  @param <M> Type of the model rendered with this view.
- *
+ * @param <M> Type of the model rendered with this view.
  * @author Pedro Fialho
  */
 public class HtmlViewAsync<M> extends HtmlPage {
-    /**
-     * Function that consumes an HtmlView to produce HTML elements.
-     */
+
+    /** Function that consumes an HtmlView to produce HTML elements. */
     protected final HtmlTemplate template;
 
     protected final HtmlVisitorAsync visitor;
@@ -50,7 +47,11 @@ public class HtmlViewAsync<M> extends HtmlPage {
         this(visitor, template, true);
     }
 
-    public HtmlViewAsync(HtmlVisitorAsync visitor, HtmlTemplate template, boolean safe) {
+    public HtmlViewAsync(
+        HtmlVisitorAsync visitor,
+        HtmlTemplate template,
+        boolean safe
+    ) {
         this.visitor = visitor;
         this.template = template;
         this.threadSafe = safe;
@@ -68,7 +69,12 @@ public class HtmlViewAsync<M> extends HtmlPage {
     }
 
     public HtmlViewAsync<M> setPreEncoding(boolean preEncoding) {
-        return HtmlFlow.viewAsync(template, visitor.isIndented, threadSafe, preEncoding);
+        return HtmlFlow.viewAsync(
+            template,
+            visitor.isIndented,
+            threadSafe,
+            preEncoding
+        );
     }
 
     @Override
@@ -82,11 +88,11 @@ public class HtmlViewAsync<M> extends HtmlPage {
     }
 
     @Override
-    public HtmlViewAsync<M> threadSafe(){
+    public HtmlViewAsync<M> threadSafe() {
         return new HtmlViewAsync<>(visitor, template);
     }
 
-    public HtmlViewAsync<M> threadUnsafe(){
+    public HtmlViewAsync<M> threadUnsafe() {
         return new HtmlViewAsync<>(visitor, template, false);
     }
 
@@ -104,6 +110,6 @@ public class HtmlViewAsync<M> extends HtmlPage {
 
     public CompletableFuture<String> renderAsync(M model) {
         StringBuilder str = new StringBuilder();
-        return writeAsync(str, model).thenApply( nothing -> str.toString());
+        return writeAsync(str, model).thenApply(nothing -> str.toString());
     }
 }

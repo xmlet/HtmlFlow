@@ -14,49 +14,39 @@
 
 package htmlflow.visitor.escape.core;
 
-import java.util.Map;
-
 import static java.util.Collections.max;
+
+import java.util.Map;
 
 /**
  * A class that provides an array-based implementation for character escaping.
  *
- * <p>
- *     This class is used to create a mapping of characters to their escape sequences,
- *     allowing for efficient character replacement during escaping operations.
- * </p>
+ * <p>This class is used to create a mapping of characters to their escape sequences, allowing for
+ * efficient character replacement during escaping operations.
  *
- * <p>
- *     Derived and adapted from Guava's ArrayBasedEscaperMap class:
- *     <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/escape/ArrayBasedEscaperMap.java">guava</a>
- * </p>
+ * <p>Derived and adapted from Guava's ArrayBasedEscaperMap class: <a
+ * href="https://github.com/google/guava/blob/master/guava/src/com/google/common/escape/ArrayBasedEscaperMap.java">guava</a>
  *
- * <p>
- *     Modified by Arthur Oliveira on 04-08-2025
- * </p>
+ * <p>Modified by Arthur Oliveira on 04-08-2025
  *
  * @author Arthur Oliveira
  * @author The Guava Authors
  */
 final class ArrayBasedEscaperMap {
 
-    /**
-     * The replacement array used for escaping characters.
-     */
+    /** The replacement array used for escaping characters. */
     private final char[][] replacementArray;
 
     /**
      * An empty replacement array used when no replacements are defined.
-     * <p>
-     *  This array is used to avoid unnecessary allocations
-     *  when there are no characters to escape.
+     *
+     * <p>This array is used to avoid unnecessary allocations when there are no characters to escape.
      */
     private static final char[][] EMPTY_REPLACEMENT_ARRAY = new char[0][0];
 
-    /**
-     * Exception message for null replacement map.
-     */
-    private static final String NULL_MAP_EXCEPTION_MESSAGE = "Replacement map cannot be null";
+    /** Exception message for null replacement map. */
+    private static final String NULL_MAP_EXCEPTION_MESSAGE =
+        "Replacement map cannot be null";
 
     private ArrayBasedEscaperMap(char[][] replacementArray) {
         this.replacementArray = replacementArray;
@@ -64,18 +54,21 @@ final class ArrayBasedEscaperMap {
 
     /**
      * Creates a replacement array from the given map.
+     *
      * @param replacements the map of characters to their replacement strings
      * @return an {@link ArrayBasedEscaperMap} instance containing the replacement array
      * @throws NullPointerException if the replacements map is null
      */
-    public static ArrayBasedEscaperMap create(Map<Character, String> replacements) {
+    public static ArrayBasedEscaperMap create(
+        Map<Character, String> replacements
+    ) {
         return new ArrayBasedEscaperMap(createReplacementArray(replacements));
     }
 
     /**
      * Returns the replacement array used for escaping characters.
-     * <p>
-     * This method provides access to the array that contains the character replacements.
+     *
+     * <p>This method provides access to the array that contains the character replacements.
      *
      * @return {@link #replacementArray}
      */
@@ -85,14 +78,13 @@ final class ArrayBasedEscaperMap {
 
     /**
      * Creates a replacement array from the given map.
-     * <p>
-     * This method constructs a character array where each index corresponds to a character,
-     * and the value at that index is the character's replacement as a character array.
+     *
+     * <p>This method constructs a character array where each index corresponds to a character, and
+     * the value at that index is the character's replacement as a character array.
      *
      * @param map the map of characters to their replacement strings
-     * @return a character array where each index corresponds to a character,
-     *         and the value at that index is the character's replacement as a character array
-     *
+     * @return a character array where each index corresponds to a character, and the value at that
+     *     index is the character's replacement as a character array
      * @throws NullPointerException if the map is null
      */
     private static char[][] createReplacementArray(Map<Character, String> map) {

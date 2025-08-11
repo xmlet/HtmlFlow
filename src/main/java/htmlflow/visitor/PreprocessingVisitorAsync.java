@@ -7,10 +7,9 @@ import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-
 /**
  * @author Pedro Fialho
- **/
+ */
 public class PreprocessingVisitorAsync extends PreprocessingVisitor {
 
     public PreprocessingVisitorAsync(boolean isIndented) {
@@ -18,32 +17,39 @@ public class PreprocessingVisitorAsync extends PreprocessingVisitor {
     }
 
     @Override
-    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E, M> asyncHtmlBlock) {
-        /**
-         * Creates an HtmlContinuation for the async block.
-         */
+    public <M, E extends Element> void visitAwait(
+        E element,
+        AwaitConsumer<E, M> asyncHtmlBlock
+    ) {
+        /** Creates an HtmlContinuation for the async block. */
         HtmlContinuation asyncCont = new HtmlContinuationAsync<>(
-                depth,
-                isClosed,
-                element,
-                asyncHtmlBlock,
-                this,
-                new HtmlContinuationSyncCloseAndIndent(this));
+            depth,
+            isClosed,
+            element,
+            asyncHtmlBlock,
+            this,
+            new HtmlContinuationSyncCloseAndIndent(this)
+        );
         /**
-         * We are resolving this view for the first time.
-         * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
-         * which will be followed by the asyncCont.
+         * We are resolving this view for the first time. Now we just need to create an HtmlContinuation
+         * corresponding to the previous static HTML, which will be followed by the asyncCont.
          */
         chainContinuationStatic(asyncCont);
         /**
-         * We have to run newlineAndIndent to leave isClosed and indentation correct for
-         * the next static HTML block.
+         * We have to run newlineAndIndent to leave isClosed and indentation correct for the next static
+         * HTML block.
          */
         indentAndAdvanceStaticBlockIndex();
     }
 
     @Override
-    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
-        throw new UnsupportedOperationException("Illegal use of suspending builder. To use it you should create a HtmlViewSuspend.");
+    public <M, E extends Element> void visitSuspending(
+        E element,
+        SuspendConsumer<E, M> suspendAction
+    ) {
+        throw new UnsupportedOperationException(
+            "Illegal use of suspending builder. To use it you should create a" +
+            " HtmlViewSuspend."
+        );
     }
 }
