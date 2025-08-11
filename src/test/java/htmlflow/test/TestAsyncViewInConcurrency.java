@@ -66,7 +66,7 @@ class TestAsyncViewInConcurrency {
         /**
          * Arrange View
          */
-        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setCaching(false).threadSafe();
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setPreEncoding(false).threadSafe();
         /**
          * Act and Assert
          * Collects to dispatch resolution through writeAsync() concurrently.
@@ -84,7 +84,7 @@ class TestAsyncViewInConcurrency {
         /**
          * Arrange View
          */
-        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setCaching(false).threadUnsafe();
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setPreEncoding(false).threadUnsafe();
         /**
          * Act and Assert
          * Since Stream is Lazy then there is a vertical processing and a sequential execution between tasks.

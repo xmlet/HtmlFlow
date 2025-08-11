@@ -140,7 +140,7 @@ public class TestTable {
          */
         String regularHtml = HtmlFlow.view(HtmlTables::taskTableView).render(tasks);
         String hotReloadHtml = HtmlFlow.builder()
-                .caching(false)
+                .preEncoding(false)
                 .indented(true)
                 .build()
                 .view(HtmlTables::taskTableView)

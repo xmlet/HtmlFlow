@@ -20,7 +20,7 @@ class TestSuspendableViewInConcurInMultpleThreads {
     @Test
     @Throws(InterruptedException::class)
     fun testMultipleThreadsInViewAsyncHotWithHtml() {
-        val view = viewSuspend<Any> { template() }.threadSafe().setCaching(false)
+        val view = viewSuspend<Any> { template() }.threadSafe().setPreEncoding(false)
         checkRender { view.render() }
     }
 }

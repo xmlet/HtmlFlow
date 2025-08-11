@@ -88,7 +88,7 @@ class TestSuspendableViewInConcurrency {
          */
         val view = viewSuspend<AsyncModel<String, Student>> { testSuspendingModel() }
             .threadUnsafe()
-            .setCaching(false)
+            .setPreEncoding(false)
         /**
          * Act and Assert
          * Since Stream is Lazy then there is a vertical processing and a sequential execution between tasks.
@@ -111,7 +111,7 @@ class TestSuspendableViewInConcurrency {
          */
         val view = viewSuspend<AsyncModel<String, Student>> { testSuspendingModel() }
             .threadSafe()
-            .setCaching(false)
+            .setPreEncoding(false)
         /**
          * Act and Assert
          * Collects to dispatch resolution through writeAsync() concurrently.

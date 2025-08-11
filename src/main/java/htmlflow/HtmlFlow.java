@@ -52,10 +52,17 @@ public class HtmlFlow {
     private static PreprocessingVisitor preprocessing(HtmlTemplate template, boolean isIndented) {
         PreprocessingVisitor pre = new PreprocessingVisitor(isIndented);
         HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
-        template.resolve(preView); // ?????? Why ????? This is not the same as next statement ????
-        /**
+        /*
+         * 1st Performs rendering by invoking the function defined as the template, collecting the
+         * resulting static HTML into an internal StringBuffer.
+         */
+        template.resolve(preView);
+        /*
          * NO problem with null model. We are just preprocessing static HTML blocks.
          * Thus, dynamic blocks which depend on model are not invoked.
+         * 2nd Simply invokes resolve in PreprocessingVisitor, which creates only
+         * the final HtmlContinuationSyncStatic containing the remaining static HTML
+         * accumulated in the internal StringBuffer out.
          */
         preView.getVisitor().resolve(null);
         return pre;
@@ -68,10 +75,17 @@ public class HtmlFlow {
     private static PreprocessingVisitorAsync preprocessingAsync(HtmlTemplate template, boolean isIndented) {
         PreprocessingVisitorAsync pre = new PreprocessingVisitorAsync(isIndented);
         HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
-        template.resolve(preView); //  ?????? Why  ????? This is not the same as next statement ????
-        /**
+        /*
+         * 1st Performs rendering by invoking the function defined as the template, collecting the
+         * resulting static HTML into an internal StringBuffer.
+         */
+        template.resolve(preView);
+        /*
          * NO problem with null model. We are just preprocessing static HTML blocks.
          * Thus, dynamic blocks which depend on model are not invoked.
+         * 2nd Simply invokes resolve in PreprocessingVisitor, which creates only
+         * the final HtmlContinuationSyncStatic containing the remaining static HTML
+         * accumulated in the internal StringBuffer out.
          */
         preView.getVisitor().resolve(null);
         return pre;
@@ -104,13 +118,13 @@ public class HtmlFlow {
      *
      * @param out      Output PrintStream.
      * @param template Function that consumes an HtmlView to produce HTML elements.
-     * @param caching  Enable the use of caching for static HTML blocks. If false, this will create a hot view
-     *                 which does not cache static HTML blocks and recalculates HTML on every rendering, useful
+     * @param preEncoding  Enable the use of preEncoding for static HTML blocks. If false, this will create a hot view
+     *                 which does not store static HTML blocks and recalculates HTML on every rendering, useful
      *                 for development scenarios when code is reloaded frequently.
      * @param <M>      Type of the model rendered with this view.
      */
-    public static <M> HtmlView<M> view(Appendable out, boolean caching, HtmlTemplate template) {
-        return HtmlFlow.view(out, template, true, false, caching);
+    public static <M> HtmlView<M> view(Appendable out, boolean preEncoding, HtmlTemplate template) {
+        return HtmlFlow.view(out, template, true, false, preEncoding);
     }
     /**
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
@@ -121,8 +135,8 @@ public class HtmlFlow {
      * @param threadSafe Enable the use for thread safety.
      * @param <M>        Type of the model rendered with this view.
      */
-    static <M> HtmlView<M> view(Appendable out, HtmlTemplate template, boolean isIndented, boolean threadSafe, boolean caching) {
-        if (caching) {
+    static <M> HtmlView<M> view(Appendable out, HtmlTemplate template, boolean isIndented, boolean threadSafe, boolean preEncoding) {
+        if (preEncoding) {
             PreprocessingVisitor pre = preprocessing(template, isIndented);
             return new HtmlView<>(
                     (() -> new HtmlViewVisitor(out, isIndented, pre.getFirst())),
@@ -151,13 +165,13 @@ public class HtmlFlow {
      * default indentation on.
      *
      * @param template Function that consumes an HtmlView to produce HTML elements.
-     * @param caching  Enable the use of caching for static HTML blocks. If false, this will create a hot view
-     *                 which does not cache static HTML blocks and recalculates HTML on every rendering, useful
+     * @param preEncoding  Enable the use of preEncoding for static HTML blocks. If false, this will create a hot view
+     *                 which does not store static HTML blocks and recalculates HTML on every rendering, useful
      *                 for development scenarios when code is reloaded frequently.
      * @param <M>      Type of the model rendered with this view.
      */
-    public static <M> HtmlView<M> view(boolean caching, HtmlTemplate template) {
-        return HtmlFlow.view(template, true, false, caching);
+    public static <M> HtmlView<M> view(boolean preEncoding, HtmlTemplate template) {
+        return HtmlFlow.view(template, true, false, preEncoding);
     }
     /**
      * Creates a HtmlView corresponding to a dynamic HtmlPage with a model.
@@ -167,8 +181,8 @@ public class HtmlFlow {
      * @param threadSafe Enable the use for thread safety.
      * @param <M>        Type of the model rendered with this view.
      */
-    static <M> HtmlView<M> view(HtmlTemplate template, boolean isIndented, boolean threadSafe, boolean caching) {
-        if (caching) {
+    static <M> HtmlView<M> view(HtmlTemplate template, boolean isIndented, boolean threadSafe, boolean preEncoding) {
+        if (preEncoding) {
             PreprocessingVisitor pre = preprocessing(template, isIndented);
             return new HtmlView<>(
                     (() -> new HtmlViewVisitor(new StringBuilder(), isIndented, pre.getFirst())),
@@ -196,13 +210,13 @@ public class HtmlFlow {
      * default indentation on.
      *
      * @param template Function that consumes an HtmlView to produce HTML elements.
-     * @param caching  Enable the use of caching for static HTML blocks. If false, this will create a hot view
-     *                 which does not cache static HTML blocks and recalculates HTML on every rendering, useful
+     * @param preEncoding  Enable the use of preEncoding for static HTML blocks. If false, this will create a hot view
+     *                 which does not store static HTML blocks and recalculates HTML on every rendering, useful
      *                 for development scenarios when code is reloaded frequently.
      * @param <M>      Type of the model rendered with this view.
      */
-    public static <M> HtmlViewAsync<M> viewAsync(boolean caching, HtmlTemplate template) {
-        return HtmlFlow.viewAsync(template, true, false, caching);
+    public static <M> HtmlViewAsync<M> viewAsync(boolean preEncoding, HtmlTemplate template) {
+        return HtmlFlow.viewAsync(template, true, false, preEncoding);
     }
     /**
      * Creates a HtmlViewAsync corresponding to a dynamic HtmlPage with an asynchronous model.
@@ -211,8 +225,8 @@ public class HtmlFlow {
      * @param isIndented Set indentation on or off.
      * @param <M>        Type of the model rendered with this view.
      */
-    static <M> HtmlViewAsync<M> viewAsync(HtmlTemplate template, boolean isIndented, boolean threadSafe, boolean caching) {
-        if (caching) {
+    static <M> HtmlViewAsync<M> viewAsync(HtmlTemplate template, boolean isIndented, boolean threadSafe, boolean preEncoding) {
+        if (preEncoding) {
             PreprocessingVisitorAsync pre = preprocessingAsync(template, isIndented);
             return new HtmlViewAsync<>(new HtmlViewVisitorAsync(isIndented, pre.getFirst()), template, threadSafe);
         } else {
@@ -238,7 +252,7 @@ public class HtmlFlow {
     public static class Builder {
         private boolean isIndented = true;
         private boolean threadSafe = false;
-        private boolean caching = true;
+        private boolean preEncoding = true;
 
         Builder() {
         }
@@ -266,14 +280,14 @@ public class HtmlFlow {
         }
 
         /**
-         * Enable or disable caching/preprocessing optimization.
+         * Enable or disable preEncoding/preprocessing optimization.
          * When disabled, hot reload mode bypasses preprocessing for dynamic development scenarios.
          *
-         * @param caching true for caching/preprocessing, false for hot reload mode
+         * @param preEncoding true for preEncoding/preprocessing, false for hot reload mode
          * @return this builder instance
          */
-        public Builder caching(boolean caching) {
-            this.caching = caching;
+        public Builder preEncoding(boolean preEncoding) {
+            this.preEncoding = preEncoding;
             return this;
         }
 
@@ -284,7 +298,7 @@ public class HtmlFlow {
          * @return Engine instance configured with current settings
          */
         public Engine build() {
-            return new Engine(isIndented, threadSafe, caching);
+            return new Engine(isIndented, threadSafe, preEncoding);
         }
     }
 
@@ -295,12 +309,12 @@ public class HtmlFlow {
     public static class Engine {
         public final boolean isIndented;
         public final boolean threadSafe;
-        public final boolean caching;
+        public final boolean preEncoding;
 
-        Engine(boolean isIndented, boolean threadSafe, boolean caching) {
+        Engine(boolean isIndented, boolean threadSafe, boolean preEncoding) {
             this.isIndented = isIndented;
             this.threadSafe = threadSafe;
-            this.caching = caching;
+            this.preEncoding = preEncoding;
         }
 
         /**
@@ -311,7 +325,7 @@ public class HtmlFlow {
          * @return HtmlView or HtmlViewHot instance based on configuration
          */
         public <M> HtmlView<M> view(HtmlTemplate template) {
-            return HtmlFlow.view(template, isIndented, threadSafe, caching);
+            return HtmlFlow.view(template, isIndented, threadSafe, preEncoding);
         }
 
         /**
@@ -324,7 +338,7 @@ public class HtmlFlow {
          * @return HtmlView or HtmlViewHot instance based on configuration
          */
         public <M> HtmlView<M> view(Appendable out, HtmlTemplate template) {
-            return HtmlFlow.view(out, template, isIndented, threadSafe, caching);
+            return HtmlFlow.view(out, template, isIndented, threadSafe, preEncoding);
         }
         /**
          * Create an HtmlViewAsync instance with the specified template using this Engine's configuration.
@@ -334,7 +348,7 @@ public class HtmlFlow {
          * @return HtmlViewAsync instance based on configuration
          */
         public <M> HtmlViewAsync<M> viewAsync(HtmlTemplate template) {
-            return HtmlFlow.viewAsync(template, isIndented, threadSafe, caching);
+            return HtmlFlow.viewAsync(template, isIndented, threadSafe, preEncoding);
         }
     }
 }

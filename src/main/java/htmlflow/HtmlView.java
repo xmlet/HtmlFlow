@@ -149,12 +149,12 @@ public class HtmlView<M> extends HtmlPage {
 
     /**
      * Returns a new instance of HtmlView with the same properties of this object
-     * but with caching set to the value of isCaching parameter.
+     * but with preEncoding set to the value of preEncoding parameter.
      *
-     * @param isCaching If true, the view will cache static HTML blocks.
+     * @param preEncoding If true, the view will preEncode static HTML blocks.
      */
-    public HtmlView<M> setCaching(boolean isCaching) {
+    public HtmlView<M> setPreEncoding(boolean preEncoding) {
         HtmlVisitor visitor = getVisitor();
-        return HtmlFlow.view(template, visitor.isIndented, threadSafe, isCaching);
+        return HtmlFlow.view(template, visitor.isIndented, threadSafe, preEncoding);
     }
 }

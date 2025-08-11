@@ -2,13 +2,11 @@ package htmlflow.test
 
 import htmlflow.*
 import kotlinx.coroutines.runBlocking
-import org.jsoup.nodes.Document
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.xmlet.htmlapifaster.body
 import org.xmlet.htmlapifaster.h1
 import org.xmlet.htmlapifaster.p
-import java.awt.SystemColor.text
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -21,7 +19,7 @@ class TestHtmlViewSuspendHot {
     fun <M> viewSuspendHot(
         template: HtmlPage.() -> Unit
     ): HtmlViewSuspend<M> {
-        return viewSuspend(template, caching = false, threadSafe = true, isIndented = true)
+        return viewSuspend(template, preEncoding = false, threadSafe = true, isIndented = true)
     }
 
     /**
@@ -172,7 +170,7 @@ class TestHtmlViewSuspendHot {
         val initialVisitor = view.visitor
         assertTrue(initialVisitor is HtmlViewVisitorSuspendHot, "Initial visitor should be HtmlViewVisitorSuspendHot")
 
-        val view2 = view.setCaching(true)
+        val view2 = view.setPreEncoding(true)
         val newVisitor = view2.visitor
 
         assertTrue(view2 !is HtmlViewSuspendHot, "New view should be HtmlViewSuspend")

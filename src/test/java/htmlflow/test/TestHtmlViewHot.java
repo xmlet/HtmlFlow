@@ -85,13 +85,13 @@ public class TestHtmlViewHot {
                     .__();
         };
 
-        HtmlView<Object> hotView = viewHot(template).setCaching(false);
+        HtmlView<Object> hotView = viewHot(template).setPreEncoding(false);
         String hotResult1 = hotView.render("test");
         String hotResult2 = hotView.render("test");
 
         counter.set(0);
 
-        HtmlView<Object> cachedView = hotView.setCaching(true);
+        HtmlView<Object> cachedView = hotView.setPreEncoding(true);
         String cachedResult1 = cachedView.render("test");
         String cachedResult2 = cachedView.render("test");
 
@@ -134,12 +134,12 @@ public class TestHtmlViewHot {
                     .h1().text("Visitor Change Test").__()
                     .__()
                     .__();
-        }).setCaching(false);
+        }).setPreEncoding(false);
 
         Object initialVisitor = view.getVisitor();
         assertInstanceOf(HtmlViewVisitorHot.class, initialVisitor, "Initial visitor should be HtmlViewVisitorHot");
 
-        HtmlView<Object> view2 = view.setCaching(true);
+        HtmlView<Object> view2 = view.setPreEncoding(true);
         Object newVisitor = view2.getVisitor();
 
         assertFalse(view2 instanceof HtmlViewHot, "New view should be HtmlView");

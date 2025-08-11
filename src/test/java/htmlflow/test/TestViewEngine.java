@@ -77,7 +77,7 @@ public class TestViewEngine {
         HtmlFlow.Engine engine = HtmlFlow.builder()
                 .indented(false)
                 .threadSafe(true)
-                .caching(false)
+                .preEncoding(false)
                 .build();
         
         HtmlView<String> view = engine.view(SIMPLE_TEMPLATE);
@@ -91,7 +91,7 @@ public class TestViewEngine {
     public void testBuilderToEnginePattern() {
         HtmlFlow.Builder builder = HtmlFlow.builder()
                 .indented(false)
-                .caching(true)
+                .preEncoding(true)
                 .threadSafe(false);
         
         HtmlFlow.Engine engine = builder.build();
@@ -148,12 +148,12 @@ public class TestViewEngine {
     @Test
     public void testBuilderCachingVsHotReload() {
         HtmlView<String> cachedView = HtmlFlow.builder()
-                .caching(true)
+                .preEncoding(true)
                 .build()
                 .view(DYNAMIC_TEMPLATE);
         
         HtmlView<String> hotView = HtmlFlow.builder()
-                .caching(false)
+                .preEncoding(false)
                 .build()
                 .view(DYNAMIC_TEMPLATE);
         
@@ -194,7 +194,7 @@ public class TestViewEngine {
         HtmlFlow.Engine engine = HtmlFlow.builder()
                 .indented(true)
                 .threadSafe(false)
-                .caching(true)
+                .preEncoding(true)
                 .build();
         
         HtmlView<String> view1 = engine.view(SIMPLE_TEMPLATE);
@@ -220,7 +220,7 @@ public class TestViewEngine {
                     HtmlView<String> view = HtmlFlow.builder()
                             .indented(indented)
                             .threadSafe(threadSafe)
-                            .caching(caching)
+                            .preEncoding(caching)
                             .build()
                             .view(SIMPLE_TEMPLATE);
 
@@ -240,7 +240,7 @@ public class TestViewEngine {
     @Test
     public void testBuilderHotReloadBehavior() {
         HtmlView<String> hotView = HtmlFlow.builder()
-                .caching(false)
+                .preEncoding(false)
                 .build()
                 .view(DYNAMIC_TEMPLATE);
         
@@ -309,11 +309,11 @@ public class TestViewEngine {
         HtmlFlow.Builder builder = HtmlFlow.builder()
                 .indented(true)
                 .threadSafe(false)
-                .caching(true);
+                .preEncoding(true);
         
         HtmlFlow.Engine engine = builder.build();
         
-        builder.indented(false).threadSafe(true).caching(false);
+        builder.indented(false).threadSafe(true).preEncoding(false);
         
         HtmlView<String> view = engine.view(SIMPLE_TEMPLATE);
         String html = view.render();
@@ -327,9 +327,9 @@ public class TestViewEngine {
     public void testMultipleEnginesFromSameBuilder() {
         HtmlFlow.Builder builder = HtmlFlow.builder().indented(false);
         
-        HtmlFlow.Engine engine1 = builder.caching(true).build();
-        HtmlFlow.Engine engine2 = builder.caching(false).build();
-        HtmlFlow.Engine engine3 = builder.threadSafe(true).caching(true).build();
+        HtmlFlow.Engine engine1 = builder.preEncoding(true).build();
+        HtmlFlow.Engine engine2 = builder.preEncoding(false).build();
+        HtmlFlow.Engine engine3 = builder.threadSafe(true).preEncoding(true).build();
         
         HtmlView<String> view1 = engine1.view(SIMPLE_TEMPLATE);
         HtmlView<String> view2 = engine2.view(SIMPLE_TEMPLATE);

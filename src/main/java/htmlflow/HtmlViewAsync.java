@@ -67,8 +67,8 @@ public class HtmlViewAsync<M> extends HtmlPage {
         return HtmlFlow.viewAsync(template, isIndented, threadSafe, true);
     }
 
-    public HtmlViewAsync<M> setCaching(boolean isCaching) {
-        return HtmlFlow.viewAsync(template, visitor.isIndented, threadSafe, isCaching);
+    public HtmlViewAsync<M> setPreEncoding(boolean preEncoding) {
+        return HtmlFlow.viewAsync(template, visitor.isIndented, threadSafe, preEncoding);
     }
 
     @Override

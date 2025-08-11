@@ -92,15 +92,15 @@ fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit) = viewSuspend<M>(
     template,
     isIndented = true,
     threadSafe = false,
-    caching = true
+    preEncoding = true
 )
 
-fun <M: Any?> viewSuspend(caching: Boolean, template: HtmlPage.() -> Unit) : HtmlViewSuspend<M> {
-    return viewSuspend(template, isIndented = true, threadSafe = false, caching = caching)
+fun <M: Any?> viewSuspend(preEncoding: Boolean, template: HtmlPage.() -> Unit) : HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, preEncoding = preEncoding)
 }
 
-fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, caching: Boolean): HtmlViewSuspend<M> {
-    return if (caching) {
+fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, preEncoding: Boolean): HtmlViewSuspend<M> {
+    return if (preEncoding) {
         val pre = preprocessingSuspend(template, isIndented)
         val visitor = HtmlViewVisitorSuspend(
             isIndented = isIndented,
@@ -117,19 +117,19 @@ fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, t
 }
 
 fun <M: Any?> HtmlFlow.Engine.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
-    return viewSuspend(template, isIndented = isIndented, threadSafe = threadSafe, caching = caching)
+    return viewSuspend(template, isIndented = isIndented, threadSafe = threadSafe, preEncoding = preEncoding)
 }
 
-fun <M: Any?> HtmlFlow.viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, caching: Boolean): HtmlViewSuspend<M> {
-    return viewSuspend(template, isIndented, threadSafe, caching)
+fun <M: Any?> HtmlFlow.viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, preEncoding: Boolean): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented, threadSafe, preEncoding)
 }
 
 fun <M: Any?> HtmlFlow.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
-    return viewSuspend(template, isIndented = true, threadSafe = false, caching = true)
+    return viewSuspend(template, isIndented = true, threadSafe = false, preEncoding = true)
 }
 
-fun <M: Any?> HtmlFlow.viewSuspend(caching: Boolean, template: HtmlPage.() -> Unit,): HtmlViewSuspend<M> {
-    return viewSuspend(template, isIndented = true, threadSafe = false, caching = caching)
+fun <M: Any?> HtmlFlow.viewSuspend(preEncoding: Boolean, template: HtmlPage.() -> Unit,): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, preEncoding = preEncoding)
 }
 
 /**

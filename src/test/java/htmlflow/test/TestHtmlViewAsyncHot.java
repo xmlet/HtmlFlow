@@ -85,13 +85,13 @@ public class TestHtmlViewAsyncHot {
                     .__();
         };
 
-        HtmlViewAsync<Object> hotView = viewAsyncHot(template).setCaching(false);
+        HtmlViewAsync<Object> hotView = viewAsyncHot(template).setPreEncoding(false);
         String hotResult1 = hotView.renderAsync("test").join();
         String hotResult2 = hotView.renderAsync("test").join();
 
         counter.set(0);
 
-        HtmlViewAsync<Object> cachedView = hotView.setCaching(true);
+        HtmlViewAsync<Object> cachedView = hotView.setPreEncoding(true);
         String cachedResult1 = cachedView.renderAsync("test").join();
         String cachedResult2 = cachedView.renderAsync("test").join();
 
@@ -139,7 +139,7 @@ public class TestHtmlViewAsyncHot {
         Object initialVisitor = view.getVisitor();
         assertInstanceOf(HtmlViewVisitorAsyncHot.class, initialVisitor, "Initial visitor should be HtmlViewVisitorAsyncHot");
 
-        HtmlViewAsync<Object> view2 = view.setCaching(true);
+        HtmlViewAsync<Object> view2 = view.setPreEncoding(true);
         Object newVisitor = view2.getVisitor();
 
         assertInstanceOf(HtmlViewAsync.class, view2, "New view should be HtmlViewAsync");

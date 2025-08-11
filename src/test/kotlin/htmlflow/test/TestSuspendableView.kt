@@ -24,7 +24,7 @@ class TestSuspendableView {
     fun viewSuspendHot(
         template: HtmlPage.() -> Unit
     ): HtmlViewSuspend<AsyncModel<String, Student>> {
-        return viewSuspend(template, true, threadSafe = true, caching = true)
+        return viewSuspend(template, true, threadSafe = true, preEncoding = true)
     }
 
     @Test

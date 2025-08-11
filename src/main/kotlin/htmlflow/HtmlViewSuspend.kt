@@ -43,8 +43,8 @@ open class HtmlViewSuspend<M>(
         return HtmlViewSuspend(template, visitor, false)
     }
 
-    fun setCaching(caching: Boolean): HtmlViewSuspend<M> {
-        return viewSuspend(template, visitor.isIndented, threadSafe, caching)
+    fun setPreEncoding(preEncoding: Boolean): HtmlViewSuspend<M> {
+        return viewSuspend(template, visitor.isIndented, threadSafe, preEncoding)
     }
 
     open suspend fun write(out: Appendable, model: M?) {

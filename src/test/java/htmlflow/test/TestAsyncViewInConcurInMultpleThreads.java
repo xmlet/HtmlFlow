@@ -26,13 +26,13 @@ class TestAsyncViewInConcurInMultpleThreads {
 
     @Test
     void testMultipleThreadsInViewAsyncHot() throws InterruptedException {
-        HtmlViewAsync<Object> view = HtmlFlow.viewAsync(TestAsyncViewInConcurInMultpleThreads::template).setCaching(false).threadSafe();
+        HtmlViewAsync<Object> view = HtmlFlow.viewAsync(TestAsyncViewInConcurInMultpleThreads::template).setPreEncoding(false).threadSafe();
         checkRender(() -> view.renderAsync().join());
     }
 
     @Test
     void testMultipleThreadsInViewHot() throws InterruptedException {
-        HtmlView<Object> view = HtmlFlow.view(TestAsyncViewInConcurInMultpleThreads::template).setCaching(false).threadSafe();
+        HtmlView<Object> view = HtmlFlow.view(TestAsyncViewInConcurInMultpleThreads::template).setPreEncoding(false).threadSafe();
         checkRender(view::render);
     }
 
