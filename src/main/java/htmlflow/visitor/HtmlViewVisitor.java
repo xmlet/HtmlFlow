@@ -56,7 +56,7 @@ public class HtmlViewVisitor extends HtmlVisitor {
      * Processing output through invocation of HtmlContinuation objects chain.
      */
     @Override
-    public void resolve(Object model) {
+    public final void resolve(Object model) {
         first.execute(model);
     }
 
@@ -73,7 +73,7 @@ public class HtmlViewVisitor extends HtmlVisitor {
      * @param dynamicHtmlBlock The continuation that consumes the element and a model.
      */
     @Override
-    public <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
+    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
         /**
          * After first resolution we will only invoke the dynamicHtmlBlock consumer and no more visits
          * to dynamic can happen.
@@ -83,12 +83,12 @@ public class HtmlViewVisitor extends HtmlVisitor {
     }
 
     @Override
-    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
+    public final <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
         throw new IllegalStateException("Wrong use of await() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
     }
 
     @Override
-    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
+    public final <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
         throw new IllegalStateException("Wrong use of suspending() in a HtmlView! Use HtmlFlow.viewSuspend() to produce a suspendable view.");
     }
 }
