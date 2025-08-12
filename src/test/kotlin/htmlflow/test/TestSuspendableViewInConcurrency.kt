@@ -3,6 +3,7 @@ package htmlflow.test
 import htmlflow.test.model.AsyncModel
 import htmlflow.test.model.Student
 import htmlflow.viewSuspend
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -51,6 +52,7 @@ class TestSuspendableViewInConcurrency {
             .forEach { assertHtml(it)}
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Test
     fun check_asyncview_processing_in_concurrent_tasks_and_parallel_threads() {
         /**
@@ -104,6 +106,7 @@ class TestSuspendableViewInConcurrency {
             .forEach { assertHtml(it)}
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Test
     fun check_asyncview_hot_processing_in_concurrent_tasks_and_parallel_threads() {
         /**

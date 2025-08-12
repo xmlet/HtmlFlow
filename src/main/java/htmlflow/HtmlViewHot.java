@@ -25,15 +25,13 @@
 package htmlflow;
 
 import htmlflow.visitor.HtmlVisitor;
-
 import java.util.function.Supplier;
 
 /**
- * Dynamic views can be bound to a Model object and unoptimized.
- * It does not store static HTML blocks and recalculate HTML on every rendering.
+ * Dynamic views can be bound to a Model object and unoptimized. It does not store static HTML
+ * blocks and recalculate HTML on every rendering.
  *
  * @param <M> Type of the model rendered with this view.
- *
  * @author Miguel Gamboa
  */
 public class HtmlViewHot<M> extends HtmlView<M> {
@@ -45,7 +43,11 @@ public class HtmlViewHot<M> extends HtmlView<M> {
      * @param template Function that consumes an HtmlView to produce HTML elements.
      * @param threadSafe If true, the view is thread-safe and uses a ThreadLocal visitor.
      */
-    HtmlViewHot(Supplier<HtmlVisitor> visitorSupplier, HtmlTemplate template, boolean threadSafe) {
+    HtmlViewHot(
+        Supplier<HtmlVisitor> visitorSupplier,
+        HtmlTemplate template,
+        boolean threadSafe
+    ) {
         super(visitorSupplier, template, threadSafe);
     }
 
@@ -76,15 +78,20 @@ public class HtmlViewHot<M> extends HtmlView<M> {
     }
 
     protected HtmlViewHot<M> clone(
-            Supplier<HtmlVisitor> visitorSupplier,
-            boolean threadSafe)
-    {
+        Supplier<HtmlVisitor> visitorSupplier,
+        boolean threadSafe
+    ) {
         return new HtmlViewHot<>(visitorSupplier, template, threadSafe);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public HtmlViewHot<M> setIndented(boolean isIndented) {
-        return (HtmlViewHot<M>) HtmlFlow.view(template, isIndented, threadSafe, false);
+        return (HtmlViewHot<M>) HtmlFlow.view(
+            template,
+            isIndented,
+            threadSafe,
+            false
+        );
     }
 }

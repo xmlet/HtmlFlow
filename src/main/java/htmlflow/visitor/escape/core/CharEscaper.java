@@ -16,38 +16,30 @@ package htmlflow.visitor.escape.core;
 
 /**
  * An abstract class that provides a base implementation for character escaping.
- * <p>
- *     This class defines the structure for escaping characters in a string,
- *     allowing subclasses to implement specific escaping logic.
- * </p>
- * <p>
- *     Derived and adapted from Guava's CharEscaper class:
- *     <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/escape/CharEscaper.java">guava</a>
- * </p>
  *
- * <p>
- *     Modified by Arthur Oliveira on 04-08-2025
- * </p>
+ * <p>This class defines the structure for escaping characters in a string, allowing subclasses to
+ * implement specific escaping logic.
+ *
+ * <p>Derived and adapted from Guava's CharEscaper class: <a
+ * href="https://github.com/google/guava/blob/master/guava/src/com/google/common/escape/CharEscaper.java">guava</a>
+ *
+ * <p>Modified by Arthur Oliveira on 04-08-2025
  *
  * @author Arthur Oliveira
  * @author The Guava Authors
  */
-abstract class CharEscaper extends Escaper{
+abstract class CharEscaper extends Escaper {
 
-    /**
-     * The multiplier for the size of the escape buffer.
-     */
+    /** The multiplier for the size of the escape buffer. */
     private static final int ESCAPE_PAD_MULTIPLIER = 2;
 
-    /**
-     * Exception message for null code input.
-     */
-    public static final String NULL_CODE_EXCEPTION_MESSAGE = "Code cannot be null";
+    /** Exception message for null code input. */
+    public static final String NULL_CODE_EXCEPTION_MESSAGE =
+        "Code cannot be null";
 
-    /**
-     * Exception message for negative size in buffer growth.
-     */
-    public static final String NEGATIVE_SIZE_EXCEPTION_MESSAGE = "Size cannot be negative: ";
+    /** Exception message for negative size in buffer growth. */
+    public static final String NEGATIVE_SIZE_EXCEPTION_MESSAGE =
+        "Size cannot be negative: ";
 
     protected CharEscaper() {}
 
@@ -67,20 +59,21 @@ abstract class CharEscaper extends Escaper{
 
     /**
      * Escapes a single character.
-     * <p>
-     *     This method is called for each character in the input string.
+     *
+     * <p>This method is called for each character in the input string.
+     *
      * @param c the character to escape
-     * @return a character array representing the escaped form of the character,
-     *         or null if the character does not need to be escaped
+     * @return a character array representing the escaped form of the character, or null if the
+     *     character does not need to be escaped
      */
     protected abstract char[] escape(char c);
 
     /**
      * Escapes the input string starting from the specified index.
-     * <p>
-     * This method is called when at least one character in the input string
-     * needs to be escaped. It processes the string from the given index,
-     * escaping characters as necessary and returning the fully escaped string.
+     *
+     * <p>This method is called when at least one character in the input string needs to be escaped.
+     * It processes the string from the given index, escaping characters as necessary and returning
+     * the fully escaped string.
      *
      * @param code the input string to escape
      * @param idx the index to start escaping from
@@ -106,8 +99,10 @@ abstract class CharEscaper extends Escaper{
 
             int sizeNeeded = escapedIdx + charsSkipped + escapedLength;
             if (escapedSize < sizeNeeded) {
-                escapedSize = sizeNeeded + ESCAPE_PAD_MULTIPLIER * (length - idx);
-                escapedChars = growBuffer(escapedChars, escapedIdx, escapedSize);
+                escapedSize =
+                    sizeNeeded + ESCAPE_PAD_MULTIPLIER * (length - idx);
+                escapedChars =
+                    growBuffer(escapedChars, escapedIdx, escapedSize);
             }
 
             if (charsSkipped > 0) {
@@ -116,7 +111,13 @@ abstract class CharEscaper extends Escaper{
             }
 
             if (escapedLength > 0) {
-                System.arraycopy(escapedChar, 0, escapedChars, escapedIdx, escapedLength);
+                System.arraycopy(
+                    escapedChar,
+                    0,
+                    escapedChars,
+                    escapedIdx,
+                    escapedLength
+                );
                 escapedIdx += escapedLength;
             }
             lastEscape = idx + 1;
@@ -136,9 +137,9 @@ abstract class CharEscaper extends Escaper{
 
     /**
      * Grows the buffer to accommodate the new size.
-     * <p>
-     * This method creates a new character array with the specified size,
-     * copying the existing characters from the old buffer to the new one.
+     *
+     * <p>This method creates a new character array with the specified size, copying the existing
+     * characters from the old buffer to the new one.
      *
      * @param buffer the original character buffer
      * @param idx the current index in the buffer
@@ -147,7 +148,9 @@ abstract class CharEscaper extends Escaper{
      */
     private static char[] growBuffer(char[] buffer, int idx, int size) {
         if (size < 0) {
-            throw new IllegalArgumentException(NEGATIVE_SIZE_EXCEPTION_MESSAGE + size);
+            throw new IllegalArgumentException(
+                NEGATIVE_SIZE_EXCEPTION_MESSAGE + size
+            );
         }
         char[] newBuffer = new char[size];
         if (idx > 0) {

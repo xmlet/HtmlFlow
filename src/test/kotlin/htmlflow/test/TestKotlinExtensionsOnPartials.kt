@@ -248,6 +248,8 @@ class TestKotlinExtensionsOnPartials {
             } // div
         } // form
     }
+
+    @Suppress("UNUSED_PARAMETER")
     private fun navbarFragment(nav: Nav<*>) {
 
     }

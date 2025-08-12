@@ -1,13 +1,14 @@
 package htmlflow.visitor
 
-abstract class HtmlVisitorSuspending protected constructor(out: Appendable?, isIndented: Boolean) : HtmlVisitor(out, isIndented) {
+abstract class HtmlVisitorSuspending protected constructor(out: Appendable?, isIndented: Boolean) :
+    HtmlVisitor(out, isIndented) {
 
     abstract override fun clone(isIndented: Boolean): HtmlVisitorSuspending
 
     /**
-     * Clones the current HtmlVisitorSuspending instance with a new Appendable output.
-     * This method is used to create a new instance for each rendering operation
-     * to ensure thread safety in asynchronous contexts.
+     * Clones the current HtmlVisitorSuspending instance with a new Appendable output. This method
+     * is used to create a new instance for each rendering operation to ensure thread safety in
+     * asynchronous contexts.
      *
      * @param out The new Appendable output for the cloned visitor.
      * @return A new instance of HtmlVisitorSuspending with the specified output.

@@ -26,9 +26,8 @@
 package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
-import org.xmlet.htmlapifaster.Element;
-
 import java.util.function.BiConsumer;
+import org.xmlet.htmlapifaster.Element;
 
 /**
  * HtmlContinuation for a dynamic block (i.e. BiConsumer) depending of an object model.
@@ -36,25 +35,24 @@ import java.util.function.BiConsumer;
  * @param <E> the type of the parent HTML element received by the dynamic HTML block.
  * @param <T> the type of the template's model.
  */
-public class HtmlContinuationSyncDynamic<E extends Element, T> extends HtmlContinuationSync {
+public class HtmlContinuationSyncDynamic<E extends Element, T>
+    extends HtmlContinuationSync {
 
-    /**
-     * The continuation that consumes the element and a model.
-     */
+    /** The continuation that consumes the element and a model. */
     final BiConsumer<E, T> consumer;
-    /**
-     * The element passed to the continuation consumer.
-     */
+
+    /** The element passed to the continuation consumer. */
     final E element;
 
     /**
      * @param currentDepth Indentation depth associated to this block.
-     * @param consumer     The continuation that consumes the element and a model.
+     * @param consumer The continuation that consumes the element and a model.
      */
     public HtmlContinuationSyncDynamic(
         int currentDepth,
         boolean isClosed,
-        E element, BiConsumer<E, T> consumer,
+        E element,
+        BiConsumer<E, T> consumer,
         HtmlVisitor visitor,
         HtmlContinuation next
     ) {
@@ -62,6 +60,7 @@ public class HtmlContinuationSyncDynamic<E extends Element, T> extends HtmlConti
         this.element = element;
         this.consumer = consumer;
     }
+
     @Override
     protected final void emitHtml(Object model) {
         consumer.accept(element, (T) model);
@@ -75,6 +74,7 @@ public class HtmlContinuationSyncDynamic<E extends Element, T> extends HtmlConti
             copyElement(element, v),
             consumer,
             v,
-            next != null ? next.copy(v) : null); // call copy recursively
+            next != null ? next.copy(v) : null
+        ); // call copy recursively
     }
 }

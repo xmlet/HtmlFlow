@@ -16,30 +16,27 @@ package htmlflow.visitor.escape.core;
 
 /**
  * An abstract class for escaping text to make it safe for HTML output.
- * <p>
- * This class provides a method to escape a given string, which may involve
- * replacing certain characters with their escaped equivalents.
- * </p>
  *
- * <p>
- *     Derived and adapted from Guava's Escaper class:
- *     <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/escape/Escaper.java">guava</a>
- * </p>
+ * <p>This class provides a method to escape a given string, which may involve replacing certain
+ * characters with their escaped equivalents.
  *
- * <p>
- *     Modified by Arthur Oliveira on 04-08-2025
- * </p>
+ * <p>Derived and adapted from Guava's Escaper class: <a
+ * href="https://github.com/google/guava/blob/master/guava/src/com/google/common/escape/Escaper.java">guava</a>
+ *
+ * <p>Modified by Arthur Oliveira on 04-08-2025
  *
  * @author Arthur Oliveira
  * @author The Guava Authors
  */
 public abstract class Escaper {
+
     protected Escaper() {}
+
     /**
      * Escapes the given text to make it safe for HTML output.
-     * <p>
-     * This method may treat input characters differently
-     * depending on the specific escaper implementation.
+     *
+     * <p>This method may treat input characters differently depending on the specific escaper
+     * implementation.
      *
      * @param code the literal text to escape
      * @return the escaped text form of {@code text}

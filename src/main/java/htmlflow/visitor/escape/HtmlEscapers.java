@@ -19,21 +19,15 @@ import htmlflow.visitor.escape.core.Escapers;
 
 /**
  * Utility class for HTML escaping.
- * <p>
- * This class provides a static method to obtain an {@link Escaper}
- * for escaping HTML characters.
- * The returned escaper will convert special HTML characters
- * to their corresponding HTML entities,
- * such as converting `&` to `&amp;amp;`, `<` to `&amp;lt`, `>` to `&amp;gt`, etc.
- * </p>
- * <p>
- *     Derived and adapted from Guava's HtmlEscapers class:
- *     <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/html/HtmlEscapers.java">guava</a>
- * </p>
  *
- * <p>
- *     Modified by Arthur Oliveira on 04-08-2025
- * </p>
+ * <p>This class provides a static method to obtain an {@link Escaper} for escaping HTML characters.
+ * The returned escaper will convert special HTML characters to their corresponding HTML entities,
+ * such as converting `&` to `&amp;amp;`, `<` to `&amp;lt`, `>` to `&amp;gt`, etc.
+ *
+ * <p>Derived and adapted from Guava's HtmlEscapers class: <a
+ * href="https://github.com/google/guava/blob/master/guava/src/com/google/common/html/HtmlEscapers.java">guava</a>
+ *
+ * <p>Modified by Arthur Oliveira on 04-08-2025
  *
  * @author Arthur Oliveira
  * @author The Guava Authors
@@ -51,18 +45,16 @@ public final class HtmlEscapers {
 
     /**
      * A pre-configured {@link Escaper} for HTML escaping.
-     * <p>
-     * This escaper is initialized with common HTML character replacements
-     * such as `&`, `<`, `>`, `"`, and `'`.
-     * </p>
+     *
+     * <p>This escaper is initialized with common HTML character replacements such as `&`, `<`, `>`,
+     * `"`, and `'`.
      */
-    private static final Escaper HTML_ESCAPER =
-            Escapers
-                    .builder()
-                    .addScape('"', "&quot;")
-                    .addScape('\'', "&#39;")
-                    .addScape('&', "&amp;")
-                    .addScape('<', "&lt;")
-                    .addScape('>', "&gt;")
-                    .build();
+    private static final Escaper HTML_ESCAPER = Escapers
+        .builder()
+        .addScape('"', "&quot;")
+        .addScape('\'', "&#39;")
+        .addScape('&', "&amp;")
+        .addScape('<', "&lt;")
+        .addScape('>', "&gt;")
+        .build();
 }
