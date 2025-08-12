@@ -177,4 +177,12 @@ public class PreprocessingVisitor extends HtmlVisitor {
             }
         }
     }
+
+    public final HtmlContinuation findLast() {
+        HtmlContinuation node = this.first;
+        while (node != null && node.next != null) {
+            node = node.next;
+        }
+        return node;
+    }
 }

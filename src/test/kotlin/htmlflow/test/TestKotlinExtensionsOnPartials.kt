@@ -271,7 +271,7 @@ class TestKotlinExtensionsOnPartials {
     }
 
     @Test fun testOwnerView() {
-        val view = ownerView(::navbarFragment) { partialOwner() }
+        ownerView(::navbarFragment) { partialOwner() }
         // view.setOut(System.out).write(Owner("Ze Manel", "Rua da Alfandega"))
     }
 

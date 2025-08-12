@@ -49,7 +49,9 @@ public class TestIndentation {
         HtmlFlow.doc(sb).setIndented(false)
                 .div()
                     .textarea()
-                        .text("Sample text\nfoo\nbar")
+                        .text("Sample text\n" +
+                              "foo" + lineSeparator() +
+                              "bar")
                     .__()
                     .script()
                     .raw("// some comment\n" +
@@ -66,7 +68,9 @@ public class TestIndentation {
         HtmlView<?> view = HtmlFlow.view(page -> page
                 .div()
                 .textarea()
-                .text("Sample text\nfoo\nbar")
+                .text("Sample text\n" +
+                        "foo" + lineSeparator() +
+                        "bar")
                 .__()
                 .script()
                 .raw("// some comment\n" +
@@ -82,7 +86,9 @@ public class TestIndentation {
         HtmlViewAsync<?> view = HtmlFlow.viewAsync(page -> page
                 .div()
                 .textarea()
-                .text("Sample text\nfoo\nbar")
+                .text("Sample text\n" +
+                        "foo" + lineSeparator() +
+                        "bar")
                 .__()
                 .script()
                 .raw("// some comment\n" +

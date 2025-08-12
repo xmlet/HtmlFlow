@@ -40,7 +40,7 @@ public class HtmlView<M> extends HtmlPage {
     /**
      * Function that consumes an HtmlView to produce HTML elements.
      */
-    private final HtmlTemplate template;
+    protected final HtmlTemplate template;
     /**
      * This field is like a union with the threadLocalVisitor, being used alternatively.
      * For non thread safe scenarios Visitors maybe shared concurrently by multiple threads.
@@ -57,14 +57,15 @@ public class HtmlView<M> extends HtmlPage {
     @java.lang.SuppressWarnings("squid:S5164")
     private final ThreadLocal<HtmlVisitor> threadLocalVisitor;
     protected final Supplier<HtmlVisitor> visitorSupplier;
-    private final boolean threadSafe;
+    protected final boolean threadSafe;
+
     /**
      * Auxiliary constructor used by clone().
      */
     HtmlView(
-        Supplier<HtmlVisitor> visitorSupplier,
-        HtmlTemplate template,
-        boolean threadSafe)
+            Supplier<HtmlVisitor> visitorSupplier,
+            HtmlTemplate template,
+            boolean threadSafe)
     {
         this.visitorSupplier = visitorSupplier;
         this.template = template;
@@ -130,9 +131,9 @@ public class HtmlView<M> extends HtmlPage {
      * @param visitorSupplier
      * @param threadSafe
      */
-    protected final HtmlView<M> clone(
-        Supplier<HtmlVisitor> visitorSupplier,
-        boolean threadSafe)
+    protected HtmlView<M> clone(
+            Supplier<HtmlVisitor> visitorSupplier,
+            boolean threadSafe)
     {
         return new HtmlView<>(visitorSupplier, template, threadSafe);
     }
@@ -142,7 +143,18 @@ public class HtmlView<M> extends HtmlPage {
      * but with indented set to the value of isIndented parameter.
      */
     @Override
-    public final HtmlView<M> setIndented(boolean isIndented) {
-        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe);
+    public HtmlView<M> setIndented(boolean isIndented) {
+        return HtmlFlow.view(getVisitor().out(), template, isIndented, threadSafe, true);
+    }
+
+    /**
+     * Returns a new instance of HtmlView with the same properties of this object
+     * but with preEncoding set to the value of preEncoding parameter.
+     *
+     * @param preEncoding If true, the view will preEncode static HTML blocks.
+     */
+    public HtmlView<M> setPreEncoding(boolean preEncoding) {
+        HtmlVisitor visitor = getVisitor();
+        return HtmlFlow.view(template, visitor.isIndented, threadSafe, preEncoding);
     }
 }

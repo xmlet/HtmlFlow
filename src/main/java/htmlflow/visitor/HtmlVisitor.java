@@ -85,7 +85,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
         this.isClosed = isClosed;
     }
 
-    HtmlVisitor(Appendable out, boolean isIndented) {
+    protected HtmlVisitor(Appendable out, boolean isIndented) {
         this.out = out;
         this.isIndented = isIndented;
     }

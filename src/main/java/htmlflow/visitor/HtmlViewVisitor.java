@@ -83,12 +83,12 @@ public class HtmlViewVisitor extends HtmlVisitor {
     }
 
     @Override
-    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
+    public final <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
         throw new IllegalStateException("Wrong use of await() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
     }
 
     @Override
-    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
+    public final <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
         throw new IllegalStateException("Wrong use of suspending() in a HtmlView! Use HtmlFlow.viewSuspend() to produce a suspendable view.");
     }
 }

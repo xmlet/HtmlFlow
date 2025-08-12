@@ -91,21 +91,45 @@ fun <M : Any?> viewAsync(template: HtmlPage.() -> Unit) = HtmlFlow.viewAsync<M>(
 fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit) = viewSuspend<M>(
     template,
     isIndented = true,
-    threadSafe = false
+    threadSafe = false,
+    preEncoding = true
 )
 
-fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean): HtmlViewSuspend<M> {
-    val pre = preprocessingSuspend(template, isIndented)
-    val visitor = HtmlViewVisitorSuspend(
-        isIndented = isIndented,
-        first = pre.first
-    )
-    /**
-     * Chain terminationNode next to the last node.
-     */
-    val terminationNode = HtmlContinuationSuspendableTerminationNode()
-    PreprocessingVisitor.HtmlContinuationSetter.setNext(visitor.findLast(), terminationNode)
-    return HtmlViewSuspend(template, visitor, threadSafe)
+fun <M: Any?> viewSuspend(preEncoding: Boolean, template: HtmlPage.() -> Unit) : HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, preEncoding = preEncoding)
+}
+
+fun <M : Any?> viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, preEncoding: Boolean): HtmlViewSuspend<M> {
+    return if (preEncoding) {
+        val pre = preprocessingSuspend(template, isIndented)
+        val visitor = HtmlViewVisitorSuspend(
+            isIndented = isIndented,
+            first = pre.first,
+        )
+        HtmlViewSuspend(template, visitor, threadSafe)
+    } else {
+        val visitor = HtmlViewVisitorSuspendHot(
+            isIndented = isIndented,
+            continuationSupplier = { preprocessingSuspend(template, isIndented) },
+        )
+        HtmlViewSuspendHot(template, visitor, threadSafe)
+    }
+}
+
+fun <M: Any?> HtmlFlow.ViewFactory.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = isIndented, threadSafe = threadSafe, preEncoding = preEncoding)
+}
+
+fun <M: Any?> HtmlFlow.viewSuspend(template: HtmlPage.() -> Unit, isIndented: Boolean, threadSafe: Boolean, preEncoding: Boolean): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented, threadSafe, preEncoding)
+}
+
+fun <M: Any?> HtmlFlow.viewSuspend(template: HtmlPage.() -> Unit): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, preEncoding = true)
+}
+
+fun <M: Any?> HtmlFlow.viewSuspend(preEncoding: Boolean, template: HtmlPage.() -> Unit,): HtmlViewSuspend<M> {
+    return viewSuspend(template, isIndented = true, threadSafe = false, preEncoding = preEncoding)
 }
 
 /**
@@ -121,5 +145,7 @@ private fun preprocessingSuspend(template: HtmlTemplate, isIndented: Boolean): P
      * Thus, dynamic blocks which depend on model are not invoked.
      */
     preView.visitor.resolve(null)
+    val terminationNode = HtmlContinuationSuspendableTerminationNode()
+    PreprocessingVisitor.HtmlContinuationSetter.setNext(pre.findLast(), terminationNode)
     return pre
 }
