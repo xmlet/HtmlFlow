@@ -32,7 +32,7 @@
     </distributionManagement>
 
     <dependencies>
-
+        <!-- Xsd2Poet is dedicated to generate a fluent java DSL based on a XSD file -->
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>xsd2poet</artifactId>
