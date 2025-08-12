@@ -6,19 +6,22 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow-wrapper</artifactId>
-    <version>4.8-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-
     <name>${project.groupId}:${project.artifactId}</name>
+
     <description>
-        HtmlFlow library purpose is to allow Java applications to easily writing
-        HTML documents in a fluent style into a java.io.PrintStream.
+        HtmlFlow project wrapper for the HtmlFlow library,
+        which allows Java applications to easily write HTML documents in a fluent style into a java.io.PrintStream.
+        This wrapper includes the core library and Kotlin support.
     </description>
+
     <url>https://github.com/xmlet/HtmlFlow</url>
 
     <modules>
         <module>htmlflow-core</module>
         <module>htmlflow-kotlin</module>
+        <module>flowifier</module>
     </modules>
 
     <licenses>
@@ -33,7 +36,7 @@
             <name>Miguel Gamboa</name>
             <email>miguelgamboa@outlook.com</email>
             <organization>CCISEL</organization>
-            <organizationUrl>http://gamboa.pt</organizationUrl>
+            <organizationUrl>https://gamboa.pt</organizationUrl>
         </developer>
     </developers>
 
@@ -43,17 +46,6 @@
         <url>git@github.com:xmlet/HtmlFlow.git</url>
         <tag>HEAD</tag>
     </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,8 +57,41 @@
         <kotlin.version>1.9.22</kotlin.version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.jupiter-version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!--JUnit Jupiter Engine to depend on the JUnit4 engine and JUnit 4 API  -->
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+                <version>${junit.jupiter-version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>java.util.logging.config.file</name>
+                            <value>src/test/resources/logging.properties</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -153,6 +178,16 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.6.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
             </plugin>
         </plugins>
     </build>
