@@ -52,7 +52,7 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
                     }
                 }
             }
-            curr = curr.next; // Move to the next node in the linked list
+            curr = curr.next;
         }
     }
 }
