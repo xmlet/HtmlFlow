@@ -2,8 +2,12 @@ package htmlflow.test;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
-import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class TestMfeView {
@@ -13,32 +17,32 @@ public class TestMfeView {
         HtmlView<?> mfe = HtmlFlow.mfe(page -> {
             page.html()
                     .head().__()
-                        .body()
-                            .div()
-                                .mfe((cfg)-> {
-                                    cfg.setMfeUrlResource("http://localhost:8081/bikes");
-                                    cfg.setMfeName("mfe1");
-                                    cfg.setMfeListeningEventName("triggerBikeEvent");
-                                    cfg.setMfeTriggersEventName("triggerCartEvent");
-                                    cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js");
-                                    cfg.setMfeStylingUrl("http://localhost:8081/css/style.css");
-                                })
-                        .__()
+                    .body()
+                    .div()
+                    .mfe((cfg) -> {
+                        cfg.setMfeUrlResource("http://localhost:8081/bikes");
+                        cfg.setMfeName("mfe1");
+                        cfg.setMfeListeningEventName("triggerBikeEvent");
+                        cfg.setMfeTriggersEventName("triggerCartEvent");
+                        cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js");
+                        cfg.setMfeStylingUrl("http://localhost:8081/css/style.css");
+                    })
+                    .__()
                     .__()
                     .__();
         });
         String actual = mfe.render();
-        Assert.assertEquals("<!DOCTYPE html><html><head><script type=\"module\" src=\"base.js\"></script><script type=\"module\" src=\"http://localhost:8081/js/mfe-bikes.js\"></script></head><body><div><micro-frontend mfe-url=\"http://localhost:8081/bikes\" mfe-name=\"mfe1\" mfe-styling-url=\"http://localhost:8081/css/style.css\" mfe-listen-event=\"triggerBikeEvent\" mfe-trigger-event=\"triggerCartEvent\"></micro-frontend></div></body></html>", actual);
+        assertContents("mfeView.html", actual);
     }
 
     @Test
-    public void shouldRenderStreamingMicroFrontend() {
+    public void shouldRenderStreamingMicroFrontend() throws IOException {
         HtmlView<?> mfe = HtmlFlow.mfe(page -> {
             page.html()
                     .head().__()
                     .body()
                     .div()
-                    .mfe((cfg)-> {
+                    .mfe((cfg) -> {
                         cfg.setMfeUrlResource("http://localhost:8080/html-chunked/stream");
                         cfg.setMfeName("mfe2");
                         cfg.setMfeListeningEventName("triggerStreamEvent");
@@ -48,7 +52,16 @@ public class TestMfeView {
                     .__()
                     .__();
         });
-        String html = mfe.render();
-        Assert.assertEquals("<!DOCTYPE html><html><head><script type=\"module\" src=\"base.js\"></script></head><body><div><micro-frontend mfe-url=\"http://localhost:8080/html-chunked/stream\" mfe-name=\"mfe2\" mfe-styling-url=\"null\" mfe-listen-event=\"triggerStreamEvent\" mfe-trigger-event=\"null\" mfe-stream-data=\"true\"></micro-frontend></div></body></html>", html);
+        String actual = mfe.render();
+        assertContents("mfeStreamingView.html", actual);
     }
+
+    private void assertContents(String pathToExpected, String actual) {
+        String normalizedActual = actual.replaceAll("\\s+", "");
+        String expected = Utils.loadLines(pathToExpected)
+                .collect(Collectors.joining(""))
+                .replaceAll("\\s+", "");
+        assertEquals(expected, normalizedActual);
+    }
+
 }
