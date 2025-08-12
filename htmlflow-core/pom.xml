@@ -2,48 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-wrapper</artifactId>
-        <version>4.8-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>htmlflow</artifactId>
-    <name>HtmlFlow Core</name>
+    <packaging>jar</packaging>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <version>4.8-SNAPSHOT</version>
+
     <description>
         HtmlFlow library purpose is to allow Java applications to easily writing
         HTML documents in a fluent style into a java.io.PrintStream.
     </description>
-    <url>https://github.com/xmlet/HtmlFlow</url>
 
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
-
-    <scm>
-        <connection>scm:git:git@github.com:xmlet/HtmlFlow.git</connection>
-        <developerConnection>scm:git:git@github.com:xmlet/HtmlFlow.git</developerConnection>
-        <url>https://github.com/xmlet/HtmlFlow</url>
-        <tag>HEAD</tag>
-    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.3</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>xsd2poet</artifactId>
@@ -51,12 +40,53 @@
         </dependency>
 
         <dependency>
-            <!-- jsoup HTML parser library @ https://jsoup.org/ -->
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.0.0-jre</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+
+        <!-- slf4j dependency is used for test logging  -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- jsoup HTML parser library @ https://jsoup.org/ -->
+        <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.15.3</version>
+            <scope>test</scope>
         </dependency>
 
+        <!-- mockito is used for mocking -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.junit-version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Non-Blocking Reactive Foundation for the JVM -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.4.23</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--JUnit Jupiter Engine to depend on the JUnit4 engine and JUnit 4 API  -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -64,47 +94,16 @@
             <scope>test</scope>
         </dependency>
 
-        <!--JUnit Jupiter Engine to depend on the JUnit4 engine and JUnit 4 API  -->
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
             <version>${junit.jupiter-version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.junit-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-            <version>3.4.23</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version>
-        </dependency>
     </dependencies>
+
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>java.util.logging.config.file</name>
-                            <value>src/test/resources/logging.properties</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -150,16 +149,6 @@
                     <sourceDirectories>
                         <source>src/main/java</source>
                     </sourceDirectories>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.6.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>central</publishingServerId>
                 </configuration>
             </plugin>
         </plugins>
