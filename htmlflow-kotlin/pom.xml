@@ -32,8 +32,8 @@
     </distributionManagement>
 
     <dependencies>
-        <!-- Xsd2Poet is dedicated to generate a fluent java DSL based on a XSD file -->
         <dependency>
+            <!-- HtmlFlow library purpose is to allow Java applications to easily writing HTML documents in a fluent style into a java.io.PrintStream. -->
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow</artifactId>
             <version>4.8-SNAPSHOT</version>
