@@ -65,9 +65,18 @@ public class HtmlFlow {
         return pre;
     }
 
-    private static PreprocessingVisitorMfe preprocessingMfe(HtmlTemplate template, boolean isIndented) {
-        PreprocessingVisitorMfe processView = new PreprocessingVisitorMfe(isIndented);
-        HtmlView<?> preView = new HtmlView<>(() -> processView, template, false);
+    private static PreprocessingVisitorMfe preprocessingMfe(
+        HtmlTemplate template,
+        boolean isIndented
+    ) {
+        PreprocessingVisitorMfe processView = new PreprocessingVisitorMfe(
+            isIndented
+        );
+        HtmlView<?> preView = new HtmlView<>(
+            () -> processView,
+            template,
+            false
+        );
         // first process
         template.resolve(preView);
         // second process
@@ -302,12 +311,20 @@ public class HtmlFlow {
         }
     }
 
-    public static <M>HtmlView<M> mfe(HtmlTemplate template) {
+    public static <M> HtmlView<M> mfe(HtmlTemplate template) {
         PreprocessingVisitorMfe pre = preprocessingMfe(template, false);
         return new HtmlView<>(
-                (() -> new HtmlViewVisitor(new StringBuilder(), true, pre.getFirst())),
-                template,
-                false);
+            (
+                () ->
+                    new HtmlViewVisitor(
+                        new StringBuilder(),
+                        true,
+                        pre.getFirst()
+                    )
+            ),
+            template,
+            false
+        );
     }
 
     /**

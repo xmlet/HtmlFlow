@@ -34,7 +34,6 @@ import java.lang.Object;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
 import org.xmlet.htmlapifaster.*;
 
 /**
@@ -212,19 +211,41 @@ public abstract class HtmlVisitor extends ElementVisitor {
     }
 
     @Override
-    public <E extends Element> void visitMfe(E e, Consumer<MfeConfiguration> mfeConsumerCfg) {
+    public <E extends Element> void visitMfe(
+        E e,
+        Consumer<MfeConfiguration> mfeConsumerCfg
+    ) {
         // collect the mfe configuration
         HtmlMfeConfig mfeConfig = new HtmlMfeConfig();
         mfeConsumerCfg.accept(mfeConfig);
         addMfePage(mfeConfig);
 
-        e.custom(mfeConfig.getMfeElementName()).addAttr("mfe-url", mfeConfig.getMfeUrlResource());
+        e
+            .custom(mfeConfig.getMfeElementName())
+            .addAttr("mfe-url", mfeConfig.getMfeUrlResource());
         e.getVisitor().visitAttribute("mfe-name", mfeConfig.getMfeName());
-        e.getVisitor().visitAttribute("mfe-styling-url", mfeConfig.getMfeStylingUrl());
-        e.getVisitor().visitAttribute("mfe-listen-event", mfeConfig.getMfeListeningEventName());
-        e.getVisitor().visitAttribute("mfe-trigger-event", mfeConfig.getMfeTriggerEventName());
-        if(mfeConfig.isMfeStreamingData()){
-            e.getVisitor().visitAttribute("mfe-stream-data", String.valueOf(mfeConfig.isMfeStreamingData()));
+        e
+            .getVisitor()
+            .visitAttribute("mfe-styling-url", mfeConfig.getMfeStylingUrl());
+        e
+            .getVisitor()
+            .visitAttribute(
+                "mfe-listen-event",
+                mfeConfig.getMfeListeningEventName()
+            );
+        e
+            .getVisitor()
+            .visitAttribute(
+                "mfe-trigger-event",
+                mfeConfig.getMfeTriggerEventName()
+            );
+        if (mfeConfig.isMfeStreamingData()) {
+            e
+                .getVisitor()
+                .visitAttribute(
+                    "mfe-stream-data",
+                    String.valueOf(mfeConfig.isMfeStreamingData())
+                );
         }
         e.custom("/" + mfeConfig.getMfeElementName());
     }

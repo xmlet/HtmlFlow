@@ -1,9 +1,9 @@
 package htmlflow;
 
-
 import org.xmlet.htmlapifaster.MfeConfiguration;
 
 public class HtmlMfeConfig implements MfeConfiguration {
+
     private String mfeUrlResource;
     private String mfeName;
     private String mfeListeningEventName;
@@ -13,9 +13,15 @@ public class HtmlMfeConfig implements MfeConfiguration {
     private String mfeStylingUrl = null;
     private boolean isMfeStreamingData;
 
-    public HtmlMfeConfig(){}
+    public HtmlMfeConfig() {}
 
-    public HtmlMfeConfig(String mfeUrlResource, String mfeName, String mfeListeningEventName, String mfeTriggersEventName, boolean isMfeStreamingData) {
+    public HtmlMfeConfig(
+        String mfeUrlResource,
+        String mfeName,
+        String mfeListeningEventName,
+        String mfeTriggersEventName,
+        boolean isMfeStreamingData
+    ) {
         this.mfeUrlResource = mfeUrlResource;
         this.mfeName = mfeName;
         this.mfeListeningEventName = mfeListeningEventName;
@@ -23,21 +29,64 @@ public class HtmlMfeConfig implements MfeConfiguration {
         this.isMfeStreamingData = isMfeStreamingData;
     }
 
-
-    public HtmlMfeConfig(String mfeUrlResource, String mfeName, String mfeListeningEventName, String mfeTriggersEventName, String mfeScriptUrl, String mfeStylingUrl, boolean isMfeStreamingData) {
-        this(mfeUrlResource, mfeName, mfeListeningEventName, mfeTriggersEventName, isMfeStreamingData);
+    public HtmlMfeConfig(
+        String mfeUrlResource,
+        String mfeName,
+        String mfeListeningEventName,
+        String mfeTriggersEventName,
+        String mfeScriptUrl,
+        String mfeStylingUrl,
+        boolean isMfeStreamingData
+    ) {
+        this(
+            mfeUrlResource,
+            mfeName,
+            mfeListeningEventName,
+            mfeTriggersEventName,
+            isMfeStreamingData
+        );
         this.mfeScriptUrl = mfeScriptUrl;
         this.mfeStylingUrl = mfeStylingUrl;
     }
 
-    public HtmlMfeConfig(String mfeUrlResource, String mfeName, String mfeListeningEventName, String mfeTriggersEventName, String mfeScriptUrl, String mfeStylingUrl) {
-        this(mfeUrlResource, mfeName, mfeListeningEventName, mfeTriggersEventName, false);
+    public HtmlMfeConfig(
+        String mfeUrlResource,
+        String mfeName,
+        String mfeListeningEventName,
+        String mfeTriggersEventName,
+        String mfeScriptUrl,
+        String mfeStylingUrl
+    ) {
+        this(
+            mfeUrlResource,
+            mfeName,
+            mfeListeningEventName,
+            mfeTriggersEventName,
+            false
+        );
         this.mfeScriptUrl = mfeScriptUrl;
         this.mfeStylingUrl = mfeStylingUrl;
     }
 
-    public HtmlMfeConfig(String mfeUrlResource, String mfeName, String mfeElementName, String mfeListeningEventName, String mfeTriggersEventName, String mfeScriptUrl, String mfeStylingUrl, boolean isMfeStreamingData) {
-        this(mfeUrlResource, mfeName, mfeListeningEventName, mfeTriggersEventName, mfeScriptUrl, mfeStylingUrl, isMfeStreamingData);
+    public HtmlMfeConfig(
+        String mfeUrlResource,
+        String mfeName,
+        String mfeElementName,
+        String mfeListeningEventName,
+        String mfeTriggersEventName,
+        String mfeScriptUrl,
+        String mfeStylingUrl,
+        boolean isMfeStreamingData
+    ) {
+        this(
+            mfeUrlResource,
+            mfeName,
+            mfeListeningEventName,
+            mfeTriggersEventName,
+            mfeScriptUrl,
+            mfeStylingUrl,
+            isMfeStreamingData
+        );
         this.mfeElementName = mfeElementName;
     }
 
@@ -47,7 +96,10 @@ public class HtmlMfeConfig implements MfeConfiguration {
     }
 
     @Override
-    public String getMfeName() { return mfeName; }
+    public String getMfeName() {
+        return mfeName;
+    }
+
     @Override
     public String getMfeElementName() {
         return mfeElementName;
