@@ -13,6 +13,66 @@ data class Weather(val country: String, val locations: Iterable<Location>)
 data class Location(val city: String, val desc: String, val celsius: Int)
 
 class TestKotlinExtensions {
+
+    @Test
+    fun text_function_should_escape_html(){
+        val textToEscape = "<p>Hello, HtmlFlow!</p>"
+        val expectedHtml = """
+            <!DOCTYPE html>
+            <html>
+                <body>
+                    <div>
+                        &lt;p&gt;Hello, HtmlFlow!&lt;/p&gt;
+                    </div>
+                </body>
+            </html>
+        """.trimIndent()
+        val builder = StringBuilder()
+
+        doc(builder).html{
+            body{
+                div{
+                    text(textToEscape)
+                }
+            }
+        }
+
+        assertEquals(
+            normalizeWhitespace(builder.toString()),
+            normalizeWhitespace(expectedHtml)
+        )
+    }
+
+    @Test
+    fun when_no_escape_is_needed_text_does_not_change() {
+        val textToEscape = "Hello, HtmlFlow!"
+        val expectedHtml = """
+            <!DOCTYPE html>
+            <html>
+                <body>
+                    <div>
+                        Hello, HtmlFlow!
+                    </div>
+                </body>
+            </html>
+        """.trimIndent()
+
+        val builder = StringBuilder()
+
+        doc(builder).html {
+            body {
+                div {
+                    text(textToEscape)
+                }
+            }
+        }
+
+        assertEquals(
+            normalizeWhitespace(builder.toString()),
+            normalizeWhitespace(expectedHtml)
+        )
+    }
+
     @Test
     fun testExtensionDyn() {
         val html = weatherView.render(portugal)
@@ -414,7 +474,20 @@ class TestKotlinExtensions {
         builder.clear()
     }
 
+
+    /**
+     * Helper method to normalize whitespace in a string.
+     *
+     * This method replaces multiple spaces and tabs with a single space
+     * and trims leading and trailing whitespace.
+     *
+     * @param s The string to normalize whitespace in.
+     *
+     * @return The normalized string.
+     */
+    fun normalizeWhitespace(s: String) = s.replace(Regex("[ \\t]+"), " ").trim()
 }
+
 private val portugal = Weather("Portugal", listOf(
     Location("Porto", "Light rain", 14),
     Location("Lisbon", "Sunny day", 14),

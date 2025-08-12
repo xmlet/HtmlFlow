@@ -85,7 +85,7 @@ public class TestFlowifier {
 
     @Test
     public void testFlowifierTuerSourceforgeHomepage() throws Exception {
-        testFlowifier("http://tuer.sourceforge.net/en/");
+        testFlowifier("https://tuer.sourceforge.io/en/");
     }
 
     @Test
@@ -113,14 +113,14 @@ public class TestFlowifier {
             "</html>";
         String actual = Flowifier.fromHtml(src);
         Iterator<String> iter = Arrays.asList(actual.split("\n")).iterator();
-        Assert.assertEquals(true, iter.hasNext());
+        Assert.assertTrue(iter.hasNext());
         Utils
                 .loadLines("htmlflowSample05ForFlowifier.java")
                 .forEach(expected -> {
                     String line = iter.next();
                     assertEquals(expected, line);
                 });
-        Assert.assertEquals(false, iter.hasNext());
+        Assert.assertFalse(iter.hasNext());
     }
 
     private void testFlowifier(final String url) throws Exception {

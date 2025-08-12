@@ -2,16 +2,23 @@ package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
 
-public abstract class HtmlContinuationSync extends HtmlContinuation{
+public abstract class HtmlContinuationSync extends HtmlContinuation {
+
     /**
      * @param currentDepth Indentation depth associated to this block.
      * @param isClosed
      * @param visitor
      * @param next
      */
-    protected HtmlContinuationSync(int currentDepth, boolean isClosed, HtmlVisitor visitor, HtmlContinuation next) {
+    protected HtmlContinuationSync(
+        int currentDepth,
+        boolean isClosed,
+        HtmlVisitor visitor,
+        HtmlContinuation next
+    ) {
         super(currentDepth, isClosed, visitor, next);
     }
+
     /**
      * Executes this continuation and calls the next one if exist.
      *
@@ -28,6 +35,7 @@ public abstract class HtmlContinuationSync extends HtmlContinuation{
             next.execute(model);
         }
     }
+
     /**
      * Hook method to emit HTML.
      *
