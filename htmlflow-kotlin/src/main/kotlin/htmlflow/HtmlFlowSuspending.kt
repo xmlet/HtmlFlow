@@ -28,7 +28,7 @@ fun <E: Element<*,*>, M> E.suspending(block: suspend E.(M) -> Unit) : E {
 
     this.visitor.visitSuspending(this, object : SuspendConsumer<E,M> {
         override suspend fun E.accept(model: M) {
-            block(this, model as M)
+            block(this, model)
         }
     })
     return this

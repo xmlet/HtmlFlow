@@ -19,9 +19,8 @@ class HtmlContinuationSuspending<E: Element<*,*>, T>(
     private val consumer: SuspendConsumer<E, T?>,
     visitor: HtmlVisitor,
     next: HtmlContinuation?
-) : HtmlContinuation(
-        currentDepth, isClosed, visitor, next
-) {
+) : HtmlContinuationSuspendable(currentDepth, isClosed, visitor, next) {
+    override val nextSuspendable: HtmlContinuationSuspendable? get() = next as? HtmlContinuationSuspendable
 
     override fun execute(model: Any?) {
         throw UnsupportedOperationException("Illegal use fo suspending continuation. This should be used with executeSuspend!")
@@ -41,7 +40,7 @@ class HtmlContinuationSuspending<E: Element<*,*>, T>(
         /*
          * Call next consumer
          */
-        next.executeSuspending(model)
+        nextSuspendable?.executeSuspending(model)
     }
 
     override fun copy(v: HtmlVisitor): HtmlContinuation {

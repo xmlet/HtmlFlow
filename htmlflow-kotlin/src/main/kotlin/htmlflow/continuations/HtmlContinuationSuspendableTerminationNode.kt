@@ -2,7 +2,10 @@ package htmlflow.continuations
 
 import htmlflow.visitor.HtmlVisitor
 
-class HtmlContinuationSuspendableTerminationNode : HtmlContinuation(-1, false, null, null) {
+class HtmlContinuationSuspendableTerminationNode : HtmlContinuationSuspendable(-1, false, null, null) {
+
+    override val nextSuspendable: HtmlContinuationSuspendable?
+        get() = null
 
     override suspend fun executeSuspending(model: Any?) {
         // Nothing to do

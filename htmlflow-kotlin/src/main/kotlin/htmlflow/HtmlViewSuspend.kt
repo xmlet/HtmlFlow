@@ -42,13 +42,12 @@ class HtmlViewSuspend<M>(
         return HtmlViewSuspend(template, visitor, false)
     }
 
-
     suspend fun write(out: Appendable, model: M?) {
         if (threadSafe) {
-            visitor.clone(out).first.executeSuspending(model)
+            visitor.clone(out).first?.executeSuspending(model)
         } else {
             visitor.setAppendable(out)
-            visitor.first.executeSuspending(model)
+            visitor.first?.executeSuspending(model)
         }
     }
 

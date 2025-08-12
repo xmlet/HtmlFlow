@@ -9,6 +9,10 @@ import java.util.function.BiConsumer
 
 class PreprocessingVisitorSuspend(isIndented: Boolean) : PreprocessingVisitorAsync(isIndented) {
 
+    override fun getFirst(): HtmlContinuationSuspendable? {
+        return first as? HtmlContinuationSuspendable
+    }
+
     /**
      * Here we are creating 2 HtmlContinuation objects: one for previous static HTML and a next one
      * corresponding to the consumer passed to dynamic().
@@ -106,12 +110,14 @@ class PreprocessingVisitorSuspend(isIndented: Boolean) : PreprocessingVisitorAsy
     override fun resolve(model: Any?) {
         val staticHtml = sb().substring(staticBlockIndex)
         val staticCont: HtmlContinuation = HtmlContinuationSuspendableSyncStatic(staticHtml.trim { it <= ' ' }, this, null)
-        last = if (first == null) staticCont.also {
-            first = it // assign both first and last
-        } else HtmlContinuationSetter.setNext(
-            last,
-            staticCont
-        ) // append new staticCont and return it to be the new last continuation.
+        last =
+            if (first == null)
+                staticCont.also { first = it  } // assign both first and last
+            else
+                HtmlContinuationSetter.setNext(
+                    last,
+                    staticCont
+                ) // append new staticCont and return it to be the new last continuation.
     }
 
     private fun chainContinuationSuspendableStatic(nextContinuation: HtmlContinuation) {

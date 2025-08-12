@@ -10,8 +10,8 @@ abstract class HtmlContinuationSuspendableSync(
     isClosed: Boolean,
     visitor: HtmlVisitor,
     next: HtmlContinuation?
-) : HtmlContinuation(currentDepth, isClosed, visitor, next
-) {
+) : HtmlContinuationSuspendable(currentDepth, isClosed, visitor, next) {
+    override val nextSuspendable: HtmlContinuationSuspendable? = next as? HtmlContinuationSuspendable
     /**
      * Executes this continuation and calls the next one if exist.
      *
@@ -27,7 +27,7 @@ abstract class HtmlContinuationSuspendableSync(
             visitor.depth = currentDepth
         }
         emitHtml(model)
-        next?.executeSuspending(model)
+        nextSuspendable?.executeSuspending(model)
     }
 
     /**

@@ -16,9 +16,8 @@ class HtmlContinuationSuspendableAsync<E: Element<*, *>, T>(
     private val consumer: AwaitConsumer<E, T>,
     visitor: HtmlVisitor,
     next: HtmlContinuation?
-) : HtmlContinuation(
-    currentDepth, isClosed, visitor, next
-) {
+) : HtmlContinuationSuspendable(currentDepth, isClosed, visitor, next) {
+    override val nextSuspendable: HtmlContinuationSuspendable? = next as? HtmlContinuationSuspendable
     override suspend fun executeSuspending(model: Any?) {
         if (currentDepth >= 0) {
             visitor.setIsClosed(isClosed)
@@ -29,7 +28,7 @@ class HtmlContinuationSuspendableAsync<E: Element<*, *>, T>(
             cf.complete(null)
         }
         cf.await()
-        next?.executeSuspending(model)
+        nextSuspendable?.executeSuspending(model)
     }
 
     override fun execute(model: Any?) {

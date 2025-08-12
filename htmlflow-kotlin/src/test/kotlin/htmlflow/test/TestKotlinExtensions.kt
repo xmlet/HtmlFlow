@@ -1,12 +1,12 @@
 package htmlflow.test
 
 import htmlflow.HtmlFlow.view
-import org.junit.Test
 import org.xmlet.htmlapifaster.EnumBorderType
 import kotlin.test.assertEquals
 import htmlflow.HtmlFlow.doc
 import org.xmlet.htmlapifaster.EnumRelType
 import htmlflow.*
+import org.junit.Test
 import org.xmlet.htmlapifaster.*
 
 data class Weather(val country: String, val locations: Iterable<Location>)

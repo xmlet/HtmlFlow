@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.time.Duration
 import java.util.concurrent.ExecutionException
+import java.util.regex.Pattern
 
 class TestSuspendableView {
 

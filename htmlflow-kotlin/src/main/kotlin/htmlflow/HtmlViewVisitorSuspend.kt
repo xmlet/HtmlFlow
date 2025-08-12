@@ -1,9 +1,7 @@
 package htmlflow;
 
-import htmlflow.continuations.HtmlContinuation
-import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
+import htmlflow.continuations.HtmlContinuationSuspendable
 import htmlflow.visitor.HtmlViewVisitor
-import htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter
 
 /**
  * Intentionally pass null to out Appendable.
@@ -14,33 +12,36 @@ import htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter
 class HtmlViewVisitorSuspend(
     out: Appendable? = null,
     isIndented: Boolean,
-    first: HtmlContinuation?
-) : HtmlViewVisitor (
-    out, isIndented, first
-) {
+    first: HtmlContinuationSuspendable?
+) : HtmlViewVisitor(out, isIndented, first) {
+
+    override fun getFirst(): HtmlContinuationSuspendable? {
+        return first as? HtmlContinuationSuspendable
+    }
+
     /**
      * The last node to be processed.
      */
-    private var last: HtmlContinuation? = null
+    private var last: HtmlContinuationSuspendable? = null
 
     init {
         last = findLast()
     }
 
     override fun clone(isIndented: Boolean): HtmlViewVisitorSuspend {
-        return HtmlViewVisitorSuspend(out, isIndented, first)
+        return HtmlViewVisitorSuspend(out, isIndented, getFirst())
     }
 
     fun clone(out: Appendable): HtmlViewVisitorSuspend {
-        return HtmlViewVisitorSuspend(out, isIndented, first)
+        return HtmlViewVisitorSuspend(out, isIndented, getFirst())
     }
 
-    fun findLast(): HtmlContinuation? {
+    fun findLast(): HtmlContinuationSuspendable? {
         var node = first
         while (node.next != null) {
             node = node.next
         }
-        return node
+        return node as? HtmlContinuationSuspendable
     }
 
 }
