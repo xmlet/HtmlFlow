@@ -30,7 +30,7 @@ import htmlflow.visitor.HtmlVisitor;
 /** HtmlContinuation for a static HTML block. */
 public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
 
-    final public String staticHtmlBlock;
+    public final String staticHtmlBlock;
 
     /**
      * Sets indentation to -1 to inform that visitor should continue with previous indentation. The
