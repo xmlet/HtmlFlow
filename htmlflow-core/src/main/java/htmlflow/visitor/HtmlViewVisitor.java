@@ -45,7 +45,11 @@ public class HtmlViewVisitor extends HtmlVisitor {
     /**
      * The first node to be processed.
      */
-    public final HtmlContinuation first;
+    protected final HtmlContinuation first;
+
+    public HtmlContinuation getFirst() {
+        return this.first;
+    }
 
     public HtmlViewVisitor(Appendable out, boolean isIndented, HtmlContinuation first) {
         super(out, isIndented);

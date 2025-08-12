@@ -40,6 +40,7 @@ import org.xmlet.htmlapifaster.Table;
 import org.xmlet.htmlapifaster.Tr;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Iterator;

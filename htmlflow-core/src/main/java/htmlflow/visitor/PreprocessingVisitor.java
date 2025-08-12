@@ -76,7 +76,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
         return (StringBuilder) out;
     }
 
-    public final HtmlContinuation getFirst() {
+    public HtmlContinuation getFirst() {
         return first;
     }
 
