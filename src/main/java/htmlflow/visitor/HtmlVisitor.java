@@ -226,7 +226,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
         if(mfeConfig.isMfeStreamingData()){
             e.getVisitor().visitAttribute("mfe-stream-data", String.valueOf(mfeConfig.isMfeStreamingData()));
         }
-
+        e.custom("/" + mfeConfig.getMfeElementName());
     }
 
     /*=========================================================================*/

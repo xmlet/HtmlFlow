@@ -302,6 +302,14 @@ public class HtmlFlow {
         }
     }
 
+    public static <M>HtmlView<M> mfe(HtmlTemplate template) {
+        PreprocessingVisitorMfe pre = preprocessingMfe(template, false);
+        return new HtmlView<>(
+                (() -> new HtmlViewVisitor(new StringBuilder(), true, pre.getFirst())),
+                template,
+                false);
+    }
+
     /**
      * Immutable Engine for creating HtmlView instances with pre-configured settings. Use the Builder
      * to create Engine instances.
@@ -434,14 +442,6 @@ public class HtmlFlow {
                 threadSafe,
                 preEncoding
             );
-        }
-
-        public static <M>HtmlView<M> mfe(HtmlTemplate template) {
-            PreprocessingVisitorMfe pre = preprocessingMfe(template, false);
-            return new HtmlView<>(
-                    (() -> new HtmlViewVisitor(new StringBuilder(), true, pre.getFirst())),
-                    template,
-                    false);
         }
     }
 }
