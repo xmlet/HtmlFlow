@@ -26,7 +26,10 @@ package htmlflow.visitor;
 
 import htmlflow.continuations.HtmlContinuation;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.MfeConfiguration;
 import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
@@ -85,6 +88,12 @@ public class HtmlViewVisitor extends HtmlVisitor {
             " dynamic!"
         );
     }
+
+    @Override
+    public <E extends Element> void visitMfe(E e, Consumer<MfeConfiguration> mfeConfiguration) {
+        throw new IllegalStateException("Wrong use of mfe in a HtmlView! Use HtmlMfe class instead.");
+    }
+
 
     @Override
     public final <M, E extends Element> void visitAwait(
