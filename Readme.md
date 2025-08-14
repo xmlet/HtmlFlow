@@ -314,6 +314,8 @@ any kind of asynchronous API.
 
 ## References
 
+* 2025, [Enabling Progressive Server-Side Rendering for Traditional Web Template Engines with Java Virtual Threads](https://www.mdpi.com/2674-113X/4/3/20) - MDPI Software Journal.
+This article compares HtmlFlow with other template engines, assessing throughput using ab and JMeter, and raw rendering performance using JMH.
 * 2024, [Progressive Server-Side Rendering with Suspendable Web Templates](https://gamboa.pt/img/my-papers/wise-2024-pssr-async-await.pdf), 25th edition of [WISE](https://wise2024-qatar.com/), Doha, Qatar, ([slides](https://gamboa.pt/img/my-papers/wise-2024-slides.pdf)).
 * 2023,
   [Enhancing SSR in Low-Thread Web Servers](https://www.scitepress.org/Link.aspx?doi=10.5220/0012165300003584),
