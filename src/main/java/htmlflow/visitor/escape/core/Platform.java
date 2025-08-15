@@ -51,12 +51,26 @@ final class Platform {
      * @return a character array from the thread-local buffer
      * @throws IllegalStateException if the thread-local buffer is null
      */
-    static char[] charBufferFromTheadLocal() {
+    static char[] charBufferFromThreadLocal() {
         char[] buffer = THREAD_LOCAL_BUFFER.get();
         if (buffer == null) {
             throw new IllegalStateException(THREAD_LOCAL_BUFFER_IS_NULL);
         }
         return buffer;
+    }
+
+    /**
+     * Cleans up the thread-local buffer for the current thread.
+     *
+     * <p>This method removes the thread-local buffer from the current thread's ThreadLocalMap,
+     * preventing potential memory leaks. It should be called when the thread is done using
+     * the buffer, especially in applications that use thread pools where threads are reused.
+     *
+     * <p>This is particularly important in long-running applications or when using application
+     * servers with thread pools to prevent accumulation of unused ThreadLocal values.
+     */
+    static void cleanupThreadLocalBuffer() {
+        THREAD_LOCAL_BUFFER.remove();
     }
 
     /** The size of the thread-local buffer used for character escaping. */
