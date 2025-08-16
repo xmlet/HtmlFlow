@@ -81,6 +81,36 @@ public class TestIndentation {
         String actual = view.setIndented(false).render();
         assertEquals(EXPECTED, actual);
     }
+
+    @Test
+    public void viewWithTextAreaAndIndent() {
+        HtmlView<?> view = HtmlFlow.view(page -> page
+                .div()
+                .textarea()
+                .text("Sample text\nfoo\nbar")
+                .__()
+                .script()
+                .raw("// some comment" + lineSeparator() +
+                        "console.log('Hello world');")
+                .__() // script
+                .__()); // div
+
+
+        String expectedResult = 
+        "<div>" + lineSeparator() +
+        "\t<textarea>"+lineSeparator() +
+        "Sample text" + lineSeparator() +
+        "foo" + lineSeparator() +
+        "bar</textarea>" + lineSeparator() +
+        "\t<script>" + lineSeparator() +
+        "\t\t// some comment" + lineSeparator() +
+        "console.log('Hello world');" + lineSeparator() +
+        "\t</script>" + lineSeparator() +
+        "</div>";
+
+        String actual = view.setIndented(true).render();
+        assertEquals(expectedResult, actual);
+    }
     @Test
     public void viewAsyncWithNoIndent() {
         HtmlViewAsync<?> view = HtmlFlow.viewAsync(page -> page

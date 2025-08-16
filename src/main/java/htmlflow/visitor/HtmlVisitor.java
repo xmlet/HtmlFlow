@@ -127,6 +127,23 @@ public abstract class HtmlVisitor extends ElementVisitor {
             isClosed = true;
         }
     }
+    /**
+     * Adds a new line.
+     * Checks whether the parent element is still opened or not (!isClosed).
+     * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     */
+    public final void newline(){
+        if (isClosed){
+            write("\n");
+        } else {
+            depth++;
+            write(FINISH_TAG);
+            if(isIndented)
+                write("\n");
+
+            isClosed = true;
+        }
+    }
 
     /**
      * This method appends the String {@code "<elementName"} and it leaves the element open to include
@@ -150,7 +167,9 @@ public abstract class HtmlVisitor extends ElementVisitor {
     @Override
     public final void visitParent(Element element) {
         depth--;
-        newlineAndIndent();
+        if(!element.getName().equals("textarea")){
+            newlineAndIndent();
+        }
         endTag(out, element.getName()); // </elementName>
     }
 
@@ -190,7 +209,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
 
     @Override
     public final <R> void visitText(Text<? extends Element, R> text) {
-        newlineAndIndent();
+        newline();
         write(HtmlEscapers.htmlEscaper().escape(text.getValue()));
     }
 
