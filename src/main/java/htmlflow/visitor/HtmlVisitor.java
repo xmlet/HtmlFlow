@@ -26,9 +26,14 @@ package htmlflow.visitor;
 
 import static htmlflow.visitor.Tags.*;
 
+import htmlflow.HtmlMfeConfig;
 import htmlflow.exceptions.HtmlFlowAppendException;
 import htmlflow.visitor.escape.HtmlEscapers;
 import java.io.IOException;
+import java.lang.Object;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -41,6 +46,7 @@ import org.xmlet.htmlapifaster.Img;
 import org.xmlet.htmlapifaster.Input;
 import org.xmlet.htmlapifaster.Link;
 import org.xmlet.htmlapifaster.Meta;
+import org.xmlet.htmlapifaster.MfeConfiguration;
 import org.xmlet.htmlapifaster.Param;
 import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
@@ -66,6 +72,16 @@ public abstract class HtmlVisitor extends ElementVisitor {
 
     /** It the HTML output should be indented or not. */
     public final boolean isIndented;
+
+    private final List<HtmlMfeConfig> mfePage = new ArrayList<>();
+
+    public void addMfePage(HtmlMfeConfig mfePage) {
+        this.mfePage.add(mfePage);
+    }
+
+    public final List<HtmlMfeConfig> getMfePage() {
+        return mfePage;
+    }
 
     /** keep track of current indentation. */
     public final int getDepth() {
@@ -208,6 +224,69 @@ public abstract class HtmlVisitor extends ElementVisitor {
     public final <R> void visitComment(Text<? extends Element, R> text) {
         newlineAndIndent();
         addComment(out, text.getValue());
+    }
+
+    /**
+     * Processes and renders a Micro Frontend (MFE) component within an HTML element.
+     *
+     * <p>This method handles the creation and configuration of MFE components in the HTML output.
+     * It collects the MFE configuration from the consumer, registers it in the visitor's MFE
+     * registry, and generates the appropriate custom element with all necessary MFE attributes.</p>
+     *
+     * <p>The implementation:</p>
+     * <ol>
+     *   <li>Creates an {@code HtmlMfeConfig} instance to store MFE configuration</li>
+     *   <li>Applies the provided consumer to configure the MFE</li>
+     *   <li>Registers the configured MFE in the visitor's registry for later script injection</li>
+     *   <li>Creates a custom element with the MFE's element name</li>
+     *   <li>Adds all required MFE attributes based on the configuration</li>
+     *   <li>Closes the custom element</li>
+     * </ol>
+     *
+     * @param e The parent element where the MFE component will be inserted
+     * @param mfeConsumerCfg A consumer that configures the MFE component
+     * @param <E> Type of the parent Element
+     *
+     */
+
+    @Override
+    public <E extends Element> void visitMfe(
+        E e,
+        Consumer<MfeConfiguration> mfeConsumerCfg
+    ) {
+        // collect the mfe configuration
+        HtmlMfeConfig mfeConfig = new HtmlMfeConfig();
+        mfeConsumerCfg.accept(mfeConfig);
+        addMfePage(mfeConfig);
+
+        e
+            .custom(mfeConfig.getMfeElementName())
+            .addAttr("mfe-url", mfeConfig.getMfeUrlResource());
+        e.getVisitor().visitAttribute("mfe-name", mfeConfig.getMfeName());
+        e
+            .getVisitor()
+            .visitAttribute("mfe-styling-url", mfeConfig.getMfeStylingUrl());
+        e
+            .getVisitor()
+            .visitAttribute(
+                "mfe-listen-event",
+                mfeConfig.getMfeListeningEventName()
+            );
+        e
+            .getVisitor()
+            .visitAttribute(
+                "mfe-trigger-event",
+                mfeConfig.getMfeTriggerEventName()
+            );
+        if (mfeConfig.isMfeStreamingData()) {
+            e
+                .getVisitor()
+                .visitAttribute(
+                    "mfe-stream-data",
+                    String.valueOf(mfeConfig.isMfeStreamingData())
+                );
+        }
+        e.custom("/" + mfeConfig.getMfeElementName());
     }
 
     /*=========================================================================*/
