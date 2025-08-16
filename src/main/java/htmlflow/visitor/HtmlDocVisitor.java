@@ -60,7 +60,7 @@ public class HtmlDocVisitor extends HtmlVisitor {
     }
 
     @Override
-    public <E extends Element> void visitMfe(
+    public final <E extends Element> void visitMfe(
         E e,
         Consumer<MfeConfiguration> mfeConfiguration
     ) {

@@ -79,7 +79,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
         this.mfePage.add(mfePage);
     }
 
-    public List<HtmlMfeConfig> getMfePage() {
+    public final List<HtmlMfeConfig> getMfePage() {
         return mfePage;
     }
 
@@ -225,6 +225,29 @@ public abstract class HtmlVisitor extends ElementVisitor {
         newlineAndIndent();
         addComment(out, text.getValue());
     }
+
+    /**
+     * Processes and renders a Micro Frontend (MFE) component within an HTML element.
+     *
+     * <p>This method handles the creation and configuration of MFE components in the HTML output.
+     * It collects the MFE configuration from the consumer, registers it in the visitor's MFE
+     * registry, and generates the appropriate custom element with all necessary MFE attributes.</p>
+     *
+     * <p>The implementation:</p>
+     * <ol>
+     *   <li>Creates an {@code HtmlMfeConfig} instance to store MFE configuration</li>
+     *   <li>Applies the provided consumer to configure the MFE</li>
+     *   <li>Registers the configured MFE in the visitor's registry for later script injection</li>
+     *   <li>Creates a custom element with the MFE's element name</li>
+     *   <li>Adds all required MFE attributes based on the configuration</li>
+     *   <li>Closes the custom element</li>
+     * </ol>
+     *
+     * @param e The parent element where the MFE component will be inserted
+     * @param mfeConsumerCfg A consumer that configures the MFE component
+     * @param <E> Type of the parent Element
+     *
+     */
 
     @Override
     public <E extends Element> void visitMfe(

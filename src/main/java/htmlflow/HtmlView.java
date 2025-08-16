@@ -145,7 +145,8 @@ public class HtmlView<M> extends HtmlPage {
             template,
             isIndented,
             threadSafe,
-            true
+            true,
+            false
         );
     }
 
@@ -161,7 +162,8 @@ public class HtmlView<M> extends HtmlPage {
             template,
             visitor.isIndented,
             threadSafe,
-            preEncoding
+            preEncoding,
+            false
         );
     }
 }

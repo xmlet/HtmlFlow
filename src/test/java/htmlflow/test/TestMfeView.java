@@ -14,7 +14,7 @@ public class TestMfeView {
 
     @Test
     public void shouldRenderMicroFrontend() {
-        HtmlView<?> mfe = HtmlFlow.mfe(page -> {
+        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).build().view((page -> {
             page.html()
                     .head().__()
                     .body()
@@ -30,14 +30,14 @@ public class TestMfeView {
                     .__()
                     .__()
                     .__();
-        });
+        }));
         String actual = mfe.render();
         assertContents("mfeView.html", actual);
     }
 
     @Test
-    public void shouldRenderStreamingMicroFrontend() throws IOException {
-        HtmlView<?> mfe = HtmlFlow.mfe(page -> {
+    public void shouldRenderStreamingMicroFrontend() {
+        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).build().view(page -> {
             page.html()
                     .head().__()
                     .body()
