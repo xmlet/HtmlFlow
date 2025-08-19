@@ -350,76 +350,86 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<
     @Override
     public void head(final Node node, final int depth) {
         try {
-            // when we're on the head of the least deep node, we're at the
-            // beginning of the visit, then appends the header
             if (depth == 0) {
                 appendHeader();
             }
             if (node instanceof Document || node instanceof DocumentType) {
-                // there is nothing to write
-            } else {
-                // indents
-                appendable.append("        ");
-                for (int spaceIndex = 0; spaceIndex < depth * 4; spaceIndex++) {
-                    appendable.append(' ');
-                }
-                if (node instanceof TextNode) {
-                    final TextNode textNode = (TextNode) node;
-                    appendable
-                        .append(".raw(")
-                        .append(
-                            convertJavaStringContentToJavaDeclarableString(
-                                Entities.escape(textNode.getWholeText())
-                            )
-                        )
-                        .append(")")
-                        .append("\n");
-                    textNode.toString();
-                } else if (node instanceof DataNode) {
-                    final DataNode dataNode = (DataNode) node;
-                    appendable
-                        .append(".raw(")
-                        .append(
-                            convertJavaStringContentToJavaDeclarableString(
-                                dataNode.getWholeData()
-                            )
-                        )
-                        .append(")")
-                        .append("\n");
-                } else if (node instanceof Comment) {
-                    final Comment comment = (Comment) node;
-                    appendable
-                        .append(".comment(")
-                        .append(
-                            convertJavaStringContentToJavaDeclarableString(
-                                comment.getData()
-                            )
-                        )
-                        .append(")")
-                        .append("\n");
-                } else {
-                    appendable.append(".").append(node.nodeName()).append("()");
-                    // looks for the class from the node name
-                    final Class<?> nodeClass = getClassFromNodeName(
-                        node.nodeName()
-                    );
-                    // if the class has been found
-                    if (nodeClass != null) {
-                        for (final Attribute attribute : node
-                            .attributes()
-                            .asList()) {
-                            appendAttribute(attribute, nodeClass);
-                        }
-                    }
-                    appendable.append("\n");
-                }
+                return;
             }
+            appendIndentation(depth);
+            processNode(node);
         } catch (final IOException ioe) {
             LOGGER.warning(
                 "Failed to append the Java source code, cause: " +
                 ioe.getMessage()
             );
         }
+    }
+
+    private void appendIndentation(final int depth) throws IOException {
+        appendable.append("        ");
+        for (int spaceIndex = 0; spaceIndex < depth * 4; spaceIndex++) {
+            appendable.append(' ');
+        }
+    }
+
+    private void processNode(final Node node) throws IOException {
+        if (node instanceof TextNode textNode) {
+            processTextNode(textNode);
+        } else if (node instanceof DataNode dataNode) {
+            processDataNode(dataNode);
+        } else if (node instanceof Comment comment) {
+            processCommentNode(comment);
+        } else {
+            processGenericNode(node);
+        }
+    }
+
+    private void processTextNode(final TextNode textNode) throws IOException {
+        appendable
+            .append(".raw(")
+            .append(
+                convertJavaStringContentToJavaDeclarableString(
+                    Entities.escape(textNode.getWholeText())
+                )
+            )
+            .append(")")
+            .append("\n");
+    }
+
+    private void processDataNode(final DataNode dataNode) throws IOException {
+        appendable
+            .append(".raw(")
+            .append(
+                convertJavaStringContentToJavaDeclarableString(
+                    dataNode.getWholeData()
+                )
+            )
+            .append(")")
+            .append("\n");
+    }
+
+    private void processCommentNode(final Comment comment) throws IOException {
+        appendable
+            .append(".comment(")
+            .append(
+                convertJavaStringContentToJavaDeclarableString(
+                    comment.getData()
+                )
+            )
+            .append(")")
+            .append("\n");
+    }
+
+    private void processGenericNode(final Node node) throws IOException {
+        appendable.append(".").append(node.nodeName()).append("()");
+        final Class<?> nodeClass = getClassFromNodeName(node.nodeName());
+        if (nodeClass != null) {
+            for (final Attribute attribute : node.attributes().asList()) {
+                appendAttribute(attribute, nodeClass);
+            }
+        }
+        appendable.append("\n");
     }
 
     private String escapeInAttribute(final String unescaped) {

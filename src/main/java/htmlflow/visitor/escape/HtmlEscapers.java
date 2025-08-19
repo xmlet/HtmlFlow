@@ -34,6 +34,8 @@ import htmlflow.visitor.escape.core.Escapers;
  */
 public final class HtmlEscapers {
 
+    private HtmlEscapers() {}
+
     /**
      * Returns an {@link Escaper} for HTML escaping.
      *

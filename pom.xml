@@ -122,6 +122,10 @@
         <mockito.junit-version>4.8.0</mockito.junit-version>
         <argLine>-Xss16m -Xmx32M</argLine>
         <kotlin.version>1.9.22</kotlin.version>
+
+        <sonar.projectKey>com.github.xmlet:htmlflow</sonar.projectKey>
+        <sonar.organization>fmcarvalho-github</sonar.organization>
+        <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
     <build>
         <plugins>
@@ -316,6 +320,11 @@
                 <configuration>
                     <publishingServerId>central</publishingServerId>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>5.1.0.4751</version>
             </plugin>
             <!-- Spotless plugin for code formatting -->
             <plugin>

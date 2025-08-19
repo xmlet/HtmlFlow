@@ -16,7 +16,6 @@ import java.util.stream.IntStream;
 
 import static htmlflow.test.TestAsyncView.randomNameGenerator;
 import static java.lang.Math.toIntExact;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -57,7 +56,7 @@ class TestAsyncViewInConcurrency {
                 .range(0, NR_OF_TASKS)
                 .parallel()
                 .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
-                .collect(toList())
+                .toList()
                 .forEach(cf ->assertHtml(cf.join()));
     }
 
@@ -75,7 +74,7 @@ class TestAsyncViewInConcurrency {
                 .range(0, NR_OF_TASKS)
                 .parallel()
                 .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
-                .collect(toList())
+                .toList()
                 .forEach(cf ->assertHtml(cf.join()));
     }
 

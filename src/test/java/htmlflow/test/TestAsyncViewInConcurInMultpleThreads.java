@@ -79,14 +79,15 @@ class TestAsyncViewInConcurInMultpleThreads {
                 .__();
     }
 
-    static final String EXPECTED_HTML = "<div>\n" +
-            "\t<span>\n" +
-            "\t\t<a href=\"link\">\n" +
-            "\t\t\ttext\n" +
-            "\t\t</a>\n" +
-            "\t\t<a href=\"link2\">\n" +
-            "\t\t\ttext2\n" +
-            "\t\t</a>\n" +
-            "\t</span>\n" +
-            "</div>";
+    static final String EXPECTED_HTML = """
+            <div>
+            \t<span>
+            \t\t<a href="link">
+            \t\t\ttext
+            \t\t</a>
+            \t\t<a href="link2">
+            \t\t\ttext2
+            \t\t</a>
+            \t</span>
+            </div>""";
 }

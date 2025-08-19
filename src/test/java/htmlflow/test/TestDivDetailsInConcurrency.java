@@ -41,7 +41,6 @@ import static htmlflow.test.Utils.loadLines;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -60,7 +59,7 @@ public class TestDivDetailsInConcurrency {
             .stream()
             .collect(Collectors.toMap(
                     identity(),
-                    task -> loadLines(format("task%d.html", task.getId())).collect(toList())
+                    task -> loadLines(format("task%d.html", task.getId())).toList()
             ));
 
     private static final HtmlView unsafeThreadView = HtmlFlow.view(HtmlLists::taskDetailsTemplate);
