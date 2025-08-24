@@ -1,48 +1,49 @@
 package htmlflow.continuations
 
 import htmlflow.visitor.HtmlVisitor
+import java.lang.UnsupportedOperationException
+import java.util.concurrent.CompletableFuture
 import kotlinx.coroutines.future.await
 import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlapifaster.async.AwaitConsumer
-import java.lang.UnsupportedOperationException
-import java.util.concurrent.CompletableFuture
-
 
 @Suppress("FINITE_BOUNDS_VIOLATION_IN_JAVA")
-class HtmlContinuationSuspendableAsync<E: Element<*, *>, T>(
+class HtmlContinuationSuspendableAsync<E : Element<*, *>, T>(
     currentDepth: Int,
     isClosed: Boolean,
     private val element: E,
     private val consumer: AwaitConsumer<E, T>,
     visitor: HtmlVisitor,
-    next: HtmlContinuation?
+    next: HtmlContinuation?,
 ) : HtmlContinuationSuspendable(currentDepth, isClosed, visitor, next) {
-    override val nextSuspendable: HtmlContinuationSuspendable? = next as? HtmlContinuationSuspendable
+    override val nextSuspendable: HtmlContinuationSuspendable? get() =
+        next as? HtmlContinuationSuspendable
+
     override suspend fun executeSuspending(model: Any?) {
         if (currentDepth >= 0) {
             visitor.setIsClosed(isClosed)
             visitor.depth = currentDepth
         }
         val cf = CompletableFuture<Unit>()
-        consumer.accept(element, model as T) {
-            cf.complete(null)
-        }
+        consumer.accept(element, model as T) { cf.complete(null) }
         cf.await()
         nextSuspendable?.executeSuspending(model)
     }
 
     override fun execute(model: Any?) {
-        throw UnsupportedOperationException("Illegal use of execute in suspendable continuation! Should use executeSuspending.")
+        throw UnsupportedOperationException(
+            "Illegal use of execute in suspendable continuation! Should use executeSuspending."
+        )
     }
 
     override fun copy(v: HtmlVisitor): HtmlContinuation? {
-        return HtmlContinuationSuspendableAsync (
+        return HtmlContinuationSuspendableAsync(
             currentDepth,
             isClosed,
             copyElement(element, v),
             consumer,
             v,
-            next?.copy(v)
+            next?.copy(v),
         ) // call copy recursively
     }
 }

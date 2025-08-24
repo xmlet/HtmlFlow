@@ -18,9 +18,14 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.time.Duration
 import java.util.concurrent.ExecutionException
-import java.util.regex.Pattern
 
 class TestSuspendableView {
+
+    fun viewSuspendHot(
+        template: HtmlPage.() -> Unit
+    ): HtmlViewSuspend<AsyncModel<String, Student>> {
+        return viewSuspend(template, true, threadSafe = true, preEncoding = true)
+    }
 
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
@@ -129,6 +134,109 @@ class TestSuspendableView {
         val asyncModel = AsyncModel(titlesFlux, studentFlux)
         val mem = ByteArrayOutputStream()
         val view: HtmlViewSuspend<AsyncModel<String, Student>> = viewSuspend { testSuspendingModel() }
+        runBlocking { view.write(PrintStream(mem), asyncModel) }
+        val actual = Utils.NEWLINE
+            .splitAsStream(mem.toString())
+            .iterator()
+        Utils
+            .loadLines("asyncTest.html")
+            .forEach { expected: String? ->
+                val next = actual.next()
+                println(next)
+                Assertions.assertEquals(expected, next)
+            }
+        Assertions.assertFalse(actual.hasNext())
+    }
+
+    @Test
+    @Throws(ExecutionException::class, InterruptedException::class)
+    fun given_async_work_when_create_hot_view_and_render_it_twice_on_same_model() {
+        val mem = ByteArrayOutputStream()
+        val studentFlux: Publisher<Student> = Flux.range(1, 5)
+            .delayElements(Duration.ofMillis(10))
+            .doOnNext { nr: Int -> println(" ########################## Emit $nr") }
+            .map { nr: Int ->
+                Student(
+                    nr.toLong(),
+                    randomNameGenerator(Math.toIntExact(nr.toLong()))
+                )
+            }
+        val titlesFlux: Publisher<String> = Flux.fromArray(arrayOf("Nr", "Name"))
+        val asyncModel = AsyncModel(titlesFlux, studentFlux)
+        val view: HtmlViewSuspend<AsyncModel<String, Student>> = viewSuspendHot { testSuspendingModel() }
+        write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel)
+        mem.reset()
+        write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel)
+    }
+
+    @Test
+    @Throws(ExecutionException::class, InterruptedException::class)
+    fun given_async_work_when_create_hot_view_and_render_it_twice_on_other_model() {
+        val mem = ByteArrayOutputStream()
+        val studentFlux: Publisher<Student> = Flux.range(1, 5)
+            .delayElements(Duration.ofMillis(10))
+            .doOnNext { nr: Int -> println(" ########################## Emit $nr") }
+            .map { nr: Int ->
+                Student(
+                    nr.toLong(),
+                    randomNameGenerator(Math.toIntExact(nr.toLong()))
+                )
+            }
+        val titlesFlux: Publisher<String> = Flux.fromArray(arrayOf("Nr", "Name"))
+        val asyncModel = AsyncModel(titlesFlux, studentFlux)
+        val view: HtmlViewSuspend<AsyncModel<String, Student>> = viewSuspendHot { testSuspendingModel() }
+        write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel)
+        //
+        // 2nd render
+        //
+        val asyncModel2nd = AsyncModel(titlesFlux, Flux.range(6, 4)
+            .delayElements(Duration.ofMillis(10))
+            .doOnNext { nr: Int -> println(" ########################## Emit $nr") }
+            .map { nr: Int ->
+                Student(
+                    nr.toLong(),
+                    randomNameGenerator(Math.toIntExact(nr.toLong()))
+                )
+            })
+        mem.reset()
+        write_and_assert_asyncview("asyncTestSecond.html", mem, view, asyncModel2nd)
+    }
+
+    @Test
+    @Throws(ExecutionException::class, InterruptedException::class)
+    fun given_async_work_when_create_hot_view_then_returns_thenable_and_prints_correct_html() {
+        val mem = ByteArrayOutputStream()
+        val studentFlux: Publisher<Student> = Flux.range(1, 5)
+            .delayElements(Duration.ofMillis(10))
+            .doOnNext { nr: Int -> println(" ########################## Emit $nr") }
+            .map { nr: Int ->
+                Student(
+                    nr.toLong(),
+                    randomNameGenerator(Math.toIntExact(nr.toLong()))
+                )
+            }
+        val titlesFlux: Publisher<String> = Flux.fromArray(arrayOf("Nr", "Name"))
+        val asyncModel = AsyncModel(titlesFlux, studentFlux)
+        val view: HtmlViewSuspend<AsyncModel<String, Student>> = viewSuspendHot { testSuspendingModel() }
+        write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel)
+    }
+
+    @Test
+    @Throws(ExecutionException::class, InterruptedException::class)
+    fun given_async_work_with_double_delay_when_create_hot_view_then_returns_thenable_and_prints_correct_html() {
+        val studentFlux: Publisher<Student> = Flux.range(1, 5)
+            .delayElements(Duration.ofMillis(10))
+            .doOnNext { nr: Int -> println(" ########################## Emit $nr") }
+            .map { nr: Int ->
+                Student(
+                    nr.toLong(),
+                    randomNameGenerator(Math.toIntExact(nr.toLong()))
+                )
+            }
+        val titlesFlux: Publisher<String> = Flux.fromArray(arrayOf("Nr", "Name")).delayElements(Duration.ofSeconds(1))
+        val asyncModel = AsyncModel(titlesFlux, studentFlux)
+        val mem = ByteArrayOutputStream()
+        val view: HtmlViewSuspend<AsyncModel<String, Student>> = viewSuspendHot { testSuspendingModel() }
         runBlocking { view.write(PrintStream(mem), asyncModel) }
         val actual = Utils.NEWLINE
             .splitAsStream(mem.toString())

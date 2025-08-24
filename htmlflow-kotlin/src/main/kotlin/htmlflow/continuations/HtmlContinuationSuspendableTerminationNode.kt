@@ -2,7 +2,8 @@ package htmlflow.continuations
 
 import htmlflow.visitor.HtmlVisitor
 
-class HtmlContinuationSuspendableTerminationNode : HtmlContinuationSuspendable(-1, false, null, null) {
+class HtmlContinuationSuspendableTerminationNode :
+    HtmlContinuationSuspendable(-1, false, null, null) {
 
     override val nextSuspendable: HtmlContinuationSuspendable?
         get() = null
@@ -12,12 +13,14 @@ class HtmlContinuationSuspendableTerminationNode : HtmlContinuationSuspendable(-
     }
 
     override fun execute(model: Any?) {
-        throw UnsupportedOperationException("Illegal use of suspending terminal node! Only valid in HtmlViewSuspend.")
+        throw UnsupportedOperationException(
+            "Illegal use of suspending terminal node! Only valid in HtmlViewSuspend."
+        )
     }
 
     /**
-     * Since this Node is used only to signal completion, and we do not use the visitor,
-     * then we van reuse it.
+     * Since this Node is used only to signal completion, and we do not use the visitor, then we van
+     * reuse it.
      */
     override fun copy(visitor: HtmlVisitor?): HtmlContinuationSuspendableTerminationNode {
         return this

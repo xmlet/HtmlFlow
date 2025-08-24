@@ -13,7 +13,7 @@
     <artifactId>htmlflow-kotlin</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>4.8-SNAPSHOT</version>
+    <version>4.9-SNAPSHOT</version>
 
     <description>
         HtmlFlow Kotlin wrapper for the HtmlFlow library, which allows Java applications to easily write HTML documents in a fluent style into a java.io.PrintStream.
@@ -36,7 +36,7 @@
             <!-- HtmlFlow library purpose is to allow Java applications to easily writing HTML documents in a fluent style into a java.io.PrintStream. -->
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow</artifactId>
-            <version>4.8-SNAPSHOT</version>
+            <version>4.9-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
