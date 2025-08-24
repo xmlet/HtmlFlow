@@ -1,46 +1,59 @@
-package htmlflow;
+package htmlflow
 
 import htmlflow.continuations.HtmlContinuation
-import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
-import htmlflow.visitor.HtmlViewVisitor
-import htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter
+import htmlflow.visitor.HtmlVisitorSuspending
+import java.util.function.BiConsumer
+import org.xmlet.htmlapifaster.Element
+import org.xmlet.htmlapifaster.SuspendConsumer
+import org.xmlet.htmlapifaster.async.AwaitConsumer
 
 /**
- * Intentionally pass null to out Appendable.
- * Since this visitor allows concurrency, due to its asynchronous nature, then we must
- * clone it on each resolution (i.e. finishAsync()) to avoid sharing continuations across
- * different tasks and set a new out Appendable.
+ * Intentionally pass null to out Appendable. Since this visitor allows concurrency, due to its
+ * asynchronous nature, then we must clone it on each resolution (i.e. finishAsync()) to avoid
+ * sharing continuations across different tasks and set a new out Appendable.
  */
-class HtmlViewVisitorSuspend(
+open class HtmlViewVisitorSuspend(
     out: Appendable? = null,
     isIndented: Boolean,
-    first: HtmlContinuation?
-) : HtmlViewVisitor (
-    out, isIndented, first
-) {
-    /**
-     * The last node to be processed.
-     */
-    private var last: HtmlContinuation? = null
+    first: HtmlContinuation,
+) : HtmlVisitorSuspending(out, isIndented) {
+    private val first: HtmlContinuation = first.copy(this)
 
-    init {
-        last = findLast()
+    override fun resolve(model: Any?) {
+        first.execute(model)
     }
 
-    override fun clone(isIndented: Boolean): HtmlViewVisitorSuspend {
-        return HtmlViewVisitorSuspend(out, isIndented, first)
+    override fun clone(isIndented: Boolean): HtmlViewVisitorSuspend =
+        HtmlViewVisitorSuspend(out, isIndented, first)
+
+    override fun clone(out: Appendable): HtmlViewVisitorSuspend =
+        HtmlViewVisitorSuspend(out, isIndented, first)
+
+    override suspend fun executeSuspending(model: Any?) {
+        first.executeSuspending(model)
     }
 
-    fun clone(out: Appendable): HtmlViewVisitorSuspend {
-        return HtmlViewVisitorSuspend(out, isIndented, first)
-    }
+    override fun <E : Element<*, *>?, U : Any?> visitDynamic(
+        element: E?,
+        consumer: BiConsumer<E?, U?>?,
+    ): Unit =
+        throw IllegalStateException(
+            "Illegal use of visitDynamic in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend."
+        )
 
-    fun findLast(): HtmlContinuation? {
-        var node = first
-        while (node.next != null) {
-            node = node.next
-        }
-        return node
-    }
+    override fun <M : Any?, E : Element<*, *>?> visitAwait(
+        element: E?,
+        asyncAction: AwaitConsumer<E?, M?>?,
+    ): Unit =
+        throw IllegalStateException(
+            "Illegal use of visitAwait in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend."
+        )
 
+    override fun <M : Any?, E : Element<*, *>?> visitSuspending(
+        element: E?,
+        suspendAction: SuspendConsumer<E?, M?>?,
+    ): Unit =
+        throw IllegalStateException(
+            "Illegal use of visitSuspending in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend."
+        )
 }

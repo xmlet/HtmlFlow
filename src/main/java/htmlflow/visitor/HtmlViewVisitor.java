@@ -25,36 +25,34 @@
 package htmlflow.visitor;
 
 import htmlflow.continuations.HtmlContinuation;
+import java.util.function.BiConsumer;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-import java.util.function.BiConsumer;
-
-
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
  *
- * HtmlViewVisitor is also a head of HtmlContinuation objects chain, storing all
- * needed information to emit HTML corresponding to Static HTML blocks and dynamic HTML.
+ * <p>HtmlViewVisitor is also a head of HtmlContinuation objects chain, storing all needed
+ * information to emit HTML corresponding to Static HTML blocks and dynamic HTML.
  *
- * @author Miguel Gamboa, Luís Duare, Pedro Fialho
- *         created on 17-01-2018
+ * @author Miguel Gamboa, Luís Duare, Pedro Fialho created on 17-01-2018
  */
 public class HtmlViewVisitor extends HtmlVisitor {
-    /**
-     * The first node to be processed.
-     */
+
+    /** The first node to be processed. */
     public final HtmlContinuation first;
 
-    public HtmlViewVisitor(Appendable out, boolean isIndented, HtmlContinuation first) {
+    public HtmlViewVisitor(
+        Appendable out,
+        boolean isIndented,
+        HtmlContinuation first
+    ) {
         super(out, isIndented);
         this.first = first.copy(this);
     }
 
-    /**
-     * Processing output through invocation of HtmlContinuation objects chain.
-     */
+    /** Processing output through invocation of HtmlContinuation objects chain. */
     @Override
     public final void resolve(Object model) {
         first.execute(model);
@@ -66,29 +64,47 @@ public class HtmlViewVisitor extends HtmlVisitor {
     }
 
     /**
-     * We only allow a single call to visitDynamic when we are preprocessing the template function
-     * and building an invocation chain of HtmlContinuation objects (see PreprocessingVisitor).
+     * We only allow a single call to visitDynamic when we are preprocessing the template function and
+     * building an invocation chain of HtmlContinuation objects (see PreprocessingVisitor).
      *
      * @param element The parent Element.
      * @param dynamicHtmlBlock The continuation that consumes the element and a model.
      */
     @Override
-    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
+    public final <E extends Element, U> void visitDynamic(
+        E element,
+        BiConsumer<E, U> dynamicHtmlBlock
+    ) {
         /**
          * After first resolution we will only invoke the dynamicHtmlBlock consumer and no more visits
-         * to dynamic can happen.
-         * Otherwise, maybe we are invoking a dynamic nested in other dynamic, which is not allowed!
+         * to dynamic can happen. Otherwise, maybe we are invoking a dynamic nested in other dynamic,
+         * which is not allowed!
          */
-        throw new IllegalStateException("You are already in a dynamic block! Do not use dynamic() chained inside another dynamic!");
+        throw new IllegalStateException(
+            "You are already in a dynamic block! Do not use dynamic() chained inside another" +
+            " dynamic!"
+        );
     }
 
     @Override
-    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
-        throw new IllegalStateException("Wrong use of await() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async view.");
+    public final <M, E extends Element> void visitAwait(
+        E element,
+        AwaitConsumer<E, M> asyncAction
+    ) {
+        throw new IllegalStateException(
+            "Wrong use of await() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async" +
+            " view."
+        );
     }
 
     @Override
-    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
-        throw new IllegalStateException("Wrong use of suspending() in a HtmlView! Use HtmlFlow.viewSuspend() to produce a suspendable view.");
+    public final <M, E extends Element> void visitSuspending(
+        E element,
+        SuspendConsumer<E, M> suspendAction
+    ) {
+        throw new IllegalStateException(
+            "Wrong use of suspending() in a HtmlView! Use HtmlFlow.viewSuspend() to produce a" +
+            " suspendable view."
+        );
     }
 }

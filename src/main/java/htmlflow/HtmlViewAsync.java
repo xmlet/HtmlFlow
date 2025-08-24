@@ -24,33 +24,34 @@
 
 package htmlflow;
 
-import htmlflow.visitor.HtmlViewVisitorAsync;
-import org.xmlet.htmlapifaster.Html;
-
+import htmlflow.visitor.HtmlVisitorAsync;
 import java.util.concurrent.CompletableFuture;
+import org.xmlet.htmlapifaster.Html;
 
 /**
  * Asynchronous views can be bound to a domain object with an asynchronous API.
  *
- *  @param <M> Type of the model rendered with this view.
- *
+ * @param <M> Type of the model rendered with this view.
  * @author Pedro Fialho
  */
 public class HtmlViewAsync<M> extends HtmlPage {
-    /**
-     * Function that consumes an HtmlView to produce HTML elements.
-     */
-    private final HtmlTemplate template;
 
-    private final HtmlViewVisitorAsync visitor;
+    /** Function that consumes an HtmlView to produce HTML elements. */
+    protected final HtmlTemplate template;
 
-    private final boolean threadSafe;
+    protected final HtmlVisitorAsync visitor;
 
-    HtmlViewAsync(HtmlViewVisitorAsync visitor, HtmlTemplate template) {
+    protected final boolean threadSafe;
+
+    HtmlViewAsync(HtmlVisitorAsync visitor, HtmlTemplate template) {
         this(visitor, template, true);
     }
 
-    public HtmlViewAsync(HtmlViewVisitorAsync visitor, HtmlTemplate template, boolean safe) {
+    public HtmlViewAsync(
+        HtmlVisitorAsync visitor,
+        HtmlTemplate template,
+        boolean safe
+    ) {
         this.visitor = visitor;
         this.template = template;
         this.threadSafe = safe;
@@ -64,11 +65,20 @@ public class HtmlViewAsync<M> extends HtmlPage {
 
     @Override
     public HtmlViewAsync<M> setIndented(boolean isIndented) {
-        return HtmlFlow.viewAsync(template, isIndented, threadSafe);
+        return HtmlFlow.viewAsync(template, isIndented, threadSafe, true);
+    }
+
+    public HtmlViewAsync<M> setPreEncoding(boolean preEncoding) {
+        return HtmlFlow.viewAsync(
+            template,
+            visitor.isIndented,
+            threadSafe,
+            preEncoding
+        );
     }
 
     @Override
-    public HtmlViewVisitorAsync getVisitor() {
+    public HtmlVisitorAsync getVisitor() {
         return visitor;
     }
 
@@ -78,16 +88,15 @@ public class HtmlViewAsync<M> extends HtmlPage {
     }
 
     @Override
-    public HtmlViewAsync<M> threadSafe(){
+    public HtmlViewAsync<M> threadSafe() {
         return new HtmlViewAsync<>(visitor, template);
     }
 
-    public HtmlViewAsync<M> threadUnsafe(){
+    public HtmlViewAsync<M> threadUnsafe() {
         return new HtmlViewAsync<>(visitor, template, false);
     }
 
-
-    public final CompletableFuture<Void> writeAsync(Appendable out, M model) {
+    public CompletableFuture<Void> writeAsync(Appendable out, M model) {
         if (threadSafe) {
             return visitor.clone(out).finishedAsync(model);
         }
@@ -99,8 +108,8 @@ public class HtmlViewAsync<M> extends HtmlPage {
         return renderAsync(null);
     }
 
-    public final CompletableFuture<String> renderAsync(M model) {
+    public CompletableFuture<String> renderAsync(M model) {
         StringBuilder str = new StringBuilder();
-        return writeAsync(str, model).thenApply( nothing -> str.toString());
+        return writeAsync(str, model).thenApply(nothing -> str.toString());
     }
 }

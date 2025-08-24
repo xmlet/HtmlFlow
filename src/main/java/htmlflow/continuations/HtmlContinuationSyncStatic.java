@@ -27,16 +27,20 @@ package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
 
-/**
- * HtmlContinuation for a static HTML block.
- */
+/** HtmlContinuation for a static HTML block. */
 public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
+
     final String staticHtmlBlock;
+
     /**
-     * Sets indentation to -1 to inform that visitor should continue with previous indentation.
-     * The isClosed is useless because it just writes what it is in its staticHtmlBlock.
+     * Sets indentation to -1 to inform that visitor should continue with previous indentation. The
+     * isClosed is useless because it just writes what it is in its staticHtmlBlock.
      */
-    public HtmlContinuationSyncStatic(String staticHtmlBlock, HtmlVisitor visitor, HtmlContinuation next) {
+    public HtmlContinuationSyncStatic(
+        String staticHtmlBlock,
+        HtmlVisitor visitor,
+        HtmlContinuation next
+    ) {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
         this.staticHtmlBlock = staticHtmlBlock.intern(); // Maybe intern() here is useless and implicit by VM
     }
@@ -51,6 +55,7 @@ public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
         return new HtmlContinuationSyncStatic(
             staticHtmlBlock,
             v,
-            next != null ? next.copy(v) : null); // call copy recursively
+            next != null ? next.copy(v) : null
+        ); // call copy recursively
     }
 }

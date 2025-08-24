@@ -248,6 +248,8 @@ class TestKotlinExtensionsOnPartials {
             } // div
         } // form
     }
+
+    @Suppress("UNUSED_PARAMETER")
     private fun navbarFragment(nav: Nav<*>) {
 
     }
@@ -271,7 +273,7 @@ class TestKotlinExtensionsOnPartials {
     }
 
     @Test fun testOwnerView() {
-        val view = ownerView(::navbarFragment) { partialOwner() }
+        ownerView(::navbarFragment) { partialOwner() }
         // view.setOut(System.out).write(Owner("Ze Manel", "Rua da Alfandega"))
     }
 

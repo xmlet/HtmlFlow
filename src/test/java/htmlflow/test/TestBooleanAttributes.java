@@ -6,8 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class TestBooleanAttributes {
-    static final String EXPECTED_NO_ATTRIBUTE = "" +
-            "<!DOCTYPE html>" +
+    static final String EXPECTED_NO_ATTRIBUTE = "<!DOCTYPE html>" +
             "<html>" +
             "<body>" +
             "<button>" +
@@ -33,8 +32,7 @@ public class TestBooleanAttributes {
         assertEquals(EXPECTED_NO_ATTRIBUTE, buffer.toString());
     }
 
-    static final String EXPECTED_ATTRIBUTE = "" +
-            "<!DOCTYPE html>" +
+    static final String EXPECTED_ATTRIBUTE = "<!DOCTYPE html>" +
             "<html>" +
             "<body>" +
             "<button disabled=\"true\">" +
