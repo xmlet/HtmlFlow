@@ -23,16 +23,15 @@
  */
 package htmlflow.flowifier;
 
+import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 
-import java.io.IOException;
-
 /**
  * Main class of the flowifier used to convert a whole document or the content
  * of a node into a Java class
- * 
+ *
  * @author Julien Gouesse
  *
  */
@@ -48,7 +47,7 @@ public class Flowifier {
     /**
      * Returns the Java source code of a class that generates the HTML source
      * code of the given node
-     * 
+     *
      * @param <T>
      *            the type of appendable used to store the Java source code
      * @param node
@@ -58,8 +57,10 @@ public class Flowifier {
      * @return the Java source code of a class that generates the HTML source
      *         code of the given node
      */
-    public <T extends Appendable> T toFlow(final Node node,
-            final HtmlToJavaHtmlFlowNodeVisitor<T> htmlToJavaHtmlFlowNodeVisitor) {
+    public <T extends Appendable> T toFlow(
+        final Node node,
+        final HtmlToJavaHtmlFlowNodeVisitor<T> htmlToJavaHtmlFlowNodeVisitor
+    ) {
         node.traverse(htmlToJavaHtmlFlowNodeVisitor);
         return htmlToJavaHtmlFlowNodeVisitor.getAppendable();
     }
@@ -67,7 +68,7 @@ public class Flowifier {
     /**
      * Returns the Java source code of a class that generates the HTML source
      * code of the given document
-     * 
+     *
      * @param <T>
      *            the type of appendable used to store the Java source code
      * @param doc
@@ -77,22 +78,25 @@ public class Flowifier {
      * @return the Java source code of a class that generates the HTML source
      *         code of the given document
      */
-    public <T extends Appendable> T toFlow(final Document doc,
-            final HtmlToJavaHtmlFlowNodeVisitor<T> htmlToJavaHtmlFlowNodeVisitor) {
+    public <T extends Appendable> T toFlow(
+        final Document doc,
+        final HtmlToJavaHtmlFlowNodeVisitor<T> htmlToJavaHtmlFlowNodeVisitor
+    ) {
         return toFlow(doc.root(), htmlToJavaHtmlFlowNodeVisitor);
     }
 
     /**
      * Returns the Java source code of a class that generates the HTML source
      * code of the given document
-     * 
+     *
      * @param doc
      *            the document whose content has to be converted
      * @return the Java source code of a class that generates the HTML source
      *         code of the given document
      */
     public String toFlow(final Document doc) {
-        final DefaultHtmlToJavaHtmlFlowNodeVisitor visitor = new DefaultHtmlToJavaHtmlFlowNodeVisitor();
+        final DefaultHtmlToJavaHtmlFlowNodeVisitor visitor =
+            new DefaultHtmlToJavaHtmlFlowNodeVisitor();
         final StringBuilder builder = toFlow(doc, visitor);
         return builder.toString();
     }
@@ -100,7 +104,7 @@ public class Flowifier {
     /**
      * Returns the Java source code of a class that generates the HTML source
      * code of the document at the given URL
-     * 
+     *
      * @param <T>
      *            the type of appendable used to store the Java source code
      * @param url
@@ -113,8 +117,10 @@ public class Flowifier {
      *             thrown when something wrong occurs while getting the document
      *             at the given URL
      */
-    public <T extends Appendable> T toFlow(final String url,
-            final HtmlToJavaHtmlFlowNodeVisitor<T> htmlToJavaHtmlFlowNodeVisitor) throws IOException {
+    public <T extends Appendable> T toFlow(
+        final String url,
+        final HtmlToJavaHtmlFlowNodeVisitor<T> htmlToJavaHtmlFlowNodeVisitor
+    ) throws IOException {
         final Document doc = Jsoup.connect(url).get();
         return toFlow(doc, htmlToJavaHtmlFlowNodeVisitor);
     }
@@ -122,7 +128,7 @@ public class Flowifier {
     /**
      * Returns the Java source code of a class that generates the HTML source
      * code of the document at the given URL
-     * 
+     *
      * @param url
      *            the URL of the document
      * @return the Java source code of a class that generates the HTML source
@@ -132,11 +138,10 @@ public class Flowifier {
      *             at the given URL
      */
     public String toFlow(final String url) throws IOException {
-        final DefaultHtmlToJavaHtmlFlowNodeVisitor visitor = new DefaultHtmlToJavaHtmlFlowNodeVisitor();
+        final DefaultHtmlToJavaHtmlFlowNodeVisitor visitor =
+            new DefaultHtmlToJavaHtmlFlowNodeVisitor();
         final StringBuilder builder = toFlow(url, visitor);
-        return builder
-            .toString()
-            .replace(".text(\"\\n\")", "");
+        return builder.toString().replace(".text(\"\\n\")", "");
     }
 
     /**

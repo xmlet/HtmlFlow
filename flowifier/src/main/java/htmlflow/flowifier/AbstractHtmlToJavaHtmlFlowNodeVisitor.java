@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.DataNode;
@@ -76,28 +75,54 @@ import org.xmlet.xsdasmfaster.classes.infrastructure.EnumInterface;
  * Defines most of the implementation for a typical visitor of a JSoup node that
  * converts the HTML source code into a Java class except the storage managed by
  * the appendable
- * 
+ *
  * @author Julien Gouesse
  *
  * @param <T>
  *            the type of appendable used to store the Java source code
  */
-public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable>
-        implements HtmlToJavaHtmlFlowNodeVisitor<T> {
+public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<
+    T extends Appendable
+>
+    implements HtmlToJavaHtmlFlowNodeVisitor<T> {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(AbstractHtmlToJavaHtmlFlowNodeVisitor.class.getCanonicalName());
+    private static final Logger LOGGER = Logger.getLogger(
+        AbstractHtmlToJavaHtmlFlowNodeVisitor.class.getCanonicalName()
+    );
 
     @SuppressWarnings("rawtypes")
-    private static final Class[] ENUM_INTERFACE_SUBCLASSES = new Class[] { EnumAutocompleteType.class,
-            EnumBorderType.class, EnumContenteditableType.class, EnumCrossoriginCrossOriginType.class,
-            EnumDirType.class, EnumDisplayType.class, EnumDraggableType.class, EnumEnctypeType.class,
-            EnumFormenctypeEnctypeType.class, EnumFormmethodMethodType.class, EnumFormtargetBrowsingContext.class,
-            EnumHttpEquivType.class, EnumKindType.class, EnumMediaType.class, EnumMethodType.class,
-            EnumOverflowType.class, EnumRelType.class, EnumRevType.class, EnumSandboxType.class, EnumScopeType.class,
-            EnumShapeType.class, EnumSpellcheckType.class, EnumTranslateType.class, EnumTypeButtonType.class,
-            EnumTypeContentType.class, EnumTypeInputType.class, EnumTypeOlType.class, EnumTypeScriptType.class,
-            EnumTypeSimpleContentType.class, EnumWrapType.class };
+    private static final Class[] ENUM_INTERFACE_SUBCLASSES = new Class[] {
+        EnumAutocompleteType.class,
+        EnumBorderType.class,
+        EnumContenteditableType.class,
+        EnumCrossoriginCrossOriginType.class,
+        EnumDirType.class,
+        EnumDisplayType.class,
+        EnumDraggableType.class,
+        EnumEnctypeType.class,
+        EnumFormenctypeEnctypeType.class,
+        EnumFormmethodMethodType.class,
+        EnumFormtargetBrowsingContext.class,
+        EnumHttpEquivType.class,
+        EnumKindType.class,
+        EnumMediaType.class,
+        EnumMethodType.class,
+        EnumOverflowType.class,
+        EnumRelType.class,
+        EnumRevType.class,
+        EnumSandboxType.class,
+        EnumScopeType.class,
+        EnumShapeType.class,
+        EnumSpellcheckType.class,
+        EnumTranslateType.class,
+        EnumTypeButtonType.class,
+        EnumTypeContentType.class,
+        EnumTypeInputType.class,
+        EnumTypeOlType.class,
+        EnumTypeScriptType.class,
+        EnumTypeSimpleContentType.class,
+        EnumWrapType.class,
+    };
 
     /**
      * supplier of the appendable
@@ -113,7 +138,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 
     /**
      * Constructor
-     * 
+     *
      * @param appendableSupplier
      *            the supplier of the appendable, can create or get an
      *            appendable
@@ -121,7 +146,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
      *            <code>true</code> if the generated HTML source code is
      *            indented, otherwise <code>false</code>
      */
-    protected AbstractHtmlToJavaHtmlFlowNodeVisitor(final Supplier<T> appendableSupplier, final boolean indented) {
+    protected AbstractHtmlToJavaHtmlFlowNodeVisitor(
+        final Supplier<T> appendableSupplier,
+        final boolean indented
+    ) {
         super();
         this.appendableSupplier = Objects.requireNonNull(appendableSupplier);
         this.indented = indented;
@@ -140,8 +168,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         appendable.append("import org.xmlet.htmlapifaster.*;\n\n");
         appendable.append("public class Flowified {\n");
         appendable.append("    public static void get(StringBuilder out) {\n");
-        appendable.append("        HtmlFlow.doc(out).setIndented(")
-                .append(Boolean.toString(indented)).append(")\n");
+        appendable
+            .append("        HtmlFlow.doc(out).setIndented(")
+            .append(Boolean.toString(indented))
+            .append(")\n");
     }
 
     @Override
@@ -153,7 +183,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 
     /**
      * This method comes from Javapoet
-     * 
+     *
      * @param c
      * @return
      */
@@ -161,34 +191,39 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         // see
         // https://docs.oracle.com/javase/specs/jls/se7/html/jls-3.html#jls-3.10.6
         switch (c) {
-        case '\b':
-            return "\\b"; /* \u0008: backspace (BS) */
-        case '\t':
-            return "\\t"; /* \u0009: horizontal tab (HT) */
-        case '\n':
-            return "\\n"; /* \u000a: linefeed (LF) */
-        case '\f':
-            return "\\f"; /* \u000c: form feed (FF) */
-        case '\r':
-            return "\\r"; /* \u000d: carriage return (CR) */
-        case '\"':
-            return "\""; /* \u0022: double quote (") */
-        case '\'':
-            return "\\'"; /* \u0027: single quote (') */
-        case '\\':
-            return "\\\\"; /* \u005c: backslash (\) */
-        default:
-            return Character.isISOControl(c) ? String.format("\\u%04x", (int) c) : Character.toString(c);
+            case '\b':
+                return "\\b";/* \u0008: backspace (BS) */
+            case '\t':
+                return "\\t";/* \u0009: horizontal tab (HT) */
+            case '\n':
+                return "\\n";/* \u000a: linefeed (LF) */
+            case '\f':
+                return "\\f";/* \u000c: form feed (FF) */
+            case '\r':
+                return "\\r";/* \u000d: carriage return (CR) */
+            case '\"':
+                return "\"";/* \u0022: double quote (") */
+            case '\'':
+                return "\\'";/* \u0027: single quote (') */
+            case '\\':
+                return "\\\\";/* \u005c: backslash (\) */
+            default:
+                return Character.isISOControl(c)
+                    ? String.format("\\u%04x", (int) c)
+                    : Character.toString(c);
         }
     }
 
     /**
      * Returns the string literal representing {@code value}, including wrapping
      * double quotes.
-     * 
+     *
      * This method comes from Javapoet
      */
-    private String stringLiteralWithDoubleQuotes(final String value, final String indent) {
+    private String stringLiteralWithDoubleQuotes(
+        final String value,
+        final String indent
+    ) {
         StringBuilder result = new StringBuilder(value.length() + 2);
         result.append('"');
         for (int i = 0; i < value.length(); i++) {
@@ -204,7 +239,11 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
                 result.append(characterLiteralWithoutSingleQuotes(c));
                 // need to append indent after linefeed?
                 if (c == '\n' && i + 1 < value.length()) {
-                    result.append("\"\n").append(indent).append(indent).append("+ \"");
+                    result
+                        .append("\"\n")
+                        .append(indent)
+                        .append(indent)
+                        .append("+ \"");
                 }
             }
         }
@@ -213,49 +252,73 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
     }
 
     @Override
-    public String convertJavaStringContentToJavaDeclarableString(final String unescaped) {
-        return unescaped == null ? null : stringLiteralWithDoubleQuotes(unescaped, "");
+    public String convertJavaStringContentToJavaDeclarableString(
+        final String unescaped
+    ) {
+        return unescaped == null
+            ? null
+            : stringLiteralWithDoubleQuotes(unescaped, "");
     }
 
     @Override
     public boolean isUncloseable(final Node node) {
-        return node instanceof Document || node instanceof DataNode || node instanceof Comment
-                || node instanceof TextNode || node instanceof DocumentType;
+        return (
+            node instanceof Document ||
+            node instanceof DataNode ||
+            node instanceof Comment ||
+            node instanceof TextNode ||
+            node instanceof DocumentType
+        );
     }
 
     @SuppressWarnings("rawtypes")
-    private String toEnumAttributeValue(final Class<? extends EnumInterface<String>> enumInterfaceClass,
-            final Attribute attribute) {
+    private String toEnumAttributeValue(
+        final Class<? extends EnumInterface<String>> enumInterfaceClass,
+        final Attribute attribute
+    ) {
         // gets all possible values of this enum
-        final EnumInterface attrValEnum = Arrays.stream(enumInterfaceClass.getEnumConstants())
-                .map(EnumInterface.class::cast)
-                // compares its value as expected in the HTML with the value of
-                // the attribute
-                .filter((final EnumInterface enumInterface) -> enumInterface.getValue().equals(attribute.getValue()))
-                // takes the first one that matches
-                .findFirst()
-                // returns null if none matches
-                .orElse(null);
+        final EnumInterface attrValEnum = Arrays
+            .stream(enumInterfaceClass.getEnumConstants())
+            .map(EnumInterface.class::cast)
+            // compares its value as expected in the HTML with the value of
+            // the attribute
+            .filter((final EnumInterface enumInterface) ->
+                enumInterface.getValue().equals(attribute.getValue())
+            )
+            // takes the first one that matches
+            .findFirst()
+            // returns null if none matches
+            .orElse(null);
         final String enumAttrValue;
         if (attrValEnum == null) {
             enumAttrValue = null;
         } else {
             // returns a string made of the name of the enum and the value of
             // the enum separated by a dot
-            enumAttrValue = enumInterfaceClass.getSimpleName() + "." + ((Enum) attrValEnum).name();
+            enumAttrValue =
+                enumInterfaceClass.getSimpleName() +
+                "." +
+                ((Enum) attrValEnum).name();
         }
         return enumAttrValue;
     }
 
     @Override
     public Class<?> getClassFromNodeName(final String nodeName) {
-        final String nodeClassname = nodeName.substring(0, 1).toUpperCase(Locale.ENGLISH)
-                + nodeName.substring(1).toLowerCase(Locale.ENGLISH);
+        final String nodeClassname =
+            nodeName.substring(0, 1).toUpperCase(Locale.ENGLISH) +
+            nodeName.substring(1).toLowerCase(Locale.ENGLISH);
         Class<?> nodeClass;
         try {
-            nodeClass = Class.forName("org.xmlet.htmlapifaster." + nodeClassname);
+            nodeClass =
+                Class.forName("org.xmlet.htmlapifaster." + nodeClassname);
         } catch (final ClassNotFoundException cnfe) {
-            LOGGER.warning("Class " + nodeClassname + " not found for the node name " + nodeName);
+            LOGGER.warning(
+                "Class " +
+                nodeClassname +
+                " not found for the node name " +
+                nodeName
+            );
             nodeClass = null;
         }
         return nodeClass;
@@ -263,18 +326,36 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 
     @SuppressWarnings("rawtypes")
     @Override
-    public Method getMethodFromAttribute(Class<?> nodeClass, Attribute attribute) {
+    public Method getMethodFromAttribute(
+        Class<?> nodeClass,
+        Attribute attribute
+    ) {
         final String attrKey = attribute.getKey();
-        final String attrMethodName = "attr" + attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH)
-                + attrKey.substring(1);
-        return Arrays.stream(nodeClass.getMethods()).filter((final Method method) -> method.getName()
-                .equals(attrMethodName)
-                && method.getParameterCount() == 1
-                && Stream
-                        .concat(Stream.of(String.class, Boolean.class, Long.class, Integer.class),
-                                Arrays.stream(ENUM_INTERFACE_SUBCLASSES))
-                        .anyMatch((final Class candidateClass) -> candidateClass.equals(method.getParameterTypes()[0])))
-                .findFirst().orElse(null);
+        final String attrMethodName =
+            "attr" +
+            attrKey.substring(0, 1).toUpperCase(Locale.ENGLISH) +
+            attrKey.substring(1);
+        return Arrays
+            .stream(nodeClass.getMethods())
+            .filter((final Method method) ->
+                method.getName().equals(attrMethodName) &&
+                method.getParameterCount() == 1 &&
+                Stream
+                    .concat(
+                        Stream.of(
+                            String.class,
+                            Boolean.class,
+                            Long.class,
+                            Integer.class
+                        ),
+                        Arrays.stream(ENUM_INTERFACE_SUBCLASSES)
+                    )
+                    .anyMatch((final Class candidateClass) ->
+                        candidateClass.equals(method.getParameterTypes()[0])
+                    )
+            )
+            .findFirst()
+            .orElse(null);
     }
 
     @Override
@@ -295,27 +376,49 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
                 }
                 if (node instanceof TextNode) {
                     final TextNode textNode = (TextNode) node;
-                    appendable.append(".raw(").append(
-                            convertJavaStringContentToJavaDeclarableString(Entities.escape(textNode.getWholeText())))
-                            .append(")").append("\n");
+                    appendable
+                        .append(".raw(")
+                        .append(
+                            convertJavaStringContentToJavaDeclarableString(
+                                Entities.escape(textNode.getWholeText())
+                            )
+                        )
+                        .append(")")
+                        .append("\n");
                     textNode.toString();
                 } else if (node instanceof DataNode) {
                     final DataNode dataNode = (DataNode) node;
-                    appendable.append(".raw(")
-                            .append(convertJavaStringContentToJavaDeclarableString(dataNode.getWholeData())).append(")")
-                            .append("\n");
+                    appendable
+                        .append(".raw(")
+                        .append(
+                            convertJavaStringContentToJavaDeclarableString(
+                                dataNode.getWholeData()
+                            )
+                        )
+                        .append(")")
+                        .append("\n");
                 } else if (node instanceof Comment) {
                     final Comment comment = (Comment) node;
-                    appendable.append(".comment(")
-                            .append(convertJavaStringContentToJavaDeclarableString(comment.getData())).append(")")
-                            .append("\n");
+                    appendable
+                        .append(".comment(")
+                        .append(
+                            convertJavaStringContentToJavaDeclarableString(
+                                comment.getData()
+                            )
+                        )
+                        .append(")")
+                        .append("\n");
                 } else {
                     appendable.append(".").append(node.nodeName()).append("()");
                     // looks for the class from the node name
-                    final Class<?> nodeClass = getClassFromNodeName(node.nodeName());
+                    final Class<?> nodeClass = getClassFromNodeName(
+                        node.nodeName()
+                    );
                     // if the class has been found
                     if (nodeClass != null) {
-                        for (final Attribute attribute : node.attributes().asList()) {
+                        for (final Attribute attribute : node
+                            .attributes()
+                            .asList()) {
                             appendAttribute(attribute, nodeClass);
                         }
                     }
@@ -323,7 +426,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
                 }
             }
         } catch (final IOException ioe) {
-            LOGGER.warning("Failed to append the Java source code, cause: " + ioe.getMessage());
+            LOGGER.warning(
+                "Failed to append the Java source code, cause: " +
+                ioe.getMessage()
+            );
         }
     }
 
@@ -335,7 +441,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
 
     @Override
     @SuppressWarnings("unchecked")
-    public void appendAttribute(final Attribute attribute, final Class<?> nodeClass) throws IOException {
+    public void appendAttribute(
+        final Attribute attribute,
+        final Class<?> nodeClass
+    ) throws IOException {
         // uses the class to look for the name of the method for this attribute
         final Method attrMethod = getMethodFromAttribute(nodeClass, attribute);
         final String attrKey = attribute.getKey();
@@ -343,9 +452,14 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         if (attrMethod == null) {
             attrVal = null;
         } else if (attrMethod.getParameterTypes()[0].equals(String.class)) {
-            attrVal = convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue()));
+            attrVal =
+                convertJavaStringContentToJavaDeclarableString(
+                    escapeInAttribute(attribute.getValue())
+                );
         } else if (attrMethod.getParameterTypes()[0].equals(Boolean.class)) {
-            if (attribute.getValue() == null || attribute.getValue().isEmpty()) {
+            if (
+                attribute.getValue() == null || attribute.getValue().isEmpty()
+            ) {
                 attrVal = null;
             } else if (attribute.getValue().equalsIgnoreCase("true")) {
                 attrVal = "Boolean.TRUE";
@@ -356,9 +470,16 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
             attrVal = "Long.valueOf(" + attribute.getValue() + "L)";
         } else if (attrMethod.getParameterTypes()[0].equals(Integer.class)) {
             attrVal = "Integer.valueOf(" + attribute.getValue() + ")";
-        } else if (EnumInterface.class.isAssignableFrom(attrMethod.getParameterTypes()[0])) {
-            attrVal = toEnumAttributeValue((Class<? extends EnumInterface<String>>) attrMethod.getParameterTypes()[0],
-                    attribute);
+        } else if (
+            EnumInterface.class.isAssignableFrom(
+                    attrMethod.getParameterTypes()[0]
+                )
+        ) {
+            attrVal =
+                toEnumAttributeValue(
+                    (Class<? extends EnumInterface<String>>) attrMethod.getParameterTypes()[0],
+                    attribute
+                );
         } else {
             attrVal = null;
         }
@@ -366,12 +487,25 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
         // attribute
         if (attrMethod == null || attrVal == null) {
             // uses the catch-all method addAttr() as no dedicated method exists
-            appendable.append(".addAttr(").append("\"").append(attrKey).append("\",")
-                    .append(convertJavaStringContentToJavaDeclarableString(escapeInAttribute(attribute.getValue())))
-                    .append(")");
+            appendable
+                .append(".addAttr(")
+                .append("\"")
+                .append(attrKey)
+                .append("\",")
+                .append(
+                    convertJavaStringContentToJavaDeclarableString(
+                        escapeInAttribute(attribute.getValue())
+                    )
+                )
+                .append(")");
         } else {
             // uses the dedicated method
-            appendable.append(".").append(attrMethod.getName()).append("(").append(attrVal).append(")");
+            appendable
+                .append(".")
+                .append(attrMethod.getName())
+                .append("(")
+                .append(attrVal)
+                .append(")");
         }
     }
 
@@ -386,7 +520,11 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
                 }
                 // closes the node, adds a comment (mostly for debugging
                 // purposes, it helps to know what is being closed)
-                appendable.append(".__()").append(" //").append(node.nodeName()).append("\n");
+                appendable
+                    .append(".__()")
+                    .append(" //")
+                    .append(node.nodeName())
+                    .append("\n");
             }
             // when we're on the tail of the least deep node, we're at the end
             // of the visit, then appends the footer
@@ -394,7 +532,10 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<T extends Appendable
                 appendFooter();
             }
         } catch (final IOException ioe) {
-            LOGGER.warning("Failed to append the Java source code, cause: " + ioe.getMessage());
+            LOGGER.warning(
+                "Failed to append the Java source code, cause: " +
+                ioe.getMessage()
+            );
         }
     }
 }
