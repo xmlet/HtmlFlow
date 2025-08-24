@@ -13,7 +13,7 @@
     <artifactId>htmlflow</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>4.8-SNAPSHOT</version>
+    <version>4.9-SNAPSHOT</version>
 
     <description>
         HtmlFlow library purpose is to allow Java applications to easily writing
@@ -37,12 +37,6 @@
             <groupId>com.github.xmlet</groupId>
             <artifactId>xsd2poet</artifactId>
             <version>1.0.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version>
         </dependency>
 
         <!-- Test dependencies -->

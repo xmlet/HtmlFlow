@@ -57,8 +57,10 @@ public class HtmlDoc extends HtmlPage {
 
     @Override
     public HtmlPage threadSafe() {
-        throw new IllegalStateException("HtmlDoc is not reusable and does not keep internal static blocks!" +
-         "Thus it does not require thread safety!");
+        throw new IllegalStateException(
+            "HtmlDoc is not reusable and does not keep internal static blocks!" +
+            "Thus it does not require thread safety!"
+        );
     }
 
     @Override

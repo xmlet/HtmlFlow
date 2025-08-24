@@ -24,7 +24,6 @@
 
 package htmlflow.visitor;
 
-
 import static htmlflow.visitor.Tags.FINISH_TAG;
 
 /**
@@ -38,9 +37,9 @@ class Indentation {
     private static final String[] tabs = createTabs(MAX_TABS);
     private static final String[] closedTabs = createClosedTabs(MAX_TABS);
 
-    private Indentation(){ }
+    private Indentation() {}
 
-    private static String[] createTabs(int tabsMax){
+    private static String[] createTabs(int tabsMax) {
         String[] tabs = new String[tabsMax];
 
         for (int i = 0; i < tabsMax; i++) {
@@ -53,11 +52,10 @@ class Indentation {
         return tabs;
     }
 
-    private static String[] createClosedTabs(int tabsMax){
+    private static String[] createClosedTabs(int tabsMax) {
         String[] closedTabs = new String[tabsMax];
 
         for (int i = 0; i < tabsMax; i++) {
-
             char[] newClosedTab = new char[i + 2];
             newClosedTab[0] = FINISH_TAG;
             newClosedTab[1] = NEWLINE;
@@ -68,7 +66,7 @@ class Indentation {
         return closedTabs;
     }
 
-    public static String tabs(int depth){
+    public static String tabs(int depth) {
         return tabs[depth];
     }
 

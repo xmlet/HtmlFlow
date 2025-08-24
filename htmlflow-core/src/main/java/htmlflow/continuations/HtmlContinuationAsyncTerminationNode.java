@@ -1,12 +1,11 @@
 package htmlflow.continuations;
 
 import htmlflow.visitor.HtmlVisitor;
-
 import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Pedro Fialho
- **/
+ */
 public class HtmlContinuationAsyncTerminationNode extends HtmlContinuation {
 
     private final CompletableFuture<Void> cf;

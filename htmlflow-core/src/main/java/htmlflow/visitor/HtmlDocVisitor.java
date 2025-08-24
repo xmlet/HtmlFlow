@@ -24,18 +24,16 @@
 
 package htmlflow.visitor;
 
+import java.util.function.BiConsumer;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-import java.util.function.BiConsumer;
-
 /**
- * This is the implementation of the ElementVisitor (from HtmlApiFaster
- * library) that emits HTML immediately with no optimizations.
+ * This is the implementation of the ElementVisitor (from HtmlApiFaster library) that emits HTML
+ * immediately with no optimizations.
  *
- * @author Miguel Gamboa
- *         created on 04-08-2022
+ * @author Miguel Gamboa created on 04-08-2022
  */
 public class HtmlDocVisitor extends HtmlVisitor {
 
@@ -43,36 +41,54 @@ public class HtmlDocVisitor extends HtmlVisitor {
         this(out, isIndented, 0);
     }
 
-    public HtmlDocVisitor(Appendable out,boolean isIndented, int depth) {
+    public HtmlDocVisitor(Appendable out, boolean isIndented, int depth) {
         super(out, isIndented);
         this.out = out;
         this.depth = depth;
     }
 
     @Override
-    public final <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
-        throw new IllegalStateException("Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view.");
+    public final <E extends Element, U> void visitDynamic(
+        E element,
+        BiConsumer<E, U> dynamicHtmlBlock
+    ) {
+        throw new IllegalStateException(
+            "Wrong use of dynamic() in a static view! Use HtmlView to produce a dynamic view."
+        );
     }
 
     @Override
-    public final <M, E extends Element> void visitAwait(E element, AwaitConsumer<E,M> asyncAction) {
-        throw new IllegalStateException("Wrong use of async() in a static view! Use HtmlViewAsync to produce an async view.");
+    public final <M, E extends Element> void visitAwait(
+        E element,
+        AwaitConsumer<E, M> asyncAction
+    ) {
+        throw new IllegalStateException(
+            "Wrong use of async() in a static view! Use HtmlViewAsync to produce an async" +
+            " view."
+        );
     }
 
     @Override
-    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
-        throw new IllegalStateException("Wrong use of suspending() in a static view! Use HtmlViewSuspend to produce an async view.");
+    public <M, E extends Element> void visitSuspending(
+        E element,
+        SuspendConsumer<E, M> suspendAction
+    ) {
+        throw new IllegalStateException(
+            "Wrong use of suspending() in a static view! Use HtmlViewSuspend to produce an" +
+            " async view."
+        );
     }
 
     @Override
     public void resolve(Object model) {
-        throw new UnsupportedOperationException("HTML has been already emitted on elements flow. " +
-                "resolve() is only available for HtmlView pages.");
+        throw new UnsupportedOperationException(
+            "HTML has been already emitted on elements flow. " +
+            "resolve() is only available for HtmlView pages."
+        );
     }
 
     @Override
     public final HtmlDocVisitor clone(boolean isIndented) {
         return new HtmlDocVisitor(this.out, isIndented);
     }
-
 }

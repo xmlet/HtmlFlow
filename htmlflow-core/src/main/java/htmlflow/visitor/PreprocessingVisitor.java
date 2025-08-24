@@ -25,53 +25,49 @@
 
 package htmlflow.visitor;
 
+import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
+
 import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import htmlflow.continuations.HtmlContinuationSyncDynamic;
 import htmlflow.continuations.HtmlContinuationSyncStatic;
+import java.lang.reflect.Field;
+import java.util.function.BiConsumer;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
-import java.lang.reflect.Field;
-import java.util.function.BiConsumer;
-
-import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
-
 /**
- * This visitor is used to make a preprocessing resolution of an HtmlTemplate.
- * It will collect the resulting HTML from visiting static HTML elements into an auxiliary
- * StringBuilder that later is extracted to: String staticHtml = sb.substring(staticBlockIndex);
- * to create an HtmlContinuationSyncStatic object.
- * It also interleaves the creation of HtmlContinuationDynamic nodes that only store dynamicHtmlBlock
- * objects corresponding to a BiConsumer<E, U> (being E an element and U the model).
- * The U comes from external module HtmlApiFaster whose classes are not strongly typed with the Model.
- * Thus, only the dynamic() and visitDynamic() methods in HtmlApiFaster were made generic to carry
- * a type parameter U corresponding to the type of the Model.
+ * This visitor is used to make a preprocessing resolution of an HtmlTemplate. It will collect the
+ * resulting HTML from visiting static HTML elements into an auxiliary StringBuilder that later is
+ * extracted to: String staticHtml = sb.substring(staticBlockIndex); to create an
+ * HtmlContinuationSyncStatic object. It also interleaves the creation of HtmlContinuationDynamic
+ * nodes that only store dynamicHtmlBlock objects corresponding to a BiConsumer<E, U> (being E an
+ * element and U the model). The U comes from external module HtmlApiFaster whose classes are not
+ * strongly typed with the Model. Thus, only the dynamic() and visitDynamic() methods in
+ * HtmlApiFaster were made generic to carry a type parameter U corresponding to the type of the
+ * Model.
  */
 public class PreprocessingVisitor extends HtmlVisitor {
+
     private static final String NOT_SUPPORTED_ERROR =
-        "This is a PreprocessingVisitor used to compile templates and not intended to support HTML views!";
-    /**
-     * The internal String builder beginning index of a static HTML block.
-     */
+        "This is a PreprocessingVisitor used to compile templates and not intended to support" +
+        " HTML views!";
+
+    /** The internal String builder beginning index of a static HTML block. */
     protected int staticBlockIndex = 0;
-    /**
-     * The first node to be processed.
-     */
+
+    /** The first node to be processed. */
     protected HtmlContinuation first;
-    /**
-     * The last HtmlContinuation
-     */
+
+    /** The last HtmlContinuation */
     protected HtmlContinuation last;
 
     public PreprocessingVisitor(boolean isIndented) {
         super(new StringBuilder(), isIndented);
     }
 
-    /**
-     * The main StringBuilder.
-     */
+    /** The main StringBuilder. */
     public final StringBuilder sb() {
         return (StringBuilder) out;
     }
@@ -82,71 +78,102 @@ public class PreprocessingVisitor extends HtmlVisitor {
 
     /**
      * Here we are creating 2 HtmlContinuation objects: one for previous static HTML and a next one
-     * corresponding to the consumer passed to dynamic().
-     * We will first create the dynamic continuation that will be the next node of the static continuation.
+     * corresponding to the consumer passed to dynamic(). We will first create the dynamic
+     * continuation that will be the next node of the static continuation.
      *
-     * U is the type of the model passed to the dynamic HTML block that is the same as T in this visitor.
-     * Yet, since it came from HtmlApiFaster that is not typed by the Model, then we have to use
-     * another generic argument for the type of the model.
+     * <p>U is the type of the model passed to the dynamic HTML block that is the same as T in this
+     * visitor. Yet, since it came from HtmlApiFaster that is not typed by the Model, then we have to
+     * use another generic argument for the type of the model.
      *
      * @param element The parent element.
      * @param dynamicHtmlBlock The continuation that consumes the element and a model.
      * @param <E> Type of the parent Element.
-     * @param <U> Type of the model passed to the dynamic HTML block that is the same as T in this visitor.
+     * @param <U> Type of the model passed to the dynamic HTML block that is the same as T in this
+     *     visitor.
      */
     @Override
-    public <E extends Element, U> void visitDynamic(E element, BiConsumer<E, U> dynamicHtmlBlock) {
+    public <E extends Element, U> void visitDynamic(
+        E element,
+        BiConsumer<E, U> dynamicHtmlBlock
+    ) {
+        /** Creates an HtmlContinuation for the dynamic block. */
+        HtmlContinuation dynamicCont = new HtmlContinuationSyncDynamic<>(
+            depth,
+            isClosed,
+            element,
+            dynamicHtmlBlock,
+            this,
+            new HtmlContinuationSyncCloseAndIndent(this)
+        );
         /**
-         * Creates an HtmlContinuation for the dynamic block.
-         */
-        HtmlContinuation dynamicCont = new HtmlContinuationSyncDynamic<>(depth, isClosed, element, dynamicHtmlBlock, this, new HtmlContinuationSyncCloseAndIndent(this));
-        /**
-         * We are resolving this view for the first time.
-         * Now we just need to create an HtmlContinuation corresponding to the previous static HTML,
-         * which will be followed by the dynamicCont.
+         * We are resolving this view for the first time. Now we just need to create an HtmlContinuation
+         * corresponding to the previous static HTML, which will be followed by the dynamicCont.
          */
         chainContinuationStatic(dynamicCont);
         /**
-         * We have to run newlineAndIndent to leave isClosed and indentation correct for
-         * the next static HTML block.
+         * We have to run newlineAndIndent to leave isClosed and indentation correct for the next static
+         * HTML block.
          */
         indentAndAdvanceStaticBlockIndex();
     }
 
     @Override
-    public <M, E extends Element> void visitAwait(E element, AwaitConsumer<E, M> asyncAction) {
-        throw new UnsupportedOperationException("Await not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage an asynchronous view.");
+    public <M, E extends Element> void visitAwait(
+        E element,
+        AwaitConsumer<E, M> asyncAction
+    ) {
+        throw new UnsupportedOperationException(
+            "Await not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage" +
+            " an asynchronous view."
+        );
     }
 
     @Override
-    public <M, E extends Element> void visitSuspending(E element, SuspendConsumer<E, M> suspendAction) {
-        throw new UnsupportedOperationException("Suspend not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage an asynchronous view.");
+    public <M, E extends Element> void visitSuspending(
+        E element,
+        SuspendConsumer<E, M> suspendAction
+    ) {
+        throw new UnsupportedOperationException(
+            "Suspend not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage" +
+            " an asynchronous view."
+        );
     }
 
-    protected final void chainContinuationStatic(HtmlContinuation nextContinuation) {
+    protected final void chainContinuationStatic(
+        HtmlContinuation nextContinuation
+    ) {
         String staticHtml = sb().substring(staticBlockIndex);
-        String staticHtmlTrimmed = staticHtml.trim();  // trim to remove the indentation from static block
-        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtmlTrimmed, this, nextContinuation);
-        if(first == null) first = staticCont; // on first visit initializes the first pointer
-        else setNext(last, staticCont);       // else append the staticCont to existing chain
-        last = nextContinuation.next;         // advance last to point to the new HtmlContinuationCloseAndIndent
+        String staticHtmlTrimmed = staticHtml.trim(); // trim to remove the indentation from static block
+        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(
+            staticHtmlTrimmed,
+            this,
+            nextContinuation
+        );
+        if (first == null) first = staticCont; // on first visit initializes the first pointer
+        else setNext(last, staticCont); // else append the staticCont to existing chain
+        last = nextContinuation.next; // advance last to point to the new HtmlContinuationCloseAndIndent
     }
 
     protected final void indentAndAdvanceStaticBlockIndex() {
         newlineAndIndent();
-        staticBlockIndex = sb().length(); // increment the staticBlockIndex to the end of internal string buffer.
+        staticBlockIndex = sb().length(); // increment the staticBlockIndex to the end of internal string
+        // buffer.
     }
 
-    /**
-     * Creates the last static HTML block.
-     */
+    /** Creates the last static HTML block. */
     @Override
     public void resolve(Object model) {
         String staticHtml = sb().substring(staticBlockIndex);
-        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(staticHtml.trim(), this, null);
-        last = first == null
-                ? first = staticCont         // assign both first and last
-                : setNext(last, staticCont); // append new staticCont and return it to be the new last continuation.
+        HtmlContinuation staticCont = new HtmlContinuationSyncStatic(
+            staticHtml.trim(),
+            this,
+            null
+        );
+        last =
+            first == null
+                ? first = staticCont // assign both first and last
+                : setNext(last, staticCont); // append new staticCont and return it to be the new
+        // last continuation.
     }
 
     @Override
@@ -154,12 +181,13 @@ public class PreprocessingVisitor extends HtmlVisitor {
         throw new UnsupportedOperationException(NOT_SUPPORTED_ERROR);
     }
 
-    @SuppressWarnings({"squid:S3011", "squid:S112"})
+    @SuppressWarnings({ "squid:S3011", "squid:S112" })
     public static class HtmlContinuationSetter {
-        private HtmlContinuationSetter() {
-        }
+
+        private HtmlContinuationSetter() {}
 
         static final Field fieldNext;
+
         static {
             try {
                 fieldNext = HtmlContinuation.class.getDeclaredField("next");
@@ -168,7 +196,11 @@ public class PreprocessingVisitor extends HtmlVisitor {
                 throw new RuntimeException(e);
             }
         }
-        public static HtmlContinuation setNext(HtmlContinuation cont, HtmlContinuation next) {
+
+        public static HtmlContinuation setNext(
+            HtmlContinuation cont,
+            HtmlContinuation next
+        ) {
             try {
                 fieldNext.set(cont, next);
                 return next;
@@ -176,5 +208,13 @@ public class PreprocessingVisitor extends HtmlVisitor {
                 throw new IllegalStateException(e);
             }
         }
+    }
+
+    public final HtmlContinuation findLast() {
+        HtmlContinuation node = this.first;
+        while (node != null && node.next != null) {
+            node = node.next;
+        }
+        return node;
     }
 }

@@ -24,8 +24,11 @@
 
 package htmlflow.visitor;
 
-import com.google.common.html.HtmlEscapers;
+import static htmlflow.visitor.Tags.*;
+
 import htmlflow.exceptions.HtmlFlowAppendException;
+import htmlflow.visitor.escape.HtmlEscapers;
+import java.io.IOException;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -43,42 +46,33 @@ import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
 
-import java.io.IOException;
-
-import static htmlflow.visitor.Tags.*;
-
-import java.lang.Object;
-
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
  *
- * @author Miguel Gamboa
- *         created on 04-08-2022
+ * @author Miguel Gamboa created on 04-08-2022
  */
 public abstract class HtmlVisitor extends ElementVisitor {
+
     protected Appendable out;
-    /**
-     * keep track of current indentation.
-     */
+
+    /** keep track of current indentation. */
     protected int depth;
+
     /**
-     * If the beginning tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code "<elem"}.
-     * On element visit the beginning tag is left open to include additional attributes.
+     * If the beginning tag is closed, or not, i.e. if it is {@code "<elem>"} or it is {@code
+     * "<elem"}. On element visit the beginning tag is left open to include additional attributes.
      */
     protected boolean isClosed = true;
-    /**
-     * It the HTML output should be indented or not.
-     */
+
+    /** It the HTML output should be indented or not. */
     public final boolean isIndented;
-    /**
-     * keep track of current indentation.
-     */
+
+    /** keep track of current indentation. */
     public final int getDepth() {
         return depth;
     }
-    /**
-     * Set current indentation.
-     */
+
+    /** Set current indentation. */
     public final void setDepth(int v) {
         depth = v;
     }
@@ -87,7 +81,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
         this.isClosed = isClosed;
     }
 
-    HtmlVisitor(Appendable out, boolean isIndented) {
+    protected HtmlVisitor(Appendable out, boolean isIndented) {
         this.out = out;
         this.isIndented = isIndented;
     }
@@ -118,32 +112,27 @@ public abstract class HtmlVisitor extends ElementVisitor {
     }
 
     /**
-     * Adds a new line and indentation.
-     * Checks whether the parent element is still opened or not (!isClosed).
-     * If it is open then it closes the parent begin tag with ">" (!isClosed).
+     * Adds a new line and indentation. Checks whether the parent element is still opened or not
+     * (!isClosed). If it is open then it closes the parent begin tag with ">" (!isClosed).
      */
-    public final void newlineAndIndent(){
-        if (isClosed){
-            if(isIndented) {
+    public final void newlineAndIndent() {
+        if (isClosed) {
+            if (isIndented) {
                 write(Indentation.tabs(depth)); // \n\t\t\t\...
             }
         } else {
             depth++;
-            if(isIndented)
-                write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
-            else
-                write(FINISH_TAG);
+            if (isIndented) write(Indentation.closedTabs(depth)); // >\n\t\t\t\...
+            else write(FINISH_TAG);
             isClosed = true;
         }
     }
 
     /**
-     * This method appends the String {@code "<elementName"} and it leaves the element
-     * open to include additional attributes.
-     * Before that it may close the parent begin tag with {@code ">"} if it is
-     * still opened (!isClosed).
-     * The newlineAndIndent() is responsible for this job to check whether the parent element
-     * is still opened or not.
+     * This method appends the String {@code "<elementName"} and it leaves the element open to include
+     * additional attributes. Before that it may close the parent begin tag with {@code ">"} if it is
+     * still opened (!isClosed). The newlineAndIndent() is responsible for this job to check whether
+     * the parent element is still opened or not.
      *
      * @param element
      */
@@ -155,8 +144,8 @@ public abstract class HtmlVisitor extends ElementVisitor {
     }
 
     /**
-     * Writes the end tag for elementName: {@code "</elementName>."}.
-     * This visit occurs when the º() is invoked.
+     * Writes the end tag for elementName: {@code "</elementName>."}. This visit occurs when the º()
+     * is invoked.
      */
     @Override
     public final void visitParent(Element element) {
@@ -164,22 +153,27 @@ public abstract class HtmlVisitor extends ElementVisitor {
         newlineAndIndent();
         endTag(out, element.getName()); // </elementName>
     }
+
     /**
-     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track, wbr.
-     * This method is invoked by visitParent specialization methods (at the end of this class)
+     * Void elements: area, base, br, col, embed, hr, img, input, link, meta, param, source, track,
+     * wbr. This method is invoked by visitParent specialization methods (at the end of this class)
      * for each void element such as area, base, etc.
      */
-    protected final void visitParentOnVoidElements(){
-        if (!isClosed){
+    protected final void visitParentOnVoidElements() {
+        if (!isClosed) {
             write(FINISH_TAG);
         }
         isClosed = true;
     }
 
     @Override
-    public final void visitAttribute(String attributeName, String attributeValue) {
-        if(isClosed)
-            throw new IllegalStateException("Cannot add attributes after!!!");
+    public final void visitAttribute(
+        String attributeName,
+        String attributeValue
+    ) {
+        if (isClosed) throw new IllegalStateException(
+            "Cannot add attributes after!!!"
+        );
         addAttribute(out, attributeName, attributeValue);
     }
 
@@ -191,8 +185,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
      */
     @Override
     public final void visitAttributeBoolean(String name, String value) {
-        if(!value.equals("false"))
-            addAttribute(out, name, value);
+        if (!value.equals("false")) addAttribute(out, name, value);
     }
 
     @Override
@@ -200,9 +193,10 @@ public abstract class HtmlVisitor extends ElementVisitor {
         newlineAndIndent();
         write(HtmlEscapers.htmlEscaper().escape(text.getValue()));
     }
+
     /**
-     * To distinguish from text() that escapes HTML by default.
-     * This raw() acts like text() but keeping text as it is.
+     * To distinguish from text() that escapes HTML by default. This raw() acts like text() but
+     * keeping text as it is.
      */
     @Override
     public final <R> void visitRaw(Text<? extends Element, R> text) {
@@ -219,13 +213,12 @@ public abstract class HtmlVisitor extends ElementVisitor {
     /*=========================================================================*/
     /*------------            Abstract HOOK Methods         -------------------*/
     /*=========================================================================*/
-    /**
-     * Processing output.
-     */
+    /** Processing output. */
     public abstract void resolve(Object model);
+
     /**
-     * Since HtmlVisitor is immutable this is the preferred way to create a copy of the
-     * existing HtmlVisitor instance with a different isIndented state.
+     * Since HtmlVisitor is immutable this is the preferred way to create a copy of the existing
+     * HtmlVisitor instance with a different isIndented state.
      *
      * @param isIndented If the new visitor should indent HTML output or not.
      */
@@ -236,10 +229,10 @@ public abstract class HtmlVisitor extends ElementVisitor {
     /*=========================================================================*/
 
     @Override
-    public final <Z extends Element> void visitElementRoot(Root<Z> var1) { }
+    public final <Z extends Element> void visitElementRoot(Root<Z> var1) {}
 
     @Override
-    public final <Z extends Element> void visitParentRoot(Root<Z> var1) { }
+    public final <Z extends Element> void visitParentRoot(Root<Z> var1) {}
 
     /*=========================================================================*/
     /*------------      Parent Methods for Void Elements   --------------------*/
@@ -247,61 +240,61 @@ public abstract class HtmlVisitor extends ElementVisitor {
 
     @Override
     public final <Z extends Element> void visitParentHr(Hr<Z> element) {
-        visitParentOnVoidElements ();
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentEmbed(Embed<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentEmbed(Embed<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentInput(Input<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentInput(Input<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentMeta(Meta<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentMeta(Meta<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentBr(Br<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentBr(Br<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentCol(Col<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentCol(Col<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentSource(Source<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentSource(Source<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentImg(Img<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentImg(Img<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentArea(Area<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentArea(Area<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentLink(Link<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentLink(Link<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentParam(Param<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentParam(Param<Z> element) {
+        visitParentOnVoidElements();
     }
 
     @Override
-    public final <Z extends Element>  void visitParentBase(Base<Z> element) {
-        visitParentOnVoidElements ();
+    public final <Z extends Element> void visitParentBase(Base<Z> element) {
+        visitParentOnVoidElements();
     }
 }
