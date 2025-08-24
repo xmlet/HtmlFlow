@@ -83,12 +83,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <systemProperties>
+                    <systemPropertyVariables>
                         <property>
                             <name>java.util.logging.config.file</name>
                             <value>src/test/resources/logging.properties</value>
                         </property>
-                    </systemProperties>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
@@ -188,6 +188,61 @@
                 <configuration>
                     <publishingServerId>central</publishingServerId>
                 </configuration>
+            </plugin>
+
+            <!-- Spotless plugin for code formatting -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.46.1</version>
+                <configuration>
+                    <formats>
+                        <format>
+                            <includes>
+                                <include>htmlflow-core/src/main/java/**/*.java</include>
+                                <include>flowifier/src/main/java/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>htmlflow-core/src/test/java/**/*.java</exclude>
+                                <exclude>flowifier/src/test/java/**/*.java</exclude>
+                            </excludes>
+                            <prettier>
+                                <devDependencies>
+                                    <prettier>3.6.1</prettier>
+                                    <prettier-plugin-java>2.2.0</prettier-plugin-java>
+                                </devDependencies>
+                                <config>
+                                    <tabWidth>4</tabWidth>
+                                    <parser>java</parser>
+                                    <plugins>prettier-plugin-java</plugins>
+                                </config>
+                            </prettier>
+                        </format>
+                    </formats>
+                    <kotlin>
+                        <includes>
+                            <include>htmlflow-kotlin/src/*/kotlin/**/*.kt</include>
+                        </includes>
+                        <excludes>
+                            <exclude>htmlflow-kotlin/src/test/kotlin/**/*.kt</exclude>
+                        </excludes>
+                        <ktfmt>
+                            <version>0.56</version>
+                            <style>KOTLINLANG</style>
+                            <blockIndent>4</blockIndent>
+                            <continuationIndent>4</continuationIndent>
+                            <removeUnusedImports>true</removeUnusedImports>
+                            <manageTrailingCommas>true</manageTrailingCommas>
+                        </ktfmt>
+                    </kotlin>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
