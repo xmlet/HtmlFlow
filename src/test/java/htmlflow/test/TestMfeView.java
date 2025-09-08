@@ -22,6 +22,7 @@ public class TestMfeView {
                         cfg.setMfeUrlResource("http://localhost:8081/bikes");
                         cfg.setMfeName("mfe1");
                         cfg.setMfeListeningEventName("triggerBikeEvent");
+                        cfg.setMfeElementName("some-element");
                         cfg.setMfeTriggersEventName("triggerCartEvent");
                         cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js");
                         cfg.setMfeStylingUrl("http://localhost:8081/css/style.css");
