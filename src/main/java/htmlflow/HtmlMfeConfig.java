@@ -131,42 +131,50 @@ public class HtmlMfeConfig implements MfeConfiguration {
     }
 
     @Override
-    public boolean setMfeStreamingData(boolean mfeStreamingData) {
-        return this.isMfeStreamingData = mfeStreamingData;
+    public MfeConfiguration setMfeStreamingData(boolean mfeStreamingData) {
+        this.isMfeStreamingData = mfeStreamingData;
+        return this;
     }
 
     @Override
-    public String setMfeUrlResource(String mfeUrlResource) {
-        return this.mfeUrlResource = mfeUrlResource;
+    public MfeConfiguration setMfeUrlResource(String mfeUrlResource) {
+        this.mfeUrlResource = mfeUrlResource;
+        return this;
     }
 
     @Override
-    public String setMfeName(String mfeName) {
-        return this.mfeName = mfeName;
+    public MfeConfiguration setMfeName(String mfeName) {
+        this.mfeName = mfeName;
+        return this;
     }
 
     @Override
-    public String setMfeListeningEventName(String mfeListeningEventName) {
-        return this.mfeListeningEventName = mfeListeningEventName;
+    public MfeConfiguration setMfeListeningEventName(String mfeListeningEventName) {
+        this.mfeListeningEventName = mfeListeningEventName;
+        return this;
     }
 
     @Override
-    public String setMfeTriggersEventName(String mfeTriggersEventName) {
-        return this.mfeTriggersEventName = mfeTriggersEventName;
+    public MfeConfiguration setMfeTriggersEventName(String mfeTriggersEventName) {
+        this.mfeTriggersEventName = mfeTriggersEventName;
+        return this;
     }
 
     @Override
-    public String setMfeElementName(String mfeElementName) {
-        return this.mfeElementName = mfeElementName;
+    public MfeConfiguration setMfeElementName(String mfeElementName) {
+        this.mfeElementName = mfeElementName;
+        return this;
     }
 
     @Override
-    public String setMfeScriptUrl(String mfeScriptUrl) {
-        return this.mfeScriptUrl = mfeScriptUrl;
+    public MfeConfiguration setMfeScriptUrl(String mfeScriptUrl) {
+        this.mfeScriptUrl = mfeScriptUrl;
+        return this;
     }
 
     @Override
-    public String setMfeStylingUrl(String mfeStylingUrl) {
-        return this.mfeStylingUrl = mfeStylingUrl;
+    public MfeConfiguration setMfeStylingUrl(String mfeStylingUrl) {
+        this.mfeStylingUrl = mfeStylingUrl;
+        return this;
     }
 }

@@ -4,7 +4,6 @@ import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +18,7 @@ public class TestMfeView {
                     .head().__()
                     .body()
                     .div()
-                    .mfe((cfg) -> {
+                    .mfe(cfg -> {
                         cfg.setMfeUrlResource("http://localhost:8081/bikes");
                         cfg.setMfeName("mfe1");
                         cfg.setMfeListeningEventName("triggerBikeEvent");
@@ -42,7 +41,7 @@ public class TestMfeView {
                     .head().__()
                     .body()
                     .div()
-                    .mfe((cfg) -> {
+                    .mfe(cfg -> {
                         cfg.setMfeUrlResource("http://localhost:8080/html-chunked/stream");
                         cfg.setMfeName("mfe2");
                         cfg.setMfeListeningEventName("triggerStreamEvent");
