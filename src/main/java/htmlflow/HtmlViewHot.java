@@ -96,6 +96,7 @@ public class HtmlViewHot<M> extends HtmlView<M> {
             template,
             isIndented,
             threadSafe,
+            false,
             false
         );
     }

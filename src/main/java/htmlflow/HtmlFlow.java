@@ -31,6 +31,7 @@ import htmlflow.visitor.HtmlViewVisitorAsyncHot;
 import htmlflow.visitor.HtmlViewVisitorHot;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
+import htmlflow.visitor.PreprocessingVisitorMfe;
 
 /**
  * Factory to create HtmlDoc or HtmlView instances corresponding to static HTMl pages or dynamic
@@ -69,6 +70,31 @@ public class HtmlFlow {
          */
         preView.getVisitor().resolve(null);
         return pre;
+    }
+
+    /**
+     * Performs preprocessing for Micro Frontend (MFE) views. Creates a specialized visitor that collects
+     * MFE configurations and processes them to enable MFE support in the view.
+     *
+     * @param template An HtmlTemplate function that defines the HTML structure with MFE components
+     * @return A PreprocessingVisitorMfe containing the processed MFE components
+     */
+    private static PreprocessingVisitorMfe preprocessingMfe(
+        HtmlTemplate template
+    ) {
+        PreprocessingVisitorMfe processView = new PreprocessingVisitorMfe(
+            false
+        );
+        HtmlView<?> preView = new HtmlView<>(
+            () -> processView,
+            template,
+            false
+        );
+        // first process
+        template.resolve(preView);
+        // second process
+        preView.getVisitor().resolve(null);
+        return processView;
     }
 
     /**
@@ -118,7 +144,7 @@ public class HtmlFlow {
      * @param <M> Type of the model rendered with this view.
      */
     public static <M> HtmlView<M> view(Appendable out, HtmlTemplate template) {
-        return HtmlFlow.view(out, template, true, false, true);
+        return HtmlFlow.view(out, template, true, false, true, false);
     }
 
     /**
@@ -136,7 +162,7 @@ public class HtmlFlow {
         boolean preEncoding,
         HtmlTemplate template
     ) {
-        return HtmlFlow.view(out, template, true, false, preEncoding);
+        return HtmlFlow.view(out, template, true, false, preEncoding, false);
     }
 
     /**
@@ -146,16 +172,33 @@ public class HtmlFlow {
      * @param template Function that consumes an HtmlView to produce HTML elements.
      * @param isIndented Set indentation on or off.
      * @param threadSafe Enable the use for thread safety.
+     * @param preEncoding Enable the use of preEncoding for static HTML blocks.
+     * @param mfeEnabled Enable support for Micro Frontends (MFE). When enabled, this uses the
+     *                  specialized MFE preprocessing path to handle MFE components.
      * @param <M> Type of the model rendered with this view.
      */
+
     static <M> HtmlView<M> view(
         Appendable out,
         HtmlTemplate template,
         boolean isIndented,
         boolean threadSafe,
-        boolean preEncoding
+        boolean preEncoding,
+        boolean mfeEnabled
     ) {
-        if (preEncoding) {
+        if (preEncoding && mfeEnabled) {
+            PreprocessingVisitorMfe processView = preprocessingMfe(template);
+            return new HtmlView<>(
+                () ->
+                    new HtmlViewVisitor(
+                        out,
+                        isIndented,
+                        processView.getFirst()
+                    ),
+                template,
+                threadSafe
+            );
+        } else if (preEncoding) {
             PreprocessingVisitor pre = preprocessing(template, isIndented);
             return new HtmlView<>(
                 (() -> new HtmlViewVisitor(out, isIndented, pre.getFirst())),
@@ -178,7 +221,7 @@ public class HtmlFlow {
      * @param <M> Type of the model rendered with this view.
      */
     public static <M> HtmlView<M> view(HtmlTemplate template) {
-        return HtmlFlow.view(template, true, false, true);
+        return HtmlFlow.view(template, true, false, true, false);
     }
 
     /**
@@ -195,7 +238,7 @@ public class HtmlFlow {
         boolean preEncoding,
         HtmlTemplate template
     ) {
-        return HtmlFlow.view(template, true, false, preEncoding);
+        return HtmlFlow.view(template, true, false, preEncoding, false);
     }
 
     /**
@@ -204,15 +247,32 @@ public class HtmlFlow {
      * @param template Function that consumes an HtmlView to produce HTML elements.
      * @param isIndented Set indentation on or off.
      * @param threadSafe Enable the use for thread safety.
+     * @param preEncoding Enable the use of preEncoding for static HTML blocks.
+     * @param mfeEnabled Enable support for Micro Frontends (MFE). When enabled, this uses the
+     *                  specialized MFE preprocessing path to handle MFE components.
      * @param <M> Type of the model rendered with this view.
      */
+
     static <M> HtmlView<M> view(
         HtmlTemplate template,
         boolean isIndented,
         boolean threadSafe,
-        boolean preEncoding
+        boolean preEncoding,
+        boolean mfeEnabled
     ) {
-        if (preEncoding) {
+        if (preEncoding && mfeEnabled) {
+            PreprocessingVisitorMfe processView = preprocessingMfe(template);
+            return new HtmlView<>(
+                () ->
+                    new HtmlViewVisitor(
+                        new StringBuilder(),
+                        isIndented,
+                        processView.getFirst()
+                    ),
+                template,
+                threadSafe
+            );
+        } else if (preEncoding) {
             PreprocessingVisitor pre = preprocessing(template, isIndented);
             return new HtmlView<>(
                 (
@@ -307,6 +367,7 @@ public class HtmlFlow {
         public final boolean isIndented;
         public final boolean threadSafe;
         public final boolean preEncoding;
+        public final boolean mfeEnabled;
 
         /**
          * Creates a Builder to configure HtmlView creation with fluent API. The returned builder can be
@@ -327,6 +388,7 @@ public class HtmlFlow {
             private boolean isIndented = true;
             private boolean threadSafe = false;
             private boolean preEncoding = true;
+            private boolean mfeEnabled = false;
 
             Builder() {}
 
@@ -365,24 +427,49 @@ public class HtmlFlow {
             }
 
             /**
+             * Enable or disable Micro Frontend (MFE) support. When enabled, views will support
+             * MFE components. MFE support requires preEncoding to be enabled.
+             *
+             * @param mfeEnabled true to enable MFE support, false to disable
+             * @return this builder instance
+             */
+            public Builder mfeEnabled(boolean mfeEnabled) {
+                this.mfeEnabled = mfeEnabled;
+                return this;
+            }
+
+            /**
              * Build an immutable Engine with the current configuration. The Engine can be used to create
              * multiple views with the same settings.
              *
              * @return Engine instance configured with current settings
+             * @throws IllegalStateException if MFE support is enabled but preEncoding is disabled
              */
             public ViewFactory build() {
-                return new ViewFactory(isIndented, threadSafe, preEncoding);
+                if (mfeEnabled && !preEncoding) {
+                    throw new IllegalStateException(
+                        "MFE support requires preEncoding to be enabled"
+                    );
+                }
+                return new ViewFactory(
+                    isIndented,
+                    threadSafe,
+                    preEncoding,
+                    mfeEnabled
+                );
             }
         }
 
         ViewFactory(
             boolean isIndented,
             boolean threadSafe,
-            boolean preEncoding
+            boolean preEncoding,
+            boolean mfeEnabled
         ) {
             this.isIndented = isIndented;
             this.threadSafe = threadSafe;
             this.preEncoding = preEncoding;
+            this.mfeEnabled = mfeEnabled;
         }
 
         /**
@@ -393,12 +480,18 @@ public class HtmlFlow {
          * @return HtmlView or HtmlViewHot instance based on configuration
          */
         public <M> HtmlView<M> view(HtmlTemplate template) {
-            return HtmlFlow.view(template, isIndented, threadSafe, preEncoding);
+            return HtmlFlow.view(
+                template,
+                isIndented,
+                threadSafe,
+                preEncoding,
+                mfeEnabled
+            );
         }
 
         /**
          * Create an HtmlView instance with the specified template and output destination using this
-         * Engine's configuration.
+         * Engine's configuration. If MFE support is enabled, the view will support MFE components.
          *
          * @param out Appendable output destination
          * @param template Function that consumes an HtmlView to produce HTML elements
@@ -411,7 +504,8 @@ public class HtmlFlow {
                 template,
                 isIndented,
                 threadSafe,
-                preEncoding
+                preEncoding,
+                mfeEnabled
             );
         }
 
