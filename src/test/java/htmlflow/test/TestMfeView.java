@@ -57,7 +57,7 @@ public class TestMfeView {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotRenderStreamingMicroFrontend() {
-        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).preEncoding(false).build().view(page -> {
+        HtmlFlow.ViewFactory.builder().mfeEnabled(true).preEncoding(false).build().view(page -> {
             page.html()
                     .head().__()
                     .body()

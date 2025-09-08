@@ -13,8 +13,6 @@ public class HtmlMfeConfig implements MfeConfiguration {
     private String mfeStylingUrl = null;
     private boolean isMfeStreamingData;
 
-    public HtmlMfeConfig() {}
-
     @Override
     public String getMfeUrlResource() {
         return mfeUrlResource;
