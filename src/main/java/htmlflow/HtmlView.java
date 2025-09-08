@@ -156,10 +156,9 @@ public class HtmlView<M> extends HtmlPage {
      * @param preEncoding If true, the view will preEncode static HTML blocks.
      */
     public HtmlView<M> setPreEncoding(boolean preEncoding) {
-        HtmlVisitor visitor = getVisitor();
         return HtmlFlow.view(
             template,
-            visitor.isIndented,
+            getVisitor().isIndented,
             threadSafe,
             preEncoding
         );

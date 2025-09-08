@@ -42,6 +42,7 @@ public class HtmlViewAsyncHot<M> extends HtmlViewAsync<M> {
         return "HtmlViewAsyncHot";
     }
 
+    @Override
     public final CompletableFuture<Void> writeAsync(Appendable out, M model) {
         HtmlVisitorAsync visitor = getVisitor();
         if (threadSafe) {

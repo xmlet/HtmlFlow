@@ -52,15 +52,17 @@ public class HtmlViewHot<M> extends HtmlView<M> {
     }
 
     @Override
-    public String getName() {
+    public final String getName() {
         return "HtmlViewHot";
     }
 
-    public String render() {
+    @Override
+    public final String render() {
         return render(null);
     }
 
-    public String render(M model) {
+    @Override
+    public final String render(M model) {
         StringBuilder out = (StringBuilder) getVisitor().out();
         out.setLength(0);
         getVisitor().resolve(model);
@@ -68,16 +70,19 @@ public class HtmlViewHot<M> extends HtmlView<M> {
         return out.toString().trim();
     }
 
-    public void write(M model) {
+    @Override
+    public final void write(M model) {
         getVisitor().resolve(model);
         this.template.resolve(this);
     }
 
-    public void write() {
+    @Override
+    public final void write() {
         write(null);
     }
 
-    protected HtmlViewHot<M> clone(
+    @Override
+    protected final HtmlViewHot<M> clone(
         Supplier<HtmlVisitor> visitorSupplier,
         boolean threadSafe
     ) {
@@ -86,7 +91,7 @@ public class HtmlViewHot<M> extends HtmlView<M> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public HtmlViewHot<M> setIndented(boolean isIndented) {
+    public final HtmlViewHot<M> setIndented(boolean isIndented) {
         return (HtmlViewHot<M>) HtmlFlow.view(
             template,
             isIndented,
