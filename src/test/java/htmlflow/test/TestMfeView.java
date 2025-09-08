@@ -36,7 +36,7 @@ public class TestMfeView {
 
     @Test
     public void shouldRenderStreamingMicroFrontend() {
-        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).build().view(page -> {
+        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).preEncoding(true).build().view(page -> {
             page.html()
                     .head().__()
                     .body()
@@ -53,6 +53,22 @@ public class TestMfeView {
         });
         String actual = mfe.render();
         assertContents("mfeStreamingView.html", actual);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotRenderStreamingMicroFrontend() {
+        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).preEncoding(false).build().view(page -> {
+            page.html()
+                    .head().__()
+                    .body()
+                    .div()
+                    .mfe(cfg -> {
+                        cfg.setMfeUrlResource("someurl");
+                    })
+                    .__()
+                    .__()
+                    .__();
+        });
     }
 
     private void assertContents(String pathToExpected, String actual) {
