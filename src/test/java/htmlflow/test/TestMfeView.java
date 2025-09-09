@@ -4,7 +4,6 @@ import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -19,10 +18,11 @@ public class TestMfeView {
                     .head().__()
                     .body()
                     .div()
-                    .mfe((cfg) -> {
+                    .mfe(cfg -> {
                         cfg.setMfeUrlResource("http://localhost:8081/bikes");
                         cfg.setMfeName("mfe1");
                         cfg.setMfeListeningEventName("triggerBikeEvent");
+                        cfg.setMfeElementName("some-element");
                         cfg.setMfeTriggersEventName("triggerCartEvent");
                         cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js");
                         cfg.setMfeStylingUrl("http://localhost:8081/css/style.css");
@@ -37,12 +37,12 @@ public class TestMfeView {
 
     @Test
     public void shouldRenderStreamingMicroFrontend() {
-        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).build().view(page -> {
+        HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).preEncoding(true).build().view(page -> {
             page.html()
                     .head().__()
                     .body()
                     .div()
-                    .mfe((cfg) -> {
+                    .mfe(cfg -> {
                         cfg.setMfeUrlResource("http://localhost:8080/html-chunked/stream");
                         cfg.setMfeName("mfe2");
                         cfg.setMfeListeningEventName("triggerStreamEvent");
@@ -54,6 +54,22 @@ public class TestMfeView {
         });
         String actual = mfe.render();
         assertContents("mfeStreamingView.html", actual);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotRenderStreamingMicroFrontend() {
+        HtmlFlow.ViewFactory.builder().mfeEnabled(true).preEncoding(false).build().view(page -> {
+            page.html()
+                    .head().__()
+                    .body()
+                    .div()
+                    .mfe(cfg -> {
+                        cfg.setMfeUrlResource("someurl");
+                    })
+                    .__()
+                    .__()
+                    .__();
+        });
     }
 
     private void assertContents(String pathToExpected, String actual) {

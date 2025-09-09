@@ -30,7 +30,6 @@ import htmlflow.HtmlMfeConfig;
 import htmlflow.exceptions.HtmlFlowAppendException;
 import htmlflow.visitor.escape.HtmlEscapers;
 import java.io.IOException;
-import java.lang.Object;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;

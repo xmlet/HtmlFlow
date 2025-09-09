@@ -37,6 +37,8 @@ import org.xmlet.htmlapifaster.MfeConfiguration;
 
 public class PreprocessingVisitorMfe extends PreprocessingVisitor {
 
+    public static final String HEAD_END_TAG = "</head>";
+
     public PreprocessingVisitorMfe(boolean isIndented) {
         super(isIndented);
     }
@@ -68,11 +70,11 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
 
         HtmlContinuation curr = this.first;
         while (curr != null) {
-            if (curr instanceof HtmlContinuationSyncStatic) {
+            if (curr instanceof HtmlContinuationSyncStatic htmlcontinuationsyncstatic) {
                 final String content =
-                    ((HtmlContinuationSyncStatic) curr).staticHtmlBlock;
+                    htmlcontinuationsyncstatic.staticHtmlBlock;
 
-                if (content.contains("</head>")) {
+                if (content.contains(HEAD_END_TAG)) {
                     Field staticHtmlBlockField;
                     try {
                         staticHtmlBlockField =
@@ -81,13 +83,13 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
                                 );
                         staticHtmlBlockField.setAccessible(true);
                         final String newHtml = content.replaceFirst(
-                            "</head>",
-                            scriptTags + "</head>"
+                                HEAD_END_TAG,
+                            scriptTags + HEAD_END_TAG
                         );
                         staticHtmlBlockField.set(curr, newHtml.intern());
                         break;
                     } catch (NoSuchFieldException | IllegalAccessException e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalStateException(e);
                     }
                 }
             }
