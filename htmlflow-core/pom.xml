@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>xsd2poet</artifactId>
-            <version>${com.github.xmlet.version}</version>
+            <version>${com.github.xmlet.xsd2poet.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
