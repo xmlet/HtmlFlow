@@ -72,13 +72,17 @@ public class HtmlMfeConfig implements MfeConfiguration {
     }
 
     @Override
-    public MfeConfiguration setMfeListeningEventName(String mfeListeningEventName) {
+    public MfeConfiguration setMfeListeningEventName(
+        String mfeListeningEventName
+    ) {
         this.mfeListeningEventName = mfeListeningEventName;
         return this;
     }
 
     @Override
-    public MfeConfiguration setMfeTriggersEventName(String mfeTriggersEventName) {
+    public MfeConfiguration setMfeTriggersEventName(
+        String mfeTriggersEventName
+    ) {
         this.mfeTriggersEventName = mfeTriggersEventName;
         return this;
     }

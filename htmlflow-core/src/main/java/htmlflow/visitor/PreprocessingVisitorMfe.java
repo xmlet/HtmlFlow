@@ -70,7 +70,9 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
 
         HtmlContinuation curr = this.first;
         while (curr != null) {
-            if (curr instanceof HtmlContinuationSyncStatic htmlcontinuationsyncstatic) {
+            if (
+                curr instanceof HtmlContinuationSyncStatic htmlcontinuationsyncstatic
+            ) {
                 final String content =
                     htmlcontinuationsyncstatic.staticHtmlBlock;
 
@@ -83,7 +85,7 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
                                 );
                         staticHtmlBlockField.setAccessible(true);
                         final String newHtml = content.replaceFirst(
-                                HEAD_END_TAG,
+                            HEAD_END_TAG,
                             scriptTags + HEAD_END_TAG
                         );
                         staticHtmlBlockField.set(curr, newHtml.intern());

@@ -44,16 +44,15 @@ abstract class CharEscaper extends Escaper {
      * Exception message for null code input.
      */
     public static final String NULL_CODE_EXCEPTION_MESSAGE =
-            "Code cannot be null";
+        "Code cannot be null";
 
     /**
      * Exception message for negative size in buffer growth.
      */
     public static final String NEGATIVE_SIZE_EXCEPTION_MESSAGE =
-            "Size cannot be negative: ";
+        "Size cannot be negative: ";
 
-    protected CharEscaper() {
-    }
+    protected CharEscaper() {}
 
     @Override
     public String escape(String code) throws NullPointerException {
@@ -112,9 +111,9 @@ abstract class CharEscaper extends Escaper {
             int sizeNeeded = escapedIdx + charsSkipped + escapedLength;
             if (escapedSize < sizeNeeded) {
                 escapedSize =
-                        sizeNeeded + ESCAPE_PAD_MULTIPLIER * (length - idx);
+                    sizeNeeded + ESCAPE_PAD_MULTIPLIER * (length - idx);
                 escapedChars =
-                        growBuffer(escapedChars, escapedIdx, escapedSize);
+                    growBuffer(escapedChars, escapedIdx, escapedSize);
             }
 
             if (charsSkipped > 0) {
@@ -124,11 +123,11 @@ abstract class CharEscaper extends Escaper {
 
             if (escapedLength > 0) {
                 System.arraycopy(
-                        escapedChar,
-                        0,
-                        escapedChars,
-                        escapedIdx,
-                        escapedLength
+                    escapedChar,
+                    0,
+                    escapedChars,
+                    escapedIdx,
+                    escapedLength
                 );
                 escapedIdx += escapedLength;
             }
@@ -161,7 +160,7 @@ abstract class CharEscaper extends Escaper {
     private static char[] growBuffer(char[] buffer, int idx, int size) {
         if (size < 0) {
             throw new IllegalArgumentException(
-                    NEGATIVE_SIZE_EXCEPTION_MESSAGE + size
+                NEGATIVE_SIZE_EXCEPTION_MESSAGE + size
             );
         }
         char[] newBuffer = new char[size];

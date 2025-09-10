@@ -16,8 +16,8 @@ class HtmlContinuationSuspendableAsync<E : Element<*, *>, T>(
     visitor: HtmlVisitor,
     next: HtmlContinuation?,
 ) : HtmlContinuationSuspendable(currentDepth, isClosed, visitor, next) {
-    override val nextSuspendable: HtmlContinuationSuspendable? get() =
-        next as? HtmlContinuationSuspendable
+    override val nextSuspendable: HtmlContinuationSuspendable?
+        get() = next as? HtmlContinuationSuspendable
 
     override suspend fun executeSuspending(model: Any?) {
         if (currentDepth >= 0) {

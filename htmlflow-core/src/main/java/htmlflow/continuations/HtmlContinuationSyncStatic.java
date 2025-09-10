@@ -37,9 +37,9 @@ public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
      * isClosed is useless because it just writes what it is in its staticHtmlBlock.
      */
     public HtmlContinuationSyncStatic(
-            String staticHtmlBlock,
-            HtmlVisitor visitor,
-            HtmlContinuation next
+        String staticHtmlBlock,
+        HtmlVisitor visitor,
+        HtmlContinuation next
     ) {
         super(-1, false, visitor, next); // The isClosed parameter is useless in this case of Static HTML block.
         this.staticHtmlBlock = staticHtmlBlock.intern(); // Maybe intern() here is useless and implicit by VM
@@ -53,9 +53,9 @@ public class HtmlContinuationSyncStatic extends HtmlContinuationSync {
     @Override
     public HtmlContinuation copy(HtmlVisitor v) {
         return new HtmlContinuationSyncStatic(
-                staticHtmlBlock,
-                v,
-                next != null ? next.copy(v) : null
+            staticHtmlBlock,
+            v,
+            next != null ? next.copy(v) : null
         ); // call copy recursively
     }
 }
