@@ -22,7 +22,7 @@ class TestSuspendableViewInConcurrency {
         .map { nr: Int ->
             Student(
                 nr.toLong(),
-                TestAsyncView.randomNameGenerator(Math.toIntExact(nr.toLong()))
+                randomNameGenerator(Math.toIntExact(nr.toLong()))
             )
         }
     val titlesFlux: Publisher<String> = Flux.fromArray(arrayOf("Nr", "Name"))

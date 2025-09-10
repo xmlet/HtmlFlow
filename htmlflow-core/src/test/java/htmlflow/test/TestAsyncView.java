@@ -37,7 +37,7 @@ class TestAsyncView {
     
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
         
-        HtmlViewAsync view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);
+        final var view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);
         mem.reset();
         write_and_assert_asyncview("asyncTest.html", mem, view, asyncModel);

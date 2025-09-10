@@ -62,7 +62,7 @@ public class Utils {
 
     public static Stream<String> loadLines(String path) {
         try{
-            InputStream in = TestDivDetails.class
+            InputStream in = Utils.class
                     .getClassLoader()
                     .getResource(path)
                     .openStream();
