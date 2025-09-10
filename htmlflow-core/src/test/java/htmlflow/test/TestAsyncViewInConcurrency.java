@@ -16,7 +16,6 @@ import java.util.stream.IntStream;
 
 import static htmlflow.test.TestAsyncView.randomNameGenerator;
 import static java.lang.Math.toIntExact;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -57,7 +56,41 @@ class TestAsyncViewInConcurrency {
                 .range(0, NR_OF_TASKS)
                 .parallel()
                 .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
-                .collect(toList())
+                .toList()
+                .forEach(cf ->assertHtml(cf.join()));
+    }
+
+    @Test
+    void check_asyncview_processing_in_concurrent_tasks_and_parallel_threads_hot() {
+        /**
+         * Arrange View
+         */
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setPreEncoding(false).threadSafe();
+        /**
+         * Act and Assert
+         * Collects to dispatch resolution through writeAsync() concurrently.
+         */
+        IntStream
+                .range(0, NR_OF_TASKS)
+                .parallel()
+                .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
+                .toList()
+                .forEach(cf ->assertHtml(cf.join()));
+    }
+
+    @Test
+    void check_asyncview_processing_in_concurrent_tasks_and_parallel_threads_hot_unsafe() {
+        /**
+         * Arrange View
+         */
+        final HtmlViewAsync<AsyncModel> view = HtmlFlow.<AsyncModel>viewAsync(TestAsyncView::testAsyncModel).setPreEncoding(false).threadUnsafe();
+        /**
+         * Act and Assert
+         * Since Stream is Lazy then there is a vertical processing and a sequential execution between tasks.
+         */
+        IntStream
+                .range(0, NR_OF_TASKS)
+                .mapToObj(i -> view.renderAsync(new AsyncModel<>(titlesFlux, studentFlux)))
                 .forEach(cf ->assertHtml(cf.join()));
     }
 

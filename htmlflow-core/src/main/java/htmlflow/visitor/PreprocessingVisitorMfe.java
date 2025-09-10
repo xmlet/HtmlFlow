@@ -30,7 +30,7 @@ import org.xmlet.htmlapifaster.MfeConfiguration;
  * <p><strong>Note:</strong> This visitor requires preEncoding to be enabled as it relies on the
  * preprocessing phase to analyze and modify the HTML structure.</p>
  *
- * @see htmlflow.visitor.PreprocessingVisitor
+ * @see PreprocessingVisitor
  * @see htmlflow.HtmlMfeConfig
  * @see org.xmlet.htmlapifaster.MfeConfiguration
  */

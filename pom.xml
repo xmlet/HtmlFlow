@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow-wrapper</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${com.github.xmlet.wrapper.version}</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
 
@@ -49,12 +49,21 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <junit.jupiter-version>5.9.0</junit.jupiter-version>
         <mockito.junit-version>4.8.0</mockito.junit-version>
+        <com.github.xmlet.version>1.0.7</com.github.xmlet.version>
+        <com.github.xmlet.wrapper.version>5.0.0</com.github.xmlet.wrapper.version>
+        <com.github.xmlet.core.version>5.0.0</com.github.xmlet.core.version>
+        <com.github.xmlet.kotlin.version>5.0.0</com.github.xmlet.kotlin.version>
+        <com.github.xmlet.flowifier.version>5.0.0</com.github.xmlet.flowifier.version>
         <argLine>-Xss16m -Xmx32M</argLine>
         <kotlin.version>1.9.22</kotlin.version>
+
+        <sonar.projectKey>com.github.xmlet:htmlflow</sonar.projectKey>
+        <sonar.organization>fmcarvalho-github</sonar.organization>
+        <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
 
     <dependencyManagement>
@@ -189,6 +198,7 @@
                     <publishingServerId>central</publishingServerId>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>

@@ -34,6 +34,8 @@ import htmlflow.visitor.escape.core.Escapers;
  */
 public final class HtmlEscapers {
 
+    private HtmlEscapers() {}
+
     /**
      * Returns an {@link Escaper} for HTML escaping.
      *
@@ -50,11 +52,11 @@ public final class HtmlEscapers {
      * `"`, and `'`.
      */
     private static final Escaper HTML_ESCAPER = Escapers
-        .builder()
-        .addScape('"', "&quot;")
-        .addScape('\'', "&#39;")
-        .addScape('&', "&amp;")
-        .addScape('<', "&lt;")
-        .addScape('>', "&gt;")
-        .build();
+            .builder()
+            .addScape('"', "&quot;")
+            .addScape('\'', "&#39;")
+            .addScape('&', "&amp;")
+            .addScape('<', "&lt;")
+            .addScape('>', "&gt;")
+            .build();
 }

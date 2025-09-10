@@ -6,19 +6,19 @@
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-wrapper</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>5.0.0</version>
     </parent>
 
     <artifactId>flowifier</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>4.8-SNAPSHOT</version>
+    <version>5.0.0</version>
 
     <dependencies>
         <!-- HtmlFlow library purpose is to allow Java applications to easily writing HTML documents in a fluent style into a java.io.PrintStream. -->
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow</artifactId>
-            <version>4.9-SNAPSHOT</version>
+            <version>5.0.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>xsd2poet</artifactId>
-            <version>1.0.5</version>
+            <version>${com.github.xmlet.version}</version>
         </dependency>
 
         <!-- jsoup HTML parser library @ https://jsoup.org/ -->

@@ -8,14 +8,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestHtmlViewAsyncHot {
+class TestHtmlViewAsyncHot {
 
-    public <M> HtmlViewAsync<M> viewAsyncHot(HtmlTemplate template) {
+    <M> HtmlViewAsync<M> viewAsyncHot(HtmlTemplate template) {
         return HtmlFlow.viewAsync(false, template);
     }
 
     @Test
-    public void should_use_hot_visitor() {
+    void should_use_hot_visitor() {
         HtmlViewAsync<Object> view = viewAsyncHot(v -> {
             v.html()
                     .body()
@@ -32,7 +32,7 @@ public class TestHtmlViewAsyncHot {
     }
 
     @Test
-    public void should_not_cache_state_between_renders() {
+    void should_not_cache_state_between_renders() {
         AtomicInteger counter = new AtomicInteger(0);
 
         HtmlViewAsync<Object> view = viewAsyncHot(v -> {
@@ -56,7 +56,7 @@ public class TestHtmlViewAsyncHot {
     }
 
     @Test
-    public void should_use_cached_visitor_when_caching_enabled() {
+    void should_use_cached_visitor_when_caching_enabled() {
         HtmlViewAsync<Object> view = HtmlFlow.viewAsync(v -> {
             v.html()
                     .body()
@@ -73,7 +73,7 @@ public class TestHtmlViewAsyncHot {
     }
 
     @Test
-    public void should_show_difference_between_hot_and_cached() {
+    void should_show_difference_between_hot_and_cached() {
         AtomicInteger counter = new AtomicInteger(0);
 
         HtmlTemplate template = v -> {
@@ -105,7 +105,7 @@ public class TestHtmlViewAsyncHot {
     }
 
     @Test
-    public void should_handle_dynamic_content_with_state_changes() {
+    void should_handle_dynamic_content_with_state_changes() {
         AtomicInteger renderCount = new AtomicInteger(0);
 
         HtmlViewAsync<Object> view = viewAsyncHot(v -> {
@@ -127,7 +127,7 @@ public class TestHtmlViewAsyncHot {
     }
 
     @Test
-    public void should_change_visitors_when_caching_changes() {
+    void should_change_visitors_when_caching_changes() {
         HtmlViewAsync<Object> view = viewAsyncHot(v -> {
             v.html()
                     .body()
@@ -147,7 +147,7 @@ public class TestHtmlViewAsyncHot {
     }
 
     @Test
-    public void should_support_thread_safety() {
+    void should_support_thread_safety() {
         HtmlViewAsync<Object> view = viewAsyncHot(v -> {
             v.html()
                     .body()
