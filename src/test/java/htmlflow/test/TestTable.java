@@ -210,7 +210,7 @@ public class TestTable {
         customOutputView.render(tasks);
         
         assertNotNull("Custom output should not be null", customOutput.toString());
-        assertTrue("Custom output should contain content", customOutput.length() > 0);
+        assertTrue("Custom output should contain content", !customOutput.isEmpty());
     }
 
     @Test

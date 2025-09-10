@@ -33,7 +33,6 @@ import htmlflow.test.model.Task;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -74,9 +73,9 @@ public class HtmlForReadme {
     @SuppressWarnings("squid:S2699")
     @Test
     public void testSample02() {
+        /*
         String html = view.render();        // 1) Get a string with the HTML
 
-        /*
         view
             .setPrintStream(System.out)
             .write();                       // 2) print to the standard output
@@ -89,7 +88,7 @@ public class HtmlForReadme {
     }
 
 
-    static HtmlView view = HtmlFlow.view(view -> view
+    static HtmlView view = HtmlFlow.view(page -> page
                 .html()
                     .body()
                         .p().text("Typesafe is awesome! :-)").__()

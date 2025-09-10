@@ -8,14 +8,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestHtmlViewHot {
+class TestHtmlViewHot {
 
     public <M> HtmlView<M> viewHot(HtmlTemplate template) {
         return HtmlFlow.view(false, template);
     }
 
     @Test
-    public void should_use_hot_visitor() {
+    void should_use_hot_visitor() {
         HtmlView<Object> view = viewHot(v -> {
             v.html()
                     .body()
@@ -32,7 +32,7 @@ public class TestHtmlViewHot {
     }
 
     @Test
-    public void should_not_cache_state_between_renders() {
+    void should_not_cache_state_between_renders() {
         AtomicInteger counter = new AtomicInteger(0);
 
         HtmlView<Object> view = viewHot(v -> {
@@ -56,7 +56,7 @@ public class TestHtmlViewHot {
     }
 
     @Test
-    public void should_use_cached_visitor_when_caching_enabled() {
+    void should_use_cached_visitor_when_caching_enabled() {
         HtmlView<Object> view = HtmlFlow.view(v -> {
             v.html()
                     .body()
@@ -73,7 +73,7 @@ public class TestHtmlViewHot {
     }
 
     @Test
-    public void should_show_difference_between_hot_and_cached() {
+    void should_show_difference_between_hot_and_cached() {
         AtomicInteger counter = new AtomicInteger(0);
 
         HtmlTemplate template = v -> {
@@ -105,7 +105,7 @@ public class TestHtmlViewHot {
     }
 
     @Test
-    public void should_handle_dynamic_content_with_state_changes() {
+    void should_handle_dynamic_content_with_state_changes() {
         AtomicInteger renderCount = new AtomicInteger(0);
 
         HtmlView<Object> view = viewHot(v -> {
@@ -127,7 +127,7 @@ public class TestHtmlViewHot {
     }
 
     @Test
-    public void should_change_visitors_when_caching_changes() {
+    void should_change_visitors_when_caching_changes() {
         HtmlView<Object> view = viewHot(v -> {
             v.html()
                     .body()

@@ -290,18 +290,10 @@ public class TestViewEngine {
     @Test
     public void testBuilderErrorHandling() {
         HtmlFlow.ViewFactory viewFactory = HtmlFlow.ViewFactory.builder().build();
-        
-        try {
-            viewFactory.view(null);
-            fail("Should throw exception for null template");
-        } catch (Exception e) {
-        }
-        
-        try {
-            viewFactory.view(null, SIMPLE_TEMPLATE).render();
-            fail("Should throw exception for null appendable");
-        } catch (Exception e) {
-        }
+
+        assertThrows(Exception.class, () -> viewFactory.view(null));
+
+        assertThrows(Exception.class, () -> viewFactory.view(null, SIMPLE_TEMPLATE).render());
     }
 
     @Test

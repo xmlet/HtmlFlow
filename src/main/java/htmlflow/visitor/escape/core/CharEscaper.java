@@ -82,7 +82,7 @@ abstract class CharEscaper extends Escaper {
     protected final String escapeSlow(String code, int idx) {
         int length = code.length();
 
-        char[] escapedChars = Platform.charBufferFromTheadLocal();
+        char[] escapedChars = Platform.charBufferFromThreadLocal();
         int escapedSize = escapedChars.length;
         int escapedIdx = 0;
         int lastEscape = 0;
@@ -132,6 +132,8 @@ abstract class CharEscaper extends Escaper {
             code.getChars(lastEscape, length, escapedChars, escapedIdx);
             escapedIdx = neededSize;
         }
+        Platform.cleanupThreadLocalBuffer();
+
         return new String(escapedChars, 0, escapedIdx);
     }
 
