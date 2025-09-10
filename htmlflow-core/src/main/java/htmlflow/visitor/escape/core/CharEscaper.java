@@ -30,18 +30,30 @@ package htmlflow.visitor.escape.core;
  */
 abstract class CharEscaper extends Escaper {
 
-    /** The multiplier for the size of the escape buffer. */
+    /**
+     * The multiplier for the size of the escape buffer.
+     */
     private static final int ESCAPE_PAD_MULTIPLIER = 2;
 
-    /** Exception message for null code input. */
+    /**
+     * The size of the buffer used for character escaping.
+     */
+    private static final int BUFFER_SIZE = 1024;
+
+    /**
+     * Exception message for null code input.
+     */
     public static final String NULL_CODE_EXCEPTION_MESSAGE =
-        "Code cannot be null";
+            "Code cannot be null";
 
-    /** Exception message for negative size in buffer growth. */
+    /**
+     * Exception message for negative size in buffer growth.
+     */
     public static final String NEGATIVE_SIZE_EXCEPTION_MESSAGE =
-        "Size cannot be negative: ";
+            "Size cannot be negative: ";
 
-    protected CharEscaper() {}
+    protected CharEscaper() {
+    }
 
     @Override
     public String escape(String code) throws NullPointerException {
@@ -64,7 +76,7 @@ abstract class CharEscaper extends Escaper {
      *
      * @param c the character to escape
      * @return a character array representing the escaped form of the character, or null if the
-     *     character does not need to be escaped
+     * character does not need to be escaped
      */
     protected abstract char[] escape(char c);
 
@@ -76,13 +88,13 @@ abstract class CharEscaper extends Escaper {
      * the fully escaped string.
      *
      * @param code the input string to escape
-     * @param idx the index to start escaping from
+     * @param idx  the index to start escaping from
      * @return the fully escaped string
      */
     protected final String escapeSlow(String code, int idx) {
         int length = code.length();
 
-        char[] escapedChars = Platform.charBufferFromTheadLocal();
+        char[] escapedChars = new char[BUFFER_SIZE];
         int escapedSize = escapedChars.length;
         int escapedIdx = 0;
         int lastEscape = 0;
@@ -100,9 +112,9 @@ abstract class CharEscaper extends Escaper {
             int sizeNeeded = escapedIdx + charsSkipped + escapedLength;
             if (escapedSize < sizeNeeded) {
                 escapedSize =
-                    sizeNeeded + ESCAPE_PAD_MULTIPLIER * (length - idx);
+                        sizeNeeded + ESCAPE_PAD_MULTIPLIER * (length - idx);
                 escapedChars =
-                    growBuffer(escapedChars, escapedIdx, escapedSize);
+                        growBuffer(escapedChars, escapedIdx, escapedSize);
             }
 
             if (charsSkipped > 0) {
@@ -112,11 +124,11 @@ abstract class CharEscaper extends Escaper {
 
             if (escapedLength > 0) {
                 System.arraycopy(
-                    escapedChar,
-                    0,
-                    escapedChars,
-                    escapedIdx,
-                    escapedLength
+                        escapedChar,
+                        0,
+                        escapedChars,
+                        escapedIdx,
+                        escapedLength
                 );
                 escapedIdx += escapedLength;
             }
@@ -142,14 +154,14 @@ abstract class CharEscaper extends Escaper {
      * characters from the old buffer to the new one.
      *
      * @param buffer the original character buffer
-     * @param idx the current index in the buffer
-     * @param size the new size for the buffer
+     * @param idx    the current index in the buffer
+     * @param size   the new size for the buffer
      * @return a new character array with the specified size, containing the existing characters
      */
     private static char[] growBuffer(char[] buffer, int idx, int size) {
         if (size < 0) {
             throw new IllegalArgumentException(
-                NEGATIVE_SIZE_EXCEPTION_MESSAGE + size
+                    NEGATIVE_SIZE_EXCEPTION_MESSAGE + size
             );
         }
         char[] newBuffer = new char[size];
