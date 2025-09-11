@@ -23,18 +23,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TestAsyncView {
-
+    
     @Test
     void given_async_work_when_create_view_and_render_it_twice_on_same_model() throws ExecutionException, InterruptedException {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
-
+    
         final Publisher<Student> studentFlux = Flux.range(1, 5)
                 .delayElements(Duration.ofMillis(10))
                 .doOnNext(nr -> System.out.println(" ########################## Emit " + nr))
                 .map(nr -> new Student(nr, randomNameGenerator(toIntExact(nr))));
-
+    
         final Publisher<String> titlesFlux = Flux.fromArray(new String[]{"Nr", "Name"});
-
+    
         final AsyncModel<String, Student> asyncModel = new AsyncModel<>(titlesFlux, studentFlux);
 
         HtmlViewAsync<AsyncModel<String, Student>> view = HtmlFlow.viewAsync(TestAsyncView::testAsyncModel);

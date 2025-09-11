@@ -44,7 +44,7 @@ private fun checkRender(render: suspend () -> String) {
         }
         for (i in 0 until threadCount) {
             thread[i]?.join()
-            Assert.assertEquals(TestAsyncViewInConcurInMultpleThreads.EXPECTED_HTML, html[i])
+            Assert.assertEquals(expectedHtml, html[i])
         }
     }
     // println("end");
