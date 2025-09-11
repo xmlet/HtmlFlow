@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.xmlet</groupId>
-        <artifactId>htmlflow-wrapper</artifactId>
+        <artifactId>htmlflow-parent</artifactId>
         <version>5.0.0</version>
     </parent>
 

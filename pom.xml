@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
-    <artifactId>htmlflow-wrapper</artifactId>
+    <artifactId>htmlflow-parent</artifactId>
     <version>5.0.0</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
@@ -56,10 +56,6 @@
         <com.github.xmlet.xsd2poet.version>1.0.7</com.github.xmlet.xsd2poet.version>
         <argLine>-Xss16m -Xmx32M</argLine>
         <kotlin.version>1.9.22</kotlin.version>
-
-        <sonar.projectKey>com.github.xmlet:htmlflow</sonar.projectKey>
-        <sonar.organization>fmcarvalho-github</sonar.organization>
-        <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
 
     <dependencyManagement>
@@ -137,6 +133,29 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>1.9.10</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>dokka</goal>
+                            <goal>javadoc</goal>
+                            <goal>javadocJar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sourceDirectories>
+                        <source>htmlflow-core/src/main/java</source>
+                        <source>htmlflow-kotlin/src/main/kotlin</source>
+                        <source>flowifier/src/main/java</source>
+                    </sourceDirectories>
+                </configuration>
             </plugin>
 
             <plugin>
