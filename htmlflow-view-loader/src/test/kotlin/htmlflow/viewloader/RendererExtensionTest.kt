@@ -1,10 +1,8 @@
 package htmlflow.viewloader
 
-import ViewNotFound
 import htmlflow.HtmlFlow
 import htmlflow.dyn
 import htmlflow.html
-import htmlflow.viewloader.renderer
 import kotlin.test.assertNotNull
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

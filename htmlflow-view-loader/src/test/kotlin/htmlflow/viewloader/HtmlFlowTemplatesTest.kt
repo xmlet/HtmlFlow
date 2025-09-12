@@ -1,7 +1,5 @@
 package htmlflow.viewloader
 
-import ViewNotFound
-import ClassInspector
 import htmlflow.HtmlFlow
 import htmlflow.HtmlView
 import htmlflow.dyn

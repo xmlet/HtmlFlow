@@ -1,7 +1,5 @@
 package htmlflow.viewloader
 
-import ClasspathLoader
-import ViewNotFound
 import htmlflow.HtmlFlow
 
 typealias TemplateRenderer = (ViewModel) -> String

@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+package htmlflow.viewloader
+
 import java.io.File
 import java.net.URL
 
