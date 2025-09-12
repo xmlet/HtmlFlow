@@ -1,128 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
-    <artifactId>htmlflow</artifactId>
-    <version>4.9-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <artifactId>htmlflow-parent</artifactId>
+    <version>5.0.0</version>
+    <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
+
     <description>
-        HtmlFlow library purpose is to allow Java applications to easily writing
-        HTML documents in a fluent style into a java.io.PrintStream.
+        HtmlFlow project wrapper for the HtmlFlow library,
+        which allows Java applications to easily write HTML documents in a fluent style into a java.io.PrintStream.
+        This wrapper includes the core library and Kotlin support.
     </description>
+
     <url>https://github.com/xmlet/HtmlFlow</url>
+
+    <modules>
+        <module>htmlflow-core</module>
+        <module>htmlflow-kotlin</module>
+        <module>htmlflow-view-loader</module>
+        <module>flowifier</module>
+    </modules>
+
     <licenses>
         <license>
             <name>MIT license</name>
             <url>https://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
+
     <developers>
         <developer>
             <name>Miguel Gamboa</name>
             <email>miguelgamboa@outlook.com</email>
             <organization>CCISEL</organization>
-            <organizationUrl>http://gamboa.pt</organizationUrl>
+            <organizationUrl>https://gamboa.pt</organizationUrl>
         </developer>
     </developers>
+
     <scm>
         <connection>scm:git:git@github.com:xmlet/HtmlFlow.git</connection>
         <developerConnection>scm:git:git@github.com:xmlet/HtmlFlow.git</developerConnection>
         <url>git@github.com:xmlet/HtmlFlow.git</url>
         <tag>HEAD</tag>
     </scm>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.xmlet</groupId>
-            <artifactId>xsd2poet</artifactId>
-            <version>1.0.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--JUnit Jupiter Engine to depend on the JUnit4 engine and JUnit 4 API  -->
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.jupiter-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.junit-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-            <version>3.4.23</version>
-            <scope>test</scope>
-        </dependency>
 
-        <dependency>
-            <!-- jsoup HTML parser library @ https://jsoup.org/ -->
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.15.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>1.7.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-reactive</artifactId>
-            <version>1.7.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <junit.jupiter-version>5.9.0</junit.jupiter-version>
         <mockito.junit-version>4.8.0</mockito.junit-version>
+        <com.github.xmlet.xsd2poet.version>1.0.7</com.github.xmlet.xsd2poet.version>
         <argLine>-Xss16m -Xmx32M</argLine>
         <kotlin.version>1.9.22</kotlin.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.jupiter-version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!--JUnit Jupiter Engine to depend on the JUnit4 engine and JUnit 4 API  -->
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+                <version>${junit.jupiter-version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -138,6 +93,7 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -150,6 +106,7 @@
                     <pushChanges>false</pushChanges>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -164,6 +121,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -177,6 +135,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.jetbrains.dokka</groupId>
                 <artifactId>dokka-maven-plugin</artifactId>
@@ -193,11 +152,13 @@
                 </executions>
                 <configuration>
                     <sourceDirectories>
-                        <source>src/main/java</source>
-                        <source>src/main/kotlin</source>
+                        <source>htmlflow-core/src/main/java</source>
+                        <source>htmlflow-kotlin/src/main/kotlin</source>
+                        <source>flowifier/src/main/java</source>
                     </sourceDirectories>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -243,71 +204,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <source>src/main/kotlin</source>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <source>src/test/java</source>
-                                <source>src/test/kotlin</source>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <jvmTarget>${maven.compiler.target}</jvmTarget>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>${maven.compiler.target}</release>
-                </configuration>
-                <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals> <goal>compile</goal> </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals> <goal>testCompile</goal> </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
@@ -317,6 +214,13 @@
                     <publishingServerId>central</publishingServerId>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>5.1.0.4751</version>
+            </plugin>
+
             <!-- Spotless plugin for code formatting -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
@@ -326,10 +230,12 @@
                     <formats>
                         <format>
                             <includes>
-                                <include>src/main/java/**/*.java</include>
+                                <include>htmlflow-core/src/main/java/**/*.java</include>
+                                <include>flowifier/src/main/java/**/*.java</include>
                             </includes>
                             <excludes>
-                                <exclude>src/test/java/**/*.java</exclude>
+                                <exclude>htmlflow-core/src/test/java/**/*.java</exclude>
+                                <exclude>flowifier/src/test/java/**/*.java</exclude>
                             </excludes>
                             <prettier>
                                 <devDependencies>
@@ -346,10 +252,10 @@
                     </formats>
                     <kotlin>
                         <includes>
-                            <include>src/*/kotlin/**/*.kt</include>
+                            <include>htmlflow-kotlin/src/*/kotlin/**/*.kt</include>
                         </includes>
                         <excludes>
-                            <exclude>src/test/kotlin/**/*.kt</exclude>
+                            <exclude>htmlflow-kotlin/src/test/kotlin/**/*.kt</exclude>
                         </excludes>
                         <ktfmt>
                             <version>0.56</version>
