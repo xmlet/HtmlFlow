@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+package htmlflow.viewloader
+
 import htmlflow.HtmlFlow
 import htmlflow.HtmlView
 import java.util.concurrent.ConcurrentHashMap

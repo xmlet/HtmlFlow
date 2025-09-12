@@ -104,6 +104,7 @@
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
                     <pushChanges>false</pushChanges>
+                    <connectionUrl>scm:git:git@github.com:xmlet/HtmlFlow.git</connectionUrl>
                 </configuration>
             </plugin>
 
