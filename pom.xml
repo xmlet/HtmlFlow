@@ -21,6 +21,7 @@
     <modules>
         <module>htmlflow-core</module>
         <module>htmlflow-kotlin</module>
+        <module>htmlflow-view-loader</module>
         <module>flowifier</module>
     </modules>
 
