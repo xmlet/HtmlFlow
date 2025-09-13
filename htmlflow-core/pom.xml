@@ -5,13 +5,13 @@
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-parent</artifactId>
-        <version>5.0.0</version>
+        <version>5.0.1</version>
     </parent>
 
     <artifactId>htmlflow</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>5.0.1-SNAPSHOT</version>
+    <version>5.0.2-SNAPSHOT</version>
 
     <description>
         HtmlFlow library purpose is to allow Java applications to easily writing
