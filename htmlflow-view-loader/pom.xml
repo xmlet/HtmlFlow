@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-parent</artifactId>
-        <version>5.0.0</version>
+        <version>5.0.1</version>
     </parent>
 
     <artifactId>htmlflow-view-loader</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>5.0.0</version>
+    <version>5.0.2-SNAPSHOT</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -26,20 +24,11 @@
         </repository>
     </distributionManagement>
 
-    <properties>
-        <sonar.sources>
-            src/main/kotlin,
-        </sonar.sources>
-        <sonar.tests>
-            src/test/kotlin,
-        </sonar.tests>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow-kotlin</artifactId>
-            <version>5.0.0</version>
+            <version>5.0.1</version>
             <scope>compile</scope>
         </dependency>
 
@@ -69,6 +58,8 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -104,27 +95,6 @@
                 </executions>
                 <configuration>
                     <jvmTarget>${maven.compiler.target}</jvmTarget>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.jetbrains.dokka</groupId>
-                <artifactId>dokka-maven-plugin</artifactId>
-                <version>1.9.10</version>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>dokka</goal>
-                            <goal>javadoc</goal>
-                            <goal>javadocJar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sourceDirectories>
-                        <source>src/main/kotlin</source>
-                    </sourceDirectories>
                 </configuration>
             </plugin>
         </plugins>
