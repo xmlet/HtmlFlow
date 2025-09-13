@@ -26,15 +26,6 @@
         </repository>
     </distributionManagement>
 
-    <properties>
-        <sonar.sources>
-            src/main/kotlin,
-        </sonar.sources>
-        <sonar.tests>
-            src/test/kotlin,
-        </sonar.tests>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.github.xmlet</groupId>
@@ -69,6 +60,8 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -104,27 +97,6 @@
                 </executions>
                 <configuration>
                     <jvmTarget>${maven.compiler.target}</jvmTarget>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.jetbrains.dokka</groupId>
-                <artifactId>dokka-maven-plugin</artifactId>
-                <version>1.9.10</version>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>dokka</goal>
-                            <goal>javadoc</goal>
-                            <goal>javadocJar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sourceDirectories>
-                        <source>src/main/kotlin</source>
-                    </sourceDirectories>
                 </configuration>
             </plugin>
         </plugins>

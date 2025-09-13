@@ -155,6 +155,7 @@
                     <sourceDirectories>
                         <source>htmlflow-core/src/main/java</source>
                         <source>htmlflow-kotlin/src/main/kotlin</source>
+                        <source>htmlflow-view-loader/src/main/kotlin</source>
                         <source>flowifier/src/main/java</source>
                     </sourceDirectories>
                 </configuration>
