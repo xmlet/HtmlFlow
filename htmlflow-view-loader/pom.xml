@@ -11,7 +11,7 @@
     <artifactId>htmlflow-view-loader</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>5.0.1</version>
+    <version>5.0.2-SNAPSHOT</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -99,8 +99,4 @@
             </plugin>
         </plugins>
     </build>
-
-  <scm>
-    <tag>htmlflow-parent-5.0.1</tag>
-  </scm>
 </project>
