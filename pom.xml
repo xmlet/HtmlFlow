@@ -21,6 +21,7 @@
         <module>htmlflow-kotlin</module>
         <module>htmlflow-view-loader</module>
         <module>flowifier</module>
+        <module>htmlflow-datastar</module>
     </modules>
 
     <licenses>
