@@ -45,6 +45,7 @@ fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
             null -> ""
             else -> "$value"
         }
+
     this.visitor.visitAttribute("data-signals-$name", res)
     return Signal(name, value)
 }
@@ -59,6 +60,111 @@ fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
  * @return a Signal instance with the given name and value
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataSignal(name: String): Signal<Any> = dataSignal(name, null)
+
+/**
+ * Creates a signal (if one doesn’t already exist)
+ * and sets up two-way data binding between it and an element’s value.
+ *
+ * @param E type of the Element receiver
+ * @param P type of the parent Element of the receiver
+ * @param R type of the value of the signal
+ * @receiver the Element to which the data-bind attribute will be added
+ * @param name the name of the signal to bind
+ * @param initialValue the initial value for the signal
+ * @return a Signal instance with the given name and value if exists
+ */
+fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataBind(
+    name: String,
+    initialValue: R? = null
+): Signal<R> {
+    this.visitor.visitAttribute("data-bind-$name", "")
+    if (initialValue != null) {
+        this.visitor.visitAttribute("value", initialValue.toString())
+        return Signal(name, initialValue)
+    }
+    return Signal(name)
+}
+/**
+ * @param E type of the Element receiver
+ * @param P type of the parent Element of the receiver
+ * @param R type of the value of the signal
+ * @receiver the Element to which the data-bind attribute will be added
+ * @param signal the Signal to bind to (its value takes precedence)
+ * @return the same Signal instance
+ */
+fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataBind(
+    signal: Signal<R>,
+    value: R? = null
+): Signal<R> {
+    this.visitor.visitAttribute("data-bind-${signal.name}", "")
+    if (value != null) this.visitor.visitAttribute("value", value.toString())
+    return signal
+}
+
+
+/**
+ * @param E type of the Element receiver
+ * @param P type of the parent Element of the receiver
+ * @receiver the Element to which the data-init attribute will be added
+ * @param js a JavaScript expression that computes the value of the signal
+ */
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataInit(
+    js: String
+){
+    this.visitor.visitAttribute("data-init", js)
+}
+
+/**
+ * @param E type of the Element receiver
+ * @param P type of the parent Element of the receiver
+ * @receiver the Element to which the data-attr attribute will be added
+ * @param name the name of the HTML attribute to bind
+ * @param signal the Signal whose value will be used for the attribute
+ * @return a Signal instance with the given name and value
+ */
+fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataAttr(
+    name: String,
+    signal: Signal<R>
+): Signal<R> {
+    this.visitor.visitAttribute("data-attr-$name", signal.toString())
+    return signal
+}
+
+
+/**
+ * Not finished yet
+ *  data-attr="{title: $foo, disabled: $bar}
+ *   -> data-attr-title="$foo"
+ *   -> data-attr-disabled="$bar"
+ *
+ * @param E type of the Element receiver
+ * @param P type of the parent Element of the receiver
+ * @receiver the Element to which the data-attr attribute will be added
+ * @param js a JavaScript expression that computes the values of multiple attributes on an element using a set of key-value pairs
+ * @return a Signal instance with the given name and value
+ */
+fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataAttr(js: String) {
+    this.visitor.visitAttribute("data-attr", js)
+}
+
+/**
+ * @param E type of the Element receiver
+ * @param P type of the parent Element of the receiver
+ * @receiver the Element to which the data-indicator attribute will be added
+ * @param name the name of the indicator signal
+ * @param request the flag if there is a fetch request in flight
+ * @return a Signal instance representing a loading state/indicator
+ */
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataIndicator(
+    name: String,
+    request: Boolean
+): Signal<Boolean> {
+    if(request){
+        this.visitor.visitAttribute("data-indicator-$name", "")
+        return Signal(name, true)
+    }
+    return Signal(name, false)
+}
 
 /**
  * @param E type of the Element receiver
@@ -106,7 +212,7 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataShow(js: String) {
  * @param E type of the Element receiver
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
- * @param js a JavaScript expression that computes the value of the signal
+ * @param signal the Signal whose value will be used for the attribute
  * @return a Signal instance with the given name and value
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataShow(signal: Signal<*>) {
@@ -128,7 +234,7 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataText(js: String) {
  * @param E type of the Element receiver
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
- * @param js a JavaScript expression that computes the value of the signal
+ * @param signal the Signal whose value will be used for the attribute
  * @return a Signal instance with the given name and value
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataText(signal: Signal<*>) {
