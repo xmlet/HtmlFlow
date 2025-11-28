@@ -28,5 +28,11 @@ data class Signal<T>(
     val name: String,
     val value: T? = null,
 ) {
+    init {
+        require(
+            !name.startsWith("__"),
+        ) { "Signal names cannot begin with nor contain a double underscore, due to its use as a modifier delimiter." }
+    }
+
     override fun toString(): String = "$" + this.name
 }

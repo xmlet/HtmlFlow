@@ -26,11 +26,11 @@ class BadAppleTest {
                 }
                 body {
                     div {
-                        val percentage = dataSignal("_percentage", 0)
-                        val contents = dataSignal("_contents", "bad apple frames go here")
+                        val percentage = dataSignal("percentage", 0)
+                        val contents = dataSignal("contents", "bad apple frames go here")
                         label {
                             dataInit("@get('/examples/bad_apple/updates')")
-                            span { dataText("Percentage: ${'$'}{percentage.toFixed(2)}%") } //Needs to be checked
+                            span { dataText("`Percentage: ${'$'}{$percentage.toFixed(2)}%`") } // Needs to be checked
                             input {
                                 attrType(EnumTypeInputType.RANGE)
                                 attrMin("0")
@@ -38,7 +38,7 @@ class BadAppleTest {
                                 attrStep("0.01")
                                 attrDisabled(true)
                                 attrStyle("cursor: default")
-                                dataAttr("value", percentage)
+                                dataAttr("value", "$percentage")
                             }
                         }
                         pre {
@@ -50,7 +50,7 @@ class BadAppleTest {
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>
@@ -58,13 +58,13 @@ class BadAppleTest {
         </script>
     </head>
 <body>
-    <div data-signals-_percentage="0" data-signals-_contents="'bad apple frames go here'"> 
+    <div data-signals-percentage="0" data-signals-contents="'bad apple frames go here'"> 
        <label data-init="@get('/examples/bad_apple/updates')">
-            <span data-text="Percentage: ${'$'}{percentage.toFixed(2)}%">
+            <span data-text="`Percentage: ${'$'}{${'$'}percentage.toFixed(2)}%`">
             </span>
-            <input type="range" min="0" max="100" step="0.01" disabled="true" style="cursor: default" data-attr-value="${'$'}_percentage">
+            <input type="range" min="0" max="100" step="0.01" disabled="true" style="cursor: default" data-attr-value="${'$'}percentage">
        </label>
-       <pre style="line-height: 100%" data-text="${'$'}_contents">
+       <pre style="line-height: 100%" data-text="${'$'}contents">
        </pre>
     </div>
 </body>

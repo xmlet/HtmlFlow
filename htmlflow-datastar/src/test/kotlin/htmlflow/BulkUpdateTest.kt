@@ -14,6 +14,7 @@ class BulkUpdateTest {
             assertEquals(expected.next().trim(), actual.trim())
         }
     }
+
     private val demoDastarRx =
         view<Unit> {
             html {
@@ -24,74 +25,72 @@ class BulkUpdateTest {
                     }
                 }
                 body {
-                    div{
+                    div {
                         attrId("demo")
-                        val fetching = dataSignal("_fetching", false)
+                        val fetching = dataSignal("fetching", false)
                         val selections = dataSignal("selections", "Array(4).fill(false)")
-                        val _all = dataSignal("_all", null) // Needs to be checked
-                        table{
-                            thead{
-                                tr{
-                                    th{
-                                        input{
+                        val all = dataSignal("all", null) // Needs to be checked
+                        table {
+                            thead {
+                                tr {
+                                    th {
+                                        input {
                                             attrType(EnumTypeInputType.CHECKBOX)
-                                            dataBind("_all", null)
-                                            dataOn("change", "$selections = Array(4).fill($_all)")
-                                            //dataEffect()
-                                            dataAttr("disabled", fetching)
+                                            dataBind(all)
+                                            dataOn("change", "$selections = Array(4).fill($all)")
+                                            // dataEffect()
+                                            dataAttr("disabled", "$fetching")
                                         }
                                     }
-                                    th{
+                                    th {
                                         +"Name"
                                     }
-                                    th{
+                                    th {
                                         +"Email"
                                     }
-                                    th{
+                                    th {
                                         +"Status"
                                     }
                                 }
                             }
-                            tbody{
-                                tr{
-                                    td{
-                                        input{
+                            tbody {
+                                tr {
+                                    td {
+                                        input {
                                             attrType(EnumTypeInputType.CHECKBOX)
                                             dataBind(selections)
-                                            dataAttr("disabled", fetching)
-
-
+                                            dataAttr("disabled", "$fetching")
                                         }
                                     }
-                                    td{
+                                    td {
                                         +"Joe Smith"
                                     }
-                                    td{
+                                    td {
                                         +"joe@smith.org"
                                     }
-                                    td{
+                                    td {
                                         +"Active"
                                     }
                                 }
                             }
                         }
-                        div{
-                            button{
+                        div {
+                            button {
                                 attrClass("success")
                                 dataOn("click", "@put('/examples/bulk_update/activate')")
-                                dataIndicator("_fetching", true)
-                                dataAttr("disabled", fetching)
-                                i{
+                                dataIndicator(fetching.name)
+                                dataAttr("disabled", "$fetching")
+                                i {
                                     attrClass("pixelarticons:user-plus")
                                 }
                                 +"Activate"
                             }
-                            button{
+                            button {
                                 attrClass("error")
                                 dataOn("click", "@put('/examples/bulk_update/deactivate')")
-                                dataIndicator("_fetching", true)
-                                dataAttr("disabled", fetching)
-                                i{
+                                dataIndicator(fetching.name)
+                                dataAttr("disabled", "$fetching")
+                                i {
                                     attrClass("pixelarticons:user-x")
                                 }
                                 +"Deactivate"
@@ -110,12 +109,12 @@ class BulkUpdateTest {
         </script>
     </head>
 <body>
-    <div id="demo" data-signals-_fetching="false" data-signals-selections="'Array(4).fill(false)'" data-signals-_all="">
+    <div id="demo" data-signals-fetching="false" data-signals-selections="'Array(4).fill(false)'" data-signals-all="">
         <table>
             <thead>
                 <tr>
                     <th>
-                        <input type="checkbox" data-bind-_all="" data-on-change="${'$'}selections = Array(4).fill(${'$'}_all)" data-attr-disabled="${'$'}_fetching">
+                        <input type="checkbox" data-bind-all="" data-on-change="${'$'}selections = Array(4).fill(${'$'}all)" data-attr-disabled="${'$'}fetching">
                     </th>
                     <th>
                         Name
@@ -131,7 +130,7 @@ class BulkUpdateTest {
             <tbody>
                 <tr>
                     <td>
-                        <input type="checkbox" data-bind-selections="" data-attr-disabled="${'$'}_fetching">
+                        <input type="checkbox" data-bind-selections="" data-attr-disabled="${'$'}fetching">
                     </td>
                     <td>
                         Joe Smith
@@ -146,12 +145,12 @@ class BulkUpdateTest {
             </tbody>
         </table>
         <div>
-            <button class="success" data-on-click="@put('/examples/bulk_update/activate')" data-indicator-_fetching="" data-attr-disabled="${'$'}_fetching">
+            <button class="success" data-on-click="@put('/examples/bulk_update/activate')" data-indicator-fetching="" data-attr-disabled="${'$'}fetching">
                 <i class="pixelarticons:user-plus">
                 </i>
                 Activate
             </button>
-            <button class="error" data-on-click="@put('/examples/bulk_update/deactivate')" data-indicator-_fetching="" data-attr-disabled="${'$'}_fetching">
+            <button class="error" data-on-click="@put('/examples/bulk_update/deactivate')" data-indicator-fetching="" data-attr-disabled="${'$'}fetching">
                 <i class="pixelarticons:user-x">
                 </i>
                 Deactivate

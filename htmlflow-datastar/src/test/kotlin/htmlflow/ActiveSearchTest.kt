@@ -3,6 +3,7 @@ package htmlflow
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.milliseconds
 
 class ActiveSearchTest {
     @Test
@@ -25,17 +26,19 @@ class ActiveSearchTest {
                     }
                 }
                 body {
-                    input{
+                    input {
                         attrType(EnumTypeInputType.TEXT)
                         attrPlaceholder("Search...")
                         dataBind("search", null)
-                        dataOn("input__debounce.200ms", "@get('/examples/active_search/search')")
+                        dataOn("input", "@get('/examples/active_search/search')") {
+                            debounce(200.milliseconds)
+                        }
                     }
                 }
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>
