@@ -149,5 +149,5 @@ class DBmonTest {
                 </div>
             </body>
         </html>    
-        """.trimIndent()
+        """
 }

@@ -27,30 +27,26 @@ class BulkUpdateTest {
                 body {
                     div {
                         attrId("demo")
-                        val fetching = dataSignal("fetching", false)
-                        val selections = dataSignal("selections", "Array(4).fill(false)")
-                        val all = dataSignal("all", null) // Needs to be checked
+                        val (fetching, selections) =
+                            dataSignals(
+                                "fetching" to false,
+                                "selections" to "Array(4).fill(false)", // This must be a JS expression
+                            ) { ifMissing() }
                         table {
                             thead {
                                 tr {
                                     th {
                                         input {
                                             attrType(EnumTypeInputType.CHECKBOX)
-                                            dataBind(all)
+                                            val all = dataBind("all")
                                             dataOn("change", "$selections = Array(4).fill($all)")
                                             // dataEffect()
                                             dataAttr("disabled", "$fetching")
                                         }
                                     }
-                                    th {
-                                        +"Name"
-                                    }
-                                    th {
-                                        +"Email"
-                                    }
-                                    th {
-                                        +"Status"
-                                    }
+                                    th { +"Name" }
+                                    th { +"Email" }
+                                    th { +"Status" }
                                 }
                             }
                             tbody {
@@ -62,15 +58,9 @@ class BulkUpdateTest {
                                             dataAttr("disabled", "$fetching")
                                         }
                                     }
-                                    td {
-                                        +"Joe Smith"
-                                    }
-                                    td {
-                                        +"joe@smith.org"
-                                    }
-                                    td {
-                                        +"Active"
-                                    }
+                                    td { +"Joe Smith" }
+                                    td { +"joe@smith.org" }
+                                    td { +"Active" }
                                 }
                             }
                         }
@@ -80,9 +70,7 @@ class BulkUpdateTest {
                                 dataOn("click", "@put('/examples/bulk_update/activate')")
                                 dataIndicator(fetching.name)
                                 dataAttr("disabled", "$fetching")
-                                i {
-                                    attrClass("pixelarticons:user-plus")
-                                }
+                                i { attrClass("pixelarticons:user-plus") }
                                 +"Activate"
                             }
                             button {
@@ -90,9 +78,7 @@ class BulkUpdateTest {
                                 dataOn("click", "@put('/examples/bulk_update/deactivate')")
                                 dataIndicator(fetching.name)
                                 dataAttr("disabled", "$fetching")
-                                i {
-                                    attrClass("pixelarticons:user-x")
-                                }
+                                i { attrClass("pixelarticons:user-x") }
                                 +"Deactivate"
                             }
                         }
@@ -109,7 +95,7 @@ class BulkUpdateTest {
         </script>
     </head>
 <body>
-    <div id="demo" data-signals-fetching="false" data-signals-selections="'Array(4).fill(false)'" data-signals-all="">
+    <div id="demo" data-signals__ifmissing="{fetching: false, selections: 'Array(4).fill(false)'}">
         <table>
             <thead>
                 <tr>

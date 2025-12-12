@@ -103,5 +103,5 @@ class DeleteRowTest {
                 </table>   
             </body>
         </html>
-        """.trimIndent()
+        """
 }
