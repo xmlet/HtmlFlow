@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 
 class BulkUpdateTest {
     @Test
-    fun `BadApple of the Datastar Frontend Reactivity`() {
+    fun `BulkUpdate of the Datastar Frontend Reactivity`() {
         val out = StringBuilder()
         demoDastarRx.setOut(out).write()
         val expected = expectedDatastarRx.trimIndent().lines().iterator()
@@ -40,7 +40,7 @@ class BulkUpdateTest {
                                             attrType(EnumTypeInputType.CHECKBOX)
                                             val all = dataBind("all")
                                             dataOn("change", "$selections = Array(4).fill($all)")
-                                            // dataEffect()
+                                            dataEffect("$selections; $all = $selections.every(Boolean)")
                                             dataAttr("disabled", "$fetching")
                                         }
                                     }
@@ -100,7 +100,7 @@ class BulkUpdateTest {
             <thead>
                 <tr>
                     <th>
-                        <input type="checkbox" data-bind-all="" data-on-change="${'$'}selections = Array(4).fill(${'$'}all)" data-attr-disabled="${'$'}fetching">
+                        <input type="checkbox" data-bind-all="" data-on-change="${'$'}selections = Array(4).fill(${'$'}all)" data-effect="${'$'}selections; ${'$'}all = ${'$'}selections.every(Boolean)" data-attr-disabled="${'$'}fetching">
                     </th>
                     <th>
                         Name

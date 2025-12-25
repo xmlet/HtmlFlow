@@ -30,7 +30,7 @@ class BadAppleTest {
                         val contents = dataSignal("contents", "bad apple frames go here")
                         label {
                             dataInit("@get('/examples/bad_apple/updates')")
-                            span { dataText("`Percentage: ${'$'}{$percentage.toFixed(2)}%`") } // Needs to be checked
+                            span { dataText("`Percentage: ${'$'}{$percentage.toFixed(2)}%`") }
                             input {
                                 attrType(EnumTypeInputType.RANGE)
                                 attrMin("0")

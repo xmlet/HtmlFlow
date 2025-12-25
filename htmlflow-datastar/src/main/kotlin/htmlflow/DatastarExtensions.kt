@@ -233,19 +233,32 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(
 }
 
 /**
- * Not finished yet
- *  data-attr="{title: $foo, disabled: $bar}
- *   -> data-attr-title="$foo"
- *   -> data-attr-disabled="$bar"
+ *
+ * data-attr="{title: $foo, disabled: $bar}
  *
  * @param E type of the Element receiver
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-attr attribute will be added
- * @param js a JavaScript expression that computes the values of multiple attributes on an element using a set of key-value pairs
+ * @param attrs a JavaScript expression that computes the values of multiple attributes on an element using a set of key-value pairs
  * @return a Signal instance with the given name and value
  */
-fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(js: String) {
-    this.visitor.visitAttribute("data-attr", js)
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(vararg attrs: Pair<String,Signal<*>>) {
+    attrs
+        .joinToString(prefix = "{", postfix = "}", separator = ", " ){ (name, value) ->
+            "$name: $value"
+        }.also {
+            this.visitor.visitAttribute("data-attr", it)
+        }
+}
+
+/**
+ * @param E type of the Element receiver
+ * @param P type of the parent Element of the receiver
+ * @receiver the Element to which the data-effect attribute will be added
+ * @param js an expression on page load and whenever any signals in the expression change
+ */
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataEffect(js: String) {
+    this.visitor.visitAttribute("data-effect", js)
 }
 
 /**
