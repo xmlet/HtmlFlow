@@ -11,7 +11,6 @@
     <artifactId>htmlflow</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>5.0.2-SNAPSHOT</version>
 
     <description>
         HtmlFlow library purpose is to allow Java applications to easily writing

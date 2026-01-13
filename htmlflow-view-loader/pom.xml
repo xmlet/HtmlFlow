@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow-kotlin</artifactId>
-            <version>5.0.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 

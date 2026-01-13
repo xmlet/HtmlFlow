@@ -9,7 +9,6 @@
 
     <artifactId>flowifier</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>5.0.2-SNAPSHOT</version>
 
 
     <dependencies>
@@ -17,7 +16,7 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow</artifactId>
-            <version>5.0.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
