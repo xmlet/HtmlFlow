@@ -29,7 +29,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.MfeConfiguration;
-import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 /**
@@ -106,17 +105,6 @@ public class HtmlViewVisitor extends HtmlVisitor {
         throw new IllegalStateException(
             "Wrong use of await() in a HtmlView! Use HtmlFlow.viewAsync() to produce an async" +
             " view."
-        );
-    }
-
-    @Override
-    public final <M, E extends Element> void visitSuspending(
-        E element,
-        SuspendConsumer<E, M> suspendAction
-    ) {
-        throw new IllegalStateException(
-            "Wrong use of suspending() in a HtmlView! Use HtmlFlow.viewSuspend() to produce a" +
-            " suspendable view."
         );
     }
 }
