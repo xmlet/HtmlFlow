@@ -34,7 +34,6 @@ import htmlflow.continuations.HtmlContinuationSyncStatic;
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 /**
@@ -124,17 +123,6 @@ public class PreprocessingVisitor extends HtmlVisitor {
     ) {
         throw new UnsupportedOperationException(
             "Await not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage" +
-            " an asynchronous view."
-        );
-    }
-
-    @Override
-    public <M, E extends Element> void visitSuspending(
-        E element,
-        SuspendConsumer<E, M> suspendAction
-    ) {
-        throw new UnsupportedOperationException(
-            "Suspend not allowed in HtmlView. Should use viewAsync() or viewSuspend() to manage" +
             " an asynchronous view."
         );
     }

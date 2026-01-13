@@ -51,7 +51,7 @@ private val htmlFlowArtistSuspendingView = viewSuspend<ArtistAsync> {
         .l // ul
         .p().b().text("Spotify popular tracks:").l
         .await { m: ArtistAsync, resume -> m.spotify.thenAccept {
-            +it.popularSongs.joinToString(", ")
+            raw(it.popularSongs.joinToString(", "))
             resume()
         }}
         .l // p

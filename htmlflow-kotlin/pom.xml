@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-parent</artifactId>
-        <version>5.0.1</version>
+        <version>5.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>htmlflow-kotlin</artifactId>
@@ -30,11 +30,20 @@
     </distributionManagement>
 
     <dependencies>
+
+        <!-- HtmlFlow library purpose is to allow Java applications to easily writing HTML documents in a fluent style into a java.io.PrintStream. -->
         <dependency>
-            <!-- HtmlFlow library purpose is to allow Java applications to easily writing HTML documents in a fluent style into a java.io.PrintStream. -->
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow</artifactId>
-            <version>5.0.1</version>
+            <version>5.0.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Xsd2Poet-kotlin provides the idiomatic Kotlin extensions -->
+        <dependency>
+            <groupId>com.github.xmlet</groupId>
+            <artifactId>xsd2poet-kotlin</artifactId>
+            <version>${com.github.xmlet.xsd2poet.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -101,13 +110,6 @@
             <scope>test</scope>
         </dependency>
 
-<!--        &lt;!&ndash; Xsd2Poet is dedicated to generate a fluent java DSL based on a XSD file &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.xmlet</groupId>-->
-<!--            <artifactId>xsd2poet</artifactId>-->
-<!--            <version>1.0.5</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>

@@ -29,7 +29,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 /**
@@ -151,16 +150,6 @@ public class HtmlViewVisitorAsyncHot extends HtmlVisitorAsync {
         throw new IllegalStateException(
             "Invalid use of visitAwait() in HtmlViewVisitorAsyncHot! This should have been" +
             " called in the continuation processor (PreprocessingVisitorAsync)"
-        );
-    }
-
-    @Override
-    public <M, E extends Element> void visitSuspending(
-        E element,
-        SuspendConsumer<E, M> suspendAction
-    ) {
-        throw new UnsupportedOperationException(
-            "Suspending operations are not supported in HtmlViewVisitorAsyncHot."
         );
     }
 }

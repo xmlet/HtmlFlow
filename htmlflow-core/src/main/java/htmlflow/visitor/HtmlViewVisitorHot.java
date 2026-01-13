@@ -26,7 +26,6 @@ package htmlflow.visitor;
 
 import java.util.function.BiConsumer;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 /**
@@ -78,17 +77,6 @@ public class HtmlViewVisitorHot extends HtmlVisitor {
         throw new UnsupportedOperationException(
             "Hot reload visitor does not support async operations. Use HtmlViewVisitorAsync" +
             " instead."
-        );
-    }
-
-    @Override
-    public <M, E extends Element> void visitSuspending(
-        E e,
-        SuspendConsumer<E, M> suspendConsumer
-    ) {
-        throw new UnsupportedOperationException(
-            "Hot reload visitor does not support suspending operations. Use appropriate async" +
-            " visitor instead."
         );
     }
 }

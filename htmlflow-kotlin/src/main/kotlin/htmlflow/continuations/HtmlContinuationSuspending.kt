@@ -16,7 +16,7 @@ class HtmlContinuationSuspending<E : Element<*, *>, T>(
     currentDepth: Int,
     isClosed: Boolean,
     val element: E,
-    private val consumer: SuspendConsumer<E, T?>,
+    private val consumer: SuspendConsumer<E, T>,
     visitor: HtmlVisitor,
     next: HtmlContinuation?,
 ) : HtmlContinuationSuspendable(currentDepth, isClosed, visitor, next) {
@@ -37,7 +37,7 @@ class HtmlContinuationSuspending<E : Element<*, *>, T>(
         /*
          * Call this consumer
          */
-        this.consumer.run { element.accept(model as T?) }
+        this.consumer.run { element.accept(model as T) }
         /*
          * Call next consumer
          */

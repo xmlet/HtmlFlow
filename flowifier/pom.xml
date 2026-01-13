@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-parent</artifactId>
-        <version>5.0.1</version>
+        <version>5.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>flowifier</artifactId>
@@ -17,15 +17,8 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow</artifactId>
-            <version>5.0.1</version>
+            <version>5.0.2-SNAPSHOT</version>
             <scope>compile</scope>
-        </dependency>
-
-        <!-- Xsd2Poet is dedicated to generate a fluent java DSL based on a XSD file -->
-        <dependency>
-            <groupId>com.github.xmlet</groupId>
-            <artifactId>xsd2poet</artifactId>
-            <version>${com.github.xmlet.xsd2poet.version}</version>
         </dependency>
 
         <!-- jsoup HTML parser library @ https://jsoup.org/ -->
