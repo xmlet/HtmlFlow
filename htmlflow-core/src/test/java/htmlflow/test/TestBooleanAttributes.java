@@ -37,7 +37,7 @@ public class TestBooleanAttributes {
             "<!DOCTYPE html>" +
             "<html>" +
             "<body>" +
-            "<button disabled=\"true\">" +
+            "<button disabled=\"disabled\">" +
             "Foo" +
             "</button>" +
             "</body>" +
