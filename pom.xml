@@ -52,7 +52,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <junit.jupiter-version>5.9.0</junit.jupiter-version>
         <mockito.junit-version>4.8.0</mockito.junit-version>
-        <com.github.xmlet.xsd2poet.version>1.0.7</com.github.xmlet.xsd2poet.version>
+        <com.github.xmlet.xsd2poet.version>1.0.8</com.github.xmlet.xsd2poet.version>
         <argLine>-Xss16m -Xmx32M</argLine>
         <kotlin.version>1.9.22</kotlin.version>
     </properties>
