@@ -31,7 +31,6 @@ import htmlflow.continuations.HtmlContinuationAsyncTerminationNode;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.SuspendConsumer;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
 /**
@@ -124,17 +123,6 @@ public class HtmlViewVisitorAsync extends HtmlVisitorAsync {
         throw new IllegalStateException(
             "Wrong use of visitAwait() in a HtmlViewAsync! Preprocessing visitor should have" +
             " already visited"
-        );
-    }
-
-    @Override
-    public <M, E extends Element> void visitSuspending(
-        E element,
-        SuspendConsumer<E, M> suspendAction
-    ) {
-        throw new IllegalStateException(
-            "Wrong use of suspending() in a HtmlViewAsync! Use HtmlFlow.viewSuspend() to" +
-            " produce a suspendable view."
         );
     }
 }

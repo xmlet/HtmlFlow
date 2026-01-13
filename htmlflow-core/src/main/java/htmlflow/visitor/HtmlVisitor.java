@@ -200,7 +200,7 @@ public abstract class HtmlVisitor extends ElementVisitor {
      */
     @Override
     public final void visitAttributeBoolean(String name, String value) {
-        if (!value.equals("false")) addAttribute(out, name, value);
+        if (!value.equals("false")) addAttribute(out, name, name);
     }
 
     @Override

@@ -5,13 +5,13 @@
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-parent</artifactId>
-        <version>5.0.1</version>
+        <version>5.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>htmlflow-view-loader</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>5.0.2-SNAPSHOT</version>
+    <version>5.0.3-SNAPSHOT</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow-kotlin</artifactId>
-            <version>5.0.1</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
