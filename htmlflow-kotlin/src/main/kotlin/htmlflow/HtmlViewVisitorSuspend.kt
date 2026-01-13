@@ -49,12 +49,4 @@ open class HtmlViewVisitorSuspend(
         throw IllegalStateException(
             "Illegal use of visitAwait in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend."
         )
-
-    override fun <M : Any?, E : Element<*, *>?> visitSuspending(
-        element: E?,
-        suspendAction: SuspendConsumer<E?, M?>?,
-    ): Unit =
-        throw IllegalStateException(
-            "Illegal use of visitSuspending in HtmlViewVisitorSuspend. Use preprocessing visitor before creating a HtmlViewSuspend."
-        )
 }

@@ -57,12 +57,4 @@ class HtmlViewVisitorSuspendHot(
         throw IllegalStateException(
             "Illegal use of visitAwait in HtmlViewVisitorSuspendHot. Use continuation processor"
         )
-
-    override fun <M, E : Element<*, *>> visitSuspending(
-        e: E,
-        suspendConsumer: SuspendConsumer<E, M?>,
-    ): Unit =
-        throw IllegalStateException(
-            "Illegal use of visitSuspending in HtmlViewVisitorSuspendHot. Use continuation processor"
-        )
 }

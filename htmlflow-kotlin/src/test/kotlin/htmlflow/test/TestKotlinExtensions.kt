@@ -446,11 +446,15 @@ class TestKotlinExtensions {
                     main {
                         section {
                             attrId("section1")
-                            h2.text("Section 1").l
-                            p.text("This is the first section.").l
+                            h2 {
+                                text("Section 1")
+                            }
+                            p {
+                                text("This is the first section.")
+                            }
                             img.attrSrc("image1.jpg").attrAlt("Image 1").l
                         }
-                        section {
+                        section { // alternative text syntax to the former section
                             attrId("section2")
                             h2.text("Section 2").l
                             p.text("This is the second section.").l
@@ -502,7 +506,7 @@ private val weatherView = view<Weather> {
     it.html
         .head
         .title.dyn { weather: Weather ->
-            +weather.country
+            text(weather.country)
         }
         .l // title
         .l // head
@@ -533,7 +537,7 @@ private val weatherView1 = view<Weather> {
     it.html
         .head
         .title.dyn { weather: Weather ->
-            +weather.country
+            text(weather.country)
         }
         .l // title
         .l // head
@@ -541,7 +545,9 @@ private val weatherView1 = view<Weather> {
             table.attrBorder(EnumBorderType._1)
                 .tr
                 .th.text("City").l
-                .th.text("Temperature").l
+                .th {
+                    text("Temperature")
+                }
                 .l // tr
                 .dyn { weather: Weather ->
                     weather.locations.forEach { loc ->
