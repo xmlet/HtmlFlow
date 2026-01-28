@@ -1,5 +1,7 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
@@ -25,20 +27,20 @@ class SortableTest {
                     }
                 }
                 body {
-                    div{
+                    div {
                         val orderInfo = dataSignal("order-info", "Initial order")
                         dataText("$orderInfo")
                     }
-                    div{
+                    div {
                         attrId("sortContainer")
                         dataOn("reordered", "${'$'}orderInfo = event.detail.orderInfo")
-                        button{ +"Item 1" }
-                        button{ +"Item 2" }
-                        button{ +"Item 3" }
-                        button{ +"Item 4" }
-                        button{ +"Item 5" }
+                        button { +"Item 1" }
+                        button { +"Item 2" }
+                        button { +"Item 3" }
+                        button { +"Item 4" }
+                        button { +"Item 5" }
                     }
-                    script{
+                    script {
                         attrType(EnumTypeScriptType.MODULE)
                         +
                             """
@@ -60,7 +62,7 @@ class SortableTest {
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>

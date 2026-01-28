@@ -1,5 +1,7 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
@@ -46,22 +48,22 @@ class FormDataTest {
                             attrValue("baz")
                         }
                         button {
-                            dataOn("click","@get('/endpoint', {contentType: 'form'})")
+                            dataOn("click", "@get('/endpoint', {contentType: 'form'})")
                             +"Submit GET request"
                         }
                         button {
-                            dataOn("click","@post('/endpoint', {contentType: 'form'})")
+                            dataOn("click", "@post('/endpoint', {contentType: 'form'})")
                             +"Submit POST request"
                         }
                     }
                     button {
-                        dataOn("click","@get('/endpoint', {contentType: 'form', selector: '#myform'})")
+                        dataOn("click", "@get('/endpoint', {contentType: 'form', selector: '#myform'})")
                         +"Submit GET request from outside the form"
                     }
                 }
             }
         }
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>
@@ -89,5 +91,4 @@ class FormDataTest {
 </body>
 </html>
     """
-
 }

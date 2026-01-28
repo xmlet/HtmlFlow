@@ -1,5 +1,7 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.EnumTypeInputType
 import org.xmlet.htmlapifaster.EnumTypeScriptType
@@ -72,13 +74,13 @@ class EditRowTest {
                                 td {
                                     input {
                                         attrType(EnumTypeInputType.TEXT)
-                                        dataBind("name", "Joe Smith")
+                                        dataBind("name")
                                     }
                                 }
                                 td {
                                     input {
                                         attrType(EnumTypeInputType.TEXT)
-                                        dataBind("email", "joe@smith.org")
+                                        dataBind("email")
                                     }
                                 }
                                 td {

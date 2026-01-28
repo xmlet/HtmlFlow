@@ -1,5 +1,7 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
@@ -25,20 +27,20 @@ class ClickToEditTest {
                     }
                 }
                 body {
-                    div{
+                    div {
                         attrId("demo")
-                        p{ +"First Name: John" }
-                        p{ +"Last Name: Doe" }
-                        p{ +"Email: joe@blow.com" }
-                        div{
-                            button{
+                        p { +"First Name: John" }
+                        p { +"Last Name: Doe" }
+                        p { +"Email: joe@blow.com" }
+                        div {
+                            button {
                                 attrClass("info")
                                 val fetching = dataIndicator("fetching")
                                 dataAttr("disabled", "$fetching")
                                 dataOn("click", "@get('/examples/click_to_edit/edit')")
                                 +"Edit"
                             }
-                            button{
+                            button {
                                 attrClass("warning")
                                 val fetching = dataIndicator("fetching")
                                 dataAttr("disabled", "$fetching")
@@ -51,7 +53,7 @@ class ClickToEditTest {
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>

@@ -1,12 +1,14 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
 
-class FileUploadTest {
+class ClickToLoadTest {
     @Test
-    fun `File Upload of the Datastar Frontend Reactivity`() {
+    fun `Click To Load of the Datastar Frontend Reactivity`() {
         val out = StringBuilder()
         demoDastarRx.setOut(out).write()
         val expected = expectedDatastarRx.trimIndent().lines().iterator()
@@ -25,25 +27,18 @@ class FileUploadTest {
                     }
                 }
                 body {
-                    label {
-                        p { +"Pick anything less than 1MB" }
-                        input {
-                            attrType(EnumTypeInputType.FILE)
-                            dataBind("files multiple")
-                        }
-                    }
                     button {
-                        attrClass("warning")
-                        val files = dataSignal("files")
-                        dataOn("click", "$files.length && @post('/examples/file_upload')")
-                        dataAttr("aria-disabled", "`${'$'}{!$files.length}`")
-                        +"Submit"
+                        attrClass("info wide")
+                        val fetching = dataIndicator("fetching")
+                        dataAttr("aria-disabled", "`${'$'}{$fetching}`")
+                        dataOn("click", "!$fetching && @get('/examples/click_to_load/more')")
+                        +"Load More"
                     }
                 }
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>
@@ -51,14 +46,8 @@ class FileUploadTest {
         </script>
     </head>
 <body>
-    <label>
-        <p>
-            Pick anything less than 1MB
-        </p>
-        <input type="file" data-bind-files multiple="">
-    </label>
-    <button class="warning" data-signals-files="" data-on-click="${'$'}files.length && @post('/examples/file_upload')" data-attr-aria-disabled="`${'$'}{!${'$'}files.length}`">
-        Submit
+    <button class="info wide" data-indicator-fetching="" data-attr-aria-disabled="`${'$'}{${'$'}fetching}`" data-on-click="!${'$'}fetching && @get('/examples/click_to_load/more')">
+        Load More
     </button>
 </body>
 </html>

@@ -1,5 +1,7 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
@@ -25,7 +27,7 @@ class AnimationsTest {
                     }
                 }
                 body {
-                    div{
+                    div {
                         attrId("color-throb")
                         attrStyle("color: var(--blue-8); background-color: var(--orange-5);")
                         +"blue on orange"
@@ -34,7 +36,7 @@ class AnimationsTest {
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>

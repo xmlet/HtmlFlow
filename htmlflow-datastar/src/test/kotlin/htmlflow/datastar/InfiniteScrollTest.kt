@@ -1,6 +1,9 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
+import org.xmlet.htmlapifaster.EnumTypeScriptType
 import org.xmlet.htmlapifaster.body
 import org.xmlet.htmlapifaster.div
 import org.xmlet.htmlapifaster.head
@@ -23,7 +26,7 @@ class InfiniteScrollTest {
             html {
                 head {
                     script {
-                        attrType(org.xmlet.htmlapifaster.EnumTypeScriptType.MODULE)
+                        attrType(EnumTypeScriptType.MODULE)
                         attrSrc("https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.5/bundles/datastar.js")
                     }
                 }

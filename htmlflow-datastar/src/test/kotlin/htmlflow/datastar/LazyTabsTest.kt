@@ -1,5 +1,7 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
@@ -25,7 +27,7 @@ class LazyTabsTest {
                     }
                 }
                 body {
-                    div{
+                    div {
                         attrId("demo")
                         div {
                             addAttr("role", "tablist")
@@ -58,7 +60,7 @@ class LazyTabsTest {
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>

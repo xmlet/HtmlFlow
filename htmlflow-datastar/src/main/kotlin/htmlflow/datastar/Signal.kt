@@ -22,11 +22,20 @@
  * SOFTWARE.
  */
 
-package htmlflow
+package htmlflow.datastar
 
-data class Signal<T>(
+/**
+ * Represents the metadata of a JavaScript Signal.
+ *
+ * A [Signal] is a static description of a signal used by the data-star processing
+ * environment. In HtmlFlow, a signal does not hold state or behavior; it only
+ * identifies a signal by name so it can be referenced and managed
+ * externally by the data star processor.
+ *
+ * @property name the name that identifies the signal
+ */
+data class Signal(
     val name: String,
-    val value: T? = null,
 ) {
     init {
         require(

@@ -1,12 +1,15 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.milliseconds
 
-class ClickToLoadTest {
+class ActiveSearchTest {
     @Test
-    fun `Click To Load of the Datastar Frontend Reactivity`() {
+    fun `Active Search of the Datastar Frontend Reactivity`() {
         val out = StringBuilder()
         demoDastarRx.setOut(out).write()
         val expected = expectedDatastarRx.trimIndent().lines().iterator()
@@ -25,18 +28,19 @@ class ClickToLoadTest {
                     }
                 }
                 body {
-                    button{
-                        attrClass("info wide")
-                        val fetching = dataIndicator("fetching")
-                        dataAttr("aria-disabled", "`${'$'}{$fetching}`")
-                        dataOn("click", "!$fetching && @get('/examples/click_to_load/more')")
-                        +"Load More"
+                    input {
+                        attrType(EnumTypeInputType.TEXT)
+                        attrPlaceholder("Search...")
+                        dataBind("search")
+                        dataOn("input", "@get('/examples/active_search/search')") {
+                            debounce(200.milliseconds)
+                        }
                     }
                 }
             }
         }
 
-    private val expectedDatastarRx ="""
+    private val expectedDatastarRx = """
     <!DOCTYPE html>
 <html>
     <head>
@@ -44,9 +48,7 @@ class ClickToLoadTest {
         </script>
     </head>
 <body>
-    <button class="info wide" data-indicator-fetching="" data-attr-aria-disabled="`${'$'}{${'$'}fetching}`" data-on-click="!${'$'}fetching && @get('/examples/click_to_load/more')">
-        Load More
-    </button>
+    <input type="text" placeholder="Search..." data-bind-search="" data-on-input__debounce.200ms="@get('/examples/active_search/search')">
 </body>
 </html>
     """

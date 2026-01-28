@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package htmlflow
+package htmlflow.datastar
 
 import htmlflow.datastar.modifiers.attributes.DataComputedModifiers
 import htmlflow.datastar.modifiers.attributes.DataInitModifiers
@@ -33,6 +33,7 @@ import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlapifaster.Input
 import org.xmlet.htmlapifaster.Select
 import org.xmlet.htmlapifaster.Textarea
+import kotlin.collections.joinToString
 
 /**
  * @param E type of the Element receiver
@@ -41,13 +42,13 @@ import org.xmlet.htmlapifaster.Textarea
  * @receiver the Element to which the data-signal attribute will be added
  * @param name the name of the signal
  * @param value the value of the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
 fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
     name: String,
     value: R?,
     modifiers: String = "",
-): Signal<R> {
+): Signal {
     val res =
         when (value) {
             is String -> "'$value'"
@@ -56,30 +57,32 @@ fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
         }
 
     this.visitor.visitAttribute("data-signals-$name$modifiers", res)
-    return Signal(name, value)
+    return Signal(name)
 }
+
+private fun List<Pair<String, Any?>>.toJson(): String =
+    this.joinToString(prefix = "{", postfix = "}", separator = ", ") { (name, value) ->
+        val res =
+            when (value) {
+                is String -> "'$value'"
+                null -> ""
+                else -> "$value"
+            }
+        "$name: $res"
+    }
 
 /**
  * @param E type of the Element receiver
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param signals pairs of signal names and their corresponding values
- * @return a list of Signal instances with the given names and values
+ * @return a list of Signal instances with the given names
  */
-fun <E : Element<*, *>, P : Element<*, *>, Any> Element<E, P>.dataSignals(vararg signals: Pair<String, Any?>): List<Signal<Any>> {
-    signals
-        .joinToString(prefix = "{", postfix = "}", separator = ", ") { (name, value) ->
-            val res =
-                when (value) {
-                    is String -> "'$value'"
-                    null -> ""
-                    else -> "$value"
-                }
-            "$name: $res"
-        }.also {
-            this.visitor.visitAttribute("data-signals", it)
-        }
-    return signals.map { (name, value) -> Signal(name, value) }
+fun <E : Element<*, *>, P : Element<*, *>, Any> Element<E, P>.dataSignals(vararg signals: Pair<String, Any?>): List<Signal> {
+    signals.toList().toJson().also {
+        this.visitor.visitAttribute("data-signals", it)
+    }
+    return signals.map { (name) -> Signal(name) }
 }
 
 /**
@@ -87,26 +90,17 @@ fun <E : Element<*, *>, P : Element<*, *>, Any> Element<E, P>.dataSignals(vararg
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param signals pairs of signal names and their corresponding values
- * @return a list of Signal instances with the given names and values
+ * @return a list of Signal instances with the given names
  */
 fun <E : Element<*, *>, P : Element<*, *>, Any> Element<E, P>.dataSignals(
     vararg signals: Pair<String, Any?>,
     modifiers: DataSignalModifiers.() -> Unit,
-): List<Signal<Any>> {
-    signals
-        .joinToString(prefix = "{", postfix = "}", separator = ", ") { (name, value) ->
-            val res =
-                when (value) {
-                    is String -> "'$value'"
-                    null -> ""
-                    else -> "$value"
-                }
-            "$name: $res"
-        }.also {
-            val mods = DataSignalModifiers().apply(modifiers).toString()
-            this.visitor.visitAttribute("data-signals$mods", it)
-        }
-    return signals.map { (name, value) -> Signal(name, value) }
+): List<Signal> {
+    signals.toList().toJson().also {
+        val mods = DataSignalModifiers().apply(modifiers).toString()
+        this.visitor.visitAttribute("data-signals$mods", it)
+    }
+    return signals.map { (name) -> Signal(name) }
 }
 
 /**
@@ -117,13 +111,13 @@ fun <E : Element<*, *>, P : Element<*, *>, Any> Element<E, P>.dataSignals(
  * @param name the name of the signal
  * @param value the value of the signal
  * @param modifiers that apply to the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
 fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
     name: String,
     value: R?,
     modifiers: DataSignalModifiers.() -> Unit,
-): Signal<R> {
+): Signal {
     val mods = DataSignalModifiers().apply(modifiers).toString()
     return dataSignal(name, value, mods)
 }
@@ -135,9 +129,9 @@ fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param name the name of the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
-fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataSignal(name: String): Signal<Any> = dataSignal(name, null)
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataSignal(name: String): Signal = dataSignal(name, null)
 
 /**
  * Creates a data signal without an initial value.
@@ -146,12 +140,12 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataSignal(name: String
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param name the name of the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataSignal(
     name: String,
     modifiers: DataSignalModifiers.() -> Unit,
-): Signal<Any> = dataSignal(name, null, modifiers)
+): Signal = dataSignal(name, null, modifiers)
 
 /**
  * Creates a signal (if one doesn’t already exist)
@@ -161,28 +155,23 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataSignal(
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-bind attribute will be added
  * @param name the name of the signal to bind
- * @param value of element to initialize the signal with
- * @return a Signal instance with the given name and value if exists
+ * @return a Signal instance with the given name
  */
-fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataBind(
-    name: String,
-    value: Any? = null,
-): Signal<Any> {
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataBind(name: String): Signal {
     require(this is Input || this is Select || this is Textarea)
     { "Element must be input, select or text area" }
     this.visitor.visitAttribute("data-bind-$name", "")
-    return Signal(name, value)
+    return Signal(name)
 }
 
 /**
  * @param E type of the Element receiver
  * @param P type of the parent Element of the receiver
- * @param R type of the value of the signal
  * @receiver the Element to which the data-bind attribute will be added
  * @param signal the Signal to bind to (its value takes precedence)
  * @return the same Signal instance
  */
-fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataBind(signal: Signal<R>): Signal<R> {
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataBind(signal: Signal): Signal {
     require(this is Input || this is Select || this is Textarea)
     { "Element must be input, select or text area" }
     this.visitor.visitAttribute("data-bind-${signal.name}", "")
@@ -218,7 +207,7 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataInit(
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-attr attribute will be added
  * @param name the name of the HTML attribute to set the value to the expression
- * @param js the javascript expression that the attribute value will be set to
+ * @param js the JavaScript expression that the attribute value will be set to
  * @return a Signal instance with the given name and value
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(
@@ -240,11 +229,11 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-attr attribute will be added
  * @param attrs a JavaScript expression that computes the values of multiple attributes on an element using a set of key-value pairs
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
-fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(vararg attrs: Pair<String,Signal<*>>) {
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(vararg attrs: Pair<String, Signal>) {
     attrs
-        .joinToString(prefix = "{", postfix = "}", separator = ", " ){ (name, value) ->
+        .joinToString(prefix = "{", postfix = "}", separator = ", ") { (name, value) ->
             "$name: $value"
         }.also {
             this.visitor.visitAttribute("data-attr", it)
@@ -266,11 +255,11 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataEffect(js: String) 
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-indicator attribute will be added
  * @param name the name of the indicator signal
- * @return a Signal instance with the value true
+ * @return a Signal instance with the given name
  */
-fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataIndicator(name: String): Signal<Boolean> {
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataIndicator(name: String): Signal {
     this.visitor.visitAttribute("data-indicator-$name", "")
-    return Signal(name, true)
+    return Signal(name)
 }
 
 /**
@@ -279,13 +268,13 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataIndicator(name: Str
  * @receiver the Element to which the data-signal attribute will be added
  * @param name the name of the signal
  * @param js a JavaScript expression that computes the value of the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataComputed(
     name: String,
     js: String,
     modifiers: String = "",
-): Signal<Any> {
+): Signal {
     this.visitor.visitAttribute("data-computed-$name$modifiers", js)
     return Signal(name)
 }
@@ -296,13 +285,13 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataComputed(
  * @receiver the Element to which the data-signal attribute will be added
  * @param name the name of the signal
  * @param js a JavaScript expression that computes the value of the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataComputed(
     name: String,
     js: String,
     modifiers: DataComputedModifiers.() -> Unit,
-): Signal<Any> {
+): Signal {
     val mods = DataComputedModifiers().apply(modifiers).toString()
     return dataComputed(name, js, mods)
 }
@@ -343,7 +332,7 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataOn(
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param js a JavaScript expression that computes the value of the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataShow(js: String) {
     this.visitor.visitAttribute("data-show", js)
@@ -354,9 +343,9 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataShow(js: String) {
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param signal the Signal whose value will be used for the attribute
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
-fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataShow(signal: Signal<*>) {
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataShow(signal: Signal) {
     this.visitor.visitAttribute("data-show", signal.toString())
 }
 
@@ -365,7 +354,7 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataShow(signal: Signal
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param js a JavaScript expression that computes the value of the signal
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataText(js: String) {
     this.visitor.visitAttribute("data-text", js)
@@ -376,9 +365,9 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataText(js: String) {
  * @param P type of the parent Element of the receiver
  * @receiver the Element to which the data-signal attribute will be added
  * @param signal the Signal whose value will be used for the attribute
- * @return a Signal instance with the given name and value
+ * @return a Signal instance with the given name
  */
-fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataText(signal: Signal<*>) {
+fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataText(signal: Signal) {
     this.visitor.visitAttribute("data-text", signal.toString())
 }
 
@@ -432,6 +421,6 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataJsonSignals(
     jsObj: String = "",
     mods: DataJsonSignalsModifiers.() -> Unit,
 ) {
-    val mods = DataJsonSignalsModifiers().apply(mods).toString()
-    this.visitor.visitAttribute("data-json-signals$mods", jsObj)
+    val modifiers = DataJsonSignalsModifiers().apply(mods).toString()
+    this.visitor.visitAttribute("data-json-signals$modifiers", jsObj)
 }

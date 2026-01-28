@@ -1,13 +1,14 @@
-package htmlflow
+package htmlflow.datastar
 
+import htmlflow.html
+import htmlflow.view
 import org.junit.Test
 import org.xmlet.htmlapifaster.*
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.milliseconds
 
-class ActiveSearchTest {
+class FileUploadTest {
     @Test
-    fun `Active Search of the Datastar Frontend Reactivity`() {
+    fun `File Upload of the Datastar Frontend Reactivity`() {
         val out = StringBuilder()
         demoDastarRx.setOut(out).write()
         val expected = expectedDatastarRx.trimIndent().lines().iterator()
@@ -26,13 +27,19 @@ class ActiveSearchTest {
                     }
                 }
                 body {
-                    input {
-                        attrType(EnumTypeInputType.TEXT)
-                        attrPlaceholder("Search...")
-                        dataBind("search", null)
-                        dataOn("input", "@get('/examples/active_search/search')") {
-                            debounce(200.milliseconds)
+                    label {
+                        p { +"Pick anything less than 1MB" }
+                        input {
+                            attrType(EnumTypeInputType.FILE)
+                            dataBind("files multiple")
                         }
+                    }
+                    button {
+                        attrClass("warning")
+                        val files = dataSignal("files")
+                        dataOn("click", "$files.length && @post('/examples/file_upload')")
+                        dataAttr("aria-disabled", "`${'$'}{!$files.length}`")
+                        +"Submit"
                     }
                 }
             }
@@ -46,7 +53,15 @@ class ActiveSearchTest {
         </script>
     </head>
 <body>
-    <input type="text" placeholder="Search..." data-bind-search="" data-on-input__debounce.200ms="@get('/examples/active_search/search')">
+    <label>
+        <p>
+            Pick anything less than 1MB
+        </p>
+        <input type="file" data-bind-files multiple="">
+    </label>
+    <button class="warning" data-signals-files="" data-on-click="${'$'}files.length && @post('/examples/file_upload')" data-attr-aria-disabled="`${'$'}{!${'$'}files.length}`">
+        Submit
+    </button>
 </body>
 </html>
     """

@@ -1,11 +1,11 @@
 package htmlflow.datastar.modifiers.base
 
 abstract class ModifierBuilder : ModifierScope {
-    private val modifiers = mutableListOf<String>()
+    private val sb = StringBuilder()
 
     override fun addModifier(mod: String) {
-        modifiers += mod
+        sb.append(mod)
     }
 
-    override fun toString(): String = modifiers.joinToString("")
+    override fun toString(): String = sb.toString()
 }
