@@ -1,6 +1,7 @@
 package htmlflow.test
 
 import htmlflow.*
+import htmlflow.HtmlFlow.doc
 import htmlflow.test.model.Track
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
@@ -12,7 +13,6 @@ import java.lang.String.format
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
-
 
 /**
  * These tests do not contain any assertion because they are only a sample for README.md
@@ -82,7 +82,7 @@ class TestKotlinExtensionsOnPartials {
         actual.trackDoc(spaceOddity)
         assertEquals(actual.toString(), trackView.render(spaceOddity))
 //        trackView.setOut(System.out).write(spaceOddity);
-    }
+	}
 
     /**
      * Sample showcase of loop with HtmlDoc
@@ -275,5 +275,202 @@ class TestKotlinExtensionsOnPartials {
         // view.setOut(System.out).write(Owner("Ze Manel", "Rua da Alfandega"))
     }
 
-    class Owner(val name: String, val address: String)
+	class Owner(val name: String, val address: String)
+
+	@Test
+	fun testThatDivElementCanBeUsedOnHtmlDocAndHtmlView() {
+		val mainMenuDoc =
+			StringBuilder()
+				.apply {
+					doc {
+						div {
+							attrId("main-menu")
+							a {
+								attrHref("/series")
+								text("My Series")
+							}
+							a {
+								attrHref("/movies")
+								text("My Movies")
+							}
+							a {
+								attrHref("/musics")
+								text("My Musics")
+							}
+						}
+					}
+				}.toString()
+
+		assertEquals(expectedMainMenuDoc, mainMenuDoc)
+
+		val favoriteMovies =
+			listOf(
+				Movie("Inception", "Christopher Nolan", 2010, "Sci-Fi"),
+				Movie("The Godfather", "Francis Ford Coppola", 1972, "Crime"),
+				Movie("Pulp Fiction", "Quentin Tarantino", 1994, "Crime"),
+			)
+
+		val favoriteMoviesView =
+			view<List<Movie>> {
+				div {
+					attrId("favorite-movies")
+					dyn { movies: List<Movie> ->
+						movies.forEach { movie ->
+							div {
+								p { text("Movie: ${movie.title}") }
+								p { text("Director: ${movie.director}") }
+								p { text("Release Year: ${movie.releaseYear}") }
+								p { text("Genre: ${movie.genre}") }
+							}
+						}
+					}
+				}
+			}.render(favoriteMovies)
+
+		assertEquals(expectedFavoriteMoviesView, favoriteMoviesView)
+	}
+
+	data class Movie(
+		val title: String,
+		val director: String,
+		val releaseYear: Int,
+		val genre: String,
+	)
+
+	@Test
+	fun testThatTrElementCanBeUsedOnHtmlDoc() {
+		val newAgentRow =
+			view<Agent>{
+						tr {
+							td {
+								dyn { agent: Agent ->
+									text(agent.name)
+								}
+							}
+							td {
+								dyn { agent: Agent ->
+									text(agent.email)
+								}
+							}
+							td {
+								dyn { agent: Agent ->
+									text(agent.id)
+								}
+							}
+						}
+			}.render(Agent("Agent Smith 0", "void0@null.org", "0"))
+
+		assertEquals(expectedAgentRow, newAgentRow)
+	}
+
+data class Agent(
+	val name: String,
+	val email: String,
+	val id: String,
+)
+	@Test
+	fun testThatSpanElementCanBeUsedOnHtmlView() {
+
+		val counter1 = Counter(0)
+		val counter2 = Counter(1)
+		val counterSpans =
+			StringBuilder()
+				.apply {
+					doc {
+						span {
+							text("The counter 1 has the value ${counter1.count}")
+						}
+						span {
+							text("The counter 2 has the value ${counter2.count}")
+						}
+					}
+				}.toString()
+
+		assertEquals(expectedCounterSpans, counterSpans)
+	}
+	data class Counter(val count: Int)
+
 }
+
+private const val expectedFavoriteMoviesView =
+	"""<div id="favorite-movies">
+	<div>
+		<p>
+			Movie: Inception
+		</p>
+		<p>
+			Director: Christopher Nolan
+		</p>
+		<p>
+			Release Year: 2010
+		</p>
+		<p>
+			Genre: Sci-Fi
+		</p>
+	</div>
+	<div>
+		<p>
+			Movie: The Godfather
+		</p>
+		<p>
+			Director: Francis Ford Coppola
+		</p>
+		<p>
+			Release Year: 1972
+		</p>
+		<p>
+			Genre: Crime
+		</p>
+	</div>
+	<div>
+		<p>
+			Movie: Pulp Fiction
+		</p>
+		<p>
+			Director: Quentin Tarantino
+		</p>
+		<p>
+			Release Year: 1994
+		</p>
+		<p>
+			Genre: Crime
+		</p>
+	</div>
+</div>"""
+
+private const val expectedMainMenuDoc =
+"""
+<div id="main-menu">
+	<a href="/series">
+		My Series
+	</a>
+	<a href="/movies">
+		My Movies
+	</a>
+	<a href="/musics">
+		My Musics
+	</a>
+</div>"""
+
+private const val expectedAgentRow =
+"""<tr>
+	<td>
+		Agent Smith 0
+	</td>
+	<td>
+		void0@null.org
+	</td>
+	<td>
+		0
+	</td>
+</tr>"""
+
+
+private val expectedCounterSpans =
+"""
+<span>
+	The counter 1 has the value 0
+</span>
+<span>
+	The counter 2 has the value 1
+</span>"""

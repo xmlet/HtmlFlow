@@ -33,10 +33,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URL;
-import org.xmlet.htmlapifaster.Div;
-import org.xmlet.htmlapifaster.Element;
-import org.xmlet.htmlapifaster.Html;
-import org.xmlet.htmlapifaster.Tr;
+
+import org.xmlet.htmlapifaster.*;
 
 /**
  * The root container for HTML elements. It is responsible for managing the {@code
@@ -84,6 +82,8 @@ public abstract class HtmlPage implements Element<HtmlPage, Element<?, ?>> {
     public final Tr<HtmlPage> tr() {
         return new Tr<>(this);
     }
+
+    public final Span<HtmlPage> span() {return new Span<>(this);}
 
     /**
      * Returns a new instance of HtmlFlow with the same properties of this object but with indented
