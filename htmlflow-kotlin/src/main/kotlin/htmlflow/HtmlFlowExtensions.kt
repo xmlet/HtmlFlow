@@ -23,7 +23,7 @@ inline val HtmlPage.html: Html<HtmlPage>
     }
 
 /** Root builder of HTML element with lambda with receiver. */
-inline fun HtmlPage.html(block: Html<HtmlPage>.() -> Unit): HtmlPage = this.html().also(block).l
+inline fun HtmlPage.html(block: Html<HtmlPage>.() -> Unit): HtmlPage = this.html().apply(block).l
 
 inline fun HtmlPage.div(block: Div<HtmlPage>.() -> Unit): HtmlPage = this.div().apply(block).l
 

@@ -342,20 +342,10 @@ class TestKotlinExtensionsOnPartials {
 		val newAgentRow =
 			view<Agent>{
 						tr {
-							td {
-								dyn { agent: Agent ->
-									text(agent.name)
-								}
-							}
-							td {
-								dyn { agent: Agent ->
-									text(agent.email)
-								}
-							}
-							td {
-								dyn { agent: Agent ->
-									text(agent.id)
-								}
+							dyn { agent: Agent ->
+								td { text(agent.name) }
+								td { text(agent.email) }
+								td { text(agent.id) }
 							}
 						}
 			}.render(Agent("Agent Smith 0", "void0@null.org", "0"))
