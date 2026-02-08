@@ -4,7 +4,6 @@ import htmlflow.continuations.HtmlContinuationSuspendable
 import htmlflow.visitor.HtmlVisitorSuspending
 import java.util.function.BiConsumer
 import org.xmlet.htmlapifaster.Element
-import org.xmlet.htmlapifaster.SuspendConsumer
 import org.xmlet.htmlapifaster.async.AwaitConsumer
 
 /**
