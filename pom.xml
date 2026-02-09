@@ -55,6 +55,11 @@
         <com.github.xmlet.xsd2poet.version>1.0.8</com.github.xmlet.xsd2poet.version>
         <argLine>-Xss16m -Xmx32M</argLine>
         <kotlin.version>2.3.10</kotlin.version>
+
+        <!-- SonarCloud: Tell SonarCloud where to find Kover coverage reports -->
+        <!-- Kover generates JaCoCo-compatible XML format, so we use the jacoco property -->
+        <!-- Using wildcard pattern to include all module reports -->
+        <sonar.coverage.jacoco.xmlReportPaths>**/target/site/kover/report.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
@@ -204,13 +209,6 @@
                         </goals>
                     </execution>
                 </executions>
-
-                <configuration>
-                    <!-- Specify to collect coverage from project dependencies. -->
-                    <!-- Used in goals: report-xml, report-html, verify, report-ic, log -->
-                    <!-- Still missing module report to merge coverage! -->
-                    <aggregate>true</aggregate>
-                </configuration>
             </plugin>
 
             <plugin>
