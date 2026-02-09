@@ -83,13 +83,10 @@ class PreprocessingVisitorSuspend(isIndented: Boolean) : PreprocessingVisitorAsy
     }
 
     /**
-     * Follows a different visit approach not inherited from the parent class, because
-     * it is a Java class that we want to keep free of kotlin dependencies like suspend functions.
+     * Follows a different visit approach not inherited from the parent class, because it is a Java
+     * class that we want to keep free of kotlin dependencies like suspend functions.
      */
-    fun <E : Element<*, *>, M> visitSuspending(
-        element: E,
-        suspendAction: SuspendConsumer<E, M>,
-    ) {
+    fun <E : Element<*, *>, M> visitSuspending(element: E, suspendAction: SuspendConsumer<E, M>) {
         /** Creates an HtmlContinuation for a suspending block. */
         val suspCont: HtmlContinuation =
             HtmlContinuationSuspending(

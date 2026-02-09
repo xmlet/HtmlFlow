@@ -64,5 +64,4 @@ public class PreprocessingVisitorAsync extends PreprocessingVisitor {
          */
         indentAndAdvanceStaticBlockIndex();
     }
-
 }
