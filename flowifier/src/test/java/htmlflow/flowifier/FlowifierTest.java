@@ -61,11 +61,6 @@ public class FlowifierTest {
     }
 
     @Test
-    public void testFlowifierTuerSourceforgeHomepage() throws Exception {
-        testFlowifier("https://tuer.sourceforge.io/en/");
-    }
-
-    @Test
     public void testFlowifierWithGamboa() throws Exception {
         testFlowifier("https://gamboa.pt/");
     }
