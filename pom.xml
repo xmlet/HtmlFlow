@@ -160,49 +160,57 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kover-maven-plugin</artifactId>
+                <version>0.9.6</version>
                 <executions>
+                    <!-- instrument test tasks -->
                     <execution>
-                        <id>default-prepare-agent</id>
+                        <id>instr</id>
                         <goals>
-                            <goal>prepare-agent</goal>
+                            <goal>instrumentation</goal>
                         </goals>
                     </execution>
+
+                    <!-- generate XML report in verify phase -->
                     <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
+                        <id>kover-xml</id>
                         <goals>
-                            <goal>report</goal>
+                            <goal>report-xml</goal>
                         </goals>
                     </execution>
+
+                    <!-- generate HTML report in verify phase -->
                     <execution>
-                        <id>default-check</id>
+                        <id>kover-html</id>
                         <goals>
-                            <goal>check</goal>
+                            <goal>report-html</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <rule implementation="org.jacoco.maven.RuleConfiguration">
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit implementation="org.jacoco.report.check.Limit">
-                                            <counter>INSTRUCTION</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.20</minimum>
-                                        </limit>
-                                        <limit implementation="org.jacoco.report.check.Limit">
-                                            <counter>CLASS</counter>
-                                            <value>MISSEDCOUNT</value>
-                                            <maximum>10</maximum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
-                        </configuration>
+                    </execution>
+
+                    <!-- check coverage rules in verify phase -->
+                    <execution>
+                        <id>kover-verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- generate IC report -->
+                    <execution>
+                        <id>kover-ic</id>
+                        <goals>
+                            <goal>report-ic</goal>
+                        </goals>
                     </execution>
                 </executions>
+
+                <configuration>
+                    <!-- Specify to collect coverage from project dependencies. -->
+                    <!-- Used in goals: report-xml, report-html, verify, report-ic, log -->
+                    <!-- Still missing module report to merge coverage! -->
+                    <aggregate>true</aggregate>
+                </configuration>
             </plugin>
 
             <plugin>
