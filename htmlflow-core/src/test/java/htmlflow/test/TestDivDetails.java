@@ -105,7 +105,7 @@ public class TestDivDetails {
     public void testDivDetailsBinding() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlView view = HtmlFlow
-            .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
+                .view(new PrintStream(mem), HtmlLists::taskDetailsTemplate);
 
         expectedTaskViews
                 .keySet()
@@ -120,33 +120,21 @@ public class TestDivDetails {
                     expectedTaskViews
                             .get(taskHtml.obj)
                             .forEach(
-                                line ->
-                                    assertEquals(line,
-                                        actual.next()));
+                                    line ->
+                                            assertEquals(line,
+                                                    actual.next()));
                 });
-    }
-
-    private static class TaskHtml {
-        final Task obj;
-        final Stream<String> html;
-        public TaskHtml(Task obj, Stream<String> html) {
-            this.obj = obj;
-            this.html = html;
-        }
-        static TaskHtml of(Task t, Stream<String> html) {
-            return new TaskHtml(t, html);
-        }
     }
 
     @Test
     public void testWritePartialViewToPrintStream() {
         ByteArrayOutputStream mem = new ByteArrayOutputStream();
         HtmlTables
-            .taskListViewHeader(HtmlFlow.doc(new PrintStream(mem)));
+                .taskListViewHeader(HtmlFlow.doc(new PrintStream(mem)));
 
         Iterator<String> iter = NEWLINE
-            .splitAsStream(mem.toString())
-            .iterator();
+                .splitAsStream(mem.toString())
+                .iterator();
 
         Utils
                 .loadLines("partialViewHeader.html")
@@ -155,5 +143,33 @@ public class TestDivDetails {
                     System.out.println(actual);
                     assertEquals(expected, actual);
                 });
+    }
+
+    @Test
+    public void testThatSpanElementCanBeUsedOnHtmlDocAsRootElement() {
+        StringBuilder mem = new StringBuilder();
+        HtmlFlow.doc(mem).span().text("I am the root element of an HTML fragment!").__();
+        Iterator<String> actual = NEWLINE
+                .splitAsStream(mem.toString().trim())
+                .iterator();
+        Stream
+                .of("<span>", "I am the root element of an HTML fragment!", "</span>")
+                .forEach(expected -> {
+                    assertEquals(expected, actual.next().trim());
+                });
+    }
+
+    private static class TaskHtml {
+        final Task obj;
+        final Stream<String> html;
+
+        public TaskHtml(Task obj, Stream<String> html) {
+            this.obj = obj;
+            this.html = html;
+        }
+
+        static TaskHtml of(Task t, Stream<String> html) {
+            return new TaskHtml(t, html);
+        }
     }
 }
