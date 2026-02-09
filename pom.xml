@@ -54,7 +54,7 @@
         <mockito.junit-version>4.8.0</mockito.junit-version>
         <com.github.xmlet.xsd2poet.version>1.0.8</com.github.xmlet.xsd2poet.version>
         <argLine>-Xss16m -Xmx32M</argLine>
-        <kotlin.version>1.9.22</kotlin.version>
+        <kotlin.version>2.3.10</kotlin.version>
     </properties>
 
     <dependencyManagement>
