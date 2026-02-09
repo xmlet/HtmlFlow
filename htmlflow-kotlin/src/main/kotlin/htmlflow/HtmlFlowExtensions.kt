@@ -4,9 +4,12 @@ package htmlflow
 import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
 import htmlflow.visitor.HtmlVisitor
 import htmlflow.visitor.PreprocessingVisitor
+import org.xmlet.htmlapifaster.Div
 import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlapifaster.Html
+import org.xmlet.htmlapifaster.Span
 import org.xmlet.htmlapifaster.Text
+import org.xmlet.htmlapifaster.Tr
 
 /** Alternative close tag function for `__()`. */
 inline val <T : Element<*, Z>, Z : Element<*, *>> T.l: Z
@@ -20,10 +23,13 @@ inline val HtmlPage.html: Html<HtmlPage>
     }
 
 /** Root builder of HTML element with lambda with receiver. */
-inline fun HtmlPage.html(block: Html<HtmlPage>.() -> Unit): HtmlPage {
-    (this.visitor as HtmlVisitor).write(HtmlPage.HEADER)
-    return Html(self()).also { it.block() }.l
-}
+inline fun HtmlPage.html(block: Html<HtmlPage>.() -> Unit): HtmlPage = this.html().apply(block).l
+
+inline fun HtmlPage.div(block: Div<HtmlPage>.() -> Unit): HtmlPage = this.div().apply(block).l
+
+inline fun HtmlPage.tr(block: Tr<HtmlPage>.() -> Unit): HtmlPage = this.tr().apply(block).l
+
+inline fun HtmlPage.span(block: Span<HtmlPage>.() -> Unit): HtmlPage = this.span().apply(block).l
 
 /** Text node property. */
 inline var <T : Element<T, Z>, Z : Element<*, *>> T.text: T
