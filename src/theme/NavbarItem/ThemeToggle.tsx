@@ -1,6 +1,6 @@
 import React, { JSX } from 'react';
 import { useColorMode } from '@docusaurus/theme-common';
-    
+
 export default function ThemeToggle(): JSX.Element {
   const { colorMode, setColorMode } = useColorMode();
   const isDarkTheme = colorMode === 'dark';

@@ -1,15 +1,8 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 @variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
-/* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #0284c7;
   --ifm-color-primary-dark: #0369a1;
@@ -22,7 +15,6 @@
   --ifm-font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --ifm-heading-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  /* Custom background colors to match sections */
   --ifm-footer-background-color: #f9fafb;
 }
 
@@ -35,14 +27,11 @@ html[data-theme='dark'] {
   --ifm-color-primary-lighter: #bae6fd;
   --ifm-color-primary-lightest: #e0f2fe;
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
-  
-  /* Custom dark mode backgrounds to match sections */
   --ifm-background-color: #030712;
   --ifm-navbar-background-color: #030712;
   --ifm-footer-background-color: #030712;
 }
 
-/* Remove background from code inside SyntaxHighlighter */
 .code-block code {
   background: transparent !important;
 }
@@ -124,7 +113,7 @@ html[data-theme='dark'] {
 }
 
 /* Dividers in mobile sidebar - hide them */
-.navbar-sidebar__items .menu__list > div[style*="width: 1px"] {
+.navbar-sidebar__items .menu__list > div[style*='width: 1px'] {
   display: none;
 }
 
@@ -140,7 +129,7 @@ html[data-theme='dark'] {
 }
 
 /* Theme toggle - half width */
-.navbar-sidebar__items .navbar__item[style*="display: flex"] {
+.navbar-sidebar__items .navbar__item[style*='display: flex'] {
   padding: 0.75rem 0.25rem;
   justify-content: center;
   align-items: center;
@@ -150,7 +139,7 @@ html[data-theme='dark'] {
 }
 
 /* GitHub link - half width */
-.navbar-sidebar__items a[href*="github.com"].navbar__link {
+.navbar-sidebar__items a[href*='github.com'].navbar__link {
   padding: 0.75rem 0.25rem;
   display: flex;
   align-items: center;

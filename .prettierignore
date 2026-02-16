@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+package-lock.json
+
+# Build output
+build
+.docusaurus
+.cache-loader
+
+# Misc
+.DS_Store
+*.log
+
+# Coverage
+coverage
+*.lcov
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

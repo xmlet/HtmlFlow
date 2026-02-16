@@ -1,5 +1,5 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
@@ -13,7 +13,7 @@ const config: Config = {
 
   url: 'https://htmlflow.org',
   baseUrl: '/',
-  organizationName: 'xmlet', 
+  organizationName: 'xmlet',
   projectName: 'HtmlFlow',
 
   onBrokenLinks: 'throw',
@@ -60,9 +60,9 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://github.com/xmlet/HtmlFlow/issues', 
-          label: 'Feedback', 
-          position: 'right'
+          href: 'https://github.com/xmlet/HtmlFlow/issues',
+          label: 'Feedback',
+          position: 'right',
         },
         {
           type: 'docSidebar',
@@ -70,7 +70,7 @@ const config: Config = {
           position: 'right',
           label: 'Guide',
         },
-        {to: '/blog', label: 'News', position: 'right'},
+        { to: '/blog', label: 'News', position: 'right' },
         {
           type: 'custom-divider',
           position: 'right',
@@ -96,7 +96,7 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
   } satisfies Preset.ThemeConfig,
-  plugins: ["./src/plugins/tailwind-config.js"],
+  plugins: ['./src/plugins/tailwind-config.js'],
 };
 
 export default config;
