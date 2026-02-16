@@ -4,27 +4,192 @@
  * work well for content-centric websites.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #0284c7;
+  --ifm-color-primary-dark: #0369a1;
+  --ifm-color-primary-darker: #075985;
+  --ifm-color-primary-darkest: #0c4a6e;
+  --ifm-color-primary-light: #0ea5e9;
+  --ifm-color-primary-lighter: #38bdf8;
+  --ifm-color-primary-lightest: #7dd3fc;
   --ifm-code-font-size: 95%;
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --ifm-heading-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* Custom background colors to match sections */
+  --ifm-footer-background-color: #f9fafb;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+html[data-theme='dark'] {
+  --ifm-color-primary: #38bdf8;
+  --ifm-color-primary-dark: #0ea5e9;
+  --ifm-color-primary-darker: #0284c7;
+  --ifm-color-primary-darkest: #0369a1;
+  --ifm-color-primary-light: #7dd3fc;
+  --ifm-color-primary-lighter: #bae6fd;
+  --ifm-color-primary-lightest: #e0f2fe;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Custom dark mode backgrounds to match sections */
+  --ifm-background-color: #030712;
+  --ifm-navbar-background-color: #030712;
+  --ifm-footer-background-color: #030712;
+}
+
+/* Remove background from code inside SyntaxHighlighter */
+.code-block code {
+  background: transparent !important;
+}
+
+/* ===========================================
+   Navbar Base Styles
+   =========================================== */
+
+.navbar__inner {
+  width: 70%;
+  margin: 0 auto;
+  font-size: 0.9rem;
+}
+
+.navbar__items {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar__brand {
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+.navbar__link svg,
+.iconExternalLink_nPIU {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 0.25rem;
+}
+
+/* ===========================================
+   Mobile Sidebar Styles
+   =========================================== */
+
+.navbar-sidebar {
+  width: 100vw;
+  max-width: 100vw;
+}
+
+.navbar-sidebar__item {
+  width: 100%;
+  padding: 0 4rem;
+}
+
+.navbar-sidebar__brand {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-sidebar__items {
+  padding: 1rem 0;
+}
+
+.clean-btn navbar-sidebar__back {
+  display: none;
+}
+
+.navbar-sidebar__items .menu__list-item {
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+}
+
+.navbar-sidebar__items .menu__link {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ifm-menu-color);
+  border-radius: 0;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-sidebar__items .menu__link:hover {
+  opacity: 0.7;
+  background-color: transparent;
+}
+
+/* Dividers in mobile sidebar - hide them */
+.navbar-sidebar__items .menu__list > div[style*="width: 1px"] {
+  display: none;
+}
+
+/* Container for theme toggle and GitHub link - make them side by side */
+.navbar-sidebar__items .menu__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.navbar-sidebar__items .menu__list-item {
+  width: 100%;
+}
+
+/* Theme toggle - half width */
+.navbar-sidebar__items .navbar__item[style*="display: flex"] {
+  padding: 0.75rem 0.25rem;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: calc(50% - 0.25rem);
+  border-bottom: none;
+}
+
+/* GitHub link - half width */
+.navbar-sidebar__items a[href*="github.com"].navbar__link {
+  padding: 0.75rem 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-sizing: border-box;
+  width: calc(50% - 0.25rem);
+  border-bottom: none;
+}
+
+/* Close button */
+.navbar-sidebar__close {
+  padding: 0.25rem;
+  margin: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+  background: transparent;
+}
+
+.navbar-sidebar__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.navbar-sidebar__close:hover {
+  opacity: 0.6;
+  background: transparent;
+}
+
+.code-block pre {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .code-block {
+    font-size: 0.8rem;
+  }
 }
