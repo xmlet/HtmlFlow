@@ -56,6 +56,10 @@ const config: Config = {
     },
     navbar: {
       title: 'HtmlFlow',
+      logo: {
+        alt: 'HtmlFlow Logo',
+        src: 'img/htmlflow-logo.svg',
+      },
       items: [
         {
           type: 'search',

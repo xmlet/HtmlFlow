@@ -40,8 +40,12 @@ html[data-theme='dark'] {
    Navbar Base Styles
    =========================================== */
 
+.navbar {
+  padding: 0.75rem 1.5rem;
+}
+
 .navbar__inner {
-  width: 70%;
+  width: 97%;
   margin: 0 auto;
   font-size: 0.9rem;
 }
@@ -181,4 +185,49 @@ html[data-theme='dark'] {
   .code-block {
     font-size: 0.8rem;
   }
+}
+
+/*
+ ===========================================
+   Desktop Sidebar Styles
+ ===========================================
+*/
+
+@media (min-width: 1500px) {
+  .theme-doc-sidebar-container {
+    /* Allow the sidebar container to take the full available width */
+    width: 33% !important;
+    max-width: 33% !important;
+    box-sizing: border-box;
+
+    /* Place direct children on the right side of this container */
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: flex-start !important;
+  }
+
+  /* Prevent immediate children from stretching across full width;
+     they will size according to their content and be pushed to the right.
+     Adjust max-width as needed for wider/ narrower sidebars. */
+  .theme-doc-sidebar-container > * {
+    width: auto;
+    max-width: 40rem;
+  }
+
+  /* Push the actual sidebar/menu to the right within the container. */
+  .theme-doc-sidebar-menu {
+    margin-left: auto !important;
+  }
+
+  /* If the page content uses this class, keep it to the left. */
+  .theme-doc-markdown {
+    margin-right: auto !important;
+  }
+}
+
+.main-docMainContainer {
+  padding-left: 0 !important;
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
 }
