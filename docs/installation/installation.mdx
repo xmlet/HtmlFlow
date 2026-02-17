@@ -1,0 +1,39 @@
+---
+title: Installation Guide
+sidebar_label: Installation Guide
+---
+
+import CodeBlock from '@site/src/components/codeBlock/CodeBlock';
+
+export const kotlinCode = `dependencies {
+  // Replace @latest-version@ with the latest version available on Maven Central
+  implementation("com.github.xmlet:htmlflow:@latest-version")
+}`;
+
+export const mavenCode = `<!-- Replace @latest-version@ with the latest version available on Maven Central -->
+<dependency>
+  <groupId>com.github.xmlet</groupId>
+  <artifactId>htmlflow</artifactId>
+  <version>@latest-version</version>
+</dependency>`;
+
+# Installation Guide
+
+To use HtmlFlow in your Java or Kotlin project, you need to include it as a dependency in your build configuration.
+HtmlFlow is hosted on the [Maven Central Repository]().
+
+### 🐘 Gradle
+
+If you are using **Gradle**, add the following line to the `dependencies` block of your `build.gradle` (or `build.gradle.kts`) file:
+
+<CodeBlock language="kotlin" code={kotlinCode} />
+
+### 🪶 Maven
+
+If you are using **Maven**, add the following dependency definition to your `pom.xml` file inside the `<dependencies>` section:
+
+<CodeBlock language="xml" code={mavenCode} />
+
+### 📦 Manual Download
+
+Alternatively, you can download the JAR artifact directly from the [Maven Central Repository]().
