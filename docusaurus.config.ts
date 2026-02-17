@@ -23,6 +23,8 @@ const config: Config = {
     locales: ['en'],
   },
 
+  clientModules: [require.resolve('./src/client-modules/aos.ts')],
+
   presets: [
     [
       'classic',

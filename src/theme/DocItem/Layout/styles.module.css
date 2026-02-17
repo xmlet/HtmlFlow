@@ -1,0 +1,20 @@
+.docItemContainer header + *,
+.docItemContainer article > *:first-child {
+  margin-top: 0;
+}
+
+@media (min-width: 997px) {
+  .docItemCol {
+    max-width: 75% !important;
+  }
+}
+
+/* Remove right padding from the content column */
+.docItemCol {
+  padding-right: 0 !important;
+}
+
+/* Remove left padding from the TOC column */
+.docTOC {
+  padding-left: 0 !important;
+}
