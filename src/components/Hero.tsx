@@ -21,7 +21,7 @@ export function Hero() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-              <Link to="/docs/intro" style={{ textDecoration: 'none' }}>
+              <Link to="/docs/overview" style={{ textDecoration: 'none' }}>
                 <Button
                   size="lg"
                   variant="outline"

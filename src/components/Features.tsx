@@ -61,7 +61,7 @@ export function Features() {
         </div>
 
         <div className="mt-16 flex justify-center">
-          <Link to="/docs/intro">
+          <Link to="/docs/overview">
             <Button
               size="lg"
               variant="outline"

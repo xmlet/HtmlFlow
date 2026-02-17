@@ -1,0 +1,101 @@
+---
+title: Core Concepts
+sidebar_label: Core Concepts
+sidebar_position: 2
+---
+
+import CodeBlock from '@site/src/components/codeBlock/CodeBlock';
+import JavaKotlinCodeBlock from '@site/src/components/codeBlock/JavaKotlinCodeBlock';
+
+# Core Concepts
+
+HtmlFlow builders:
+
+- Element builders (such as `body()`, `div()`, `p()`, etc.) return the **created element**.
+- `text()` and `raw()` return the **parent element** (e.g., `.h1().text("...")` returns the `H1` parent). `text()` escapes HTML, while `raw()` doesn’t.
+- Attribute builders - {`attr<attribute name>()`} - return their parent (e.g., `.img().attrSrc("...")` returns the `Img`).
+- `__()` in Java or `l` in `Kotlin` — returns the parent element and emits the end tag of an element.
+
+HtmlFlow provides both an **eager** and a **lazy** approach to build HTML.
+This allows the `Appendable` to be provided either _beforehand_ or _later_ when the view is rendered.
+The `doc()` and `view()` factory methods follow each of these approaches:
+
+### Eager
+
+export const javaCode1 = `HtmlFlow
+    .doc(System.out)
+        .html()
+            .body()
+                .h1()
+                    .text("Welcome")
+                .__()
+                .table()
+                    .tr()...
+                .__()
+            .__()
+        .__()
+    .__();`;
+
+export const kotlinCode1 = `System.out
+    .doc {
+        html {
+            body {
+                h1.text("Welcome")
+                    .l
+                    .table {
+                        tr {...}
+                    }
+            }
+        }
+    }`;
+
+<JavaKotlinCodeBlock javaCode={javaCode1} kotlinCode={kotlinCode1} />
+
+### Lazy
+
+export const javaCode2 = `var view = HtmlFlow.<Model>view( page ->
+    page
+        .html()
+            .body()
+                .text("Welcome")
+            .__()
+            .table()
+                .tr()...
+            .__()
+        .__()
+    .__()
+);`;
+
+export const kotlinCode2 = `val view = view<Model> {
+    html {
+        body {
+            h1
+                .text("Welcome")
+                .l
+                .table {
+                    tr {...}
+                }
+            }
+        }
+    }`;
+
+## <JavaKotlinCodeBlock javaCode={javaCode2} kotlinCode={kotlinCode2}/>
+
+An `HtmlView` is more performant than an `HtmlDoc` when we need to bind the same template with different data **models**.
+In this scenario, **static HTML blocks are resolved only once**, on `HtmlView` instantiation.
+
+Given an `HtmlView` instance, e.g., `view`, we can render the HTML using one of the following approaches:
+
+export const aproach1 = `String html = view.render(tracks)`;
+export const approach2 = `view.setOut(System.out).write(tracks)`;
+
+- <CodeBlock code={aproach1} language="java" />
+- <CodeBlock code={approach2} language="java" />
+
+The `setOut()` method accepts any kind of `Appendable` object.
+The resulting `HtmDoc` or `HtmlView` from `HtmlFlow.doc()` or `HtmlFlow.view()` is configurable with the following options:
+
+- `setIndent(boolean)`: Enables or disables indentation. It is on by default.
+- `threadSafe()`: Enables the use of the view in multi-threaded scenarios. It is off by default.
+
+**Note:** `HtmDoc` and `HtmlView` are **immutable**, and the aforementioned methods return a new instance.
