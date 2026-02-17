@@ -12,6 +12,7 @@
 /* Remove right padding from the content column */
 .docItemCol {
   padding-right: 0 !important;
+  padding-left: 0 !important;
 }
 
 /* Remove left padding from the TOC column */
