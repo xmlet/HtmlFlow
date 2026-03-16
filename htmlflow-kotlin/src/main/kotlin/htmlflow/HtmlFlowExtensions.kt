@@ -8,6 +8,7 @@ import org.xmlet.htmlapifaster.Div
 import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlapifaster.Html
 import org.xmlet.htmlapifaster.Span
+import org.xmlet.htmlapifaster.Tbody
 import org.xmlet.htmlapifaster.Text
 import org.xmlet.htmlapifaster.Tr
 
@@ -30,6 +31,8 @@ inline fun HtmlPage.div(block: Div<HtmlPage>.() -> Unit): HtmlPage = this.div().
 inline fun HtmlPage.tr(block: Tr<HtmlPage>.() -> Unit): HtmlPage = this.tr().apply(block).l
 
 inline fun HtmlPage.span(block: Span<HtmlPage>.() -> Unit): HtmlPage = this.span().apply(block).l
+
+inline fun HtmlPage.tbody(block: Tbody<HtmlPage>.() -> Unit): HtmlPage = this.tbody().apply(block).l
 
 /** Text node property. */
 inline var <T : Element<T, Z>, Z : Element<*, *>> T.text: T
