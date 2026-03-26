@@ -37,6 +37,7 @@ import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Span;
+import org.xmlet.htmlapifaster.Tbody;
 import org.xmlet.htmlapifaster.Tr;
 
 /**
