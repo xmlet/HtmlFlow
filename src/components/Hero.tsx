@@ -6,7 +6,9 @@ import { WaveBackground } from './WaveBackground';
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-white dark:bg-gray-950 px-6 py-16 sm:py-24">
-      <WaveBackground />
+      <div className="hidden sm:block">
+        <WaveBackground />
+      </div>
 
       <div className="relative mx-auto max-w-7xl" style={{ zIndex: 1 }}>
         <div className="grid items-center gap-12 lg:grid-cols-2">
