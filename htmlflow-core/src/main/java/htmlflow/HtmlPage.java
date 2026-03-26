@@ -33,8 +33,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URL;
-
-import org.xmlet.htmlapifaster.*;
+import org.xmlet.htmlapifaster.Div;
+import org.xmlet.htmlapifaster.Element;
+import org.xmlet.htmlapifaster.Html;
+import org.xmlet.htmlapifaster.Span;
+import org.xmlet.htmlapifaster.Tr;
 
 /**
  * The root container for HTML elements. It is responsible for managing the {@code

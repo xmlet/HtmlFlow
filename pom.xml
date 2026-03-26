@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.xmlet</groupId>
     <artifactId>htmlflow-parent</artifactId>
-    <version>5.0.3-SNAPSHOT</version>
+    <version>5.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
 
@@ -54,7 +54,12 @@
         <mockito.junit-version>4.8.0</mockito.junit-version>
         <com.github.xmlet.xsd2poet.version>1.0.8</com.github.xmlet.xsd2poet.version>
         <argLine>-Xss16m -Xmx32M</argLine>
-        <kotlin.version>1.9.22</kotlin.version>
+        <kotlin.version>2.3.10</kotlin.version>
+
+        <!-- SonarCloud: Tell SonarCloud where to find Kover coverage reports -->
+        <!-- Kover generates JaCoCo-compatible XML format, so we use the jacoco property -->
+        <!-- Using wildcard pattern to include all module reports -->
+        <sonar.coverage.jacoco.xmlReportPaths>**/target/site/kover/report.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
@@ -160,47 +165,48 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kover-maven-plugin</artifactId>
+                <version>0.9.6</version>
                 <executions>
+                    <!-- instrument test tasks -->
                     <execution>
-                        <id>default-prepare-agent</id>
+                        <id>instr</id>
                         <goals>
-                            <goal>prepare-agent</goal>
+                            <goal>instrumentation</goal>
                         </goals>
                     </execution>
+
+                    <!-- generate XML report in verify phase -->
                     <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
+                        <id>kover-xml</id>
                         <goals>
-                            <goal>report</goal>
+                            <goal>report-xml</goal>
                         </goals>
                     </execution>
+
+                    <!-- generate HTML report in verify phase -->
                     <execution>
-                        <id>default-check</id>
+                        <id>kover-html</id>
                         <goals>
-                            <goal>check</goal>
+                            <goal>report-html</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <rule implementation="org.jacoco.maven.RuleConfiguration">
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit implementation="org.jacoco.report.check.Limit">
-                                            <counter>INSTRUCTION</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.20</minimum>
-                                        </limit>
-                                        <limit implementation="org.jacoco.report.check.Limit">
-                                            <counter>CLASS</counter>
-                                            <value>MISSEDCOUNT</value>
-                                            <maximum>10</maximum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
-                        </configuration>
+                    </execution>
+
+                    <!-- check coverage rules in verify phase -->
+                    <execution>
+                        <id>kover-verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- generate IC report -->
+                    <execution>
+                        <id>kover-ic</id>
+                        <goals>
+                            <goal>report-ic</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
