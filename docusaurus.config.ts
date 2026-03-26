@@ -54,6 +54,12 @@ const config: Config = {
     },
     navbar: {
       title: 'HtmlFlow',
+      logo: {
+        alt: 'HtmlFlow Logo',
+        src: 'img/htmlflow-logo.png',
+        srcDark: 'img/htmlflow-logo.png', // TODO We could maybe add a dark version of the logo to be used here and in the hero section
+        href: '/',
+      },
       items: [
         {
           type: 'search',

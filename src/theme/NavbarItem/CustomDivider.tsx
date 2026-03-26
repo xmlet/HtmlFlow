@@ -3,6 +3,7 @@ import React, { JSX } from 'react';
 export default function CustomDivider(): JSX.Element {
   return (
     <div
+      className="hide-sm"
       style={{
         width: '1px',
         height: '24px',

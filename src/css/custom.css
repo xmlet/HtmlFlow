@@ -41,9 +41,13 @@ html[data-theme='dark'] {
    =========================================== */
 
 .navbar__inner {
-  width: 70%;
   margin: 0 auto;
   font-size: 0.9rem;
+  padding: 0 1.5rem;
+}
+
+.navbar__logo {
+  margin-right: 0.8rem;
 }
 
 .navbar__items {
@@ -64,6 +68,11 @@ html[data-theme='dark'] {
   margin-left: 0.25rem;
 }
 
+.tooltip {
+  display: flex;
+  align-items: center;
+}
+
 /* ===========================================
    Mobile Sidebar Styles
    =========================================== */
@@ -71,10 +80,6 @@ html[data-theme='dark'] {
 .navbar-sidebar__items .menu__link:hover {
   opacity: 0.7;
   background-color: transparent;
-}
-
-.navbar-sidebar__items .menu__list > div[style*='width: 1px'] {
-  display: none;
 }
 
 .navbar-sidebar__items .menu__list {
@@ -87,24 +92,8 @@ html[data-theme='dark'] {
   width: 100%;
 }
 
-.navbar-sidebar__items .navbar__item[style*='display: flex'] {
-  padding: 0.75rem 0.25rem;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  width: calc(50% - 0.25rem);
-  border-bottom: none;
-}
-
-.navbar-sidebar__items a[href*='github.com'].navbar__link {
-  padding: 0.75rem 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  box-sizing: border-box;
-  width: calc(50% - 0.25rem);
-  border-bottom: none;
+.navbar-sidebar__items .tooltip {
+  display: none;
 }
 
 .navbar-sidebar__close svg {
@@ -119,5 +108,10 @@ html[data-theme='dark'] {
 @media (max-width: 768px) {
   .code-block {
     font-size: 0.8rem;
+  }
+
+  .hide-sm {
+    display: none;
+    visibility: hidden;
   }
 }

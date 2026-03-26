@@ -10,14 +10,7 @@ export default function ThemeToggle(): JSX.Element {
   };
 
   return (
-    <div
-      className="navbar__item"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 0.5rem',
-      }}
-    >
+    <div className="navbar__item tooltip">
       <button
         onClick={toggleTheme}
         aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
