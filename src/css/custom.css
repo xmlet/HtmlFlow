@@ -115,3 +115,7 @@ html[data-theme='dark'] {
     visibility: hidden;
   }
 }
+
+.breadcrumbHomeIcon_YNFT {
+  display: inline-block;
+}
