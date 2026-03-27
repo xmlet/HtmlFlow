@@ -28,6 +28,7 @@ import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
 import htmlflow.HtmlTemplate;
 import htmlflow.HtmlView;
+import htmlflow.test.model.Agent;
 import htmlflow.test.model.Task;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeContentType;
@@ -200,5 +201,17 @@ public class HtmlTables {
                     .__() // table
                 .__() // body
             .__() // html
+    );
+
+    public static HtmlView agentsTableBodyView = HtmlFlow.view(view -> view
+            .tbody()
+            .<Iterable<Agent>>dynamic((tbody, agents) -> agents.forEach(agent ->
+                tbody
+                    .tr()
+                        .td().text(agent.getName()).__()
+                        .td().text(agent.getEmail()).__()
+                    .__() // tr
+            ))
+            .__()
     );
 }
