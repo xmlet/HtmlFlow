@@ -380,6 +380,52 @@ data class Agent(
 	}
 	data class Counter(val count: Int)
 
+    @Test
+    fun testThatTbodyElementCanBeUsedOnHtmlDocAndHtmlView(){
+        val agentsTableDoc =
+            StringBuilder()
+                .apply {
+                    doc {
+                        tbody {
+                            tr {
+                                td { text("James Bond") }
+                                td { text("bond@mi6.gov.uk") }
+                                td { text("007") }
+                            }
+                            tr {
+                                td { text("Ethan Hunt") }
+                                td { text("ehunt@imf.gov") }
+                                td { text("001") }
+                            }
+                        }
+                    }
+                }.toString()
+
+        assertEquals(expectedAgentsTableDoc, agentsTableDoc)
+
+        val agents = listOf(
+            Agent("Jason Bourne", "bourne@cia.gov", "002"),
+            Agent("Napoleon Solo", "solo@uncle.org", "003")
+        )
+
+        val agentsTableView =
+            view<List<Agent>> {
+                tbody {
+                    dyn { agents: List<Agent> ->
+                        agents.forEach { agent ->
+                            tr {
+                                td { text(agent.name) }
+                                td { text(agent.email) }
+                                td { text(agent.id) }
+                            }
+                        }
+                    }
+                }
+            }.render(agents)
+
+        assertEquals(expectedAgentsTableView, agentsTableView)
+    }
+
 }
 
 private const val expectedFavoriteMoviesView =
@@ -464,3 +510,57 @@ private val expectedCounterSpans =
 <span>
 	The counter 2 has the value 1
 </span>"""
+
+
+private const val expectedAgentsTableDoc =
+    """
+<tbody>
+	<tr>
+		<td>
+			James Bond
+		</td>
+		<td>
+			bond@mi6.gov.uk
+		</td>
+		<td>
+			007
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Ethan Hunt
+		</td>
+		<td>
+			ehunt@imf.gov
+		</td>
+		<td>
+			001
+		</td>
+	</tr>
+</tbody>"""
+
+private const val expectedAgentsTableView =
+    """<tbody>
+	<tr>
+		<td>
+			Jason Bourne
+		</td>
+		<td>
+			bourne@cia.gov
+		</td>
+		<td>
+			002
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Napoleon Solo
+		</td>
+		<td>
+			solo@uncle.org
+		</td>
+		<td>
+			003
+		</td>
+	</tr>
+</tbody>"""
