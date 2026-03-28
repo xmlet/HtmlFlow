@@ -25,6 +25,7 @@ package htmlflow.test;
 
 import htmlflow.HtmlFlow;
 import htmlflow.HtmlView;
+import htmlflow.test.model.Agent;
 import htmlflow.test.model.Priority;
 import htmlflow.test.model.Status;
 import htmlflow.test.model.Task;
@@ -244,6 +245,20 @@ public class TestTable {
         validateBindingTable(view.render(dataSource));
     }
 
+    @Test
+    public void testRenderTableBody() {
+        List<Agent> agents = Arrays.asList(
+                new Agent(1, "Agent Smith " + 1, "void"+ 1 +"@null.org"),
+                new Agent(2, "Agent Smith " + 2, "void"+ 2 +"@null.org"),
+                new Agent(3, "Agent Smith " + 3, "void"+ 3 +"@null.org")
+        );
+
+        String actualTableBody = HtmlTables.agentsTableBodyView.render(agents);
+
+        assertEquals(expectedTableBodyPartial, actualTableBody);
+
+    }
+
     static void validateBindingTable(String actual){
         Iterator<String> iter = NEWLINE
             .splitAsStream(actual)
@@ -311,4 +326,34 @@ public class TestTable {
             }
         }
     }
+
+    private final static String expectedTableBodyPartial =
+		"""
+		<tbody>
+			<tr>
+				<td>
+					Agent Smith 1
+				</td>
+				<td>
+					void1@null.org
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Agent Smith 2
+				</td>
+				<td>
+					void2@null.org
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Agent Smith 3
+				</td>
+				<td>
+					void3@null.org
+				</td>
+			</tr>
+		</tbody>
+		""".trim();
 }

@@ -37,6 +37,7 @@ import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.Html;
 import org.xmlet.htmlapifaster.Span;
+import org.xmlet.htmlapifaster.Tbody;
 import org.xmlet.htmlapifaster.Tr;
 
 /**
@@ -88,6 +89,10 @@ public abstract class HtmlPage implements Element<HtmlPage, Element<?, ?>> {
 
     public final Span<HtmlPage> span() {
         return new Span<>(this);
+    }
+
+    public final Tbody<HtmlPage> tbody() {
+        return new Tbody<>(this);
     }
 
     /**
