@@ -1,19 +1,15 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+release:
+  label: Release
+  description: HtmlFlow Release Notes
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+announcement:
+  label: Announcement
+  description: HtmlFlow Announcements
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+tutorial:
+  label: Tutorial
+  description: HtmlFlow Tutorials and Guides
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+feature:
+  label: Feature
+  description: HtmlFlow Features

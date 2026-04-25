@@ -33,7 +33,7 @@ const config: Config = {
         blog: {
           showReadingTime: true,
           feedOptions: {
-            type: ['rss', 'atom'],
+            type: ['rss'],
             xslt: true,
           },
           onInlineTags: 'warn',
@@ -78,6 +78,13 @@ const config: Config = {
         },
         { to: '/blog', label: 'News', position: 'right' },
         {
+          type: 'custom-rss',
+          href: '/blog/rss.xml',
+          label: 'RSS',
+          position: 'right',
+          title: 'Blog RSS Feed',
+        },
+        {
           type: 'custom-divider',
           position: 'right',
         },
@@ -98,8 +105,9 @@ const config: Config = {
       ],
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.oneLight,
+      darkTheme: prismThemes.oneDark,
+      additionalLanguages: ['java', 'kotlin'],
     },
   } satisfies Preset.ThemeConfig,
   plugins: ['./src/plugins/tailwind-config.js'],

@@ -119,3 +119,16 @@ html[data-theme='dark'] {
 .breadcrumbHomeIcon_YNFT {
   display: inline-block;
 }
+
+ul {
+  list-style: circle;
+}
+
+.title_f1Hy {
+  font-size: 1.2rem !important;
+  line-height: 1.2;
+}
+
+aside {
+  margin: 0 0.5rem;
+}
