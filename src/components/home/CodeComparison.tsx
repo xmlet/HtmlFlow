@@ -1,6 +1,6 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { ArrowRight } from 'lucide-react';
+import { LuArrowRight as ArrowRight } from 'react-icons/lu';
 import { useColorMode } from '@docusaurus/theme-common';
 import { useState } from 'react';
 
@@ -65,7 +65,7 @@ export function CodeComparison() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-          <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl w-full lg:min-w-[520px]">
+          <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl w-full min-w-0 lg:min-w-[520px]">
             <div className="rounded-xl bg-white dark:bg-gray-900">
               <div className="border-b border-gray-100 dark:border-gray-800 px-6 py-4">
                 <div className="flex items-center justify-between">
@@ -80,7 +80,7 @@ export function CodeComparison() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setLanguage('java')}
-                      className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                      className={`px-3 py-1 text-xs font-medium rounded ${
                         language === 'java'
                           ? 'bg-sky-600 text-white'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -90,7 +90,7 @@ export function CodeComparison() {
                     </button>
                     <button
                       onClick={() => setLanguage('kotlin')}
-                      className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                      className={`px-3 py-1 text-xs font-medium rounded ${
                         language === 'kotlin'
                           ? 'bg-sky-600 text-white'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -101,9 +101,9 @@ export function CodeComparison() {
                   </div>
                 </div>
               </div>
-              <div className="overflow-x-auto overflow-hidden rounded-b-xl">
+              <div className="overflow-x-auto overflow-hidden rounded-b-xl [&_code]:bg-transparent [&_pre]:max-w-full">
                 <SyntaxHighlighter
-                  className="code-block"
+                  className="max-w-full"
                   language={language}
                   style={colorMode === 'dark' ? oneDark : oneLight}
                   customStyle={{
@@ -127,7 +127,7 @@ export function CodeComparison() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl w-full lg:min-w-[520px]">
+          <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl w-full min-w-0 lg:min-w-[520px]">
             <div className="rounded-xl bg-white dark:bg-gray-900">
               <div className="border-b border-gray-100 dark:border-gray-800 px-6 py-4">
                 <div className="flex items-center gap-2">
@@ -139,9 +139,9 @@ export function CodeComparison() {
                   <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Output</span>
                 </div>
               </div>
-              <div className="overflow-x-auto overflow-hidden rounded-b-xl">
+              <div className="overflow-x-auto overflow-hidden rounded-b-xl [&_code]:bg-transparent [&_pre]:max-w-full">
                 <SyntaxHighlighter
-                  className="code-block"
+                  className="max-w-full"
                   language="html"
                   style={colorMode === 'dark' ? oneDark : oneLight}
                   customStyle={{

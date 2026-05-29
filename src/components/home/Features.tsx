@@ -1,5 +1,5 @@
-import { ArrowRight } from 'lucide-react';
-import { Button } from './ui/button';
+import { LuArrowRight as ArrowRight } from 'react-icons/lu';
+import { Button } from '../ui/button';
 import Link from '@docusaurus/Link';
 
 const features = [
@@ -61,7 +61,7 @@ export function Features() {
         </div>
 
         <div className="mt-16 flex justify-center">
-          <Link to="/docs/intro">
+          <Link to="/docs/introduction">
             <Button
               size="lg"
               variant="outline"

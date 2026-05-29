@@ -1,17 +1,5 @@
 import React, { JSX } from 'react';
 
 export default function CustomDivider(): JSX.Element {
-  return (
-    <div
-      className="hide-sm"
-      style={{
-        width: '1px',
-        height: '24px',
-        backgroundColor: 'var(--ifm-navbar-link-color)',
-        opacity: 0.2,
-        margin: '0 0.5rem',
-        alignSelf: 'center',
-      }}
-    />
-  );
+  return <div className="hidden h-6 w-px self-center bg-[var(--ifm-navbar-link-color)] opacity-20 sm:block mx-2" />;
 }

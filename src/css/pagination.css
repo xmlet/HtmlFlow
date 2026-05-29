@@ -1,0 +1,21 @@
+@media (max-width: 600px) {
+  .pagination-nav {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pagination-nav__item {
+  display: flex;
+}
+
+html[data-theme='dark'] .pagination-nav__link {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.pagination-nav__label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  line-height: 1.35;
+}

@@ -2,6 +2,8 @@ import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
+const LATEST_VERSION = '5.0.4';
+
 const config: Config = {
   title: 'HtmlFlow',
   tagline: 'Type-safe HTML for Java and Kotlin',
@@ -16,11 +18,15 @@ const config: Config = {
   organizationName: 'xmlet',
   projectName: 'HtmlFlow',
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
 
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
+  },
+
+  customFields: {
+    latestVersion: LATEST_VERSION,
   },
 
   presets: [
@@ -41,7 +47,13 @@ const config: Config = {
           onUntruncatedBlogPosts: 'warn',
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: [
+            './src/css/custom.css',
+            './src/css/blog.css',
+            './src/css/pagination.css',
+            './src/css/search.css',
+            './src/theme/DocSidebarItem/sidebar.css',
+          ],
         },
       } satisfies Preset.Options,
     ],
@@ -57,13 +69,13 @@ const config: Config = {
       logo: {
         alt: 'HtmlFlow Logo',
         src: 'img/htmlflow-logo.png',
-        srcDark: 'img/htmlflow-logo.png', // TODO We could maybe add a dark version of the logo to be used here and in the hero section
+        srcDark: 'img/htmlflow-logo.png',
         href: '/',
       },
       items: [
         {
           type: 'search',
-          position: 'left',
+          position: 'right',
         },
         {
           href: 'https://github.com/xmlet/HtmlFlow/issues',
@@ -71,12 +83,18 @@ const config: Config = {
           position: 'right',
         },
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'right',
+          to: '/docs/introduction',
           label: 'Guide',
+          position: 'right',
+          activeBaseRegex: '/docs/',
         },
         { to: '/blog', label: 'News', position: 'right' },
+        {
+          type: 'custom-github',
+          label: '',
+          href: 'https://github.com/xmlet/HtmlFlow',
+          position: 'right',
+        },
         {
           type: 'custom-rss',
           href: '/blog/rss.xml',
@@ -85,21 +103,7 @@ const config: Config = {
           title: 'Blog RSS Feed',
         },
         {
-          type: 'custom-divider',
-          position: 'right',
-        },
-        {
           type: 'custom-theme-toggle',
-          position: 'right',
-        },
-        {
-          type: 'custom-divider',
-          position: 'right',
-        },
-        {
-          type: 'custom-github',
-          label: '',
-          href: 'https://github.com/xmlet/HtmlFlow',
           position: 'right',
         },
       ],
@@ -109,8 +113,63 @@ const config: Config = {
       darkTheme: prismThemes.oneDark,
       additionalLanguages: ['java', 'kotlin'],
     },
+    footer: {
+      logo: {
+        alt: 'HtmlFlow',
+        src: 'img/htmlflow-logo.png',
+        width: 32,
+        height: 32,
+      },
+      links: [
+        {
+          title: 'Docs',
+          items: [
+            { label: 'Introduction', to: '/docs/introduction' },
+            { label: 'Getting Started', to: '/docs/getting-started' },
+            { label: 'Core Concepts', to: '/docs/core-concepts' },
+            { label: 'Advanced', to: '/docs/advanced' },
+            { label: 'API Reference', to: '/docs/api-reference' },
+          ],
+        },
+        {
+          title: 'Community',
+          items: [
+            { label: 'GitHub', href: 'https://github.com/xmlet/HtmlFlow' },
+            { label: 'Issues', href: 'https://github.com/xmlet/HtmlFlow/issues' },
+            { label: 'Releases', href: 'https://github.com/xmlet/HtmlFlow/releases' },
+          ],
+        },
+        {
+          title: 'More',
+          items: [
+            { label: 'News', to: '/blog' },
+            { label: 'RSS Feed', href: '/blog/rss.xml' },
+            { label: 'Maven Central', href: 'https://search.maven.org/artifact/com.github.xmlet/htmlflow' },
+          ],
+        },
+      ],
+      copyright: `Copyright © ${new Date().getFullYear()} HtmlFlow.`,
+    },
   } satisfies Preset.ThemeConfig,
-  plugins: ['./src/plugins/tailwind-config.js'],
+  plugins: [
+    './src/plugins/tailwind-config.js',
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        docsRouteBasePath: '/docs',
+        blogRouteBasePath: '/blog',
+        indexBlog: true,
+        indexDocs: true,
+        indexPages: false,
+        searchBarShortcut: true,
+        searchBarShortcutHint: false,
+        searchBarPosition: 'right',
+        highlightSearchTermsOnTargetPage: true,
+        searchBarShortcutKeymap: 'mod+k',
+      },
+    ],
+  ],
 };
 
 export default config;

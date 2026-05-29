@@ -1,5 +1,5 @@
-import { Button } from './ui/button';
-import { ArrowRight, Github } from 'lucide-react';
+import { Button } from '../ui/button';
+import { LuArrowRight as ArrowRight, LuGithub as GithubIcon } from 'react-icons/lu';
 import Link from '@docusaurus/Link';
 import { WaveBackground } from './WaveBackground';
 
@@ -10,7 +10,7 @@ export function Hero() {
         <WaveBackground />
       </div>
 
-      <div className="relative mx-auto max-w-7xl" style={{ zIndex: 1 }}>
+      <div className="relative z-[1] mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="text-center lg:text-left">
             <h1 className="mb-6 text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl lg:text-7xl">
@@ -23,7 +23,7 @@ export function Hero() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-              <Link to="/docs/intro" style={{ textDecoration: 'none' }}>
+              <Link to="/docs/introduction" className="no-underline">
                 <Button
                   size="lg"
                   variant="outline"
@@ -33,13 +33,13 @@ export function Hero() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link to="https://github.com/xmlet/HtmlFlow" style={{ textDecoration: 'none' }}>
+              <Link to="https://github.com/xmlet/HtmlFlow" className="no-underline">
                 <Button
                   size="lg"
                   variant="outline"
                   className="gap-2 border-sky-200 hover:bg-sky-50 dark:border-sky-700 dark:hover:bg-sky-900/50"
                 >
-                  <Github className="h-4 w-4" />
+                  <GithubIcon className="h-4 w-4" />
                   View on GitHub
                 </Button>
               </Link>
