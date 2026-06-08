@@ -26,7 +26,15 @@ html[data-theme='dark'] {
   --ifm-footer-background-color: #030712;
 }
 
-html {
+html[data-theme='light'] .navbar-icon {
+  color: #1f2937;
+}
+
+html[data-theme='light'] .navbar-icon:hover {
+  color: var(--ifm-color-primary);
+}
+
+html.docs-smooth-scroll {
   scroll-behavior: smooth;
 }
 
@@ -127,6 +135,14 @@ html[data-theme='dark'] .footer {
   .navbar__items {
     gap: 0.6rem;
   }
+}
+
+.footer__link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  text-decoration: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

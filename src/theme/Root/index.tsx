@@ -1,55 +1,76 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from '@docusaurus/router';
 
+const ACTIVE_CLASS = 'hash-active';
+const SMOOTH_SCROLL_CLASS = 'docs-smooth-scroll';
+
+function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  if (el) window.requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+}
+
 function useHashActiveSidebar() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
+  const isDocsPage = pathname.startsWith('/docs/');
+  const previousHash = useRef('');
+  const previousPathname = useRef(pathname);
 
   useEffect(() => {
-    const ACTIVE_CLASS = 'hash-active';
+    const normalizedPath = window.location.pathname.replace(/\/$/, '');
 
-    const clearActive = () => {
+    if (previousPathname.current !== pathname) {
+      previousHash.current = '';
+      previousPathname.current = pathname;
+    }
+
+    document.documentElement.classList.toggle(SMOOTH_SCROLL_CLASS, isDocsPage);
+
+    const clearActive = () =>
       document
         .querySelectorAll<HTMLElement>(`.theme-doc-sidebar-container .menu__link.${ACTIVE_CLASS}`)
         .forEach(el => el.classList.remove(ACTIVE_CLASS));
-    };
 
-    if (!pathname.startsWith('/docs/')) {
+    if (!isDocsPage) {
       clearActive();
       return;
     }
 
-    const collectTrackedSections = () => {
+    const handleDocumentClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = (e.target instanceof Element ? e.target : null)?.closest<HTMLAnchorElement>('a[href]');
+      if (!link) return;
+
+      const url = new URL(link.href, window.location.href);
+      if (url.pathname.replace(/\/$/, '') !== normalizedPath || !url.hash) return;
+      if (!document.getElementById(decodeURIComponent(url.hash.slice(1)))) return;
+
+      e.preventDefault();
+      window.history.pushState(null, '', `${url.pathname}${url.search}${url.hash}`);
+      previousHash.current = url.hash;
+      scrollToId(decodeURIComponent(url.hash.slice(1)));
+    };
+
+    document.addEventListener('click', handleDocumentClick, true);
+
+    if (hash && hash !== previousHash.current) {
+      window.setTimeout(() => scrollToId(decodeURIComponent(hash.slice(1))), 0);
+    }
+    previousHash.current = hash;
+
+    const updateActive = () => {
       const headings = Array.from(
         document.querySelectorAll<HTMLElement>('.theme-doc-markdown h2[id], .theme-doc-markdown h3[id]')
       );
-      return headings.map(h => ({ id: h.id, anchor: h }));
-    };
+      if (!headings.length) return;
 
-    const updateActive = () => {
-      const tracked = collectTrackedSections();
-      if (!tracked.length) return;
+      const navH = document.querySelector<HTMLElement>('.navbar')?.getBoundingClientRect().height ?? 60;
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
 
-      const navbar = document.querySelector<HTMLElement>('.navbar');
-      const navH = navbar?.getBoundingClientRect().height ?? 60;
-      const threshold = navH + 24;
-
-      let activeId: string | null = null;
-      for (const { id, anchor } of tracked) {
-        const top = anchor.getBoundingClientRect().top;
-        if (top <= threshold) {
-          activeId = id;
-        }
+      let active = headings[0];
+      for (const h of headings) {
+        if (h.getBoundingClientRect().top <= navH + 24) active = h;
       }
-      if (!activeId) activeId = tracked[0].id;
-
-      // Bottom guard: trailing sections sit too low to ever reach the top
-      // threshold on short pages, so force the last section active once the
-      // viewport hits the bottom of the document.
-      const scrollBottom = window.scrollY + window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight;
-      if (scrollBottom >= docHeight - 2) {
-        activeId = tracked[tracked.length - 1].id;
-      }
+      const activeId = atBottom ? headings[headings.length - 1].id : active.id;
 
       clearActive();
       const link = document.querySelector<HTMLElement>(
@@ -57,17 +78,16 @@ function useHashActiveSidebar() {
       );
       if (link) {
         link.classList.add(ACTIVE_CLASS);
-        const parentCategory = link.closest('.theme-doc-sidebar-item-category-level-2');
-        const categoryLink = parentCategory?.querySelector<HTMLElement>(
-          ':scope > .menu__list-item-collapsible > .menu__link'
-        );
-        categoryLink?.classList.add(ACTIVE_CLASS);
+        link
+          .closest('.theme-doc-sidebar-item-category-level-2')
+          ?.querySelector<HTMLElement>(':scope > .menu__list-item-collapsible > .menu__link')
+          ?.classList.add(ACTIVE_CLASS);
       } else {
-        const docPath = window.location.pathname.replace(/\/$/, '');
-        const categoryLink = document.querySelector<HTMLElement>(
-          `.theme-doc-sidebar-item-category-level-2 > .menu__list-item-collapsible > .menu__link[href="${docPath}"]`
-        );
-        categoryLink?.classList.add(ACTIVE_CLASS);
+        document
+          .querySelector<HTMLElement>(
+            `.theme-doc-sidebar-item-category-level-2 > .menu__list-item-collapsible > .menu__link[href="${normalizedPath}"]`
+          )
+          ?.classList.add(ACTIVE_CLASS);
       }
     };
 
@@ -76,12 +96,13 @@ function useHashActiveSidebar() {
     const timer = setTimeout(updateActive, 150);
 
     return () => {
+      document.removeEventListener('click', handleDocumentClick, true);
       window.removeEventListener('scroll', updateActive);
       window.removeEventListener('resize', updateActive);
       clearTimeout(timer);
       clearActive();
     };
-  }, [pathname]);
+  }, [pathname, hash, isDocsPage]);
 }
 
 export default function Root({ children }: { children: React.ReactNode }): React.ReactElement {
