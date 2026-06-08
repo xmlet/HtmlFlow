@@ -51,7 +51,7 @@ const config: Config = {
             './src/css/custom.css',
             './src/css/blog.css',
             './src/css/pagination.css',
-            './src/css/search.css',
+            './src/css/mobile-sidebar.css',
             './src/theme/DocSidebarItem/sidebar.css',
           ],
         },
@@ -74,7 +74,7 @@ const config: Config = {
       },
       items: [
         {
-          type: 'search',
+          type: 'custom-search',
           position: 'right',
         },
         {
@@ -162,7 +162,7 @@ const config: Config = {
         indexBlog: true,
         indexDocs: true,
         indexPages: false,
-        searchBarShortcut: true,
+        searchBarShortcut: false,
         searchBarShortcutHint: false,
         searchBarPosition: 'right',
         highlightSearchTermsOnTargetPage: true,

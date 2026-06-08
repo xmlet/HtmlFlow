@@ -1,7 +1,7 @@
-import { Button } from '../ui/button';
+import { Button } from '../../Ui/Button';
 import { LuArrowRight as ArrowRight, LuGithub as GithubIcon } from 'react-icons/lu';
 import Link from '@docusaurus/Link';
-import { WaveBackground } from './WaveBackground';
+import { WaveBackground } from '../WaveBackground';
 
 export function Hero() {
   return (

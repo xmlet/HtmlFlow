@@ -35,22 +35,8 @@ html {
   padding: 0 3rem;
 }
 
-.navbar__logo {
-  margin-right: 0.8rem;
-}
-
-.navbar__items {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 .navbar__items--right {
   gap: 0.85rem;
-}
-
-.navbar__items--right > * {
-  flex: 0 0 auto;
 }
 
 .navbar__items--right .navbar__link svg,
@@ -73,10 +59,6 @@ html {
 
 html[data-theme='light'] .navbar-icon {
   color: #1f2937;
-}
-
-html[data-theme='light'] .navbar-icon:hover {
-  color: var(--ifm-color-primary);
 }
 
 .navbar-sidebar__items .menu__list {
@@ -170,7 +152,6 @@ html[data-theme='dark'] .footer {
 
 .footer__link-item:hover {
   color: var(--ifm-color-primary-lighter);
-  text-decoration: none;
 }
 
 .footer__item {
@@ -217,4 +198,12 @@ html[data-theme='dark'] .footer {
 
 code {
   background: transparent !important;
+}
+
+.theme-doc-markdown .hash-link {
+  opacity: 0.35;
+  color: var(--ifm-color-emphasis-600);
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
 }

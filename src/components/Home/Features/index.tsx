@@ -1,5 +1,5 @@
 import { LuArrowRight as ArrowRight } from 'react-icons/lu';
-import { Button } from '../ui/button';
+import { Button } from '../../Ui/Button';
 import Link from '@docusaurus/Link';
 
 const features = [
