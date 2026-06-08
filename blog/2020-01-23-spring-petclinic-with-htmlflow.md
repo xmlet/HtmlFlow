@@ -8,7 +8,7 @@ description: spring-petclinic implementation of the sample Spring-based pet clin
 
 We have provided a standard implementation of the sample Spring-based pet clinic web application integrated with HtmlFlow views at [github.com/xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic).
 
-{/_ truncate _/}
+{/* truncate */}
 
 :::info
 In this implementation, the Thymeleaf template engine has been replaced with HtmlFlow.
