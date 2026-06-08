@@ -37,6 +37,8 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
         },
         blog: {
+          blogSidebarCount: 'ALL',
+          blogSidebarTitle: 'All Posts',
           showReadingTime: true,
           feedOptions: {
             type: ['rss'],

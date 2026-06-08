@@ -1,5 +1,6 @@
 .theme-doc-sidebar-menu {
-  padding: 0.5rem 0.75rem 1rem 1rem;
+  padding-left: 3rem;
+  padding-right: 1rem;
 }
 
 .theme-doc-sidebar-container .menu__link--active,
@@ -79,10 +80,9 @@ html[data-theme='dark'] .theme-doc-sidebar-item-link .menu__link.hash-active {
   background: var(--ifm-color-emphasis-100) !important;
 }
 
-html[data-theme='dark']
-  .theme-doc-sidebar-item-category-level-2
-  > .menu__list-item-collapsible
-  > .menu__link.hash-active {
+html[data-theme='dark'] .theme-doc-sidebar-item-category-level-2,
+> .menu__list-item-collapsible,
+> .menu__link.hash-active {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 
