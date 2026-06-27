@@ -13,7 +13,8 @@
     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --ifm-footer-background-color: #f9fafb;
-  --doc-sidebar-width: 360px !important;
+  --doc-sidebar-width: 360px;
+  --hf-navbar-icon: #1f2937;
 }
 
 html[data-theme='dark'] {
@@ -24,14 +25,8 @@ html[data-theme='dark'] {
   --ifm-background-color: #030712;
   --ifm-navbar-background-color: #030712;
   --ifm-footer-background-color: #030712;
-}
-
-html[data-theme='light'] .navbar-icon {
-  color: #1f2937;
-}
-
-html[data-theme='light'] .navbar-icon:hover {
-  color: var(--ifm-color-primary);
+  --hf-navbar-icon: #ffffff;
+  --hf-bg-deep: #0a0f1c;
 }
 
 html.docs-smooth-scroll {
@@ -58,7 +53,7 @@ html.docs-smooth-scroll {
 .navbar-icon {
   display: inline-flex;
   cursor: pointer;
-  color: #ffffff;
+  color: var(--hf-navbar-icon);
   transition: color 0.2s ease;
 }
 
@@ -103,7 +98,7 @@ aside {
 }
 
 html[data-theme='dark'] .footer {
-  --ifm-footer-background-color: #0a0f1c;
+  --ifm-footer-background-color: var(--hf-bg-deep);
   --ifm-footer-link-color: rgba(255, 255, 255, 0.6);
   --ifm-footer-title-color: #ffffff;
   --footer-border-color: rgba(255, 255, 255, 0.06);
@@ -158,4 +153,8 @@ html[data-theme='dark'] .footer {
 
 code {
   background: transparent !important;
+}
+
+.hf-code-block pre {
+  max-width: 100%;
 }

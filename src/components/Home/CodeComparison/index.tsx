@@ -101,7 +101,7 @@ export function CodeComparison() {
                   </div>
                 </div>
               </div>
-              <div className="overflow-x-auto overflow-hidden rounded-b-xl [&_code]:bg-transparent [&_pre]:max-w-full">
+              <div className="overflow-x-auto overflow-hidden rounded-b-xl hf-code-block">
                 <SyntaxHighlighter
                   className="max-w-full"
                   language={language}
@@ -139,7 +139,7 @@ export function CodeComparison() {
                   <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Output</span>
                 </div>
               </div>
-              <div className="overflow-x-auto overflow-hidden rounded-b-xl [&_code]:bg-transparent [&_pre]:max-w-full">
+              <div className="overflow-x-auto overflow-hidden rounded-b-xl hf-code-block">
                 <SyntaxHighlighter
                   className="max-w-full"
                   language="html"
