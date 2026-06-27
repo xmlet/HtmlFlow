@@ -3,18 +3,114 @@ sidebar_position: 1
 hide_table_of_contents: true
 ---
 
-# Introduction
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-<div className="h-24" />
+# Introduction
 
 ## What is HtmlFlow?
 
-<div className="h-48" />
+HtmlFlow is a Java library for writing **type-safe HTML** documents in a fluent
+style, with first-class support for both **Java and Kotlin**. Instead of a separate
+template language with its own syntax and dialects, you build HTML directly in your
+host language, where every element and attribute is a strongly-typed method call.
+
+It is an _internal DSL_: HTML lives inside Java/Kotlin itself, so
+the entire toolchain you already use (the compiler, the debugger, IDE autocompletion)
+works on your views. The output is always valid HTML according to the HTML 5.2
+specification.
+
+A minimal page in both languages:
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+HtmlFlow
+  .doc(System.out)
+    .html()
+      .head()
+        .title().text("HtmlFlow").__()
+      .__() // head
+      .body()
+        .div().attrClass("container")
+          .h1().text("My first HtmlFlow page").__()
+          .img().attrSrc("https://bit.ly/2MoHwrU").__()
+          .p().text("Typesafe is awesome! :-)").__()
+        .__() // div
+      .__() // body
+    .__(); // html
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+System.out.doc {
+  html {
+    head {
+      title { text("HtmlFlow") }
+    }
+    body {
+      div {
+        attrClass("container")
+        h1 { text("My first HtmlFlow page") }
+        img { attrSrc("https://bit.ly/2MoHwrU") }
+        p { text("Typesafe is awesome! :-)") }
+      } // div
+    } // body
+  } // html
+}
+```
+
+  </TabItem>
+</Tabs>
 
 ## Motivation
 
-<div className="h-48" />
+Traditional text-based template engines (Thymeleaf, Velocity, Mustache, and the like)
+keep the markup in separate template files written in their own custom syntax. That design
+has real downsides:
+
+- **No compile-time safety.** A misspelled tag, a misplaced attribute, or a typo in a
+  variable name is only discovered at render time, often in production.
+- **A second language to learn.** Each engine invents its own syntax for conditionals,
+  loops, and includes, none of which your IDE understands as well as plain code.
+- **Limited tooling.** Refactoring, find-usages, type inference, and step-debugging stop
+  at the boundary between your code and the template.
+
+HtmlFlow removes that boundary by making every view ordinary Java or Kotlin code, which
+undoes each of those costs in turn.
+
+- The compiler checks the HTML structure, so a misspelled tag or misplaced attribute fails
+  the build instead of surfacing at render time.
+- There is no second syntax to learn, because conditionals, loops, and includes are the
+  language constructs you already use.
+- Your full toolchain (refactoring, find-usages, type inference, step-debugging) reaches
+  straight through your views, since no template boundary remains to stop it. IDE
+  autocompletion even suggests **only** the elements and attributes valid in the current
+  context.
+
+It is also fast. Independent [template-engine benchmarks](https://github.com/xmlet/template-benchmark)
+rank HtmlFlow as the most performant engine among the leading text-based
+template engines, and on par with other HTML DSL libraries such as j2html and
+kotlinx.html.
 
 ## Approach
 
-<div className="h-48" />
+The fluent API is **auto-generated from the HTML 5.2 XSD schema** using the
+[xmlet](https://github.com/xmlet) tooling. Each element exposes exactly the children and
+attributes the specification allows, and attribute values are constrained by enumerated
+types where the spec defines a fixed set. As a result, invalid markup such as nesting a
+`<div>` directly inside an `<h1>` does not compile, because the method does not exist in
+that context.
+
+Every view is built from two kinds of content: **static** blocks, which never change, and
+**dynamic** blocks, which depend on a data model. Separating the two is what lets HtmlFlow
+pre-compute the static parts once and bind only the dynamic parts on each render.
+
+Continue to [Getting Started](/docs/getting-started) to add HtmlFlow to your project and
+render your first page, then to [Core Concepts](/docs/core-concepts) for the builder API,
+templates, and data binding.

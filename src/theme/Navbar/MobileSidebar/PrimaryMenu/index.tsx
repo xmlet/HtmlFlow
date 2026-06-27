@@ -2,7 +2,7 @@ import React, { type ReactNode } from 'react';
 import Link from '@docusaurus/Link';
 import { useLocation } from '@docusaurus/router';
 import { useNavbarMobileSidebar } from '@docusaurus/theme-common/internal';
-import { LuBookOpen, LuCode, LuNewspaper, LuMessageSquare, LuChevronRight, LuArrowUpRight } from 'react-icons/lu';
+import { LuBookOpen, LuNewspaper, LuMessageSquare, LuChevronRight, LuArrowUpRight } from 'react-icons/lu';
 
 interface MenuCard {
   icon: ReactNode;
@@ -21,13 +21,6 @@ const CARDS: MenuCard[] = [
     subtitle: 'Tutorials and core concepts',
     href: '/docs/introduction',
     match: '/docs',
-  },
-  {
-    icon: <LuCode />,
-    title: 'API Reference',
-    subtitle: 'Full Java & Kotlin API docs',
-    href: '/docs/api-reference',
-    match: '/docs/api-reference',
   },
   {
     icon: <LuNewspaper />,

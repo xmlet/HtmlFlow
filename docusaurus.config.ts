@@ -13,6 +13,12 @@ const config: Config = {
     v4: true,
   },
 
+  markdown: {
+    mdx1Compat: {
+      admonitions: true,
+    },
+  },
+
   url: 'https://htmlflow.org',
   baseUrl: '/',
   organizationName: 'xmlet',
@@ -130,7 +136,6 @@ const config: Config = {
             { label: 'Getting Started', to: '/docs/getting-started' },
             { label: 'Core Concepts', to: '/docs/core-concepts' },
             { label: 'Advanced', to: '/docs/advanced' },
-            { label: 'API Reference', to: '/docs/api-reference' },
           ],
         },
         {

@@ -6,7 +6,7 @@ import {
   type WorkerSearchResult,
 } from '@easyops-cn/docusaurus-search-local/dist/client/client/theme/searchByWorker';
 
-export type Area = 'Guide' | 'API Reference' | 'News' | 'Other';
+export type Area = 'Guide' | 'News' | 'Other';
 
 export interface DocResult {
   title: string;
@@ -29,13 +29,12 @@ export interface ResultGroup {
   items: DocResult[];
 }
 
-const AREA_ORDER: Area[] = ['Guide', 'API Reference', 'News', 'Other'];
+const AREA_ORDER: Area[] = ['Guide', 'News', 'Other'];
 const RESULT_LIMIT = 12;
 const DEBOUNCE_MS = 120;
 
 function areaOf(url: string, baseUrl: string): Area {
   const path = url.startsWith(baseUrl) ? `/${url.slice(baseUrl.length)}` : url;
-  if (path.startsWith('/docs/api-reference')) return 'API Reference';
   if (path.startsWith('/docs')) return 'Guide';
   if (path.startsWith('/blog')) return 'News';
   return 'Other';

@@ -53,7 +53,7 @@ export function CodeComparison() {
   const [language, setLanguage] = useState<'java' | 'kotlin'>('java');
 
   return (
-    <section className="bg-gray-100 dark:bg-gray-900 px-6 py-24">
+    <section className="bg-gray-100 dark:bg-gray-900 px-6 py-12 sm:py-24">
       <div className="mx-auto max-w-7xl flex flex-col items-center">
         <div className="mb-8 text-center">
           <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
@@ -64,8 +64,8 @@ export function CodeComparison() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-          <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl w-full min-w-0 lg:min-w-[520px]">
+        <div className="hf-code-comparison-grid">
+          <div className="hf-code-panel rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl">
             <div className="rounded-xl bg-white dark:bg-gray-900">
               <div className="border-b border-gray-100 dark:border-gray-800 px-6 py-4">
                 <div className="flex items-center justify-between">
@@ -127,7 +127,7 @@ export function CodeComparison() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl w-full min-w-0 lg:min-w-[520px]">
+          <div className="hf-code-panel rounded-2xl bg-gray-50 dark:bg-gray-800 p-1 shadow-xl">
             <div className="rounded-xl bg-white dark:bg-gray-900">
               <div className="border-b border-gray-100 dark:border-gray-800 px-6 py-4">
                 <div className="flex items-center gap-2">

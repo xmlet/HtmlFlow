@@ -5,12 +5,91 @@ hide_table_of_contents: true
 
 # Integrations
 
-<div className="h-24" />
-
 ## data-\*
-
-<div className="h-48" />
 
 ## http4k
 
-<div className="h-48" />
+[http4k](https://www.http4k.org/) is a Kotlin HTTP toolkit built on the idea of handlers as plain
+functions (`(Request) -> Response`). HtmlFlow plugs into http4k's templating SPI through the
+**`htmlflow-view-loader`** module (`com.github.xmlet:htmlflow-view-loader`), so HtmlFlow views can
+be used wherever http4k expects a template engine: alongside, or instead of, Pebble, Thymeleaf,
+or Handlebars.
+
+The view loader does **convention-based resolution**: you expose your views as
+`HtmlView<MyViewModel>` members (a `val` property or a function), point the loader at a package, and
+it builds a registry that maps each model type to its view (matching superclasses and interfaces as
+a fallback). The result is a `(ViewModel) -> String` function, which is exactly http4k's
+`TemplateRenderer`.
+
+### 1. Dependencies
+
+Add the Kotlin DSL, the view loader, and http4k's template core:
+
+```groovy
+implementation 'com.github.xmlet:htmlflow-kotlin:5.0.4'
+implementation 'com.github.xmlet:htmlflow-view-loader:5.0.4'
+implementation 'org.http4k:http4k-template-core'
+```
+
+### 2. A view model and its view
+
+The model implements http4k's `ViewModel`; the view is an `HtmlView` typed by that model. To find a
+view, the loader scans each class in the package for a zero-argument member that returns an
+`HtmlView` — a `val` property or a function both work. It just needs an instance to read that member
+from, and it tries several ways to get one: a Kotlin `object`, a top-level (file-level) declaration,
+a class with a no-argument constructor, a companion object, a `getInstance()` singleton, or a
+constructor that takes an `HtmlFlow.ViewFactory`. A Kotlin `object` is the simplest, so this example
+uses one:
+
+```kotlin
+import htmlflow.*
+import org.http4k.template.ViewModel
+import org.xmlet.htmlapifaster.body
+import org.xmlet.htmlapifaster.h1
+
+data class Greeting(val name: String) : ViewModel
+
+object Views {
+  val greeting: HtmlView<Greeting> = HtmlFlow.view {
+    it.html {
+      body {
+        dyn { model: Greeting -> h1 { text("Hello, ${model.name}!") } }
+      }
+    }
+  }
+}
+```
+
+### 3. Build the renderer
+
+`ClasspathLoader(ViewModel::class.java).createRenderer(package)` scans the package and returns a
+renderer that resolves the right view from the model's type at call time:
+
+```kotlin
+import htmlflow.viewloader.ClasspathLoader
+import org.http4k.template.TemplateRenderer
+
+val renderer: TemplateRenderer =
+  ClasspathLoader(ViewModel::class.java).createRenderer("com.example.views")
+```
+
+### 4. Wire it into an http4k handler
+
+Use http4k's `viewModel` body lens to render a model straight into a response. No explicit view
+lookup is needed. The loader picks `Views.greeting` because the model is a `Greeting`:
+
+```kotlin
+import org.http4k.core.*
+import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.template.viewModel
+
+val htmlView = Body.viewModel(renderer, TEXT_HTML).toLens()
+
+val app: HttpHandler = { _: Request ->
+  Response(Status.OK).with(htmlView of Greeting("World"))
+}
+```
+
+Set `hotReload = true` on `createRenderer(...)` during development to re-scan views on each render
+(this also disables pre-encoding); keep it `false` (the default) in production so views are
+pre-encoded once and cached. See [Core Concepts → Configuring Views](/docs/core-concepts#configuring-views).

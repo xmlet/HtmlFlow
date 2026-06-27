@@ -7,7 +7,6 @@ import {
   LuArrowUp,
   LuArrowDown,
   LuFileText,
-  LuCode,
   LuNewspaper,
   LuBookOpen,
   LuLibrary,
@@ -36,7 +35,6 @@ function Highlight({ text, query }: { text: string; query: string }): ReactNode 
 
 const AREA_ICON: Record<Area, ReactNode> = {
   Guide: <LuFileText />,
-  'API Reference': <LuCode />,
   News: <LuNewspaper />,
   Other: <LuFileText />,
 };

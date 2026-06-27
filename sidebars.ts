@@ -80,17 +80,6 @@ const sidebars: SidebarsConfig = {
         { type: 'link', label: 'Repositories', href: '/docs/resources#repositories' },
       ],
     },
-    {
-      type: 'category',
-      label: 'API Reference',
-      collapsed: false,
-      collapsible: true,
-      link: { type: 'doc', id: 'api-reference' },
-      items: [
-        { type: 'link', label: 'Java API', href: '/docs/api-reference#java-api' },
-        { type: 'link', label: 'Kotlin DSL', href: '/docs/api-reference#kotlin-dsl' },
-      ],
-    },
   ],
 };
 

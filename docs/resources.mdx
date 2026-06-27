@@ -5,16 +5,37 @@ hide_table_of_contents: true
 
 # Resources
 
-<div className="h-24" />
-
 ## Articles
 
-<div className="h-48" />
+HtmlFlow's design (type-safe templates, higher-order composition, and progressive async
+rendering) is grounded in peer-reviewed research:
+
+- **2025**: [Enabling Progressive Server-Side Rendering for Traditional Web Template Engines with Java Virtual Threads](https://www.mdpi.com/2674-113X/4/3/20), MDPI _Software_ journal. Compares HtmlFlow against other engines, measuring throughput (ab, JMeter) and raw rendering performance (JMH).
+- **2024**: [Progressive Server-Side Rendering with Suspendable Web Templates](https://gamboa.pt/img/my-papers/wise-2024-pssr-async-await.pdf), 25th [WISE](https://wise2024-qatar.com/) conference, Doha. Introduces the suspendable `await`/`suspending` model behind [Streaming HTML](/docs/advanced#streaming-html).
+- **2023**: [Enhancing SSR in Low-Thread Web Servers](https://www.scitepress.org/Link.aspx?doi=10.5220/0012165300003584), 19th [WebIst](http://www.webist.org/?y=2023) conference, Rome. Covers HtmlFlow's async approach (which works with any source) and binding to multiple asynchronous data sources.
+- **2020**: [Text Web Templates Considered Harmful](https://link.springer.com/chapter/10.1007/978-3-030-61750-9_4), LNBIP vol. 399. Argues that an HTML DSL (HtmlFlow, kotlinx.html) yields templates governed only by the host language, with no rules of their own.
+- **2019**: [HoT: Unleash Web Views with Higher-order Templates](https://www.scitepress.org/Link.aspx?doi=10.5220/0008167701180129), 15th [WebIst](http://www.webist.org/?y=2019) conference, Vienna. Describes composing templates through higher-order functions.
+- **2018**: [Modern Type-Safe Template Engines](https://dzone.com/articles/modern-type-safe-template-engines), DZone. An accessible overview and performance comparison.
 
 ## Talks
 
-<div className="h-48" />
+Slides and presentations accompanying the research above:
+
+- [Progressive Server-Side Rendering with Suspendable Web Templates](https://gamboa.pt/img/my-papers/wise-2024-slides.pdf): WISE 2024 slides.
+- [Enhancing SSR in Low-Thread Web Servers](https://gamboa.pt/img/my-papers/webist-2023-slides.pdf): WebIst 2023 slides.
+- [Domain Specific Language generation based on a XML Schema](https://www.slideshare.net/LuisDuarte105/domain-specific-language-generation-based-on-a-xml-schema-208756986): MSc thesis presentation (Luís Duarte, 2018) on the xmlet generator that produces HtmlFlow's API.
 
 ## Repositories
 
-<div className="h-48" />
+- [xmlet/HtmlFlow](https://github.com/xmlet/HtmlFlow): the library itself (core, Kotlin, Flowifier, and view-loader modules).
+- [xmlet/HtmlFlow-Datastar](https://github.com/xmlet/HtmlFlow-Datastar): the type-safe Datastar DSL behind the `data-*` integration.
+- [xmlet/XsdAsmFaster](https://github.com/xmlet/XsdAsmFaster): the generator that produces HtmlFlow's fluent element API (HtmlApiFaster) from the HTML 5.2 XSD.
+- [xmlet/spring-petclinic](https://github.com/xmlet/spring-petclinic): the Spring PetClinic sample reimplemented with HtmlFlow [views](https://github.com/xmlet/spring-petclinic/tree/master/src/main/java/org/springframework/samples/petclinic/views).
+- [xmlet/template-benchmark](https://github.com/xmlet/template-benchmark): JMH benchmark comparing HtmlFlow with other template engines.
+- [spring-comparing-template-engines](https://github.com/jreijn/spring-comparing-template-engines#benchmarks-102019): independent throughput benchmark that includes HtmlFlow.
+
+### API docs
+
+- [HtmlFlow Javadoc](https://javadoc.io/doc/com.github.xmlet/htmlflow): the public API.
+- [HtmlApiFaster Javadoc](https://javadoc.io/doc/com.github.xmlet/htmlApiFaster/latest/org/xmlet/htmlapifaster/package-summary.html): the generated fluent HTML element API underneath HtmlFlow.
+- [Maven Central](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow): all released artifacts and versions.

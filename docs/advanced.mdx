@@ -3,18 +3,157 @@ sidebar_position: 4
 hide_table_of_contents: true
 ---
 
-# Advanced Features
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-<div className="h-24" />
+# Advanced Features
 
 ## Asynchronous Rendering
 
-<div className="h-48" />
+When part of a view binds to data that arrives **asynchronously** (a reactive
+`Publisher`/`Flux`, a `CompletableFuture`, or a Kotlin suspend function), a normal
+`HtmlView` is not enough: the HTML that follows the async block could be emitted before the
+async data resolves, producing malformed output. `HtmlViewAsync`, created with
+`HtmlFlow.viewAsync(...)`, solves this with the **`await`** builder.
+
+`.await((element, model, onCompletion) -> ...)` hands you the parent element, the model, and an
+`onCompletion` callback. HtmlFlow pauses emission of everything after the block until you signal
+`onCompletion.finish()`, guaranteeing well-formed HTML regardless of when the data completes.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+// Binds to a Reactive Streams Publisher (here a Reactor Flux)
+HtmlViewAsync<Flux<Track>> playlistView = HtmlFlow.viewAsync(view -> view
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<Flux<Track>>await((table, tracks, onCompletion) -> tracks
+          .doOnComplete(onCompletion::finish) // resume the rest of the page when the stream ends
+          .doOnNext(trk -> table
+            .tr()
+              .td().text(trk.artist()).__()
+              .td().text(trk.name()).__()
+            .__())
+          .subscribe())
+      .__() // table
+    .__() // body
+  .__() // html
+);
+
+// Render to a CompletableFuture, or write progressively to an Appendable
+CompletableFuture<String> html = playlistView.renderAsync(trackFlux);
+CompletableFuture<Void>   done = playlistView.writeAsync(System.out, trackFlux);
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+// viewAsync + await
+val playlistView = viewAsync<Flux<Track>> {
+  html {
+    body {
+      table {
+        tr {
+          th { text("Artist") }
+          th { text("Track") }
+        }
+        await { tracks: Flux<Track>, onCompletion ->
+          tracks
+            .doOnComplete(onCompletion)
+            .doOnNext { trk ->
+              tr {
+                td { text(trk.artist) }
+                td { text(trk.name) }
+              }
+            }
+            .subscribe()
+        }
+      } // table
+    } // body
+  } // html
+}
+```
+
+  </TabItem>
+</Tabs>
+
+### Kotlin coroutines: `viewSuspend`
+
+Kotlin has a second way to bind asynchronous data that avoids the callback plumbing of `await`.
+`viewSuspend(...)`, created with the matching factory, replaces the `onCompletion` callback with a
+`suspending { }` block: inside it you call ordinary `suspend` functions (`await()`, `Flow.collect`,
+`delay`) as straight-line code, and the view itself suspends and resumes at each suspension point,
+so there is nothing to signal manually.
+
+```kotlin
+val playlistView = viewSuspend<Flux<Track>> {
+  html { body { table {
+    tr { th { text("Artist") }; th { text("Track") } }
+    suspending { tracks: Flux<Track> ->
+      tracks.asFlow().collect { trk ->
+        tr { td { text(trk.artist) }; td { text(trk.name) } }
+      }
+    }
+  } } }
+}
+```
+
+Both approaches produce identical, well-formed output. Reach for `await` when you need Java interop
+or are already working with reactive callbacks, and for `viewSuspend` when you want plain coroutine
+code with no callback wiring.
+
+The `await`/`suspending` mechanism works with any asynchronous API
+(Reactive Streams `Publisher`, Reactor `Flux`/`Mono`, `CompletableFuture`, Kotlin `Flow` or suspend
+functions) and supports binding several independent async sources within one view.
 
 ## Streaming HTML
 
-<div className="h-48" />
+Because `HtmlViewAsync.writeAsync(out, model)` writes to its `Appendable` **as each async block
+resolves**, it enables _progressive server-side rendering_ (PSSR): the static head and the early
+parts of the page are flushed to the client immediately, while slower data (a database query, a
+remote API) streams in afterwards.
+
+The browser therefore starts parsing and painting before the full response is ready, cutting
+time-to-first-byte and perceived latency.
+
+To stream end-to-end, pass an `Appendable` backed by the server's response output (so writes are
+flushed to the socket) instead of buffering into a `String`:
+
+```java
+// Pseudocode: wire writeAsync to a chunked/streaming HTTP response writer
+Writer responseWriter = httpResponse.getWriter();      // flushes to the client
+CompletableFuture<Void> done = playlistView.writeAsync(responseWriter, trackFlux);
+done.thenRun(responseWriter::close);
+```
+
+`await`'s completion gating is what keeps the streamed output well-formed: HtmlFlow only emits the
+markup after an async block once that block signals completion, so tags never interleave out of
+order. This design, and its performance under low-thread and virtual-thread servers, is detailed
+in the project's research (see [Resources → Articles](/docs/resources#articles)).
 
 ## Flowifier
 
-<div className="h-48" />
+**Flowifier** is the reverse tool: it turns existing HTML into the equivalent HtmlFlow builder
+code. It is handy when migrating an existing page, a designer's static mockup, or a snippet from
+elsewhere into a type-safe HtmlFlow view, instead of retyping tags by hand.
+
+It ships as a separate artifact, `com.github.xmlet:flowifier`. The entry point is the static
+`Flowifier.fromHtml(String html)`, which returns the **Java source code** of a class that
+reproduces the given HTML with HtmlFlow:
+
+```java
+import htmlflow.flowifier.Flowifier;
+
+String html = "<html><body><h1>Hello</h1></body></html>";
+String htmlFlowJavaSource = Flowifier.fromHtml(html);
+System.out.println(htmlFlowJavaSource); // prints the generated HtmlFlow builder class
+```

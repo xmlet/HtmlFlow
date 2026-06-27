@@ -3,34 +3,547 @@ sidebar_position: 3
 hide_table_of_contents: true
 ---
 
-# Core Concepts
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-<div className="h-24" />
+# Core Concepts
 
 ## HTML Builders
 
-<div className="h-48" />
+A view is built by chaining method calls. There are four kinds of builder methods, and
+knowing what each one **returns** is the key to reading and writing HtmlFlow fluently:
+
+- **Element builders** (`html()`, `body()`, `div()`, `p()`, …) open a new element and
+  return that **child** element, so the next call nests inside it.
+- **Attribute builders** (`attrClass(...)`, `attrSrc(...)`, `attrHref(...)`, …) set an
+  attribute and return the **same** element, so you can keep chaining attributes.
+- **Text builders** (`.text(...)`, `.raw(...)`) add a text node and return the **parent**
+  element; `.text(...)` escapes its content, while `.raw(...)` emits it unescaped.
+- **Close builder** (`.__()` in Java, `.l` in Kotlin) emits the element's end tag and
+  returns its **parent**, stepping back out one level.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+HtmlFlow.doc(System.out)
+  .html()
+    .body()
+      .div().attrClass("card")   // element builder + attribute builder
+        .h1().text("Title").__() // text returns the <h1>, __() closes it
+      .__()                      // closes the <div>
+    .__()                        // closes the <body>
+  .__();                         // closes the <html>
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+System.out.doc {
+  html {
+    body {
+      div {
+        attrClass("card")
+        h1 { text("Title") }
+      } // div
+    } // body
+  } // html
+}
+```
+
+  </TabItem>
+</Tabs>
+
+In Java the `.__()` calls make the nesting explicit; the trailing `// div` comments are a
+common convention to track which element each close belongs to. In Kotlin the trailing
+lambda braces close elements for you, and `.l` is available as a shorthand for `.__()`
+when chaining without a block.
 
 ## Html Templates
 
-<div className="h-48" />
+HtmlFlow offers two ways to define a template, differing in **when** the HTML is produced.
+
+- **`HtmlFlow.doc(out)` → `HtmlDoc` (eager).** The markup is written to the `Appendable`
+  immediately, as you chain the builders. Best for a document you render once.
+- **`HtmlFlow.view(template)` → `HtmlView<M>` (lazy, reusable).** The template, an
+  `HtmlTemplate` lambda, is defined once and rendered many times, each time with a
+  different model `M`.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+// Eager: writes to System.out right away
+HtmlFlow.doc(System.out)
+  .html().body().h1().text("Welcome").__().__().__();
+
+// Lazy & reusable: defined once, rendered on demand
+HtmlView<String> view = HtmlFlow.view(page -> page
+  .html().body().h1().text("Welcome").__().__().__());
+
+String html = view.render();
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+// Eager
+System.out.doc {
+  html { body { h1 { text("Welcome") } } }
+}
+
+// Lazy & reusable
+val view = view<String> {
+  html { body { h1 { text("Welcome") } } }
+}
+
+val html = view.render()
+```
+
+  </TabItem>
+</Tabs>
+
+:::tip Why a view is faster
+An `HtmlView` separates **static** HTML (which never changes) from **dynamic** HTML (which
+depends on the model). The static blocks are resolved only once, when the view is
+instantiated, and reused on every subsequent render. Binding the same template to many
+models, the typical web-server workload, therefore avoids recomputing the parts that
+never change.
+:::
 
 ## Models and Data Binding
 
-<div className="h-48" />
+A template renders dynamic data through a **model** object. In a reusable view the model
+is passed to `render(model)`, and you read it inside a **dynamic block**:
+
+- **`.dynamic((element, model) -> ...)`**: used in an `HtmlView`; receives both the parent
+  element and the model. In Kotlin this is `.dyn { model -> ... }`.
+- **`.of(element -> ...)`**: used in an eager `HtmlDoc`; receives only the element (the
+  data is captured directly from the surrounding scope).
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+record Track(String artist, String name) {}
+
+HtmlView<Track> trackView = HtmlFlow.view(page -> page
+  .html()
+    .body()
+      .ul()
+        .<Track>dynamic((ul, track) -> ul
+          .li().text("Artist: " + track.artist()).__()
+          .li().text("Track: " + track.name()).__())
+      .__() // ul
+    .__() // body
+  .__() // html
+);
+
+// Render to a String...
+String html = trackView.render(new Track("David Bowie", "Space Oddity"));
+// ...or write straight to an Appendable
+trackView.setOut(System.out).write(new Track("David Bowie", "Space Oddity"));
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+data class Track(val artist: String, val name: String)
+
+val trackView = view<Track> {
+  html {
+    body {
+      ul {
+        dyn { track: Track ->
+          li { text("Artist: ${track.artist}") }
+          li { text("Track: ${track.name}") }
+        }
+      } // ul
+    } // body
+  } // html
+}
+
+val html = trackView.render(Track("David Bowie", "Space Oddity"))
+```
+
+  </TabItem>
+</Tabs>
+
+Only content inside a dynamic block is re-evaluated on each render; everything outside it
+is treated as a static block and emitted as-is. This split has a direct performance
+consequence: **keep dynamic blocks as small as possible.**
+
+Anything inside a `dynamic` / `dyn` block, even tags and attributes that never change, is
+rebuilt by re-walking the builders on every render. Anything outside is pre-encoded once and
+reused. So put only the model-dependent values inside the block, and leave the surrounding
+structure static.
+
+When the structure _itself_ depends on the model, see
+[Pre-encoding model-driven structure](#pre-encoding-model-driven-structure) below.
 
 ## Conditional Rendering and Loops
 
-<div className="h-48" />
+HtmlFlow has **no special syntax** for conditionals or iteration: you use ordinary Java or
+Kotlin control flow inside a dynamic (`.dynamic` / `.dyn`) or `.of` block. An `if`
+statement conditionally adds elements; a `forEach` loop repeats them.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+HtmlView<List<Track>> playlistView = HtmlFlow.view(page -> page
+  .html()
+    .body()
+      .table()
+        .tr()
+          .th().text("Artist").__()
+          .th().text("Track").__()
+        .__() // tr
+        .<List<Track>>dynamic((table, tracks) -> tracks.forEach(trk -> table
+          .tr()
+            .td().text(trk.artist()).__()
+            .td().text(trk.name()).__()
+          .__() // tr
+        ))
+      .__() // table
+    .__() // body
+  .__() // html
+);
+```
+
+```java
+// Conditional: only render the <li> when the value is present
+.<Track>dynamic((ul, track) -> {
+  if (track.diedDate() != null)
+    ul.li().text("Died in " + track.diedDate().getYear()).__();
+})
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+val playlistView = view<List<Track>> {
+  html {
+    body {
+      table {
+        tr {
+          th { text("Artist") }
+          th { text("Track") }
+        }
+        dyn { tracks: List<Track> ->
+          tracks.forEach { track ->
+            tr {
+              td { text(track.artist) }
+              td { text(track.name) }
+            }
+          }
+        }
+      } // table
+    } // body
+  } // html
+}
+```
+
+```kotlin
+// Conditional
+dyn { track: Track ->
+  if (track.diedDate != null) {
+    li { text("Died in ${track.diedDate.year}") }
+  }
+}
+```
+
+  </TabItem>
+</Tabs>
+
+### Pre-encoding model-driven structure
+
+Sometimes the HTML _structure_, not just a value, depends on the model: a loop body, or a
+branch that emits different markup. That markup has to live inside a dynamic block, so by the
+rule above it is re-walked on every render (and, in a loop, on every iteration), with its static
+tags rebuilt each time.
+
+You can recover the pre-encoding: extract the model-driven fragment into its **own** reusable
+`HtmlView` (created once, at module level) and render it where you need it, inserting the result
+with `raw(...)`. The fragment's static HTML is encoded **once** at instantiation and reused on
+every call, so each render only binds the dynamic values. A repeated table row is the clearest
+example:
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+// Created once — static <tr>/<td> structure is pre-encoded a single time
+static final HtmlView<Track> rowView = HtmlFlow.view(page -> page
+  .tr()
+    .<Track>dynamic((tr, t) -> tr.td().text(t.artist()).__())
+    .<Track>dynamic((tr, t) -> tr.td().text(t.name()).__())
+  .__());
+
+static final HtmlView<List<Track>> playlistView = HtmlFlow.view(page -> page
+  .html().body().table()
+    .<List<Track>>dynamic((table, tracks) ->
+      tracks.forEach(t -> table.raw(rowView.render(t))))
+  .__().__().__());
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+val rowView = view<Track> {
+  tr {
+    dyn { t: Track -> td { text(t.artist) } }
+    dyn { t: Track -> td { text(t.name) } }
+  }
+}
+
+val playlistView = view<List<Track>> {
+  html { body { table {
+    dyn { tracks: List<Track> ->
+      tracks.forEach { t -> raw(rowView.render(t)) }
+    }
+  } } }
+}
+```
+
+  </TabItem>
+</Tabs>
+
+This pays off only with **pre-encoding enabled** (the default) and enough static markup in the
+fragment to pay off the extra `render(...)` call. The gain comes from reusing the fragment's
+pre-encoded static blocks rather than re-walking them. Keep the fragment view in a `static final`
+field (Kotlin: a top-level `val`); creating it inside the loop, or inside the enclosing template,
+would re-run pre-encoding every time and erase the benefit.
 
 ## Configuring Views
 
-<div className="h-48" />
+A view's behaviour is configured through `HtmlFlow.ViewFactory`. The builder exposes the
+common options; `view(...)`/`doc(...)` use sensible defaults when called without a factory.
+
+```java
+HtmlView<Model> view = HtmlFlow.ViewFactory.builder()
+  .indented(true)     // pretty-print output (default true)
+  .threadSafe(false)  // make the view safe to share across threads (default false)
+  .preEncoding(true)  // pre-encode static blocks for faster rendering (default true)
+  .mfeEnabled(false)  // enable the mfe() micro-frontend builder (default false)
+  .build()
+  .view(template);
+```
+
+:::note Views are immutable
+`HtmlDoc` and `HtmlView` never mutate in place. Configuration methods such as
+`setIndented(boolean)`, `threadSafe()`, and `setOut(Appendable)` return a **new** instance
+with the change applied, so assign the result rather than relying on a side effect.
+:::
+
+Indentation is on by default; turn it off in production to emit minified HTML. Views are
+**not** thread-safe by default. Call `threadSafe()` (or set `threadSafe(true)`) before
+sharing one view across request threads.
 
 ## Reusable Components
 
-<div className="h-48" />
+Templates compose. A **fragment** (also called a _partial_) is just a function that takes a
+parent element and adds children to it: a `Consumer` of an HTML element in Java, or a
+receiver function in Kotlin. Because it accepts any element, not only the page root, the
+same fragment can be reused anywhere that element type is valid.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+// A reusable input-field fragment
+static void inputField(Div<?> container, String label, String id, Object value) {
+  container
+    .div().attrClass("form-group")
+      .label().text(label).__()
+      .input()
+        .attrClass("form-control")
+        .attrType(EnumTypeInputType.TEXT)
+        .attrId(id).attrName(id)
+        .attrValue(value.toString())
+      .__() // input
+    .__(); // div
+}
+
+// A template that builds a form from a reusable fragment
+public static HtmlView<Owner> ownerView() {
+  return HtmlFlow.view(page -> page
+    .html()
+      .body()
+        .form().attrMethod(EnumMethodType.POST)
+          .<Owner>dynamic((form, owner) -> {
+            inputField(form.div(), "Name", "name", owner.getName());
+            inputField(form.div(), "Address", "address", owner.getAddress());
+          })
+        .__() // form
+      .__() // body
+    .__() // html
+  );
+}
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+// A reusable input-field fragment
+fun Div<*>.inputField(label: String, id: String, value: Any) {
+  div {
+    attrClass("form-group")
+    label { text(label) }
+    input {
+      attrClass("form-control")
+      attrType(EnumTypeInputType.TEXT)
+      attrId(id); attrName(id)
+      attrValue(value.toString())
+    } // input
+  } // div
+}
+
+// A layout template that calls the fragment
+fun ownerView(): HtmlView<Owner> = view {
+  html {
+    body {
+      form {
+        attrMethod(EnumMethodType.POST)
+        dyn { owner: Owner ->
+          inputField("Name", "name", owner.name)
+          inputField("Address", "address", owner.address)
+        }
+      } // form
+    } // body
+  } // html
+}
+```
+
+  </TabItem>
+</Tabs>
+
+:::warning Call dynamic fragments inside a dynamic block
+When a fragment depends on the model, invoke it from inside a `dynamic()` / `dyn` block, as
+above, **not** from `of()`. Content added via `of()` is captured once as a static block, so
+a model-dependent fragment placed there would render only the first model's data and reuse
+it forever.
+:::
+
+### Layouts
+
+Fragments also compose into **layouts**. A layout is an ordinary template with "holes": rather
+than fixed markup, it accepts fragments as parameters (`Consumer<Nav<?>>`, `Consumer<Div<?>>`, …)
+and drops each one into place with the `.of(fragment::accept)` builder.
+
+`.of(navbar::accept)` is shorthand for `.of(nav -> navbar.accept(nav))`: it chains a consumer of
+the most recently created element, so the fragment fills exactly that spot.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+// A layout with "navbar" and "content" holes
+static HtmlView<Owner> layout(Consumer<Nav<?>> navbar, Consumer<Div<?>> content) {
+  return HtmlFlow.view(page -> page
+    .html()
+      .head()
+        .title().text("PetClinic").__()
+      .__() // head
+      .body()
+        .nav().of(navbar::accept).__()  // fill the navbar hole
+        .div().attrClass("container")
+          .of(content::accept)          // fill the content hole
+        .__() // div
+      .__() // body
+    .__() // html
+  );
+}
+
+// Build a concrete view by passing fragments into the layout
+HtmlView<Owner> ownerView = layout(
+  nav -> nav.a().attrHref("/").text("Home").__(),
+  div -> div.h1().text("Owner").__());
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+// A layout with "navbar" and "content" holes
+fun layout(navbar: Nav<*>.() -> Unit, content: Div<*>.() -> Unit): HtmlView<Owner> =
+  view {
+    html {
+      head { title { text("PetClinic") } }
+      body {
+        nav { navbar() }       // fill the navbar hole
+        div {
+          attrClass("container")
+          content()            // fill the content hole
+        }
+      }
+    }
+  }
+
+// Build a concrete view by passing fragments into the layout
+val ownerView = layout(
+  navbar = { a { attrHref("/"); text("Home") } },
+  content = { h1 { text("Owner") } })
+```
+
+  </TabItem>
+</Tabs>
+
+Because the layout is itself a reusable `HtmlView`, its static skeleton (head, `nav`/`div`
+structure) is pre-encoded once; only the inserted fragments change between the views you build
+from it.
 
 ## Dynamic Content
 
-<div className="h-48" />
+Some content is not known at render time and must be loaded from another service. The v5
+**`mfe()`** builder embeds a _micro-frontend_: an HTML fragment fetched from a remote URL,
+supporting both server-side rendering (SSR) and client-side rendering (CSR) with optional
+event wiring between fragments. It requires a view built with `mfeEnabled(true)`.
+
+```java
+HtmlView<?> view = HtmlFlow.ViewFactory.builder()
+  .mfeEnabled(true)
+  .build()
+  .view(page -> page
+    .html()
+      .head().__()
+      .body()
+        .div()
+          .mfe(cfg -> {
+            cfg.setMfeUrlResource("http://localhost:8081/bikes");
+            cfg.setMfeName("mfe1");
+            cfg.setMfeElementName("some-element");
+            cfg.setMfeListeningEventName("triggerBikeEvent");
+            cfg.setMfeTriggersEventName("triggerCartEvent");
+            cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js");
+            cfg.setMfeStylingUrl("http://localhost:8081/css/style.css");
+          })
+        .__() // div
+      .__() // body
+    .__() // html
+  );
+```
+
+The same `mfe(cfg -> ...)` builder is available from the Kotlin DSL inside the corresponding
+element block.
+
+For content that arrives **asynchronously** (reactive streams, futures, or Kotlin suspend
+functions) and for streaming the HTML out progressively, see
+[Advanced → Asynchronous Rendering](/docs/advanced#asynchronous-rendering) and
+[Streaming HTML](/docs/advanced#streaming-html).

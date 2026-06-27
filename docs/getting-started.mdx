@@ -3,14 +3,121 @@ sidebar_position: 2
 hide_table_of_contents: true
 ---
 
-# Getting Started
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-<div className="h-24" />
+# Getting Started
 
 ## Installation
 
-<div className="h-48" />
+HtmlFlow requires **Java 17 or later** and is published on
+[Maven Central](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow).
+Add the core artifact for Java projects; Kotlin projects add the `htmlflow-kotlin`
+artifact, which adds a Kotlin-friendly DSL on top of the core.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```xml title="pom.xml (Maven)"
+<dependency>
+  <groupId>com.github.xmlet</groupId>
+  <artifactId>htmlflow</artifactId>
+  <version>5.0.4</version>
+</dependency>
+```
+
+```groovy title="build.gradle (Gradle)"
+implementation 'com.github.xmlet:htmlflow:5.0.4'
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```xml title="pom.xml (Maven)"
+<dependency>
+  <groupId>com.github.xmlet</groupId>
+  <artifactId>htmlflow-kotlin</artifactId>
+  <version>5.0.4</version>
+</dependency>
+```
+
+```groovy title="build.gradle (Gradle)"
+implementation 'com.github.xmlet:htmlflow-kotlin:5.0.4'
+```
+
+  </TabItem>
+</Tabs>
 
 ## Quick Start
 
-<div className="h-48" />
+The quickest way to produce HTML is `HtmlFlow.doc(...)`, which writes directly to any
+`Appendable`: `System.out`, a `StringBuilder`, a servlet writer, and so on. Build the
+document fluently and HtmlFlow emits the markup as you go.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+import htmlflow.HtmlFlow;
+
+public class Example {
+  public static void main(String[] args) {
+    HtmlFlow
+      .doc(System.out)
+        .html()
+          .head()
+            .title().text("Getting Started").__()
+          .__() // head
+          .body()
+            .h1().text("Hello, HtmlFlow!").__()
+            .p().text("Rendered with type-safe HTML.").__()
+          .__() // body
+        .__(); // html
+  }
+}
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+import htmlflow.*
+
+fun main() {
+  System.out.doc {
+    html {
+      head {
+        title { text("Getting Started") }
+      }
+      body {
+        h1 { text("Hello, HtmlFlow!") }
+        p { text("Rendered with type-safe HTML.") }
+      } // body
+    } // html
+  }
+}
+```
+
+  </TabItem>
+</Tabs>
+
+Running either program prints:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Getting Started</title>
+  </head>
+  <body>
+    <h1>Hello, HtmlFlow!</h1>
+    <p>Rendered with type-safe HTML.</p>
+  </body>
+</html>
+```
+
+`HtmlFlow.doc(...)` renders eagerly and is ideal for one-off documents. When you need to
+render the **same** template repeatedly with different data (the common case in a web
+application), use a reusable `HtmlFlow.view(...)`, which binds a data model and resolves
+its static HTML only once. That, along with the rest of the API, is covered next in
+[Core Concepts](/docs/core-concepts).
