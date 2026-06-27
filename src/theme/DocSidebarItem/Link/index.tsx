@@ -34,7 +34,6 @@ export default function DocSidebarItemLink({
         'menu__list-item',
         className
       )}
-      key={label}
     >
       <Link
         className={clsx('menu__link group', !isInternalLink && 'items-center', {

@@ -14,6 +14,7 @@ import useIsBrowser from '@docusaurus/useIsBrowser';
 import DocSidebarItems from '@theme/DocSidebarItems';
 import DocSidebarItemLink from '@theme/DocSidebarItem/Link';
 import type { Props } from '@theme/DocSidebarItem/Category';
+import type { Props as LinkProps } from '@theme/DocSidebarItem/Link';
 
 function useAutoExpandActiveCategory({
   isActive,
@@ -117,7 +118,7 @@ function DocSidebarItemCategoryEmpty({ item, ...props }: Props) {
     type: 'link' as const,
     ...forwardableProps,
   };
-  return <DocSidebarItemLink item={linkItem as any} {...props} />;
+  return <DocSidebarItemLink item={linkItem as LinkProps['item']} {...props} />;
 }
 
 function DocSidebarItemCategoryCollapsible({ item, onItemClick, activePath, level, index, ...props }: Props) {

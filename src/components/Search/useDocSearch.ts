@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {
   fetchIndexesByWorker,
@@ -101,13 +101,13 @@ export function useDocSearch(query: string) {
   const warmed = useRef(false);
   const reqId = useRef(0);
 
-  const warmup = () => {
+  const warmup = useCallback(() => {
     if (warmed.current) return;
     warmed.current = true;
     void fetchIndexesByWorker(baseUrl, '').catch(() => {
       /* no-op: index unavailable (e.g. dev) */
     });
-  };
+  }, [baseUrl]);
 
   useEffect(() => {
     const trimmed = query.trim();

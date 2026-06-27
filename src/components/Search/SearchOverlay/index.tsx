@@ -67,7 +67,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }): Rea
   useEffect(() => {
     warmup();
     inputRef.current?.focus();
-  }, []);
+  }, [warmup]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
