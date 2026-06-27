@@ -80,9 +80,10 @@ html[data-theme='dark'] .theme-doc-sidebar-item-link .menu__link.hash-active {
   background: var(--ifm-color-emphasis-100) !important;
 }
 
-html[data-theme='dark'] .theme-doc-sidebar-item-category-level-2,
-> .menu__list-item-collapsible,
-> .menu__link.hash-active {
+html[data-theme='dark']
+  .theme-doc-sidebar-item-category-level-2
+  > .menu__list-item-collapsible
+  > .menu__link.hash-active {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 

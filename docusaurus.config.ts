@@ -18,7 +18,7 @@ const config: Config = {
   organizationName: 'xmlet',
   projectName: 'HtmlFlow',
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
 
   i18n: {
     defaultLocale: 'en',
