@@ -331,6 +331,9 @@ would re-run pre-encoding every time and erase the benefit.
 A view's behaviour is configured through `HtmlFlow.ViewFactory`. The builder exposes the
 common options; `view(...)`/`doc(...)` use sensible defaults when called without a factory.
 
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
 ```java
 HtmlView<Model> view = HtmlFlow.ViewFactory.builder()
   .indented(true)     // pretty-print output (default true)
@@ -340,6 +343,25 @@ HtmlView<Model> view = HtmlFlow.ViewFactory.builder()
   .build()
   .view(template);
 ```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+The Kotlin DSL's `view { }` uses defaults; to change them, build the view through
+the same `ViewFactory`:
+
+```kotlin
+val view: HtmlView<Model> = HtmlFlow.ViewFactory.builder()
+  .indented(true)     // pretty-print output (default true)
+  .threadSafe(false)  // make the view safe to share across threads (default false)
+  .preEncoding(true)  // pre-encode static blocks for faster rendering (default true)
+  .mfeEnabled(false)  // enable the mfe() micro-frontend builder (default false)
+  .build()
+  .view(template)
+```
+
+  </TabItem>
+</Tabs>
 
 :::note Views are immutable
 `HtmlDoc` and `HtmlView` never mutate in place. Configuration methods such as
@@ -516,6 +538,9 @@ Some content is not known at render time and must be loaded from another service
 supporting both server-side rendering (SSR) and client-side rendering (CSR) with optional
 event wiring between fragments. It requires a view built with `mfeEnabled(true)`.
 
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
 ```java
 HtmlView<?> view = HtmlFlow.ViewFactory.builder()
   .mfeEnabled(true)
@@ -540,8 +565,40 @@ HtmlView<?> view = HtmlFlow.ViewFactory.builder()
   );
 ```
 
-The same `mfe(cfg -> ...)` builder is available from the Kotlin DSL inside the corresponding
-element block.
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+The Kotlin DSL has no sugar for `mfeEnabled`, so build the view through the same
+`ViewFactory`; `mfe { }` is then available inside any element block:
+
+```kotlin
+import htmlflow.*
+
+val view: HtmlView<*> = HtmlFlow.ViewFactory.builder()
+  .mfeEnabled(true)
+  .build()
+  .view<Any> { page ->
+    page.html {
+      head { }
+      body {
+        div {
+          mfe { cfg ->
+            cfg.setMfeUrlResource("http://localhost:8081/bikes")
+            cfg.setMfeName("mfe1")
+            cfg.setMfeElementName("some-element")
+            cfg.setMfeListeningEventName("triggerBikeEvent")
+            cfg.setMfeTriggersEventName("triggerCartEvent")
+            cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js")
+            cfg.setMfeStylingUrl("http://localhost:8081/css/style.css")
+          }
+        } // div
+      } // body
+    } // html
+  }
+```
+
+  </TabItem>
+</Tabs>
 
 For content that arrives **asynchronously** (reactive streams, futures, or Kotlin suspend
 functions) and for streaming the HTML out progressively, see
