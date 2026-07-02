@@ -7,6 +7,127 @@ hide_table_of_contents: true
 
 ## data-\*
 
+[DataStar](https://data-star.dev/) is a hypermedia framework that builds interactive web
+applications by extending HTML with declarative **`data-*` attributes**. Rather than introducing a
+template language or a client-side component model, it enhances standard HTML with reactive
+behavior, making it a natural fit for HtmlFlow.
+
+The **`htmlflow-datastar`** module extends **`htmlflow-kotlin`** with a **type-safe DSL** for DataStar's
+attributes and expressions. Instead of writing `data-*` attributes and JavaScript expressions as
+strings, they are represented through Kotlin APIs that provide compile-time validation, IDE
+completion, and seamless integration with the existing HtmlFlow Kotlin DSL.
+
+### 1. Dependencies
+
+### 1. Dependency
+
+Add the **`htmlflow-datastar`** module to your project. It already depends on **`htmlflow-kotlin`**, so no additional HtmlFlow modules are required.
+
+```groovy
+implementation 'com.github.xmlet:htmlflow-datastar:1.3.0-alpha'
+```
+
+### 2. Type-safe signals and attributes
+
+DataStar manages reactive state through **`signals`**, which are created and consumed by different **`data-*`** attributes. In HtmlFlow Datastar, a signal
+is created once using **`dataSignal`** and represented as a typed **`Signal<T>`** object that can be reused throughout the view. Instead of referencing signals
+through string-based **`data-*`** attributes, builders such as **`dataText`**, **`dataShow`**, and **`dataClass`** accept **`Signal<T>`** objects directly, providing
+type safety, IDE completion, and consistent signal references. As shown below, the **`count`** signal is created once and then passed to **`dataText`** to display its value.
+
+```kotlin
+div {
+  val count: Signal<Int> = dataSignal("count", 0)
+  div {
+    dataInit { get(::getCounterEvents) }
+    span {
+      attrId("counter")
+      dataText { +count }
+    }
+  }
+}
+```
+
+This produces the equivalent DataStar markup:
+
+```html
+<div data-signals:count="0" data-init="@get('/examples/counter/events')">
+  <span id="counter" data-text="$count"></span>
+</div>
+```
+
+Reusing the same **`Signal<T>`** object avoids misspelled signal names and keeps references consistent.
+
+### 3. Type-safe events and modifiers
+
+User interactions are defined through **`data-on:*`** attributes. HtmlFlow Datastar exposes these as
+typed event builders, where the event type (**`Click`**, **`Input`**, etc.), the action, and any modifiers
+are expressed through Kotlin APIs rather than string concatenation.
+
+In this example, the input is bound to the **`search`** signal. Every input event performs a **GET**
+request after a **200 ms** debounce.
+
+```kotlin
+div {
+  val search: Signal<String> = dataSignal("search", "")
+  input {
+    attrType(EnumTypeInputType.TEXT)
+    attrPlaceholder("Search...")
+    dataBind(search)
+    dataOn(Input) {
+      get(::search)
+      modifiers { debounce(200.milliseconds) }
+    }
+  }
+}
+```
+
+Which produces:
+
+```html
+<div data-signals:search="''">
+  <input type="text" placeholder="Search..." data-bind:search data-on:input__debounce="@get('/examples/search')" />
+</div>
+```
+
+Typed events and modifiers eliminate invalid event names and malformed modifier syntax.
+
+### 4. Type-safe expressions
+
+Many DataStar attributes accept JavaScript-like expressions. Instead of writing these expressions as
+strings, HtmlFlow Datastar represents them as Kotlin objects that can be combined using familiar
+operators such as **`and`**, **`or`**, and **`not`**.
+
+In the following example, **`dataIndicator`** creates a reactive indicator that is referenced both by
+the **`disabled`** attribute and by the click handler.
+
+```kotlin
+button {
+  val fetching: Signal<Boolean> = dataIndicator("_fetching")
+  dataAttr("disabled") { +fetching }
+  dataOn(Click) {
+      !fetching and get(::clickToLoadMore)
+  }
+  text("Load More")
+}
+```
+
+Which generates:
+
+```html
+<button
+  data-indicator:_fetching
+  data-attr:disabled="$_fetching"
+  data-on:click="!$_fetching && @get('/examples/click_to_load/more')"
+>
+  Load More
+</button>
+```
+
+Expressions can be composed and refactored using Kotlin operators instead of string concatenation.
+
+**HtmlFlow Datastar** generates standard **DataStar** HTML, enabling developers to build reactive user interfaces
+declaratively with a fully **type-safe** Kotlin DSL while preserving compatibility with the **DataStar** runtime.
+
 ## http4k
 
 [http4k](https://www.http4k.org/) is a Kotlin HTTP toolkit built on the idea of handlers as plain
