@@ -27,13 +27,91 @@ function useHashActiveSidebar() {
 
     const clearActive = () =>
       document
-        .querySelectorAll<HTMLElement>(`.theme-doc-sidebar-container .menu__link.${ACTIVE_CLASS}`)
+        .querySelectorAll<HTMLElement>(`.menu__link.${ACTIVE_CLASS}`)
         .forEach(el => el.classList.remove(ACTIVE_CLASS));
+
+    const removePills = () => document.querySelectorAll('.hf-sidebar-pill').forEach(el => el.remove());
+
+    document.querySelectorAll('.navbar-sidebar .hf-sidebar-pill').forEach(el => el.remove());
 
     if (!isDocsPage) {
       clearActive();
+      removePills();
       return;
     }
+
+    const positionPill = (link: HTMLElement) => {
+      if (link.closest('.navbar-sidebar')) return;
+      const menu = link.closest<HTMLElement>('.theme-doc-sidebar-menu');
+      if (!menu) return;
+      const rect = link.getBoundingClientRect();
+      if (!rect.height) return; // sidebar hidden in this layout
+      let pill = menu.querySelector<HTMLElement>(':scope > .hf-sidebar-pill');
+      const isNew = !pill;
+      if (!pill) {
+        pill = document.createElement('div');
+        pill.className = 'hf-sidebar-pill';
+        menu.prepend(pill);
+      }
+      if (isNew) pill.style.transition = 'none';
+      const menuRect = menu.getBoundingClientRect();
+      pill.style.transform = `translate(${rect.left - menuRect.left}px, ${rect.top - menuRect.top}px)`;
+      pill.style.width = `${rect.width}px`;
+      pill.style.height = `${rect.height}px`;
+      pill.style.opacity = '1';
+      if (isNew) {
+        void pill.offsetHeight; // flush styles so the first paint isn't animated
+        pill.style.transition = '';
+      }
+    };
+
+    let disposed = false;
+
+    const updateActive = () => {
+      if (disposed) return;
+      const sidebarIds = new Set(
+        Array.from(
+          document.querySelectorAll<HTMLAnchorElement>('.theme-doc-sidebar-item-link .menu__link[href*="#"]')
+        ).map(a => decodeURIComponent(new URL(a.href, window.location.href).hash.slice(1)))
+      );
+      const headings = Array.from(
+        document.querySelectorAll<HTMLElement>('.theme-doc-markdown h2[id], .theme-doc-markdown h3[id]')
+      ).filter(h => sidebarIds.has(h.id));
+      if (!headings.length) {
+        setTimeout(updateActive, 200);
+        return;
+      }
+
+      const navH = document.querySelector<HTMLElement>('.navbar')?.getBoundingClientRect().height ?? 60;
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8;
+
+      let active = headings[0];
+      for (const h of headings) {
+        if (h.getBoundingClientRect().top <= navH + 24) active = h;
+      }
+      const activeId = atBottom ? headings[headings.length - 1].id : active.id;
+
+      clearActive();
+      document
+        .querySelectorAll<HTMLElement>(`.theme-doc-sidebar-item-link .menu__link[href$="#${activeId}"]`)
+        .forEach(link => {
+          link.classList.add(ACTIVE_CLASS);
+          positionPill(link);
+        });
+    };
+
+    const scrollAndUpdate = (id: string) => {
+      scrollToId(id);
+      const fallback = setTimeout(updateActive, 700);
+      window.addEventListener(
+        'scrollend',
+        () => {
+          clearTimeout(fallback);
+          updateActive();
+        },
+        { once: true }
+      );
+    };
 
     const handleDocumentClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -47,59 +125,27 @@ function useHashActiveSidebar() {
       e.preventDefault();
       window.history.pushState(null, '', `${url.pathname}${url.search}${url.hash}`);
       previousHash.current = url.hash;
-      scrollToId(decodeURIComponent(url.hash.slice(1)));
+      scrollAndUpdate(decodeURIComponent(url.hash.slice(1)));
     };
 
     document.addEventListener('click', handleDocumentClick, true);
 
     if (hash && hash !== previousHash.current) {
-      window.setTimeout(() => scrollToId(decodeURIComponent(hash.slice(1))), 0);
+      window.setTimeout(() => scrollAndUpdate(decodeURIComponent(hash.slice(1))), 0);
+    } else {
+      setTimeout(updateActive, 150);
     }
     previousHash.current = hash;
 
-    const updateActive = () => {
-      const headings = Array.from(
-        document.querySelectorAll<HTMLElement>('.theme-doc-markdown h2[id], .theme-doc-markdown h3[id]')
-      );
-      if (!headings.length) return;
-
-      const navH = document.querySelector<HTMLElement>('.navbar')?.getBoundingClientRect().height ?? 60;
-      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-
-      let active = headings[0];
-      for (const h of headings) {
-        if (h.getBoundingClientRect().top <= navH + 24) active = h;
-      }
-      const activeId = atBottom ? headings[headings.length - 1].id : active.id;
-
-      clearActive();
-      const link = document.querySelector<HTMLElement>(
-        `.theme-doc-sidebar-item-link .menu__link[href$="#${activeId}"]`
-      );
-      if (link) {
-        link.classList.add(ACTIVE_CLASS);
-        link
-          .closest('.theme-doc-sidebar-item-category-level-2')
-          ?.querySelector<HTMLElement>(':scope > .menu__list-item-collapsible > .menu__link')
-          ?.classList.add(ACTIVE_CLASS);
-      } else {
-        document
-          .querySelector<HTMLElement>(
-            `.theme-doc-sidebar-item-category-level-2 > .menu__list-item-collapsible > .menu__link[href="${normalizedPath}"]`
-          )
-          ?.classList.add(ACTIVE_CLASS);
-      }
-    };
-
     window.addEventListener('scroll', updateActive, { passive: true });
     window.addEventListener('resize', updateActive, { passive: true });
-    const timer = setTimeout(updateActive, 150);
+    document.fonts?.ready.then(updateActive);
 
     return () => {
+      disposed = true;
       document.removeEventListener('click', handleDocumentClick, true);
       window.removeEventListener('scroll', updateActive);
       window.removeEventListener('resize', updateActive);
-      clearTimeout(timer);
       clearActive();
     };
   }, [pathname, hash, isDocsPage]);

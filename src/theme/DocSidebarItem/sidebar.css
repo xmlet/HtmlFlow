@@ -32,7 +32,6 @@ html[data-theme='dark'] .theme-doc-sidebar-item-category-level-1 + .theme-doc-si
   border-top-color: rgba(255, 255, 255, 0.06);
 }
 
-.theme-doc-sidebar-item-category-level-2 > .menu__list-item-collapsible,
 .theme-doc-sidebar-item-link {
   margin-bottom: 0.08rem;
 }
@@ -44,6 +43,7 @@ html[data-theme='dark'] .theme-doc-sidebar-item-category-level-1 + .theme-doc-si
   background: none !important;
   transition:
     color 0.15s ease,
+    background 0.2s ease,
     box-shadow 0.15s ease;
 }
 
@@ -60,31 +60,48 @@ html[data-theme='dark'] .theme-doc-sidebar-item-link .menu__link:hover {
 .theme-doc-sidebar-item-link .menu__link.hash-active {
   color: var(--ifm-color-primary) !important;
   font-weight: 600;
+}
+
+.navbar-sidebar .theme-doc-sidebar-item-link .menu__link {
+  transition: color 0.15s ease;
+}
+
+.navbar-sidebar .theme-doc-sidebar-item-link .menu__link.hash-active {
   background: var(--ifm-color-emphasis-100) !important;
 }
 
-html[data-theme='dark'] .theme-doc-sidebar-item-link .menu__link--active,
-html[data-theme='dark'] .theme-doc-sidebar-item-link .menu__link.hash-active {
+html[data-theme='dark'] .navbar-sidebar .theme-doc-sidebar-item-link .menu__link.hash-active {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 
-.theme-doc-sidebar-item-category-level-2 > .menu__list-item-collapsible > .menu__link--active {
-  color: var(--ifm-font-color-base) !important;
-  font-weight: 600;
-  background: none !important;
-  box-shadow: none;
+.theme-doc-sidebar-menu {
+  position: relative;
 }
 
-.theme-doc-sidebar-item-category-level-2 > .menu__list-item-collapsible > .menu__link.hash-active {
-  color: var(--ifm-color-primary) !important;
-  background: var(--ifm-color-emphasis-100) !important;
+.theme-doc-sidebar-item-link .menu__link {
+  position: relative;
+  z-index: 1;
 }
 
-html[data-theme='dark']
-  .theme-doc-sidebar-item-category-level-2
-  > .menu__list-item-collapsible
-  > .menu__link.hash-active {
-  background: rgba(255, 255, 255, 0.05) !important;
+.hf-sidebar-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: 6px;
+  background: var(--ifm-color-emphasis-100);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition:
+    transform 0.15s ease,
+    width 0.15s ease,
+    height 0.15s ease,
+    opacity 0.15s ease;
+}
+
+html[data-theme='dark'] .hf-sidebar-pill {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .menu__link--sublist-caret::after {

@@ -132,6 +132,14 @@ html[data-theme='dark'] .footer {
   }
 }
 
+/* Footer columns stack below infima's 996px breakpoint — center them */
+@media (max-width: 996px) {
+  .footer__col,
+  .footer__copyright {
+    text-align: center;
+  }
+}
+
 .footer__link-item {
   display: inline-flex;
   align-items: center;
