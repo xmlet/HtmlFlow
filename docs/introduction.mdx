@@ -13,7 +13,7 @@ import TabItem from '@theme/TabItem';
 HtmlFlow is a Java library for writing **type-safe HTML** documents in a fluent
 style, with first-class support for both **Java and Kotlin**. Instead of a separate
 template language with its own syntax and dialects, you build HTML directly in your
-host language, where every element and attribute is a strongly-typed method call.
+host language, where every element and attribute is statically typed.
 
 It is an _internal DSL_: HTML lives inside Java/Kotlin itself, so
 the entire toolchain you already use (the compiler, the debugger, IDE autocompletion)
@@ -75,7 +75,7 @@ keep the markup in separate template files written in their own custom syntax. T
 has real downsides:
 
 - **No compile-time safety.** A misspelled tag, a misplaced attribute, or a typo in a
-  variable name is only discovered at render time, often in production.
+  variable name is only discovered at render time.
 - **A second language to learn.** Each engine invents its own syntax for conditionals,
   loops, and includes, none of which your IDE understands as well as plain code.
 - **Limited tooling.** Refactoring, find-usages, type inference, and step-debugging stop
@@ -93,23 +93,26 @@ undoes each of those costs in turn.
   autocompletion even suggests **only** the elements and attributes valid in the current
   context.
 
-It is also fast. Independent [template-engine benchmarks](https://github.com/xmlet/template-benchmark)
-rank HtmlFlow as the most performant engine among the leading text-based
-template engines, and on par with other HTML DSL libraries such as j2html and
-kotlinx.html.
+On the JVM, there are several HTML DSL alternatives, including libraries such as
+j2html and kotlinx.html. In benchmark suites such as the
+[template-benchmark](https://github.com/xmlet/template-benchmark) project,
+HtmlFlow outperforms these libraries and ranks among the best-performing
+text-based template engines.
 
 ## Approach
 
 The fluent API is **auto-generated from the HTML 5.2 XSD schema** using the
-[xmlet](https://github.com/xmlet) tooling. Each element exposes exactly the children and
+[xmlet/xsd2poet](https://github.com/xmlet/xsd2poet) tooling.
+Each element exposes exactly the children and
 attributes the specification allows, and attribute values are constrained by enumerated
 types where the spec defines a fixed set. As a result, invalid markup such as nesting a
 `<div>` directly inside an `<h1>` does not compile, because the method does not exist in
 that context.
 
 Every view is built from two kinds of content: **static** blocks, which never change, and
-**dynamic** blocks, which depend on a data model. Separating the two is what lets HtmlFlow
-pre-compute the static parts once and bind only the dynamic parts on each render.
+**dynamic** blocks, which depend on a data model. Separating the two is what lets HtmlFlow:
+
+> **pre-encode** the static parts **once** and **bind** only the dynamic parts **on each render**.
 
 Continue to [Getting Started](/docs/getting-started) to add HtmlFlow to your project and
 render your first page, then to [Core Concepts](/docs/core-concepts) for the builder API,

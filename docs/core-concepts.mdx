@@ -41,6 +41,7 @@ HtmlFlow.doc(System.out)
 
 ```kotlin
 import htmlflow.*
+import org.xmlet.htmlapifaster.*
 
 System.out.doc {
   html {
@@ -76,15 +77,18 @@ HtmlFlow offers two ways to define a template, differing in **when** the HTML is
   <TabItem value="java" label="Java">
 
 ```java
-// Eager: writes to System.out right away
-HtmlFlow.doc(System.out)
-  .html().body().h1().text("Welcome").__().__().__();
+// Lazily builds a reusable view. Created once and rendered multiple times.
+static HtmlView<String> view = HtmlFlow.view(page -> page
+        .html().body().h1().<String>dynamic((h1, name) -> h1.text("Welcome " + name)).__().__().__());
 
-// Lazy & reusable: defined once, rendered on demand
-HtmlView<String> view = HtmlFlow.view(page -> page
-  .html().body().h1().text("Welcome").__().__().__());
+static void printTwice(String name) {
+    // Builds and renders on the fly.
+    HtmlFlow.doc(System.out)
+            .html().body().h1().text("Welcome " + name).__().__().__();
 
-String html = view.render();
+    // Binds and renders a pre-encoded view.
+    view.setOut(System.out).write(name);
+}
 ```
 
   </TabItem>
@@ -92,18 +96,21 @@ String html = view.render();
 
 ```kotlin
 import htmlflow.*
+import org.xmlet.htmlapifaster.*
 
-// Eager
-System.out.doc {
-  html { body { h1 { text("Welcome") } } }
-}
-
-// Lazy & reusable
+// Lazily builds a reusable view. Created once and rendered multiple times.
 val view = view<String> {
-  html { body { h1 { text("Welcome") } } }
-}
+        html { body { h1 { dyn { name: String -> text("Welcome $name") } } } }
+    }
 
-val html = view.render()
+fun printTwice(name: String) {
+    // Builds and renders on the fly.
+    System.out.doc {
+        html { body { h1 { text("Welcome $name") } } }
+    }
+    // Binds and renders the pre-encoded view.
+    view.setOut(System.out).write(name)
+}
 ```
 
   </TabItem>
@@ -120,7 +127,7 @@ never change.
 ## Models and Data Binding
 
 A template renders dynamic data through a **model** object. In a reusable view the model
-is passed to `render(model)`, and you read it inside a **dynamic block**:
+is passed to `write(model)` or `render(model)`, and you read it inside a **dynamic block**:
 
 - **`.dynamic((element, model) -> ...)`**: used in an `HtmlView`; receives both the parent
   element and the model. In Kotlin this is `.dyn { model -> ... }`.
