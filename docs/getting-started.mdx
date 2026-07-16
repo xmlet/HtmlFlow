@@ -51,8 +51,8 @@ implementation 'com.github.xmlet:htmlflow-kotlin:5.0.4'
 ## Quick Start
 
 The quickest way to produce HTML is `HtmlFlow.doc(...)`, which writes directly to any
-`Appendable`: `System.out`, a `StringBuilder`, a servlet writer, and so on. Build the
-document fluently and HtmlFlow emits the markup as you go.
+`Appendable`: `System.out`, a `StringBuilder`, a `Writer`, or other.
+Build the document fluently and HtmlFlow emits the markup as you go.
 
 <Tabs groupId="lang">
   <TabItem value="java" label="Java">
@@ -82,6 +82,7 @@ public class Example {
 
 ```kotlin
 import htmlflow.*
+import org.xmlet.htmlapifaster.*
 
 fun main() {
   System.out.doc {

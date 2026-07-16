@@ -20,6 +20,13 @@ async data resolves, producing malformed output. `HtmlViewAsync`, created with
 `onCompletion` callback. HtmlFlow pauses emission of everything after the block until you signal
 `onCompletion.finish()`, guaranteeing well-formed HTML regardless of when the data completes.
 
+The listing below shows how `await` can be used with a Reactive Streams
+publisher such as a Reactor `Flux`. The `await` block subscribes to the stream
+and emits a table row for each `Track` as it arrives. Once the publisher
+completes, it invokes the provided `onCompletion` callback, allowing HtmlFlow to
+resume rendering the remainder of the document while preserving well-formed
+HTML.
+
 <Tabs groupId="lang">
   <TabItem value="java" label="Java">
 
