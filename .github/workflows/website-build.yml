@@ -1,0 +1,37 @@
+name: Website build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type check
+        run: yarn typecheck
+
+      - name: Format check
+        run: yarn format:check
+
+      - name: Build site
+        run: yarn build
+
+      - name: Verify agent-readiness artifacts
+        run: |
+          test -f build/llms.txt
+          test -f build/llms-full.txt
+          test -f build/robots.txt
+          test -f build/docs/introduction/index.md
+          test -f build/docs/core-concepts/index.md
+          ! grep -rl "<TabItem" build/docs --include="*.md"

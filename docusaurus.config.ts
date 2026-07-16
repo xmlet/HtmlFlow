@@ -150,7 +150,7 @@ const config: Config = {
           title: 'More',
           items: [
             { label: 'News', to: '/blog' },
-            { label: 'RSS Feed', href: '/blog/rss.xml' },
+            { label: 'RSS Feed', href: 'pathname:///blog/rss.xml' },
             { label: 'Maven Central', href: 'https://search.maven.org/artifact/com.github.xmlet/htmlflow' },
           ],
         },
@@ -160,6 +160,7 @@ const config: Config = {
   } satisfies Preset.ThemeConfig,
   plugins: [
     './src/plugins/tailwind-config.js',
+    './src/plugins/agent-ready.js',
     [
       require.resolve('@easyops-cn/docusaurus-search-local'),
       {

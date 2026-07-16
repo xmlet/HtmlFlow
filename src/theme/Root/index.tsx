@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useLocation } from '@docusaurus/router';
+import Head from '@docusaurus/Head';
 
 const ACTIVE_CLASS = 'hash-active';
 const SMOOTH_SCROLL_CLASS = 'docs-smooth-scroll';
@@ -151,7 +152,27 @@ function useHashActiveSidebar() {
   }, [pathname, hash, isDocsPage]);
 }
 
+/**
+ * Points AI agents at the plain-markdown mirror of the current docs page
+ * (generated at build time by src/plugins/agent-ready.js).
+ */
+function MarkdownAlternateLink(): React.ReactElement | null {
+  const { pathname } = useLocation();
+  if (!(pathname === '/docs' || pathname.startsWith('/docs/'))) return null;
+  const base = pathname.endsWith('/') ? pathname : `${pathname}/`;
+  return (
+    <Head>
+      <link rel="alternate" type="text/markdown" href={`${base}index.md`} />
+    </Head>
+  );
+}
+
 export default function Root({ children }: { children: React.ReactNode }): React.ReactElement {
   useHashActiveSidebar();
-  return <>{children}</>;
+  return (
+    <>
+      <MarkdownAlternateLink />
+      {children}
+    </>
+  );
 }
