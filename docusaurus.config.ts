@@ -162,6 +162,19 @@ const config: Config = {
     './src/plugins/tailwind-config.js',
     './src/plugins/agent-ready.js',
     [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          { from: '/install', to: '/docs/getting-started' },
+          { from: '/features', to: '/docs/introduction' },
+          { from: '/features_version3', to: '/docs/introduction' },
+          { from: '/about', to: '/docs/introduction' },
+          { from: '/news.html', to: '/blog' },
+          { from: '/news_archive.html', to: '/blog' },
+        ],
+      },
+    ],
+    [
       require.resolve('@easyops-cn/docusaurus-search-local'),
       {
         hashed: true,
