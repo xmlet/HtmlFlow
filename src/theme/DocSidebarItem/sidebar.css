@@ -4,10 +4,21 @@
 }
 
 .theme-doc-sidebar-container .menu__link--active,
-.theme-doc-sidebar-container .menu__link--active:hover,
+.theme-doc-sidebar-container .menu__link--active:hover {
+  background: none !important;
+}
+
+/* Active section header: full-width bar on the collapsible row (not the
+   inner flex link, which excludes the caret button). Matches the leaf pill. */
 .theme-doc-sidebar-container .menu__list-item-collapsible--active,
 .theme-doc-sidebar-container .menu__list-item-collapsible--active:hover {
-  background: none !important;
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 6px;
+}
+
+html[data-theme='dark'] .theme-doc-sidebar-container .menu__list-item-collapsible--active,
+html[data-theme='dark'] .theme-doc-sidebar-container .menu__list-item-collapsible--active:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
