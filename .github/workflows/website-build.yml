@@ -4,7 +4,6 @@ on:
   push:
   pull_request:
 
-# Never let two deploys race for the gh-pages branch.
 concurrency:
   group: website-${{ github.ref }}
   cancel-in-progress: false
@@ -46,37 +45,28 @@ jobs:
           test -f build/CNAME
           test -f build/.nojekyll
 
-      - name: Upload site
-        if: github.event_name == 'push' && github.ref == 'refs/heads/website'
-        uses: actions/upload-artifact@v4
+      # Packages build/ as the tarball actions/deploy-pages consumes.
+      # Unlike upload-artifact, this preserves hidden files such as .nojekyll.
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/gh-pages'
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: site
           path: build
-          # build/.nojekyll is hidden; v4 drops hidden files unless asked.
-          include-hidden-files: true
-          retention-days: 1
 
+  # Publishes to GitHub Pages. Pages is configured with build_type=workflow, so
+  # this is what actually updates htmlflow.org; the gh-pages branch is the site
+  # source, not the served output.
   deploy:
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/website'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/gh-pages'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download site
-        uses: actions/download-artifact@v4
-        with:
-          name: site
-          path: build
-
-      - name: Publish to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages
-          # gh-pages holds build output only; keep it a single commit.
-          force_orphan: true
-          user_name: github-actions[bot]
-          user_email: github-actions[bot]@users.noreply.github.com
-          commit_message: 'Deploy ${{ github.sha }}'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

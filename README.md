@@ -155,19 +155,27 @@ Old URLs are mapped to their new locations via
 
 ## Deployment
 
-Deploys to the `gh-pages` branch of `xmlet/HtmlFlow`, served at the custom
-domain in `static/CNAME` (`htmlflow.org`).
+`gh-pages` is the **site source** branch, not the served output. GitHub Pages
+for this repo is configured with `build_type: workflow`, so nothing is served
+straight from a branch — the live site comes from whatever
+`.github/workflows/website-build.yml` last published.
 
-Using SSH:
-
-```bash
-USE_SSH=true yarn deploy
-```
-
-Not using SSH:
+To release: merge your work into `gh-pages` and push.
 
 ```bash
-GIT_USER=<Your GitHub username> yarn deploy
+git switch gh-pages
+git merge website
+git push origin gh-pages
 ```
 
-`deploy` builds the site and force-pushes `build/` to `gh-pages`.
+That push runs the `build` job (typecheck, format, build, artifact checks), and
+only on success does the `deploy` job publish to Pages via
+`actions/deploy-pages`. Pushes to any other branch build but never deploy, so
+`website` is safe to use as the working branch.
+
+The custom domain comes from `static/CNAME` (`htmlflow.org`), which the build
+copies into `build/`. CI asserts both it and `build/.nojekyll` exist, so losing
+the domain fails the build instead of the live site.
+
+> Do **not** run `yarn deploy`. `docusaurus deploy` force-pushes built output
+> onto `gh-pages`, which would overwrite the source. It is unused here.
