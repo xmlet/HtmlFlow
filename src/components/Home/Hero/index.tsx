@@ -1,11 +1,18 @@
 import { Button } from '../../Ui/Button';
 import { LuArrowRight as ArrowRight, LuGithub as GithubIcon } from 'react-icons/lu';
 import Link from '@docusaurus/Link';
+import Head from '@docusaurus/Head';
 import { WaveBackground } from '../WaveBackground';
+
+const LOGO = { src: '/img/htmlflow-logo.png', width: 308, height: 264 };
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-white dark:bg-gray-950 px-6 py-16 sm:py-24">
+      <Head>
+        <link rel="preload" as="image" href={LOGO.src} fetchPriority="high" />
+      </Head>
+
       <div className="hidden sm:block">
         <WaveBackground />
       </div>
@@ -54,13 +61,15 @@ export function Hero() {
             <div className="relative">
               <div className="relative flex h-64 w-64 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-xl border-4 border-sky-100 dark:border-sky-900 sm:h-80 sm:w-80">
                 {/* Root-relative: "img/..." resolves against the current path
-                    and only works at "/". LCP element, hence fetchPriority. */}
+                    and only works at "/". LCP element, hence fetchPriority.
+                    Width is left auto so the 308x264 logo is not squashed into
+                    a square box. */}
                 <img
-                  src="/img/htmlflow-logo.png"
+                  src={LOGO.src}
                   alt="HtmlFlow Logo"
-                  className="h-48 w-48 sm:h-56 sm:w-56"
-                  width={224}
-                  height={224}
+                  className="h-48 w-auto sm:h-56"
+                  width={LOGO.width}
+                  height={LOGO.height}
                   fetchPriority="high"
                   decoding="sync"
                 />
