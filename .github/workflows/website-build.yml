@@ -62,9 +62,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    environment:
-      name: github-pages
-      url: https://htmlflow.org
     steps:
       - name: Download site
         uses: actions/download-artifact@v4
