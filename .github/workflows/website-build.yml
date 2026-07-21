@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
 
+# Never let two deploys race for the gh-pages branch.
+concurrency:
+  group: website-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,3 +40,46 @@ jobs:
           test -f build/docs/introduction/index.md
           test -f build/docs/core-concepts/index.md
           ! grep -rl "<TabItem" build/docs --include="*.md"
+
+      - name: Verify deploy artifacts
+        run: |
+          test -f build/CNAME
+          test -f build/.nojekyll
+
+      - name: Upload site
+        if: github.event_name == 'push' && github.ref == 'refs/heads/website'
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: build
+          # build/.nojekyll is hidden; v4 drops hidden files unless asked.
+          include-hidden-files: true
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/website'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment:
+      name: github-pages
+      url: https://htmlflow.org
+    steps:
+      - name: Download site
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: build
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: gh-pages
+          # gh-pages holds build output only; keep it a single commit.
+          force_orphan: true
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: 'Deploy ${{ github.sha }}'
