@@ -22,34 +22,51 @@ export function Hero() {
               checking, and excellent performance.
             </p>
 
+            {/* `asChild` so each control renders as a single <a> carrying the
+                button styling. Wrapping a <button> in a <Link> instead nests
+                interactive content inside interactive content, which the HTML
+                content model forbids and which gives two focus stops. */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-              <Link to="/docs/introduction" className="no-underline">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="gap-2 border-sky-200 hover:bg-sky-50 dark:border-sky-700 dark:hover:bg-sky-900/50"
-                >
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="gap-2 border-sky-200 hover:bg-sky-50 dark:border-sky-700 dark:hover:bg-sky-900/50"
+              >
+                <Link to="/docs/introduction" className="no-underline">
                   Get Started
                   <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="https://github.com/xmlet/HtmlFlow" className="no-underline">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="gap-2 border-sky-200 hover:bg-sky-50 dark:border-sky-700 dark:hover:bg-sky-900/50"
-                >
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="gap-2 border-sky-200 hover:bg-sky-50 dark:border-sky-700 dark:hover:bg-sky-900/50"
+              >
+                <Link to="https://github.com/xmlet/HtmlFlow" className="no-underline">
                   <GithubIcon className="h-4 w-4" />
                   View on GitHub
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
 
           <div className="relative flex items-center justify-center lg:justify-end">
             <div className="relative">
               <div className="relative flex h-64 w-64 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-xl border-4 border-sky-100 dark:border-sky-900 sm:h-80 sm:w-80">
-                <img src="img/htmlflow-logo.png" alt="HtmlFlow Logo" className="h-48 w-48 sm:h-56 sm:w-56" />
+                {/* Root-relative, not "img/...": the latter resolves against
+                    the current path and only happens to work at "/". This is
+                    the LCP element, hence the eager fetchPriority. */}
+                <img
+                  src="/img/htmlflow-logo.png"
+                  alt="HtmlFlow Logo"
+                  className="h-48 w-48 sm:h-56 sm:w-56"
+                  width={224}
+                  height={224}
+                  fetchPriority="high"
+                  decoding="sync"
+                />
               </div>
             </div>
           </div>

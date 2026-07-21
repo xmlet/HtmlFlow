@@ -17,12 +17,11 @@ const features: { title: string; description: ReactNode; icon: IconType }[] = [
     description: (
       <>
         Optimized for speed with excellent throughput and low overhead.{' '}
-        <a
-          href="https://github.com/xmlet/template-benchmark"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 underline"
-        >
+        {/* No colour/decoration utilities: Infima's `a` rule is unlayered and
+            outranks every Tailwind layer, so they are silently ignored. The
+            colour comes from --ifm-color-primary, the underline from
+            custom.css. */}
+        <a href="https://github.com/xmlet/template-benchmark" target="_blank" rel="noopener noreferrer">
           Check the benchmarks
         </a>{' '}
         to see performance results.
@@ -69,16 +68,18 @@ export function Features() {
         </div>
 
         <div className="mt-16 flex justify-center">
-          <Link to="/docs/introduction">
-            <Button
-              size="lg"
-              variant="outline"
-              className="gap-2 border-sky-200 hover:bg-sky-50 dark:border-sky-700 dark:hover:bg-sky-900/50"
-            >
+          {/* asChild: a <button> inside an <a> is invalid nesting. See Hero. */}
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="gap-2 border-sky-200 hover:bg-sky-50 dark:border-sky-700 dark:hover:bg-sky-900/50"
+          >
+            <Link to="/docs/introduction" className="no-underline">
               Get Started
               <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

@@ -1,5 +1,18 @@
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+// PrismLight ships no grammars; registering only the three used here keeps the
+// full Prism language set (most of it unused) out of the bundle.
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import java from 'react-syntax-highlighter/dist/esm/languages/prism/java';
+import kotlin from 'react-syntax-highlighter/dist/esm/languages/prism/kotlin';
+import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
+// The a11y variants of the One themes: every token clears WCAG AA against the
+// backgrounds below, which the stock oneLight/oneDark do not (their comment
+// colour lands at 2.5:1 and 2.9:1).
+import a11yLight from 'react-syntax-highlighter/dist/esm/styles/prism/a11y-one-light';
+import a11yDark from 'react-syntax-highlighter/dist/esm/styles/prism/a11y-dark';
+
+SyntaxHighlighter.registerLanguage('java', java);
+SyntaxHighlighter.registerLanguage('kotlin', kotlin);
+SyntaxHighlighter.registerLanguage('html', markup);
 import { LuArrowRight as ArrowRight } from 'react-icons/lu';
 import { useState } from 'react';
 
@@ -54,6 +67,13 @@ const codeStyle = {
   lineHeight: '1.5',
 };
 
+// The default gutter colour is far too faint to read; these clear WCAG AA
+// against the panel backgrounds set in customStyle.
+const lineNumberStyle = {
+  light: { color: '#57606a' },
+  dark: { color: '#9aa4b2' },
+};
+
 /**
  * Renders the sample once per theme and lets CSS reveal the right one.
  * react-syntax-highlighter emits token colours as inline styles, so choosing
@@ -67,8 +87,9 @@ function ThemedCode({ language, children }: { language: string; children: string
         <SyntaxHighlighter
           className="max-w-full"
           language={language}
-          style={oneLight}
+          style={a11yLight}
           customStyle={{ ...codeStyle, background: 'white' }}
+          lineNumberStyle={lineNumberStyle.light}
           showLineNumbers
         >
           {children}
@@ -78,8 +99,9 @@ function ThemedCode({ language, children }: { language: string; children: string
         <SyntaxHighlighter
           className="max-w-full"
           language={language}
-          style={oneDark}
+          style={a11yDark}
           customStyle={{ ...codeStyle, background: '#111827' }}
+          lineNumberStyle={lineNumberStyle.dark}
           showLineNumbers
         >
           {children}
@@ -119,20 +141,22 @@ export function CodeComparison() {
                   </div>
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={() => setLanguage('java')}
                       className={`px-3 py-1 text-xs font-medium rounded ${
                         language === 'java'
-                          ? 'bg-sky-600 text-white'
+                          ? 'bg-sky-700 text-white'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                       }`}
                     >
                       Java
                     </button>
                     <button
+                      type="button"
                       onClick={() => setLanguage('kotlin')}
                       className={`px-3 py-1 text-xs font-medium rounded ${
                         language === 'kotlin'
-                          ? 'bg-sky-600 text-white'
+                          ? 'bg-sky-700 text-white'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                       }`}
                     >

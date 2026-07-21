@@ -8,6 +8,7 @@ export default function ThemeToggle(): JSX.Element {
 
   return (
     <button
+      type="button"
       className="navbar__item navbar-icon"
       onClick={() => setColorMode(isDark ? 'light' : 'dark')}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}

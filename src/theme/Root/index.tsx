@@ -50,8 +50,13 @@ function useHashActiveSidebar() {
       let pill = menu.querySelector<HTMLElement>(':scope > .hf-sidebar-pill');
       const isNew = !pill;
       if (!pill) {
-        pill = document.createElement('div');
+        // The menu is a <ul>, whose only permitted element children are <li>,
+        // <script> and <template> -- a <div> here would be invalid HTML. It is
+        // decorative, so hide it from the accessibility tree.
+        pill = document.createElement('li');
         pill.className = 'hf-sidebar-pill';
+        pill.setAttribute('role', 'presentation');
+        pill.setAttribute('aria-hidden', 'true');
         menu.prepend(pill);
       }
       if (isNew) pill.style.transition = 'none';

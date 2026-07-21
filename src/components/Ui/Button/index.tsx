@@ -44,7 +44,17 @@ function Button({
   }) {
   const Comp = asChild ? Slot : 'button';
 
-  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+      // After {...props}: a `type` key present but undefined would otherwise
+      // win and reinstate the implicit "submit", which submits any enclosing
+      // form. Irrelevant when asChild renders something other than a button.
+      {...(asChild ? {} : { type: props.type ?? 'button' })}
+    />
+  );
 }
 
 export { Button, buttonVariants };

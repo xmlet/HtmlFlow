@@ -6,17 +6,18 @@ interface RssProps {
   label?: string;
 }
 
-export default function RssNav({ href, label = 'RSS feed' }: RssProps): JSX.Element {
+export default function RssNav({ href, label }: RssProps): JSX.Element {
+  const name = label || 'RSS feed';
   return (
     <a
       href={href}
       className="navbar__item navbar-icon"
-      aria-label={label}
-      title={label}
+      aria-label={name}
+      title={name}
       target="_blank"
       rel="noopener noreferrer"
     >
-      <Rss size={18} strokeWidth={1.75} />
+      <Rss size={18} strokeWidth={1.75} role="presentation" aria-hidden="true" />
     </a>
   );
 }
