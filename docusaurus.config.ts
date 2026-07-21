@@ -70,7 +70,11 @@ const config: Config = {
   themeConfig: {
     colorMode: {
       respectPrefersColorScheme: true,
-      disableSwitch: true,
+      // Must stay false or the choice is never persisted: disableSwitch drops
+      // the localStorage read from the pre-paint script and makes
+      // ColorModeProvider delete the stored value on mount. The stock toggle it
+      // would otherwise reveal is suppressed in theme/Navbar/ColorModeToggle.
+      disableSwitch: false,
     },
     navbar: {
       title: 'HtmlFlow',
