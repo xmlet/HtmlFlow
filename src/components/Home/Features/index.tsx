@@ -17,10 +17,8 @@ const features: { title: string; description: ReactNode; icon: IconType }[] = [
     description: (
       <>
         Optimized for speed with excellent throughput and low overhead.{' '}
-        {/* No colour/decoration utilities: Infima's `a` rule is unlayered and
-            outranks every Tailwind layer, so they are silently ignored. The
-            colour comes from --ifm-color-primary, the underline from
-            custom.css. */}
+        {/* No Tailwind colour/underline utilities: Infima styles anchors from
+            an unlayered rule, which outranks every layer. See custom.css. */}
         <a href="https://github.com/xmlet/template-benchmark" target="_blank" rel="noopener noreferrer">
           Check the benchmarks
         </a>{' '}
@@ -68,7 +66,7 @@ export function Features() {
         </div>
 
         <div className="mt-16 flex justify-center">
-          {/* asChild: a <button> inside an <a> is invalid nesting. See Hero. */}
+          {/* asChild: a <button> inside an <a> is invalid nesting. */}
           <Button
             asChild
             size="lg"

@@ -7,8 +7,7 @@ interface GitHubProps {
 }
 
 export default function GitHub({ href, label }: GitHubProps): JSX.Element {
-  // `|| 'GitHub'` rather than a default parameter: navbar config may pass an
-  // empty string, which a default only covers when the value is undefined.
+  // Not a default parameter: navbar config may pass an empty string.
   const name = label || 'GitHub';
   return (
     <a
@@ -19,8 +18,7 @@ export default function GitHub({ href, label }: GitHubProps): JSX.Element {
       aria-label={name}
       title={name}
     >
-      {/* Decorative: the link is already named. react-icons stamps role="img"
-          on the svg, which then demands its own text alternative. */}
+      {/* Decorative; react-icons would otherwise stamp role="img" on the svg. */}
       <SiGithub size={18} role="presentation" aria-hidden="true" />
     </a>
   );

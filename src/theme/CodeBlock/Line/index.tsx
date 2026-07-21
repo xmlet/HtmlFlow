@@ -5,15 +5,11 @@ import type { Props } from '@theme/CodeBlock/Line';
 import styles from './styles.module.css';
 
 /**
- * Swizzled to emit a <span> per line instead of the stock <div>.
- *
- * Code block lines live inside <pre><code>, and <code> accepts only phrasing
- * content -- a <div> there is invalid per the HTML content model. The element
- * is purely presentational (the line box comes from CSS: `table-row` when line
- * numbers are on, otherwise `block`), so a <span> renders identically.
+ * Swizzled to emit a <span> per line instead of the stock <div>: these sit
+ * inside <code>, which accepts only phrasing content. CSS supplies the line
+ * box either way, so the two render identically.
  */
 
-// Keeps empty lines from collapsing to zero height.
 function LineBreak() {
   return <br />;
 }
@@ -48,8 +44,7 @@ export default function CodeBlockLine({
   return (
     <span
       {...lineProps}
-      // With line numbers, styles.codeLine supplies `display: table-row`.
-      // Without it the stock <div> was block-level, which a <span> is not.
+      // styles.codeLine already sets table-row when line numbers are on.
       style={showLineNumbers ? lineProps.style : { display: 'block', ...lineProps.style }}
     >
       {showLineNumbers ? (

@@ -6,11 +6,9 @@ import type * as Preset from '@docusaurus/preset-classic';
 const LATEST_VERSION = '5.0.4';
 
 /**
- * Several One-theme tokens fall under the WCAG AA 4.5:1 minimum against the
- * theme's own background -- comments are the worst at 2.47:1 (light) and
- * 2.32:1 (dark). Rather than swap to a different theme (no prism-react-renderer
- * light theme passes AA outright), darken or lighten only the offending token
- * groups. Keys are the theme's original colours so the mapping is exact.
+ * Darkens the One themes' sub-4.5:1 tokens in place. No prism-react-renderer
+ * light theme clears WCAG AA outright, so patching beats swapping themes.
+ * Keyed by original colour so the mapping stays exact.
  */
 function withAccessibleTokens(theme: PrismTheme, replacements: Record<string, string>): PrismTheme {
   return {
@@ -22,20 +20,18 @@ function withAccessibleTokens(theme: PrismTheme, replacements: Record<string, st
   };
 }
 
-// Measured against #fafafa (oneLight's background); each lands just past 4.5:1.
 const codeThemeLight = withAccessibleTokens(prismThemes.oneLight, {
-  'hsl(230, 4%, 64%)': '#727277', // comment, prolog, cdata      2.47 -> 4.58
-  'hsl(35, 99%, 36%)': '#a86201', // attr-name, class-name, ...   3.93 -> 4.56
-  'hsl(5, 74%, 59%)': '#c44a3f', // property, tag, symbol, ...   3.51 -> 4.57
-  'hsl(119, 34%, 47%)': '#40813f', // selector, string, char, ...  3.07 -> 4.54
-  'hsl(221, 87%, 60%)': '#3a6ddc', // variable, operator, function 3.88 -> 4.57
-  'hsl(198, 99%, 37%)': '#017baf', // url                          4.00 -> 4.52
+  'hsl(230, 4%, 64%)': '#727277',
+  'hsl(35, 99%, 36%)': '#a86201',
+  'hsl(5, 74%, 59%)': '#c44a3f',
+  'hsl(119, 34%, 47%)': '#40813f',
+  'hsl(221, 87%, 60%)': '#3a6ddc',
+  'hsl(198, 99%, 37%)': '#017baf',
 });
 
-// Measured against #282c34 (oneDark's background).
 const codeThemeDark = withAccessibleTokens(prismThemes.oneDark, {
-  'hsl(220, 10%, 40%)': '#8f939c', // comment, prolog, cdata      2.32 -> 4.55
-  'hsl(355, 65%, 65%)': '#e17079', // property, tag, symbol, ...   4.38 -> 4.53
+  'hsl(220, 10%, 40%)': '#8f939c',
+  'hsl(355, 65%, 65%)': '#e17079',
 });
 
 const config: Config = {
@@ -77,7 +73,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
         },
         blog: {
-          // Rendered as the list page's <h1>; the navbar calls this "News".
+          // Rendered as the list page's <h1>.
           blogTitle: 'News',
           blogSidebarCount: 'ALL',
           blogSidebarTitle: 'All Posts',
@@ -106,10 +102,10 @@ const config: Config = {
   themeConfig: {
     colorMode: {
       respectPrefersColorScheme: true,
-      // Must stay false or the choice is never persisted: disableSwitch drops
-      // the localStorage read from the pre-paint script and makes
-      // ColorModeProvider delete the stored value on mount. The stock toggle it
-      // would otherwise reveal is suppressed in theme/Navbar/ColorModeToggle.
+      // Must stay false. disableSwitch also drops the localStorage read from
+      // the pre-paint script and deletes the stored choice on mount, so the
+      // theme never persists. theme/Navbar/ColorModeToggle hides the stock
+      // toggle this exposes.
       disableSwitch: false,
     },
     navbar: {
@@ -139,9 +135,7 @@ const config: Config = {
         { to: '/blog', label: 'News', position: 'right' },
         {
           type: 'custom-github',
-          // No visible text -- the icon is the label. Leave this unset rather
-          // than '': the component turns it into the link's aria-label, and an
-          // empty one makes the link nameless to screen readers.
+          // Becomes the link's aria-label; '' leaves it nameless.
           label: 'GitHub',
           href: 'https://github.com/xmlet/HtmlFlow',
           position: 'right',

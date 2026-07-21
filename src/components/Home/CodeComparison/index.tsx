@@ -1,12 +1,9 @@
-// PrismLight ships no grammars; registering only the three used here keeps the
-// full Prism language set (most of it unused) out of the bundle.
+// PrismLight ships no grammars, keeping the unused languages out of the bundle.
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import java from 'react-syntax-highlighter/dist/esm/languages/prism/java';
 import kotlin from 'react-syntax-highlighter/dist/esm/languages/prism/kotlin';
 import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
-// The a11y variants of the One themes: every token clears WCAG AA against the
-// backgrounds below, which the stock oneLight/oneDark do not (their comment
-// colour lands at 2.5:1 and 2.9:1).
+// a11y variants: the stock One themes put comments below WCAG AA.
 import a11yLight from 'react-syntax-highlighter/dist/esm/styles/prism/a11y-one-light';
 import a11yDark from 'react-syntax-highlighter/dist/esm/styles/prism/a11y-dark';
 
@@ -67,18 +64,15 @@ const codeStyle = {
   lineHeight: '1.5',
 };
 
-// The default gutter colour is far too faint to read; these clear WCAG AA
-// against the panel backgrounds set in customStyle.
+// The default gutter colour is too faint to clear WCAG AA.
 const lineNumberStyle = {
   light: { color: '#57606a' },
   dark: { color: '#9aa4b2' },
 };
 
 /**
- * Renders the sample once per theme and lets CSS reveal the right one.
- * react-syntax-highlighter emits token colours as inline styles, so choosing
- * the palette from useColorMode would bake the light one into the prerendered
- * HTML -- the panel then flashes white until React hydrates.
+ * Renders the sample once per theme and lets CSS reveal one. Token colours are
+ * inline styles, so a useColorMode branch would flash white until hydration.
  */
 function ThemedCode({ language, children }: { language: string; children: string }) {
   return (

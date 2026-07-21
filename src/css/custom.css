@@ -3,8 +3,7 @@
 @variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
 :root {
-  /* sky-700 rather than sky-600: this drives --ifm-link-color, and sky-600
-     only reaches 4.09:1 on white -- below the WCAG AA 4.5:1 minimum. */
+  /* Drives --ifm-link-color. sky-600 only reached 4.09:1 on white. */
   --ifm-color-primary: #0369a1;
   --ifm-color-primary-dark: #075985;
   --ifm-color-primary-light: #0284c7;
@@ -227,11 +226,9 @@ html[data-theme='dark'] :not(pre) > code {
   }
 }
 
-/* Links sitting inside a block of text must be distinguishable without relying
-   on colour (WCAG 1.4.1). Infima's `a` rule is unlayered, so it outranks every
-   Tailwind utility regardless of specificity -- an `underline` class on the
-   element itself does nothing. This rule is unlayered too and loads after
-   Infima, so it wins on source order. */
+/* Links in text need more than colour to stand out (WCAG 1.4.1). An `underline`
+   class cannot do it: Infima styles anchors from an unlayered rule, which beats
+   every Tailwind layer. This rule is unlayered too and loads later. */
 .markdown p a:not(.button):not(.card),
 .markdown li a:not(.button):not(.card),
 main p a:not(.button):not(.card) {

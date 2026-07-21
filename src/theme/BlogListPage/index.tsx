@@ -9,11 +9,7 @@ import BlogPostItems from '@theme/BlogPostItems';
 import BlogListPageStructuredData from '@theme/BlogListPage/StructuredData';
 import type { Props } from '@theme/BlogListPage';
 
-/**
- * Mirrors the stock BlogListPage, adding the <h1> it omits. Every document
- * needs exactly one top-level heading: without it the page has no accessible
- * name in the heading outline that screen readers navigate by.
- */
+/** Mirrors the stock BlogListPage, adding the <h1> it omits. */
 
 function BlogListPageMetadata(props: Props): ReactNode {
   const { metadata } = props;

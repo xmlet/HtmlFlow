@@ -22,10 +22,8 @@ export function Hero() {
               checking, and excellent performance.
             </p>
 
-            {/* `asChild` so each control renders as a single <a> carrying the
-                button styling. Wrapping a <button> in a <Link> instead nests
-                interactive content inside interactive content, which the HTML
-                content model forbids and which gives two focus stops. */}
+            {/* asChild renders each control as one <a>. Wrapping a <button> in
+                a <Link> nests interactive content and gives two focus stops. */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
               <Button
                 asChild
@@ -55,9 +53,8 @@ export function Hero() {
           <div className="relative flex items-center justify-center lg:justify-end">
             <div className="relative">
               <div className="relative flex h-64 w-64 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-xl border-4 border-sky-100 dark:border-sky-900 sm:h-80 sm:w-80">
-                {/* Root-relative, not "img/...": the latter resolves against
-                    the current path and only happens to work at "/". This is
-                    the LCP element, hence the eager fetchPriority. */}
+                {/* Root-relative: "img/..." resolves against the current path
+                    and only works at "/". LCP element, hence fetchPriority. */}
                 <img
                   src="/img/htmlflow-logo.png"
                   alt="HtmlFlow Logo"

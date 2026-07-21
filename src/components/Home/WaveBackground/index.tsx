@@ -1,9 +1,6 @@
 /**
- * The gradient stops come from CSS custom properties rather than useColorMode.
- * useColorMode reports 'light' during SSR and on the first client render, so
- * reading it here baked the light stops into the static HTML and the wave only
- * turned dark once React hydrated -- a visible flash, since Docusaurus sets
- * data-theme before first paint and everything around it was already dark.
+ * Stops come from CSS variables, not useColorMode: that reports 'light' during
+ * SSR and on the first render, so the wave flashed light until hydration.
  */
 export function WaveBackground() {
   return (

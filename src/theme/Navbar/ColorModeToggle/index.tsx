@@ -1,12 +1,7 @@
 /**
- * Suppresses the stock navbar colour-mode toggle in favour of the custom one in
- * src/theme/NavbarItem/ThemeToggle.tsx, which matches the other navbar icons.
- *
- * Hiding it via colorMode.disableSwitch is not an option: that flag also strips
- * the localStorage read out of the pre-paint inline script and makes
- * ColorModeProvider delete the stored choice on mount, so the preference never
- * survives a reload. Both desktop Navbar/Content and MobileSidebar/Header
- * render this component, so returning null here covers both.
+ * Hides the stock toggle in favour of NavbarItem/ThemeToggle. Both the desktop
+ * navbar and the mobile sidebar header render this component, so null covers
+ * both. colorMode.disableSwitch would hide it too, but breaks persistence.
  */
 export default function NavbarColorModeToggle(): null {
   return null;

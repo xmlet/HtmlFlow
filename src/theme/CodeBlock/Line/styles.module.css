@@ -1,6 +1,5 @@
-/* Mirrors @docusaurus/theme-classic's CodeBlock/Line styles. Kept local so the
-   swizzled component below does not depend on the theme's internal CSS module
-   paths. */
+/* Copied from @docusaurus/theme-classic's CodeBlock/Line so the swizzle does
+   not import the theme's internal CSS module path. */
 
 .codeLine {
   display: table-row;
