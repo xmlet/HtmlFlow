@@ -1,7 +1,6 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { LuArrowRight as ArrowRight } from 'react-icons/lu';
-import { useColorMode } from '@docusaurus/theme-common';
 import { useState } from 'react';
 
 const javaCode = `HtmlFlow
@@ -48,8 +47,49 @@ const htmlCode = `<html>
   </body>
 </html>`;
 
+const codeStyle = {
+  margin: 0,
+  padding: '1.5rem',
+  fontSize: '0.875rem',
+  lineHeight: '1.5',
+};
+
+/**
+ * Renders the sample once per theme and lets CSS reveal the right one.
+ * react-syntax-highlighter emits token colours as inline styles, so choosing
+ * the palette from useColorMode would bake the light one into the prerendered
+ * HTML -- the panel then flashes white until React hydrates.
+ */
+function ThemedCode({ language, children }: { language: string; children: string }) {
+  return (
+    <>
+      <div className="block dark:hidden">
+        <SyntaxHighlighter
+          className="max-w-full"
+          language={language}
+          style={oneLight}
+          customStyle={{ ...codeStyle, background: 'white' }}
+          showLineNumbers
+        >
+          {children}
+        </SyntaxHighlighter>
+      </div>
+      <div className="hidden dark:block">
+        <SyntaxHighlighter
+          className="max-w-full"
+          language={language}
+          style={oneDark}
+          customStyle={{ ...codeStyle, background: '#111827' }}
+          showLineNumbers
+        >
+          {children}
+        </SyntaxHighlighter>
+      </div>
+    </>
+  );
+}
+
 export function CodeComparison() {
-  const { colorMode } = useColorMode();
   const [language, setLanguage] = useState<'java' | 'kotlin'>('java');
 
   return (
@@ -102,21 +142,7 @@ export function CodeComparison() {
                 </div>
               </div>
               <div className="overflow-x-auto overflow-hidden rounded-b-xl hf-code-block">
-                <SyntaxHighlighter
-                  className="max-w-full"
-                  language={language}
-                  style={colorMode === 'dark' ? oneDark : oneLight}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1.5rem',
-                    background: colorMode === 'dark' ? '#111827' : 'white',
-                    fontSize: '0.875rem',
-                    lineHeight: '1.5',
-                  }}
-                  showLineNumbers
-                >
-                  {language === 'java' ? javaCode : kotlinCode}
-                </SyntaxHighlighter>
+                <ThemedCode language={language}>{language === 'java' ? javaCode : kotlinCode}</ThemedCode>
               </div>
             </div>
           </div>
@@ -140,21 +166,7 @@ export function CodeComparison() {
                 </div>
               </div>
               <div className="overflow-x-auto overflow-hidden rounded-b-xl hf-code-block">
-                <SyntaxHighlighter
-                  className="max-w-full"
-                  language="html"
-                  style={colorMode === 'dark' ? oneDark : oneLight}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1.5rem',
-                    background: colorMode === 'dark' ? '#111827' : 'white',
-                    fontSize: '0.875rem',
-                    lineHeight: '1.5',
-                  }}
-                  showLineNumbers
-                >
-                  {htmlCode}
-                </SyntaxHighlighter>
+                <ThemedCode language="html">{htmlCode}</ThemedCode>
               </div>
             </div>
           </div>

@@ -1,8 +1,11 @@
-import { useColorMode } from '@docusaurus/theme-common';
-
+/**
+ * The gradient stops come from CSS custom properties rather than useColorMode.
+ * useColorMode reports 'light' during SSR and on the first client render, so
+ * reading it here baked the light stops into the static HTML and the wave only
+ * turned dark once React hydrated -- a visible flash, since Docusaurus sets
+ * data-theme before first paint and everything around it was already dark.
+ */
 export function WaveBackground() {
-  const { colorMode } = useColorMode();
-
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <svg
@@ -14,17 +17,8 @@ export function WaveBackground() {
       >
         <defs>
           <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            {colorMode === 'dark' ? (
-              <>
-                <stop offset="0%" stopColor="#00BCFF" />
-                <stop offset="90%" stopColor="#1b3f88" />
-              </>
-            ) : (
-              <>
-                <stop offset="0%" stopColor="#99CCFF" />
-                <stop offset="90%" stopColor="#93afe7" />
-              </>
-            )}
+            <stop offset="0%" stopColor="var(--hf-wave-from)" />
+            <stop offset="90%" stopColor="var(--hf-wave-to)" />
           </linearGradient>
         </defs>
         <path
