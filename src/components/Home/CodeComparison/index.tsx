@@ -106,7 +106,7 @@ function ThemedCode({ language, children }: { language: string; children: string
 }
 
 export function CodeComparison() {
-  const [language, setLanguage] = useState<'java' | 'kotlin'>('java');
+  const [language, setLanguage] = useState<'java' | 'kotlin'>('kotlin');
 
   return (
     <section className="bg-gray-100 dark:bg-gray-900 px-6 py-12 sm:py-24">
