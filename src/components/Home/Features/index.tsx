@@ -42,7 +42,7 @@ const features: { title: string; description: ReactNode; icon: IconType }[] = [
 
 export function Features() {
   return (
-    <section className="bg-white dark:bg-gray-950 px-6 py-12 sm:py-24">
+    <section className="bg-gray-100 dark:bg-gray-900 px-6 py-12 sm:py-24">
       <div className="mx-auto max-w-7xl flex flex-col items-center">
         <div className="mb-8 text-center">
           <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
