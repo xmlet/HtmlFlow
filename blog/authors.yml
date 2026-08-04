@@ -1,9 +1,69 @@
-# TODO: CHANGE THIS
 miguel:
   name: Miguel Gamboa
   title: HtmlFlow Author
   url: https://github.com/fmcarvalho
   image_url: https://avatars.githubusercontent.com/u/578217
   socials:
-    # TODO: add socials here?
+    web: https://gamboa.pt
     github: fmcarvalho
+bernardo:
+  name: Bernardo Pereira
+  url: https://github.com/BernardoPe
+  image_url: https://avatars.githubusercontent.com/u/116907804
+  socials:
+    web: https://bernardope.com/
+    github: BernardoPe
+leonel:
+  name: Leonel Correia
+  url: https://github.com/LeonelCorreia
+  image_url: https://avatars.githubusercontent.com/u/146749413
+  socials:
+    github: LeonelCorreia
+paulo:
+  name: Paulo Carvalho
+  url: https://github.com/PauloCarvalho13
+  image_url: https://avatars.githubusercontent.com/u/136796555
+  socials:
+    github: PauloCarvalho13
+ricardo:
+  name: Ricardo Gomes
+  url: https://github.com/RicardoGomes07
+  image_url: https://avatars.githubusercontent.com/u/144710913
+  socials:
+    github: RicardoGomes07
+arthur:
+  name: Arthur Oliveira
+  url: https://github.com/Thuzys
+  image_url: https://avatars.githubusercontent.com/u/114019837
+  socials:
+    github: Thuzys
+brian:
+  name: Brian Melhorado
+  url: https://github.com/Brgm37
+  image_url: https://avatars.githubusercontent.com/u/114441596
+  socials:
+    github: Brgm37
+florin:
+  name: Florin Sofinet
+  url: https://github.com/Florins13
+  image_url: https://avatars.githubusercontent.com/u/40792767
+  socials:
+    github: Florins13
+vizinha:
+  name: André Vizinha
+  url: https://github.com/cotinhalol
+  image_url: https://media.licdn.com/dms/image/v2/D4D03AQGF-7BHu-vtmA/profile-displayphoto-crop_800_800/B4DZko6dLLJYAI-/0/1757328036951?e=1787184000&v=beta&t=aYc3oJUAYTdScy_BvJDC-Krdh5zt2vteVPRsoq5e88A
+  socials:
+    github: cotinhalol
+fialho:
+  name: Pedro Fialho
+  url: https://github.com/Raidline
+  image_url: https://avatars.githubusercontent.com/u/22427121
+  socials:
+    github: Raidline
+lcduarte:
+  name: Luís Duarte
+  url: https://github.com/lcduarte
+  image_url: https://avatars.githubusercontent.com/u/5586583
+  socials:
+    github: lcduarte
