@@ -12,14 +12,14 @@ import TabItem from '@theme/TabItem';
 ## What is HtmlFlow?
 
 HtmlFlow is a Java library for writing **type-safe HTML** documents in a fluent
-style, with first-class support for both **Java and Kotlin**. Instead of a separate
-template language with its own syntax and dialects, you build HTML directly in your
-host language, where every element and attribute is statically typed.
+style, with first-class support for both **Java and Kotlin**.
 
-It is an _internal DSL_: HTML lives inside Java/Kotlin itself, so
-the entire toolchain you already use (the compiler, the debugger, IDE autocompletion)
-works on your views. The output is always valid HTML according to the HTML 5.2
-specification.
+There is no separate template language. You build HTML directly in your host language,
+where every element and attribute is statically typed.
+
+It is an _internal DSL_: the HTML lives inside Java/Kotlin itself, so the toolchain you
+already use — compiler, debugger, IDE autocompletion — works on your views. The output is
+always valid HTML 5.2.
 
 A minimal page in both languages:
 
@@ -104,11 +104,12 @@ text-based template engines.
 
 The fluent API is **auto-generated from the HTML 5.2 XSD schema** using the
 [xmlet/xsd2poet](https://github.com/xmlet/xsd2poet) tooling.
-Each element exposes exactly the children and
-attributes the specification allows, and attribute values are constrained by enumerated
-types where the spec defines a fixed set. As a result, invalid markup such as nesting a
-`<div>` directly inside an `<h1>` does not compile, because the method does not exist in
-that context.
+
+Each element exposes exactly the children and attributes the specification allows.
+Attribute values are constrained by enumerated types wherever the spec defines a fixed set.
+
+So invalid markup does not compile. Nesting a `<div>` directly inside an `<h1>` fails at
+build time, because in that context the method does not exist.
 
 Every view is built from two kinds of content: **static** blocks, which never change, and
 **dynamic** blocks, which depend on a data model. Separating the two is what lets HtmlFlow:
