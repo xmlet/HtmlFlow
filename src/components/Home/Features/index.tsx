@@ -42,7 +42,7 @@ const features: { title: string; description: ReactNode; icon: IconType }[] = [
 
 export function Features() {
   return (
-    <section className="bg-white dark:bg-gray-950 px-6 py-12 sm:py-24">
+    <section className="bg-gray-100 dark:bg-gray-900 px-6 py-12 sm:py-24">
       <div className="mx-auto max-w-7xl flex flex-col items-center">
         <div className="mb-8 text-center">
           <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
@@ -54,7 +54,7 @@ export function Features() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="rounded-lg bg-gray-50 dark:bg-gray-900/50 p-8 transition-all hover:bg-gray-100 dark:hover:bg-gray-800/50"
+              className="rounded-lg bg-white dark:bg-gray-800/50 p-8 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100 dark:bg-sky-900/40">
                 <feature.icon className="h-5 w-5 text-sky-600 dark:text-sky-400" />

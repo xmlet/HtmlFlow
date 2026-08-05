@@ -4,6 +4,7 @@ import Layout from '@theme/Layout';
 import { Hero } from '../components/Home/Hero';
 import { CodeComparison } from '../components/Home/CodeComparison';
 import { Features } from '../components/Home/Features';
+import { DatastarSection } from '../components/Home/DatastarSection';
 
 export default function Home(): ReactNode {
   const { siteConfig } = useDocusaurusContext();
@@ -12,6 +13,7 @@ export default function Home(): ReactNode {
       <main>
         <Hero />
         <CodeComparison />
+        <DatastarSection />
         <Features />
       </main>
     </Layout>
