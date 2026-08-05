@@ -2,16 +2,21 @@
 @variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
+/* The Inter @font-face lives in static/fonts/inter.css. That file explains why
+   it stays out of the webpack pipeline. */
+
 :root {
   /* Drives --ifm-link-color. sky-600 only reached 4.09:1 on white. */
   --ifm-color-primary: #0369a1;
   --ifm-color-primary-dark: #075985;
   --ifm-color-primary-light: #0284c7;
   --ifm-code-font-size: 95%;
+  /* system-ui stays as the fallback: it renders during `swap` and if the font
+     request fails. */
   --ifm-font-family-base:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
   --ifm-heading-font-family:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --ifm-footer-background-color: #f9fafb;
   --doc-sidebar-width: 360px;
