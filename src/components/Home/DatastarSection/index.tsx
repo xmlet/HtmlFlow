@@ -5,12 +5,10 @@ import { ThemedCode } from '../ThemedCode';
 
 const datastarKotlinCode = `button {
   val fetching = dataIndicator("_fetching")
-
   dataAttr("disabled") { +fetching }
   dataOn(Click) {
     !fetching and get(::clickToLoadMore)
   }
-
   text("Load More")
 }`;
 
