@@ -5,7 +5,16 @@
 /* The Inter @font-face lives in static/fonts/inter.css. That file explains why
    it stays out of the webpack pipeline. */
 
+/* Ui/Button ships shadcn's `focus-visible:ring-ring` and `border-ring`, but
+   nothing defined --ring. The ring still drew from `currentcolor` via
+   --tw-ring-shadow, so it tracked the button's text colour and `border-ring`
+   did nothing. This token gives the ring a colour of its own per mode. */
+@theme {
+  --color-ring: var(--hf-focus-ring);
+}
+
 :root {
+  --hf-focus-ring: #0369a1;
   /* Drives --ifm-link-color. sky-600 only reached 4.09:1 on white. */
   --ifm-color-primary: #0369a1;
   --ifm-color-primary-dark: #075985;
@@ -25,6 +34,7 @@
   --hf-wave-to: #93afe7;
 }
 
+  --hf-focus-ring: #38bdf8;
 html[data-theme='dark'] {
   --ifm-color-primary: #38bdf8;
   --ifm-color-primary-dark: #0ea5e9;

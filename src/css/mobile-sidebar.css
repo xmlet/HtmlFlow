@@ -540,3 +540,14 @@ html[data-theme='dark'] .hf-foot-icon:hover {
     box-shadow: none;
   }
 }
+
+/* The stock close button renders a bare 16x16 icon, under the 24x24 minimum for
+   a touch target. Pad it out without moving the icon. */
+.navbar-sidebar__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: -0.5rem;
+}
