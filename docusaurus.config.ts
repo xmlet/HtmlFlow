@@ -194,6 +194,8 @@ const config: Config = {
             { label: 'Getting Started', to: '/docs/getting-started' },
             { label: 'Core Concepts', to: '/docs/core-concepts' },
             { label: 'Advanced', to: '/docs/advanced' },
+            { label: 'Integrations', to: '/docs/integrations' },
+            { label: 'Resources', to: '/docs/resources' },
           ],
         },
         {

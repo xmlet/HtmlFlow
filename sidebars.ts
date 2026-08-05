@@ -61,12 +61,19 @@ interface TopicDoc {
   headings: string[]; // `##` heading texts, in document order
 }
 
-function parseDoc(filename: string): TopicDoc {
+/**
+ * Returns null for files without `sidebar_position`, the opt-in marker for a
+ * published topic page. Before this guard the glob below swept up any draft
+ * left in docs/ and put it in the nav.
+ */
+function parseDoc(filename: string): TopicDoc | null {
   const raw = fs.readFileSync(path.join(DOCS_DIR, filename), 'utf8');
   const id = filename.slice(0, filename.lastIndexOf('.'));
   const lines = raw.split('\n');
 
-  const position = Number(frontmatterValue(lines, 'sidebar_position') ?? 999);
+  const rawPosition = frontmatterValue(lines, 'sidebar_position');
+  if (rawPosition === undefined) return null;
+  const position = Number(rawPosition);
   const sidebarLabel = frontmatterValue(lines, 'sidebar_label');
 
   // Collect headings, ignoring lines inside fenced code blocks.
@@ -90,6 +97,7 @@ const topicDocs = fs
   .readdirSync(DOCS_DIR)
   .filter(f => f.endsWith('.mdx') || f.endsWith('.md'))
   .map(parseDoc)
+  .filter((doc): doc is TopicDoc => doc !== null)
   .sort((a, b) => a.position - b.position);
 
 const sidebars: SidebarsConfig = {
