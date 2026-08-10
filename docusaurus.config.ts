@@ -56,6 +56,27 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
+  // Docusaurus copies static/ verbatim, so the @font-face URL inside this file
+  // matches the preload below. The webpack CSS pipeline would fingerprint the
+  // woff2 and split the two into separate downloads.
+  stylesheets: ['/fonts/inter.css'],
+
+  // Without the preload the browser finds the font after it parses the CSS,
+  // flashing the system fallback first. crossorigin is required even
+  // same-origin: fonts fetch in CORS mode, and omitting it downloads twice.
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        href: '/fonts/inter-variable-latin.woff2',
+        as: 'font',
+        type: 'font/woff2',
+        crossorigin: 'anonymous',
+      },
+    },
+  ],
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -173,6 +194,8 @@ const config: Config = {
             { label: 'Getting Started', to: '/docs/getting-started' },
             { label: 'Core Concepts', to: '/docs/core-concepts' },
             { label: 'Advanced', to: '/docs/advanced' },
+            { label: 'Integrations', to: '/docs/integrations' },
+            { label: 'Resources', to: '/docs/resources' },
           ],
         },
         {

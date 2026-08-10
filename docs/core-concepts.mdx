@@ -59,12 +59,13 @@ System.out.doc {
   </TabItem>
 </Tabs>
 
-In Java the `.__()` calls make the nesting explicit; the trailing `// div` comments are a
-common convention to track which element each close belongs to. In Kotlin the trailing
-lambda braces close elements for you, and `.l` is available as a shorthand for `.__()`
-when chaining without a block.
+In Java the `.__()` calls make the nesting explicit. The trailing `// div` comments are a
+common convention for tracking which element each close belongs to.
 
-## Html Templates
+In Kotlin the trailing lambda braces close elements for you, and `.l` is a shorthand for
+`.__()` when chaining without a block.
+
+## HTML Templates
 
 HtmlFlow offers two ways to define a template, differing in **when** the HTML is produced.
 
@@ -190,10 +191,12 @@ Only content inside a dynamic block is re-evaluated on each render; everything o
 is treated as a static block and emitted as-is. This split has a direct performance
 consequence: **keep dynamic blocks as small as possible.**
 
-Anything inside a `dynamic` / `dyn` block, even tags and attributes that never change, is
-rebuilt by re-walking the builders on every render. Anything outside is pre-encoded once and
-reused. So put only the model-dependent values inside the block, and leave the surrounding
-structure static.
+Anything inside a `dynamic` / `dyn` block is rebuilt by re-walking the builders on every
+render — even tags and attributes that never change. Anything outside is pre-encoded once
+and reused.
+
+So put only the model-dependent values inside the block, and leave the surrounding structure
+static.
 
 When the structure _itself_ depends on the model, see
 [Pre-encoding model-driven structure](#pre-encoding-model-driven-structure) below.
@@ -277,15 +280,16 @@ dyn { track: Track ->
 ### Pre-encoding model-driven structure
 
 Sometimes the HTML _structure_, not just a value, depends on the model: a loop body, or a
-branch that emits different markup. That markup has to live inside a dynamic block, so by the
-rule above it is re-walked on every render (and, in a loop, on every iteration), with its static
-tags rebuilt each time.
+branch that emits different markup.
 
-You can recover the pre-encoding: extract the model-driven fragment into its **own** reusable
-`HtmlView` (created once, at module level) and render it where you need it, inserting the result
-with `raw(...)`. The fragment's static HTML is encoded **once** at instantiation and reused on
-every call, so each render only binds the dynamic values. A repeated table row is the clearest
-example:
+That markup has to live inside a dynamic block. By the rule above it is re-walked on every
+render — and, in a loop, on every iteration — rebuilding its static tags each time.
+
+You can recover the pre-encoding. Extract the model-driven fragment into its **own** reusable
+`HtmlView`, created once at module level, and render it where you need it with `raw(...)`.
+
+The fragment's static HTML is then encoded **once** at instantiation and reused on every call,
+so each render only binds the dynamic values. A repeated table row is the clearest example:
 
 <Tabs groupId="lang">
   <TabItem value="java" label="Java">
@@ -328,11 +332,13 @@ val playlistView = view<List<Track>> {
   </TabItem>
 </Tabs>
 
-This pays off only with **pre-encoding enabled** (the default) and enough static markup in the
-fragment to pay off the extra `render(...)` call. The gain comes from reusing the fragment's
-pre-encoded static blocks rather than re-walking them. Keep the fragment view in a `static final`
-field (Kotlin: a top-level `val`); creating it inside the loop, or inside the enclosing template,
-would re-run pre-encoding every time and erase the benefit.
+This pays off only with **pre-encoding enabled** (the default), and only when the fragment holds
+enough static markup to earn back the extra `render(...)` call. The gain comes from reusing the
+fragment's pre-encoded static blocks instead of re-walking them.
+
+Keep the fragment view in a `static final` field, or a top-level `val` in Kotlin. Creating it
+inside the loop, or inside the enclosing template, re-runs pre-encoding every time and erases
+the benefit.
 
 ## Configuring Views
 
@@ -385,8 +391,10 @@ sharing one view across request threads.
 
 Templates compose. A **fragment** (also called a _partial_) is just a function that takes a
 parent element and adds children to it: a `Consumer` of an HTML element in Java, or a
-receiver function in Kotlin. Because it accepts any element, not only the page root, the
-same fragment can be reused anywhere that element type is valid.
+receiver function in Kotlin.
+
+Because it accepts any element, not only the page root, the same fragment can be reused
+anywhere that element type is valid.
 
 <Tabs groupId="lang">
   <TabItem value="java" label="Java">
@@ -539,10 +547,10 @@ Because the layout is itself a reusable `HtmlView`, its static skeleton (head, `
 structure) is pre-encoded once; only the inserted fragments change between the views you build
 from it.
 
-## Dynamic Content
+## Micro-Frontends
 
 Some content is not known at render time and must be loaded from another service. The v5
-**`mfe()`** builder embeds a _micro-frontend_: an HTML fragment fetched from a remote URL,
+`mfe()` builder embeds a _micro-frontend_: an HTML fragment fetched from a remote URL,
 supporting both server-side rendering (SSR) and client-side rendering (CSR) with optional
 event wiring between fragments. It requires a view built with `mfeEnabled(true)`.
 

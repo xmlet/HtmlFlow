@@ -2,29 +2,56 @@
 @variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
+/* The Inter @font-face lives in static/fonts/inter.css. That file explains why
+   it stays out of the webpack pipeline. */
+
+/* Ui/Button ships shadcn's `focus-visible:ring-ring` and `border-ring`, but
+   nothing defined --ring. The ring still drew from `currentcolor` via
+   --tw-ring-shadow, so it tracked the button's text colour and `border-ring`
+   did nothing. This token gives the ring a colour of its own per mode. */
+@theme {
+  --color-ring: var(--hf-focus-ring);
+}
+
 :root {
+  --hf-focus-ring: #0369a1;
   /* Drives --ifm-link-color. sky-600 only reached 4.09:1 on white. */
   --ifm-color-primary: #0369a1;
   --ifm-color-primary-dark: #075985;
   --ifm-color-primary-light: #0284c7;
-  --ifm-code-font-size: 95%;
+  /* 14px against a 16px body, as on developers.cloudflare.com and
+     discord-player.js.org. The old 95% gave a fractional 15.2px, too close to
+     the prose size to read as code. */
+  --ifm-code-font-size: 87.5%;
+  /* Infima ships 1.45. The reference sites all run looser: cloudflare 1.63,
+     discord-player 1.54, handlebars 1.5. */
+  --ifm-pre-line-height: 1.6;
+  /* A border over a transparent fill left identifiers blending into the prose.
+     Comparable fills: handlebars rgba(142,150,170,.14), htpy #f5f5f5,
+     cloudflare #fafafa. */
+  --hf-inline-code-bg: #f1f5f9;
+  /* system-ui stays as the fallback: it renders during `swap` and if the font
+     request fails. */
   --ifm-font-family-base:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
   --ifm-heading-font-family:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Arial, sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --ifm-footer-background-color: #f9fafb;
   --doc-sidebar-width: 360px;
+  --hf-doc-measure: 880px;
   --hf-navbar-icon: #1f2937;
   --hf-wave-from: #99ccff;
   --hf-wave-to: #93afe7;
 }
 
 html[data-theme='dark'] {
+  --hf-focus-ring: #38bdf8;
   --ifm-color-primary: #38bdf8;
   --ifm-color-primary-dark: #0ea5e9;
   --ifm-color-primary-light: #7dd3fc;
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+  --hf-inline-code-bg: rgba(255, 255, 255, 0.09);
   --ifm-background-color: #030712;
   --ifm-navbar-background-color: #030712;
   --ifm-footer-background-color: #030712;
@@ -175,6 +202,15 @@ html[data-theme='dark'] :not(pre) > code {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+/* Puts back the fill the rule above strips, for docs inline code only:
+   `!important` to beat it, scoped to the markdown body so the landing page keeps
+   its own chips. Infima's --ifm-code-padding-* default to 0.1rem, tighter than
+   the 2-3px by 4-6px the reference sites use. */
+.theme-doc-markdown.markdown :not(pre) > code {
+  background: var(--hf-inline-code-bg) !important;
+  padding: 0.15em 0.4em;
+}
+
 /* Restore Markdown list bullets stripped by Tailwind preflight */
 .theme-doc-markdown.markdown ul:not([class]) {
   list-style: disc;
@@ -224,6 +260,77 @@ html[data-theme='dark'] :not(pre) > code {
   .hf-code-panel {
     min-width: 520px;
   }
+}
+
+/* The docs hide the in-page TOC, leaving the right-hand column empty and running
+   prose and code to the full 1093px, about 121 characters a line. One cap on the
+   markdown container gives text and code blocks the same left and right edges;
+   tune it with --hf-doc-measure. `margin-inline: auto` centres that measure in
+   the leftover space, and the breadcrumbs take the same cap so their left edge
+   stays level with the prose. */
+.theme-doc-markdown.markdown,
+.theme-doc-breadcrumbs {
+  max-width: var(--hf-doc-measure);
+  margin-inline: auto;
+}
+
+/* Above 1080p the column has room to spare: Infima caps .container at 1320px, so
+   the article stops growing at 1288px and 880 of that went to text. These steps
+   spend the slack without touching the Infima container variable. At 17px, 880px
+   runs 90 characters a line, 1000 runs 102, 1120 runs 114, the loose end of the
+   84-130 the reference sites use. It stops at 1120 because longer lines get
+   harder to track back. The breakpoints clear 1920 rather than meet it: a
+   maximised window on a 1080p monitor lays out at 1905 once the scrollbar takes
+   its share, so that screen keeps 880. */
+@media (min-width: 1920px) {
+  :root {
+    --hf-doc-measure: 1000px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --hf-doc-measure: 1120px;
+  }
+}
+
+/* Long samples scroll inside the cap rather than widening the column. */
+.theme-doc-markdown.markdown pre {
+  max-width: var(--hf-doc-measure);
+  overflow-x: auto;
+}
+
+/* handlebarsjs.com, developers.cloudflare.com and discord-player.js.org all run
+   1.75 line-height with 24px/600 section headings. Ours ran 1.65 with 32px/700,
+   louder and tighter than any of them. Scoped to the docs so the landing page
+   keeps its own display scale. */
+.theme-doc-markdown.markdown {
+  line-height: 1.75;
+  /* Widening the column at 16px would push the line past 115 characters. Scaling
+     the type with it holds the measure near 107 as the column grows. 45-85 is
+     the usual advice; the reference sites land at 84-130. */
+  font-size: 17px;
+}
+
+.theme-doc-markdown.markdown h1 {
+  font-size: 2.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.theme-doc-markdown.markdown h2 {
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  /* 48px above every section, the first included, so the spacing holds all the
+     way down the page. */
+  margin-top: 3rem;
+}
+
+.theme-doc-markdown.markdown h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
 }
 
 /* Links in text need more than colour to stand out (WCAG 1.4.1). An `underline`
