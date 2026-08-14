@@ -37,7 +37,7 @@ const codeThemeDark = withAccessibleTokens(prismThemes.oneDark, {
 const config: Config = {
   title: 'HtmlFlow',
   tagline: 'Type-safe HTML for Java and Kotlin',
-  favicon: 'img/htmlflow-logo.png',
+  favicon: 'img/htmlflow-gravatar.png',
 
   future: {
     v4: true,
