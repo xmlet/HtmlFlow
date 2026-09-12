@@ -50,7 +50,7 @@ public class HtmlViewVisitor extends HtmlVisitor {
         HtmlContinuation first
     ) {
         super(out, isIndented);
-        this.first = first.copy(this);
+        this.first = first.compiledCopy(this);
     }
 
     /** Processing output through invocation of HtmlContinuation objects chain. */

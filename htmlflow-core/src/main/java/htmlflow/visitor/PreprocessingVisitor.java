@@ -26,13 +26,26 @@
 package htmlflow.visitor;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
+import static htmlflow.visitor.Tags.ATTRIBUTE_MID;
+import static htmlflow.visitor.Tags.QUOTATION;
+import static htmlflow.visitor.Tags.SPACE;
 
 import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import htmlflow.continuations.HtmlContinuationSyncDynamic;
+import htmlflow.continuations.HtmlContinuationSyncForEach;
 import htmlflow.continuations.HtmlContinuationSyncStatic;
+import htmlflow.continuations.HtmlContinuationSyncValue;
+import htmlflow.continuations.HtmlContinuationSyncValue.Kind;
+import htmlflow.continuations.HtmlContinuationSyncWhen;
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
@@ -55,6 +68,13 @@ public class PreprocessingVisitor extends HtmlVisitor {
 
     /** The internal String builder beginning index of a static HTML block. */
     protected int staticBlockIndex = 0;
+
+    /**
+     * True when the leading whitespace of the next static block belongs to the page. A dynamic
+     * block re-emits its own indentation on every render, so we trim the block that follows it.
+     * A value slot doesn't, and trimming there would delete real whitespace.
+     */
+    private boolean keepLeadingSpace = false;
 
     /** The first node to be processed. */
     protected HtmlContinuation first;
@@ -130,16 +150,227 @@ public class PreprocessingVisitor extends HtmlVisitor {
     protected final void chainContinuationStatic(
         HtmlContinuation nextContinuation
     ) {
-        String staticHtml = sb().substring(staticBlockIndex);
-        String staticHtmlTrimmed = staticHtml.trim(); // trim to remove the indentation from static block
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(
-            staticHtmlTrimmed,
+            takeStaticBlock(true),
             this,
             nextContinuation
         );
-        if (first == null) first = staticCont; // on first visit initializes the first pointer
-        else setNext(last, staticCont); // else append the staticCont to existing chain
+        appendNode(staticCont);
         last = nextContinuation.next; // advance last to point to the new HtmlContinuationCloseAndIndent
+        keepLeadingSpace = false;
+    }
+
+    /**
+     * Returns the static HTML that we accumulated since the last node of the chain.
+     *
+     * @param trimEnd True when a dynamic block follows, which emits the trailing indentation
+     *     again, and false when a value slot follows and the HTML is already final.
+     */
+    private String takeStaticBlock(boolean trimEnd) {
+        String block = sb().substring(staticBlockIndex);
+        int from = 0;
+        int to = block.length();
+        if (!keepLeadingSpace) while (
+            from < to && block.charAt(from) <= ' '
+        ) from++;
+        if (trimEnd) while (to > from && block.charAt(to - 1) <= ' ') to--;
+        return block.substring(from, to);
+    }
+
+    private void requireOpenTag() {
+        if (isClosed) throw new IllegalStateException(
+            "Cannot add attributes after!!!"
+        );
+    }
+
+    /** Creates an HtmlContinuation for a value slot, keeping the HTML around it unchanged. */
+    private void chainValueSlot(Kind kind, Object accessor, String attrName) {
+        chainStaticThen(
+            takeStaticBlock(false),
+            new HtmlContinuationSyncValue(kind, accessor, attrName, this, null)
+        );
+    }
+
+    /** Creates a value slot whose indentation goes into the previous static HTML block. */
+    private void chainIndentedValueSlot(Kind kind, Object accessor) {
+        newlineAndIndent();
+        chainValueSlot(kind, accessor, null);
+    }
+
+    @Override
+    public <M> void visitValueRaw(Function<M, ?> accessor) {
+        chainIndentedValueSlot(Kind.RAW, accessor);
+    }
+
+    @Override
+    public <M> void visitValueText(Function<M, ?> accessor) {
+        chainIndentedValueSlot(Kind.TEXT, accessor);
+    }
+
+    @Override
+    public <M> void visitValueInt(ToIntFunction<M> accessor) {
+        chainIndentedValueSlot(Kind.INT, accessor);
+    }
+
+    @Override
+    public <M> void visitValueLong(ToLongFunction<M> accessor) {
+        chainIndentedValueSlot(Kind.LONG, accessor);
+    }
+
+    @Override
+    public <M> void visitValueBoolean(Predicate<M> accessor) {
+        chainIndentedValueSlot(Kind.BOOLEAN, accessor);
+    }
+
+    @Override
+    public <M> void visitValueDouble(ToDoubleFunction<M> accessor) {
+        chainIndentedValueSlot(Kind.DOUBLE, accessor);
+    }
+
+    @Override
+    public <M> void visitValueAttribute(String name, Function<M, ?> accessor) {
+        requireOpenTag();
+        // The name and both quotes are constant, so they belong in the static blocks around the slot.
+        write(SPACE);
+        write(name);
+        write(ATTRIBUTE_MID);
+        chainValueSlot(Kind.RAW, accessor, null);
+        write(QUOTATION);
+    }
+
+    @Override
+    public <M> void visitValueAttributeNullable(
+        String name,
+        Function<M, ?> accessor
+    ) {
+        requireOpenTag();
+        // The attribute may be absent, so name, value and quotes all wait until render time.
+        chainValueSlot(Kind.ATTR_NULLABLE, accessor, name);
+    }
+
+    @Override
+    public <M, E, T extends Element> void visitForEach(
+        Function<M, ? extends Iterable<E>> items,
+        T element,
+        Consumer<T> itemTemplate
+    ) {
+        String outerStatic = openControlFlow();
+        chainStaticThen(
+            outerStatic,
+            new HtmlContinuationSyncForEach<M, E>(
+                items,
+                recordBlock(element, itemTemplate),
+                this,
+                null
+            )
+        );
+    }
+
+    @Override
+    public <M, T extends Element> void visitWhen(
+        Predicate<M> condition,
+        T element,
+        Consumer<T> body,
+        Consumer<T> orElse
+    ) {
+        String outerStatic = openControlFlow();
+        HtmlContinuation bodyChain = recordBlock(element, body);
+        HtmlContinuation elseChain = recordBlock(element, orElse);
+        chainStaticThen(
+            outerStatic,
+            new HtmlContinuationSyncWhen<M, T>(
+                condition,
+                bodyChain,
+                elseChain,
+                this,
+                null
+            )
+        );
+    }
+
+    /**
+     * Starts a loop or a conditional and returns the static HTML that precedes it. We close the
+     * begin tag of the parent here, and not inside each block, so that every block starts in
+     * the same state. We have to take the static HTML before we record any block, because a
+     * recording rewinds the internal string buffer.
+     */
+    private String openControlFlow() {
+        closeParentTag();
+        return takeStaticBlock(false);
+    }
+
+    /** Creates the chain of one HTML block of a loop or a conditional, bound to this visitor. */
+    private <T extends Element> HtmlContinuation recordBlock(
+        T element,
+        Consumer<T> block
+    ) {
+        if (block == null) return null;
+        HtmlContinuation chain = recordSubChain(element, block);
+        chain.compile();
+        return chain.compiledCopy(this);
+    }
+
+    /** Closes the begin tag of the parent and increments the depth, if it is still open. */
+    private void closeParentTag() {
+        if (isClosed) return;
+        depth++;
+        visitParentOnVoidElements();
+    }
+
+    /**
+     * Preencodes the body in a chain of its own and leaves the internal string buffer and the
+     * chain in construction as they were. We save and restore all the state of the recording,
+     * which is what allows a loop or a conditional to nest inside another one.
+     */
+    private <T extends Element> HtmlContinuation recordSubChain(
+        T element,
+        Consumer<T> body
+    ) {
+        HtmlContinuation outerFirst = first;
+        HtmlContinuation outerLast = last;
+        boolean outerKeepLeadingSpace = keepLeadingSpace;
+        boolean outerIsClosed = isClosed;
+        int outerDepth = depth;
+        int mark = sb().length();
+
+        first = null;
+        last = null;
+        // The leading indentation belongs to the body, so it gets emitted on every iteration.
+        keepLeadingSpace = true;
+        staticBlockIndex = mark;
+
+        body.accept(element);
+
+        appendNode(
+            new HtmlContinuationSyncStatic(takeStaticBlock(false), this, null)
+        );
+        HtmlContinuation chain = first;
+
+        first = outerFirst;
+        last = outerLast;
+        keepLeadingSpace = outerKeepLeadingSpace;
+        isClosed = outerIsClosed;
+        depth = outerDepth;
+        sb().setLength(mark); // the body belongs to its own chain and not to the page
+        staticBlockIndex = mark;
+        return chain;
+    }
+
+    /** Appends the given static HTML and then the node, without reading the buffer again. */
+    private void chainStaticThen(String staticHtml, HtmlContinuation node) {
+        // We skip an empty static node because the render would traverse it for nothing.
+        appendNode(
+            staticHtml.isEmpty()
+                ? node
+                : new HtmlContinuationSyncStatic(staticHtml, this, node)
+        );
+        last = node;
+        keepLeadingSpace = true;
+        staticBlockIndex = sb().length();
+    }
+
+    private void appendNode(HtmlContinuation node) {
+        if (first == null) first = node; else setNext(last, node);
     }
 
     protected final void indentAndAdvanceStaticBlockIndex() {
@@ -151,9 +382,9 @@ public class PreprocessingVisitor extends HtmlVisitor {
     /** Creates the last static HTML block. */
     @Override
     public void resolve(Object model) {
-        String staticHtml = sb().substring(staticBlockIndex);
+        String staticHtml = takeStaticBlock(true);
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(
-            staticHtml.trim(),
+            staticHtml,
             this,
             null
         );
