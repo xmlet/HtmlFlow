@@ -63,8 +63,18 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
 
     public static final String HEAD_END_TAG = "</head>";
 
+    private static final String SCRIPT_TAG_TEMPLATE = "<script type=\"module\" src=\"%s\"%s></script>";
+
     public PreprocessingVisitorMfe(boolean isIndented) {
         super(isIndented);
+    }
+
+
+    private String buildScriptTag(String src, String integrity) {
+        String integrityAttr = (integrity != null && !integrity.isEmpty())
+                ? " integrity=\"" + integrity + "\"" + " crossorigin=\"anonymous\""
+                : "";
+        return SCRIPT_TAG_TEMPLATE.formatted(src, integrityAttr);
     }
 
     /**
@@ -81,36 +91,39 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
         super.resolve(model);
 
         final StringBuilder scriptTags = new StringBuilder();
-        scriptTags.append("<script type=\"module\" src=\"base.js\"></script>");
+        scriptTags.append(this.buildScriptTag("base.js", null));
         for (MfeConfiguration mfeConfig : this.getMfePage()) {
             final String scriptSrc = mfeConfig.getMfeScriptUrl();
             if (scriptSrc != null && !scriptSrc.isEmpty()) {
-                scriptTags
-                    .append("<script type=\"module\" src=\"")
-                    .append(scriptSrc)
-                    .append("\"></script>");
+                final String integrity = mfeConfig.getMfeScriptIntegrity();
+                if (integrity != null && !integrity.isEmpty()) {
+                    scriptTags.append(this.buildScriptTag(scriptSrc, integrity));
+                }
+                else {
+                    scriptTags.append(this.buildScriptTag(scriptSrc, null));
+                }
             }
         }
 
         HtmlContinuation curr = this.first;
         while (curr != null) {
             if (
-                curr instanceof HtmlContinuationSyncStatic htmlcontinuationsyncstatic
+                    curr instanceof HtmlContinuationSyncStatic htmlcontinuationsyncstatic
             ) {
                 final String content =
-                    htmlcontinuationsyncstatic.staticHtmlBlock;
+                        htmlcontinuationsyncstatic.staticHtmlBlock;
 
                 if (content.contains(HEAD_END_TAG)) {
                     Field staticHtmlBlockField;
                     try {
                         staticHtmlBlockField =
-                            HtmlContinuationSyncStatic.class.getDeclaredField(
-                                    "staticHtmlBlock"
+                                HtmlContinuationSyncStatic.class.getDeclaredField(
+                                        "staticHtmlBlock"
                                 );
                         staticHtmlBlockField.setAccessible(true);
                         final String newHtml = content.replaceFirst(
-                            HEAD_END_TAG,
-                            scriptTags + HEAD_END_TAG
+                                HEAD_END_TAG,
+                                scriptTags + HEAD_END_TAG
                         );
                         staticHtmlBlockField.set(curr, newHtml.intern());
                         break;
