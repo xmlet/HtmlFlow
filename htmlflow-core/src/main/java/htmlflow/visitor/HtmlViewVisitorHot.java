@@ -24,7 +24,15 @@
 
 package htmlflow.visitor;
 
+import htmlflow.continuations.HtmlContinuationSyncValue;
+import htmlflow.continuations.HtmlContinuationSyncValue.Kind;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
@@ -67,6 +75,90 @@ public class HtmlViewVisitorHot extends HtmlVisitor {
         BiConsumer<E, U> biConsumer
     ) {
         biConsumer.accept(e, (U) model);
+    }
+
+    /** No preencoded chain here, so each slot writes its value straight away. */
+    private void writeValue(Kind kind, Object accessor) {
+        newlineAndIndent();
+        write(HtmlContinuationSyncValue.format(kind, accessor, model));
+    }
+
+    @Override
+    public <M> void visitValueRaw(Function<M, ?> accessor) {
+        writeValue(Kind.RAW, accessor);
+    }
+
+    @Override
+    public <M> void visitValueText(Function<M, ?> accessor) {
+        writeValue(Kind.TEXT, accessor);
+    }
+
+    @Override
+    public <M> void visitValueInt(ToIntFunction<M> accessor) {
+        writeValue(Kind.INT, accessor);
+    }
+
+    @Override
+    public <M> void visitValueLong(ToLongFunction<M> accessor) {
+        writeValue(Kind.LONG, accessor);
+    }
+
+    @Override
+    public <M> void visitValueDouble(ToDoubleFunction<M> accessor) {
+        writeValue(Kind.DOUBLE, accessor);
+    }
+
+    @Override
+    public <M> void visitValueBoolean(Predicate<M> accessor) {
+        writeValue(Kind.BOOLEAN, accessor);
+    }
+
+    @Override
+    public <M> void visitValueAttribute(String name, Function<M, ?> accessor) {
+        visitAttribute(
+            name,
+            HtmlContinuationSyncValue.format(Kind.RAW, accessor, model)
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <M> void visitValueAttributeNullable(
+        String name,
+        Function<M, ?> accessor
+    ) {
+        Object value = accessor.apply((M) model);
+        if (value != null) visitAttribute(name, String.valueOf(value));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <M, E, T extends Element> void visitForEach(
+        Function<M, ? extends Iterable<E>> items,
+        T element,
+        Consumer<T> itemTemplate
+    ) {
+        Object outer = model;
+        for (E item : items.apply((M) outer)) {
+            model = item;
+            itemTemplate.accept(element);
+        }
+        model = outer;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <M, T extends Element> void visitWhen(
+        Predicate<M> condition,
+        T element,
+        Consumer<T> body,
+        Consumer<T> orElse
+    ) {
+        if (condition.test((M) model)) {
+            body.accept(element);
+        } else if (orElse != null) {
+            orElse.accept(element);
+        }
     }
 
     @Override
