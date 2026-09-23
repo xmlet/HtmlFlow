@@ -33,11 +33,14 @@ import static htmlflow.visitor.Tags.SPACE;
 import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import htmlflow.continuations.HtmlContinuationSyncDynamic;
+import htmlflow.continuations.HtmlContinuationSyncForEach;
 import htmlflow.continuations.HtmlContinuationSyncStatic;
 import htmlflow.continuations.HtmlContinuationSyncValue;
 import htmlflow.continuations.HtmlContinuationSyncValue.Kind;
+import htmlflow.continuations.HtmlContinuationSyncWhen;
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -245,6 +248,97 @@ public class PreprocessingVisitor extends HtmlVisitor {
         requireOpenTag();
         // The attribute may be absent, so all of it waits for render time.
         chainValueSlot(Kind.ATTR_NULLABLE, accessor, name);
+    }
+
+    @Override
+    public <M, E, T extends Element> void visitForEach(
+        Function<M, ? extends Iterable<E>> items,
+        T element,
+        Consumer<T> itemTemplate
+    ) {
+        String outerStatic = openControlFlow();
+        chainStaticThen(
+            outerStatic,
+            new HtmlContinuationSyncForEach<M, E>(
+                items,
+                recordBlock(element, itemTemplate),
+                this,
+                null
+            )
+        );
+    }
+
+    @Override
+    public <M, T extends Element> void visitWhen(
+        Predicate<M> condition,
+        T element,
+        Consumer<T> body,
+        Consumer<T> orElse
+    ) {
+        String outerStatic = openControlFlow();
+        HtmlContinuation bodyChain = recordBlock(element, body);
+        HtmlContinuation elseChain = recordBlock(element, orElse);
+        chainStaticThen(
+            outerStatic,
+            new HtmlContinuationSyncWhen<M>(
+                condition,
+                bodyChain,
+                elseChain,
+                this,
+                null
+            )
+        );
+    }
+
+    /**
+     * Closes the parent begin tag if it is still open, and takes the static HTML before the block.
+     * The block records its own leading indentation, so this writes none.
+     */
+    private String openControlFlow() {
+        if (!isClosed) {
+            depth++;
+            visitParentOnVoidElements();
+        }
+        return takeStaticBlock(false);
+    }
+
+    /**
+     * Preencodes the body of a loop or conditional into its own chain. Saves and restores all the
+     * recording state, so blocks can nest.
+     */
+    private <T extends Element> HtmlContinuation recordBlock(
+        T element,
+        Consumer<T> body
+    ) {
+        if (body == null) return null;
+        HtmlContinuation outerFirst = first;
+        HtmlContinuation outerLast = last;
+        boolean outerKeepLeadingSpace = keepLeadingSpace;
+        boolean outerIsClosed = isClosed;
+        int outerDepth = depth;
+        int mark = sb().length();
+
+        first = null;
+        last = null;
+        // The body owns its leading indentation, so every iteration writes it.
+        keepLeadingSpace = true;
+        staticBlockIndex = mark;
+
+        body.accept(element);
+
+        appendNode(
+            new HtmlContinuationSyncStatic(takeStaticBlock(false), this, null)
+        );
+        HtmlContinuation chain = first;
+
+        first = outerFirst;
+        last = outerLast;
+        keepLeadingSpace = outerKeepLeadingSpace;
+        isClosed = outerIsClosed;
+        depth = outerDepth;
+        sb().setLength(mark); // the body lives in its own chain, not the page
+        staticBlockIndex = mark;
+        return chain;
     }
 
     /** Appends the static HTML, skipped when empty, and then the node. */
