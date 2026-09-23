@@ -24,6 +24,8 @@
  */
 package htmlflow.continuations;
 
+import htmlflow.continuations.codegen.ChainCompiler;
+import htmlflow.continuations.codegen.ChainCompiler.Renderer;
 import htmlflow.visitor.HtmlVisitor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -54,6 +56,9 @@ public abstract class HtmlContinuation {
     /** Next HtmlContinuation */
     public final HtmlContinuation next;
 
+    /** The compiled chain starting at this node, or null when it did not compile. */
+    private Renderer compiled;
+
     /**
      * @param currentDepth Indentation depth associated to this block.
      */
@@ -67,6 +72,21 @@ public abstract class HtmlContinuation {
         this.isClosed = isClosed;
         this.visitor = visitor;
         this.next = next;
+    }
+
+    /** Compiles the chain starting at this node. */
+    public final void compile() {
+        compiled = ChainCompiler.compile(this);
+    }
+
+    /**
+     * Copies this node for a new visitor. The copy renders through the generated {@link Renderer}
+     * when the chain compiled, and through the linked chain otherwise.
+     */
+    public final HtmlContinuation compiledCopy(HtmlVisitor visitor) {
+        return compiled == null
+            ? copy(visitor)
+            : new HtmlContinuationSyncCompiled(compiled, this, visitor);
     }
 
     public HtmlContinuation getNext() {
