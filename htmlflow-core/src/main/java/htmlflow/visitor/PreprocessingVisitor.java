@@ -26,13 +26,23 @@
 package htmlflow.visitor;
 
 import static htmlflow.visitor.PreprocessingVisitor.HtmlContinuationSetter.setNext;
+import static htmlflow.visitor.Tags.ATTRIBUTE_MID;
+import static htmlflow.visitor.Tags.QUOTATION;
+import static htmlflow.visitor.Tags.SPACE;
 
 import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationSyncCloseAndIndent;
 import htmlflow.continuations.HtmlContinuationSyncDynamic;
 import htmlflow.continuations.HtmlContinuationSyncStatic;
+import htmlflow.continuations.HtmlContinuationSyncValue;
+import htmlflow.continuations.HtmlContinuationSyncValue.Kind;
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 import org.xmlet.htmlapifaster.Element;
 import org.xmlet.htmlapifaster.async.AwaitConsumer;
 
@@ -55,6 +65,13 @@ public class PreprocessingVisitor extends HtmlVisitor {
 
     /** The internal String builder beginning index of a static HTML block. */
     protected int staticBlockIndex = 0;
+
+    /**
+     * Whether the next static block keeps its leading whitespace. A dynamic block writes its own
+     * indentation on each render, so the block after it gets trimmed. A value slot writes none, so
+     * trimming after it would eat real whitespace.
+     */
+    private boolean keepLeadingSpace = false;
 
     /** The first node to be processed. */
     protected HtmlContinuation first;
@@ -130,16 +147,120 @@ public class PreprocessingVisitor extends HtmlVisitor {
     protected final void chainContinuationStatic(
         HtmlContinuation nextContinuation
     ) {
-        String staticHtml = sb().substring(staticBlockIndex);
-        String staticHtmlTrimmed = staticHtml.trim(); // trim to remove the indentation from static block
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(
-            staticHtmlTrimmed,
+            takeStaticBlock(true),
             this,
             nextContinuation
         );
-        if (first == null) first = staticCont; // on first visit initializes the first pointer
-        else setNext(last, staticCont); // else append the staticCont to existing chain
+        appendNode(staticCont);
         last = nextContinuation.next; // advance last to point to the new HtmlContinuationCloseAndIndent
+        keepLeadingSpace = false;
+    }
+
+    /**
+     * Returns the static HTML written since the last node of the chain.
+     *
+     * @param trimEnd True before a dynamic block, which writes the trailing indentation again.
+     *     False before a value slot, where the HTML is already final.
+     */
+    private String takeStaticBlock(boolean trimEnd) {
+        String block = sb().substring(staticBlockIndex);
+        int from = 0;
+        int to = block.length();
+        if (!keepLeadingSpace) {
+            while (from < to && block.charAt(from) <= ' ') from++;
+        }
+        if (trimEnd) {
+            while (to > from && block.charAt(to - 1) <= ' ') to--;
+        }
+        return block.substring(from, to);
+    }
+
+    private void requireOpenTag() {
+        if (isClosed) throw new IllegalStateException(
+            "Cannot add attributes after!!!"
+        );
+    }
+
+    /** Chains a value slot, leaving the HTML around it untouched. */
+    private void chainValueSlot(Kind kind, Object accessor, String attrName) {
+        chainStaticThen(
+            takeStaticBlock(false),
+            new HtmlContinuationSyncValue(kind, accessor, attrName, this, null)
+        );
+    }
+
+    /** Chains a value slot whose indentation goes in the static block before it. */
+    private void chainIndentedValueSlot(Kind kind, Object accessor) {
+        newlineAndIndent();
+        chainValueSlot(kind, accessor, null);
+    }
+
+    @Override
+    public <M> void visitValueRaw(Function<M, ?> accessor) {
+        chainIndentedValueSlot(Kind.RAW, accessor);
+    }
+
+    @Override
+    public <M> void visitValueText(Function<M, ?> accessor) {
+        chainIndentedValueSlot(Kind.TEXT, accessor);
+    }
+
+    @Override
+    public <M> void visitValueInt(ToIntFunction<M> accessor) {
+        chainIndentedValueSlot(Kind.INT, accessor);
+    }
+
+    @Override
+    public <M> void visitValueLong(ToLongFunction<M> accessor) {
+        chainIndentedValueSlot(Kind.LONG, accessor);
+    }
+
+    @Override
+    public <M> void visitValueBoolean(Predicate<M> accessor) {
+        chainIndentedValueSlot(Kind.BOOLEAN, accessor);
+    }
+
+    @Override
+    public <M> void visitValueDouble(ToDoubleFunction<M> accessor) {
+        chainIndentedValueSlot(Kind.DOUBLE, accessor);
+    }
+
+    @Override
+    public <M> void visitValueAttribute(String name, Function<M, ?> accessor) {
+        requireOpenTag();
+        // Name and quotes are constant, so they go in the static blocks around the slot.
+        write(SPACE);
+        write(name);
+        write(ATTRIBUTE_MID);
+        chainValueSlot(Kind.RAW, accessor, null);
+        write(QUOTATION);
+    }
+
+    @Override
+    public <M> void visitValueAttributeNullable(
+        String name,
+        Function<M, ?> accessor
+    ) {
+        requireOpenTag();
+        // The attribute may be absent, so all of it waits for render time.
+        chainValueSlot(Kind.ATTR_NULLABLE, accessor, name);
+    }
+
+    /** Appends the static HTML, skipped when empty, and then the node. */
+    private void chainStaticThen(String staticHtml, HtmlContinuation node) {
+        appendNode(
+            staticHtml.isEmpty()
+                ? node
+                : new HtmlContinuationSyncStatic(staticHtml, this, node)
+        );
+        last = node;
+        keepLeadingSpace = true;
+        staticBlockIndex = sb().length();
+    }
+
+    private void appendNode(HtmlContinuation node) {
+        if (first == null) first = node; else setNext(last, node);
     }
 
     protected final void indentAndAdvanceStaticBlockIndex() {
@@ -151,9 +272,9 @@ public class PreprocessingVisitor extends HtmlVisitor {
     /** Creates the last static HTML block. */
     @Override
     public void resolve(Object model) {
-        String staticHtml = sb().substring(staticBlockIndex);
+        String staticHtml = takeStaticBlock(true);
         HtmlContinuation staticCont = new HtmlContinuationSyncStatic(
-            staticHtml.trim(),
+            staticHtml,
             this,
             null
         );
