@@ -8,10 +8,9 @@
  * scripts can react to a fragment becoming ready, trigger/listen for custom cross-fragment
  * events, and force a reload.
  *
- * See `docs/MFE-API.md` for the full consumer-facing API reference.
  */
-import { loadStylesheet, adoptStylesheet } from "./theme-loader.js";
-import { createSafeHtml } from "./html-sanitizer.js";
+import { loadStylesheet, adoptStylesheet } from "./modules/theme-loader";
+import { createSafeHtml } from "./modules/html-sanitizer";
 
 /**
  * The object passed to every `onInit`/`mfe()` callback once a `<micro-frontend>` fragment is

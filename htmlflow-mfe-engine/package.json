@@ -1,12 +1,12 @@
 {
   "name": "ts-engine",
   "version": "1.0.0",
-  "main": "src/original_base.js",
+  "main": "src/htmlflow-mfe-engine.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "typecheck": "npx tsc --noEmit",
-    "build:tsc": "npm run typecheck && npx esbuild src/base.ts --bundle --format=esm --outfile=../mfe-shell/src/main/resources/META-INF/resources/base.js",
-    "build:minified": "npx esbuild src/base.ts --bundle --minify --format=esm --outfile=../mfe-shell/src/main/resources/META-INF/resources/base.js"
+    "build:tsc": "npm run typecheck && npx esbuild src/htmlflow-mfe-engine.ts --bundle --format=esm --outfile=./dist/htmlflow-mfe-engine.js",
+    "build:minified": "npx esbuild src/htmlflow-mfe-engine.ts --bundle --minify --format=esm --outfile=./dist/htmlflow-mfe-engine.js"
   },
   "keywords": [],
   "author": "",
