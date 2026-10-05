@@ -3,10 +3,9 @@
  *
  * Defines the `<micro-frontend>` custom element (backed by the {@link Mfe} class), which
  * fetches and renders an HTML fragment (or streamed HTML fragments) from a configured URL
- * into its own shadow root, adopts shared/own CSS stylesheets, and exposes a small pub-sub
- * API (`window.mfe(name, callback)` / the `MfeContext` handed to that callback) so host-page
- * scripts can react to a fragment becoming ready, trigger/listen for custom cross-fragment
- * events, and force a reload.
+ * into its own shadow root. Adopts shared/own CSS stylesheets, exposes a small pub-sub
+ * API (`window.mfe(name, callback)` to react when fragments are loaded,
+ * trigger/listen for custom cross-fragment events, and fragment reloading.
  *
  */
 import { loadStylesheet, adoptStylesheet } from "./modules/theme-loader";

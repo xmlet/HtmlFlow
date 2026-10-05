@@ -1,9 +1,9 @@
 /**
  * Shared, module-level singleton cache for the theme/stylesheet loader.
  *
- * Provides `loadStylesheet`/`adoptStylesheet` used by `base.ts` to fetch and share a single
+ * Provides `loadStylesheet`/`adoptStylesheet` used by `htmlflow-mfe-engine.ts` to fetch and share a single
  * `CSSStyleSheet` (via Constructable Stylesheets) across every `<micro-frontend>` fragment's
- * shadow root and, when propagated, the host document itself — so a shared theme is fetched
+ * shadow root, including the shel. A shared theme is fetched
  * and parsed only once no matter how many fragments request it concurrently.
  */
 
@@ -12,9 +12,7 @@ const styleSheetCache = new Map<string, Promise<CSSStyleSheet>>();
 /**
  * Loads the stylesheet at `url` (via {@link loadStylesheet}, reusing the shared cache) and
  * adopts it onto `target.adoptedStyleSheets`, guarding against adding a duplicate entry if the
- * same sheet has already been inserted. The guard matters specifically for `Document`
- * targets, since multiple independent fragments may all target the same `document.adoptedStyleSheets`
- * array.
+ * same sheet has already been inserted.
  * @param target - either `document` (to theme the host shell) or a fragment's `ShadowRoot`.
  * @param url - URL of the CSS resource to fetch, parse, and adopt.
  */
