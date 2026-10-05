@@ -45,7 +45,6 @@ import org.xmlet.htmlapifaster.MfeConfiguration;
  *
  * <p>Implementation details:</p>
  * <ul>
- *   <li>Always injects a base module script: {@code <script type="module" src="base.js"></script>}</li>
  *   <li>Adds module scripts for each configured MFE component that provides a script URL</li>
  *   <li>Uses reflection to modify the static HTML blocks in the continuation chain</li>
  *   <li>Targets the first HTML continuation containing the closing head tag</li>
@@ -91,7 +90,6 @@ public class PreprocessingVisitorMfe extends PreprocessingVisitor {
         super.resolve(model);
 
         final StringBuilder scriptTags = new StringBuilder();
-        scriptTags.append(this.buildScriptTag("base.js", null));
         for (MfeConfiguration mfeConfig : this.getMfePage()) {
             final String scriptSrc = mfeConfig.getMfeScriptUrl();
             if (scriptSrc != null && !scriptSrc.isEmpty()) {
