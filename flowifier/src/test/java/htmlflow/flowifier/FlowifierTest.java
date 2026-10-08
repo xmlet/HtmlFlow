@@ -1,6 +1,5 @@
 package htmlflow.flowifier;
 
-import htmlflow.flowifier.Flowifier;
 import htmlflow.test.Utils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -94,6 +93,24 @@ public class FlowifierTest {
                 });
         Assert.assertEquals(false, iter.hasNext());
     }
+
+    @Test
+    public void testFlowifierPreservesApostropheInAttributeValue() {
+        String src = "<!DOCTYPE html>" +
+            "<html>" +
+            "<body>" +
+            "<header class=\"intro-header\" style=\"background-image: url('https://gamboa.pt/img/bg.jpg')\"></header>" +
+            "<p>Simply search for \"eclemma\".</p>" +
+            "</body>" +
+            "</html>";
+
+        String generatedJava = Flowifier.fromHtml(src);
+
+        Assert.assertTrue(generatedJava.contains("url('https://gamboa.pt/img/bg.jpg')"));
+        Assert.assertFalse(generatedJava.contains("&apos;"));
+            Assert.assertTrue(generatedJava.contains("Simply search for \\\"eclemma\\\"."));
+            Assert.assertFalse(generatedJava.contains("&quot;eclemma&quot;"));
+        }
 
     private void testFlowifier(final String url) throws Exception {
         final Flowifier flowifier = new Flowifier();

@@ -390,7 +390,7 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<
             .append(".raw(")
             .append(
                 convertJavaStringContentToJavaDeclarableString(
-                    Entities.escape(textNode.getWholeText())
+                    escapeText(textNode.getWholeText())
                 )
             )
             .append(")")
@@ -435,7 +435,15 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<
     private String escapeInAttribute(final String unescaped) {
         // FIXME ask JSoup's maintainer to expose a public method to escape the
         // value of an attribute
-        return Entities.escape(unescaped).replace("\"", "&quot;");
+        return escapeHtmlPreservingApostrophe(unescaped).replace("\"", "&quot;");
+    }
+
+    private String escapeText(final String unescaped) {
+        return escapeHtmlPreservingApostrophe(unescaped).replace("&quot;", "\"");
+    }
+
+    private String escapeHtmlPreservingApostrophe(final String unescaped) {
+        return Entities.escape(unescaped).replace("&apos;", "'");
     }
 
     @Override
