@@ -69,6 +69,7 @@ public class HtmlFlow {
          * accumulated in the internal StringBuffer out.
          */
         preView.getVisitor().resolve(null);
+        pre.getFirst().compile();
         return pre;
     }
 
@@ -94,6 +95,7 @@ public class HtmlFlow {
         template.resolve(preView);
         // second process
         preView.getVisitor().resolve(null);
+        processView.getFirst().compile();
         return processView;
     }
 
@@ -123,6 +125,7 @@ public class HtmlFlow {
          * accumulated in the internal StringBuffer out.
          */
         preView.getVisitor().resolve(null);
+        pre.getFirst().compile();
         return pre;
     }
 
