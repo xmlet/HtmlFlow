@@ -76,6 +76,11 @@ class TestWhenAndNesting {
             .render(GROUPS);
         assertEquals(expected, slots.render(GROUPS));
         assertEquals(expected, slots.render(GROUPS), "second render differs from the first");
+        assertEquals(
+            expected,
+            Utils.renderToAppendable(TestWhenAndNesting::whenTemplate, GROUPS),
+            "written to an Appendable, the page differs"
+        );
     }
 
     private static void nestedTemplate(HtmlPage page) {
@@ -133,6 +138,11 @@ class TestWhenAndNesting {
         assertEquals(
             expected,
             HtmlFlow.<List<Group>>view(TestWhenAndNesting::nestedTemplate).render(GROUPS)
+        );
+        assertEquals(
+            expected,
+            Utils.renderToAppendable(TestWhenAndNesting::nestedTemplate, GROUPS),
+            "written to an Appendable, the page differs"
         );
     }
 }
