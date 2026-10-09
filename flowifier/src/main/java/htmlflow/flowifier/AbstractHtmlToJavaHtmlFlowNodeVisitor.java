@@ -435,11 +435,13 @@ public abstract class AbstractHtmlToJavaHtmlFlowNodeVisitor<
     private String escapeInAttribute(final String unescaped) {
         // FIXME ask JSoup's maintainer to expose a public method to escape the
         // value of an attribute
-        return escapeHtmlPreservingApostrophe(unescaped).replace("\"", "&quot;");
+        return escapeHtmlPreservingApostrophe(unescaped)
+            .replace("\"", "&quot;");
     }
 
     private String escapeText(final String unescaped) {
-        return escapeHtmlPreservingApostrophe(unescaped).replace("&quot;", "\"");
+        return escapeHtmlPreservingApostrophe(unescaped)
+            .replace("&quot;", "\"");
     }
 
     private String escapeHtmlPreservingApostrophe(final String unescaped) {
