@@ -91,6 +91,14 @@
             <version>${junit.jupiter-version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Browser automation for the MFE engine e2e tests (*IT, run with -Pe2e) -->
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.63.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,4 +131,34 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- End-to-end tests of htmlflow-mfe-engine: mvn -pl htmlflow-core -am -Pe2e verify -->
+        <profile>
+            <id>e2e</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>3.5.2</version>
+                        <configuration>
+                            <argLine>-Xmx512m</argLine>
+                            <systemPropertyVariables>
+                                <mfe.engine.dist>${project.basedir}/../htmlflow-mfe-engine/dist</mfe.engine.dist>
+                            </systemPropertyVariables>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
