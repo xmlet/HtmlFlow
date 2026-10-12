@@ -159,7 +159,7 @@ public interface Renderer {
 }
 ```
 
-New field in `HtmlContinuation`:
+New field `compiled` in `HtmlContinuation` (possible duplication with inherited `renderer`):
 ```java
 public abstract class HtmlContinuation {
     ...
@@ -192,15 +192,20 @@ public class HtmlViewVisitor extends HtmlVisitor {
   }
 ```
 
+Additional step in `preprocessing` of `HtmlFlow`:
+```java
+pre.getFirst().compile();
+```
+
 
 ## Review History
 
 This section tracks architectural review feedback, proposed changes, and
-their resolution throughout the ADR lifecycle.
+their resolution throughout this ADR lifecycle.
 
 | Date | Reviewer | Review Focus | Status |
 |---|---|---|---|
-| 2026-10-12 | Maintainer | Renderer ownership and polymorphism | Open |
+| 2026-10-12 | gamboa | Renderer ownership and polymorphism | Open |
 
 ### Review 1 — Renderer Ownership and Polymorphism
 
@@ -230,5 +235,33 @@ Keep `HtmlContinuation` independent of bytecode compilation concerns.
 Use separate continuation implementations for compiled and interpreted
 rendering, allowing each to provide its own execution behavior through
 the existing continuation abstraction.
+
+Consider introducing a common base interface for `HtmlContinuation` and
+`HtmlContinuationSyncCompiled`.  
+Perhaps the existing `Renderer` interface could serve this purpose, but
+I do not like its name.  
+Following HtmlFlow's `Html` prefix convention, `HtmlResolver` might be
+more consistent with the terminology established in its foundations.  
+
+I also dislike having two methods, `render()` and `write()`, in `Renderer`
+(or its potential replacement, `HtmlResolver`).
+Since both perform similar operations with different argument types,
+they could share the same name through method overloading.
+
+I am also unsure whether `HtmlContinuationSyncCompiled` should be called
+a *continuation*.
+The term *continuation* reflects the rationale behind the existing
+singly linked list of continuation nodes.
+If I understand correctly, `HtmlContinuationSyncCompiled` performs all
+rendering operations as a single unit, without chaining to another
+continuation.
+If so, `HtmlResolverCompiled` might be a more appropriate name.
+
+**Potential common members of `HtmlResolver`:**
+- `resolve(Object model)` — Replaces the existing `execute(Object model)`.
+- `copy(...)` — Creates a copy bound to the appropriate rendering context.
+- `compile()` — Is this necessary in the common interface, or could
+  compilation be handled entirely during preprocessing?
+
 
 **Outcome:** Pending architectural review and decision.
