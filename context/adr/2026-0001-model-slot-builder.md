@@ -1,4 +1,19 @@
-# Introduce a Value-Based HTML API as an Alternative to `dynamic()` / `dyn()`
+# ADR 2026-0001: Introduce a Value-Based HTML API as an Alternative to `dynamic()` / `dyn()`
+
+**Status:** Proposed  
+**Date:** 2026-10-12
+
+## Table of Contents
+
+- [Context](#context)
+- [Decision](#decision)
+  - [Example: Continuation Chain Representation](#example-continuation-chain-representation)
+    - [Current Approach in HtmlFlow 5.0.4: `dynamic()` / `dyn()`](#current-approach-in-htmlflow-504-dynamic--dyn)
+    - [Proposed Approach: Value-Based Continuations](#proposed-approach-value-based-continuations)
+  - [Implementation Notes](#implementation-notes)
+- [Consequences](#consequences)
+- [Review History](#review-history)
+  - [Review 1 — Renderer Ownership and Polymorphism](#review-1--renderer-ownership-and-polymorphism)
 
 ## Context
 
@@ -11,23 +26,25 @@ where `E` represents the parent HTML element and `M` represents the
 template's model.  
 During rendering, this callback may perform several operations that introduce
 **runtime overhead**:
+
 1. Accessing model values through getter methods.
 2. Repeatedly invoking fluent HTML builders to construct and serialize HTML
    elements, including string conversion and concatenation.
 
-## Proposed Change
+## Decision
 
-This ADR proposes introducing a **new value-based HtmlFlow API** as an
-alternative to the existing `dynamic()` / `dyn()` builders.
+Introduce a **new value-based HtmlFlow API** as an alternative to the existing
+`dynamic()` / `dyn()` builders.
 
 Instead of representing an entire dynamic block as a single
 `HtmlContinuationSyncDynamic`, the new API allows preprocessing to
 decompose it into **pre-encoded static HTML fragments interleaved with
 `HtmlContinuationSyncValue` nodes**.  
 Each `HtmlContinuationSyncValue` retains a model accessor responsible
-for extracting a single dynamic value at rendering time.  
+for extracting a single dynamic value at rendering time.
 
 The preprocessing phase (in `HtmlFlow.preprocessing()`) consists of two steps:
+
 1. **Continuation chain construction** — Performed by `PreprocessingVisitor`,
    which builds the continuation chain by interleaving static HTML fragments
    with the new continuation types: `HtmlContinuationSyncValue`,
@@ -38,7 +55,7 @@ The preprocessing phase (in `HtmlFlow.preprocessing()`) consists of two steps:
    `Renderer` implementation. If compilation is not supported or fails,
    the original continuation chain remains available as a fallback.
 
-## Example: Continuation Chain Representation
+### Example: Continuation Chain Representation
 
 Consider a template that produces the following HTML:
 
@@ -56,7 +73,7 @@ Here, `Alice` and `1995-06-15` are values obtained from `model.getName()` and
 
 The entire HTML fragment is generated inside a dynamic callback.
 
-```
+```text
 +--------------------------------------+
 | : HtmlContinuationSyncDynamic        |
 +--------------------------------------+
@@ -81,7 +98,7 @@ and serializes the corresponding HTML structure.
 
 The same HTML fragment is decomposed during preprocessing into:
 
-```
+```text
 +--------------------------------------+
 | : HtmlContinuationSyncStatic           |
 +--------------------------------------+
@@ -134,7 +151,7 @@ The existing `dynamic()` / `dyn()` API remains available for dynamic
 blocks that require arbitrary HTML construction or behavior that cannot
 be expressed through value-based continuations.
 
-## Proposal
+### Implementation Notes
 
 The `HtmlContinuationSyncCompiled` class represents a continuation whose
 original chain has been compiled into specialized JVM bytecode by
@@ -160,6 +177,7 @@ public interface Renderer {
 ```
 
 New field `compiled` in `HtmlContinuation` (possible duplication with inherited `renderer`):
+
 ```java
 public abstract class HtmlContinuation {
     ...
@@ -171,7 +189,7 @@ public abstract class HtmlContinuation {
     }
     ...
     /**
-     * Copies this node for a new visitor. The copy renders through the 
+     * Copies this node for a new visitor. The copy renders through the
      * generated {@link Renderer} when the chain compiled, and through
      * the linked chain otherwise.
      */
@@ -184,6 +202,7 @@ public abstract class HtmlContinuation {
 ```
 
 `HtmlViewVisitor` now calls `compiledCopy` instead of `copy`:
+
 ```java
 public class HtmlViewVisitor extends HtmlVisitor {
   public HtmlViewVisitor(Appendable out, boolean isIndented, HtmlContinuation first) {
@@ -193,10 +212,22 @@ public class HtmlViewVisitor extends HtmlVisitor {
 ```
 
 Additional step in `preprocessing` of `HtmlFlow`:
+
 ```java
 pre.getFirst().compile();
 ```
 
+## Consequences
+
+- Value-based continuations separate static HTML structure from
+  model-dependent values, avoiding repeated serialization of static fragments.
+- Eligible chains can be compiled to avoid linked-list traversal during
+  rendering. Chains that cannot be compiled retain the original continuation
+  chain as a fallback.
+- The existing `dynamic()` / `dyn()` API remains available for behavior that
+  cannot be expressed with value-based continuations.
+- The proposed compilation design adds renderer ownership and dispatch concerns
+  that remain unresolved in the review history below.
 
 ## Review History
 
@@ -258,10 +289,10 @@ continuation.
 If so, `HtmlResolverCompiled` might be a more appropriate name.
 
 **Potential common members of `HtmlResolver`:**
+
 - `resolve(Object model)` — Replaces the existing `execute(Object model)`.
 - `copy(...)` — Creates a copy bound to the appropriate rendering context.
 - `compile()` — Is this necessary in the common interface, or could
   compilation be handled entirely during preprocessing?
-
 
 **Outcome:** Pending architectural review and decision.
