@@ -71,20 +71,34 @@ Here, `Alice` and `1995-06-15` are values obtained from `model.getName()` and
 
 ### Current Approach in HtmlFlow 5.0.4: `dynamic()` / `dyn()`
 
-The entire HTML fragment is generated inside a dynamic callback.
+The outer `<ul>` tags are emitted by static continuations. The dynamic
+continuation builds the list items and inserts the model values.
 
 ```text
++--------------------------------------+
+| : HtmlContinuationSyncStatic         |
++--------------------------------------+
+| "<ul>"                               |
++--------------------------------------+
+                  |
+                  v
 +--------------------------------------+
 | : HtmlContinuationSyncDynamic        |
 +--------------------------------------+
 | BiConsumer<Element, User>            |
 |                                      |
-| - build <ul>                         |
 | - build <li>                         |
 | - model.getName()                    |
 | - build </li><li>                    |
 | - model.getBirth()                   |
-| - build </li></ul>                   |
+| - build </li>                        |
++--------------------------------------+
+                  |
+                  v
++--------------------------------------+
+| : HtmlContinuationSyncStatic         |
++--------------------------------------+
+| "</ul>"                              |
 +--------------------------------------+
                   |
                   v
@@ -100,35 +114,35 @@ The same HTML fragment is decomposed during preprocessing into:
 
 ```text
 +--------------------------------------+
-| : HtmlContinuationSyncStatic           |
+| : HtmlContinuationSyncStatic         |
 +--------------------------------------+
 | "<ul><li>"                           |
 +--------------------------------------+
                   |
                   v
 +--------------------------------------+
-| : HtmlContinuationSyncValue            |
+| : HtmlContinuationSyncValue          |
 +--------------------------------------+
 | User::getName                        |
 +--------------------------------------+
                   |
                   v
 +--------------------------------------+
-| : HtmlContinuationSyncStatic           |
+| : HtmlContinuationSyncStatic         |
 +--------------------------------------+
 | "</li><li>"                          |
 +--------------------------------------+
                   |
                   v
 +--------------------------------------+
-| : HtmlContinuationSyncValue            |
+| : HtmlContinuationSyncValue          |
 +--------------------------------------+
 | User::getBirth                       |
 +--------------------------------------+
                   |
                   v
 +--------------------------------------+
-| : HtmlContinuationSyncStatic           |
+| : HtmlContinuationSyncStatic         |
 +--------------------------------------+
 | "</li></ul>"                         |
 +--------------------------------------+
