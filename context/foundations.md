@@ -71,9 +71,12 @@ The fundamental concepts are:
 
 The diagram above highlights **three methods operating at different layers** of the
 rendering pipeline, each with a distinct responsibility in **processing the model**:
-- `HtmlVisitor` — `void resolve(Object model)`
-- `HtmlView` — `void write(T model)`
 - `HtmlContinuation` — `void execute(Object model)`
+- `HtmlVisitor` — `void resolve(Object model)`
+- `HtmlView` — `void write(M model)` does `getVisitor().resolve(model);`
+
+A new visitor may be instantiated for each `HtmlView.write()` invocation, since
+visitors **cannot be shared** across concurrent rendering executions.
 
 `HtmlTemplate` is a functional interface representing a function that defines an
 HTML document.  
@@ -96,16 +99,14 @@ are **visited during template execution**.
 Different visitor implementations may provide different rendering strategies
 without requiring changes to the template definition.
 
-**Key principle:** The `Visitor` determines *how HTML is processed and emitted*,
+**Key principle:** The `ElementVisitor` determines *how HTML is processed and emitted*,
 independently of the template that defines its structure.
 
 The following excerpts from `HtmlViewVisitor` illustrate two crucial aspects of
 its design.
-1. a new visitor may be instantiated for each `HtmlView.write()` invocation,
-   since visitors **cannot be shared** across concurrent rendering executions.
-   Each visitor owns its own `Appendable` output. Creating a new visitor from an
-   existing continuation chain involves **copying the chain** and binding its
-   nodes to the new visitor instance.
+1. creating a new visitor from an existing continuation chain involves **copying
+   the chain** and binding its nodes to the new visitor instance. Each visitor
+   owns its own `Appendable` output
 2. resolving a visitor simply delegates execution to the first continuation,
    which subsequently invokes the remaining nodes in the chain.
 
@@ -138,10 +139,10 @@ The process can be summarized as follows:
 
 ```java
 PreprocessingVisitor pre = new PreprocessingVisitor(isIndented);
-HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
-template.resolve(preView);
-preView.getVisitor().resolve(null);
-return new HtmlView<>(
+HtmlView<?> preView = new HtmlView<>(() -> pre, template, false); // 1.
+template.resolve(preView);                                        // 2.
+preView.getVisitor().resolve(null);                               // 3.
+return new HtmlView<>(                                            // 4.
     () -> new HtmlViewVisitor(..., pre.getFirst()),
     ...
 );
@@ -161,20 +162,17 @@ The preprocessing sequence involves the following steps:
    output to an internal `StringBuilder`.
    This auxiliary view provides the root context required by the template.
 
-2. **Traverse the template.**
-   Calling `template.resolve(preView)` executes the template and visits
-   its HTML elements.
-   Static HTML is serialized into the internal `StringBuilder`, while
-   dynamic blocks are intercepted by `PreprocessingVisitor.visitDynamic()`.
+2. **Traverse the template and Construct the continuation chain.** 
+   Calling `template.resolve(preView)` executes the template and visits its HTML
+   elements.
+   * static HTML is serialized into the internal `StringBuilder`, while dynamic
+   blocks are intercepted by `PreprocessingVisitor.visitDynamic()`.
+   * each invocation of `visitDynamic()` extracts the accumulated static HTML
+   into an `HtmlContinuationSyncStatic` node and appends it to the chain.  It
+   then appends an `HtmlContinuationSyncDynamic` node containing the callback
+   responsible for binding the model during rendering.
 
-3. **Construct the continuation chain.**
-   Each invocation of `visitDynamic()` extracts the accumulated static
-   HTML into an `HtmlContinuationSyncStatic` node and appends it to the
-   chain.
-   It then creates an `HtmlContinuationSyncDynamic` node containing the
-   callback responsible for binding the model during rendering.
-
-4. **Finalize the continuation chain.**
+3. **Finalize the continuation chain.**
    After template traversal, the remaining static HTML must be appended
    to the chain.
    This is achieved by calling `preView.getVisitor().resolve(null)`.
@@ -182,10 +180,14 @@ The preprocessing sequence involves the following steps:
    simply creates the final `HtmlContinuationSyncStatic` node, even
    when the remaining static HTML is empty.
 
-5. **Create the reusable `HtmlView`.**
+4. **Create the reusable `HtmlView`.**
    Once preprocessing is complete, `HtmlFlow.view()` creates the final
    `HtmlView`, providing a supplier of `HtmlViewVisitor` instances
    configured with the first continuation from `pre.getFirst()`.
+
+**Note** that other types of dynamic continuations, including asynchronous and
+suspending variants, handle different kinds of dynamic blocks and are chained in
+the same manner as `HtmlContinuationSyncDynamic`.
 
 **Preprocessing occurs only once**, when the `HtmlView` is created.
 Subsequent calls to `HtmlView.write(T model)` obtain a new
@@ -204,7 +206,3 @@ and `HtmlViewVisitor.resolve()` executes that chain.
 These operations have distinct responsibilities despite sharing the
 same method name, making the preprocessing workflow less intuitive
 and potentially misleading during maintenance or refactoring.
-
-Note that other types of dynamic continuations, including asynchronous and
-suspending variants, handle different kinds of dynamic blocks and are chained in
-the same manner as `HtmlContinuationSyncDynamic`.
