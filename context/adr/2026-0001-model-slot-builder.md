@@ -69,12 +69,54 @@ Consider a template that produces the following HTML:
 Here, `Alice` and `1995-06-15` are values obtained from `model.getName()` and
 `model.getBirth()`, respectively.
 
-### Current Approach in HtmlFlow 5.0.4: `dynamic()` / `dyn()`
+### Proposal
+
+<table>
+<tr>
+<th>
+
+Current Approach in HtmlFlow 5.0.4: `dynamic()` / `dyn()`
+
+</th>
+<th>
+
+**Proposed Approach**: 1st - Value-Based Continuations
+
+</th>
+<th>
+
+**Proposed Approach**: 2nd - `HtmlContinuationSyncCompiled` compiled to JVM bytecode 
+
+</th>
+</tr>
+<tr>
+<td>
 
 The outer `<ul>` tags are emitted by static continuations. The dynamic
 continuation builds the list items and inserts the model values.
 
+At every rendering execution, the callback traverses the fluent HTML builders
+and serializes the corresponding HTML structure.
+
+</td>
+<td>
+
+1st - During preprocessing the same HTML fragment is decomposed into:
+
+</td>
+<td>
+
+2nd - During preprocessing the continuations chain is compiled into:
+
+</td>
+</tr>
+<tr>
+<td>
+
 ```text
+                 ...
+                  |
+                  v
 +--------------------------------------+
 | : HtmlContinuationSyncStatic         |
 +--------------------------------------+
@@ -102,17 +144,16 @@ continuation builds the list items and inserts the model values.
 +--------------------------------------+
                   |
                   v
-                next
+                 ...
 ```
 
-At every rendering execution, the callback traverses the fluent HTML builders
-and serializes the corresponding HTML structure.
-
-### Proposed Approach: Value-Based Continuations
-
-The same HTML fragment is decomposed during preprocessing into:
+</td>
+<td>
 
 ```text
+                 ...
+                  |
+                  v
 +--------------------------------------+
 | : HtmlContinuationSyncStatic         |
 +--------------------------------------+
@@ -146,7 +187,33 @@ The same HTML fragment is decomposed during preprocessing into:
 +--------------------------------------+
 | "</li></ul>"                         |
 +--------------------------------------+
+                  |
+                  v
+                 ...
 ```
+
+</td>
+<td>
+
+```text
+                 ...
+                  |
+                  v
++--------------------------------------+
+| : HtmlContinuationSyncCompiled       |
++--------------------------------------+
+| JVM bytecode                         |
++--------------------------------------+
+                  |
+                  v
+                 ...
+```
+
+</td>
+</tr>
+</table>
+
+### Proposed Approach: Value-Based Continuations
 
 The static fragments are encoded only once during preprocessing. At rendering
 time, only the value accessors are evaluated and their results are appended
