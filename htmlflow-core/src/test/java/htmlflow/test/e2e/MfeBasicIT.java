@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.xmlet.htmlapifaster.EnumTypeScriptType;
 
 /** End-to-end test of the compiled htmlflow-mfe-engine (dist/) rendering HtmlFlow MFE views. */
-public class MfeHelloWorldIT extends MfeE2EBase {
+public class MfeBasicIT extends MfeE2EBase {
 
     private static final HtmlView<?> HOST_PAGE = HtmlFlow.ViewFactory.builder()
         .mfeEnabled(true)
