@@ -14,6 +14,9 @@
 - [Consequences](#consequences)
 - [Review History](#review-history)
   - [Review 1 — Renderer Ownership and Polymorphism](#review-1--renderer-ownership-and-polymorphism)
+  - [Review 2 — Appendable parameter of `resolve` method][review-2]
+
+[review-2]: #review-2--appendable-parameter-of-resolve-method
 
 ## Context
 
@@ -318,6 +321,7 @@ their resolution throughout this ADR lifecycle.
 | Date | Reviewer | Review Focus | Status |
 |---|---|---|---|
 | 2026-10-12 | gamboa | Renderer ownership and polymorphism | Open |
+| 2026-10-16 | gamboa | Appendable parameter of `resolve` method | Open |
 
 ### Review 1 — Renderer Ownership and Polymorphism
 
@@ -377,3 +381,36 @@ If so, `HtmlResolverCompiled` might be a more appropriate name.
   compilation be handled entirely during preprocessing?
 
 **Outcome:** Pending architectural review and decision.
+
+### Review 2 — Appendable parameter of `resolve` method
+
+Currently, `Appendable` is stored and managed by `HtmlVisitor`.  
+Continuation classes extending `HtmlContinuation` write to the output through a
+visitor reference kept in `HtmlContinuation`.  
+If `HtmlResolver.resolve(Appendable out, Object model)` retains its `Appendable`
+argument, the visitor field could be dropped from continuations.  
+
+However, sync, async, and suspending continuations directly control indentation
+on the visitor. For example:
+
+```java
+public final void execute(Object model) {
+    if (currentDepth >= 0) {
+        this.visitor.setIsClosed(isClosed);
+        this.visitor.setDepth(currentDepth);
+    }
+    ...
+}
+```
+
+Thus, perhaps the easiest approach is to make the `HtmlResolver` implementation
+for a compiled chain similar to the current `HtmlContinuation`, writing through
+a visitor field instead.  
+In that case, the method could simply be `resolve(Object model)`.  
+
+However, I still think that passing `Appendable` as a parameter would be the
+most effective approach.
+Moreover, it would avoid the cyclic references in the design.
+
+**Date:** 2026-10-16
+**Status:** Open — Requires further discussion.
