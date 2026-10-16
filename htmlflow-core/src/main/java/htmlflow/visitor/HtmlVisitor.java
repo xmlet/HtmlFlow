@@ -24,9 +24,15 @@
 
 package htmlflow.visitor;
 
+import static htmlflow.visitor.Tags.*;
+
 import htmlflow.HtmlMfeConfig;
 import htmlflow.exceptions.HtmlFlowAppendException;
 import htmlflow.visitor.escape.HtmlEscapers;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import org.xmlet.htmlapifaster.Area;
 import org.xmlet.htmlapifaster.Base;
 import org.xmlet.htmlapifaster.Br;
@@ -45,13 +51,6 @@ import org.xmlet.htmlapifaster.Param;
 import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
 import org.xmlet.htmlapifaster.Text;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
-import static htmlflow.visitor.Tags.*;
 
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
