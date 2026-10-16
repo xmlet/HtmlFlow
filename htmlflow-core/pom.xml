@@ -92,7 +92,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Browser automation for the MFE engine e2e tests (*IT, run with -Pe2e) -->
+        <!-- Browser automation for the MFE engine e2e tests -->
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
@@ -143,7 +143,7 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>3.5.2</version>
                         <configuration>
-                            <argLine>-Xmx512m</argLine>
+                            <argLine>-Xmx32m</argLine>
                             <systemPropertyVariables>
                                 <mfe.engine.dist>${project.basedir}/../htmlflow-mfe-engine/dist</mfe.engine.dist>
                             </systemPropertyVariables>
