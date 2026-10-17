@@ -58,9 +58,9 @@ public class HtmlContinuationSyncWhen<M> extends HtmlContinuationSync {
     @Override
     protected final void emitHtml(Object model) {
         if (condition.test((M) model)) {
-            body.execute(model);
+            body.resolve(model);
         } else if (orElse != null) {
-            orElse.execute(model);
+            orElse.resolve(model);
         }
     }
 

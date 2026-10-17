@@ -46,7 +46,7 @@ final class HtmlContinuationSyncCompiled extends HtmlContinuation {
     }
 
     @Override
-    public void execute(Object model) {
+    public void resolve(Object model) {
         Appendable out = visitor.out();
         if (out instanceof StringBuilder) {
             renderer.render((StringBuilder) out, model);

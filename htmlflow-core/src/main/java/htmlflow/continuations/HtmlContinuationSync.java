@@ -25,14 +25,14 @@ public abstract class HtmlContinuationSync extends HtmlContinuation {
      * @param model
      */
     @Override
-    public final void execute(Object model) {
+    public final void resolve(Object model) {
         if (currentDepth >= 0) {
             this.visitor.setIsClosed(isClosed);
             this.visitor.setDepth(currentDepth);
         }
         emitHtml(model);
         if (next != null) {
-            next.execute(model);
+            next.resolve(model);
         }
     }
 

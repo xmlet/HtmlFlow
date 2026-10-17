@@ -12,7 +12,7 @@ class HtmlContinuationSuspendableTerminationNode :
         // Nothing to do
     }
 
-    override fun execute(model: Any?) {
+    override fun resolve(model: Any?) {
         throw UnsupportedOperationException(
             "Illegal use of suspending terminal node! Only valid in HtmlViewSuspend."
         )
