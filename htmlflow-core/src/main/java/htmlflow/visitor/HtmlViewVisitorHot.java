@@ -80,7 +80,7 @@ public class HtmlViewVisitorHot extends HtmlVisitor {
     /** No preencoded chain here, so each slot writes its value straight away. */
     private void writeValue(Kind kind, Object accessor) {
         newlineAndIndent();
-        write(HtmlContinuationSyncValue.format(kind, accessor, model));
+        HtmlContinuationSyncValue.appendValue(out, kind, accessor, model);
     }
 
     @Override
@@ -113,12 +113,10 @@ public class HtmlViewVisitorHot extends HtmlVisitor {
         writeValue(Kind.BOOLEAN, accessor);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <M> void visitValueAttribute(String name, Function<M, ?> accessor) {
-        visitAttribute(
-            name,
-            HtmlContinuationSyncValue.format(Kind.RAW, accessor, model)
-        );
+        visitAttribute(name, String.valueOf(accessor.apply((M) model)));
     }
 
     @SuppressWarnings("unchecked")

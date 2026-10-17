@@ -34,8 +34,8 @@ import org.xmlet.htmlapifaster.async.AwaitConsumer;
 /**
  * This is the base implementation of the ElementVisitor (from HtmlApiFaster library).
  *
- * <p>HtmlViewVisitor is also a head of HtmlContinuation objects chain, storing all needed
- * information to emit HTML corresponding to Static HTML blocks and dynamic HTML.
+ * <p>HtmlViewVisitor also holds the resolver of the preprocessed template, which emits the static
+ * HTML blocks and the dynamic HTML.
  *
  * @author Miguel Gamboa, Luís Duare, Pedro Fialho created on 17-01-2018
  */
@@ -53,7 +53,7 @@ public class HtmlViewVisitor extends HtmlVisitor {
         this.first = first.copy(this);
     }
 
-    /** Processing output through invocation of HtmlContinuation objects chain. */
+    /** Emits the page through the compiled chain or the HtmlContinuation chain. */
     @Override
     public final void resolve(Object model) {
         first.resolve(model);

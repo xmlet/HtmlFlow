@@ -186,17 +186,12 @@ public class HtmlFlow {
         boolean preEncoding,
         boolean mfeEnabled
     ) {
-        if (preEncoding && mfeEnabled) {
-            HtmlResolver resolver = preprocessingMfe(template);
+        if (preEncoding) {
+            HtmlResolver resolver = mfeEnabled
+                ? preprocessingMfe(template)
+                : preprocessing(template, isIndented);
             return new HtmlView<>(
                 () -> new HtmlViewVisitor(out, isIndented, resolver),
-                template,
-                threadSafe
-            );
-        } else if (preEncoding) {
-            HtmlResolver resolver = preprocessing(template, isIndented);
-            return new HtmlView<>(
-                (() -> new HtmlViewVisitor(out, isIndented, resolver)),
                 template,
                 threadSafe
             );
@@ -255,8 +250,10 @@ public class HtmlFlow {
         boolean preEncoding,
         boolean mfeEnabled
     ) {
-        if (preEncoding && mfeEnabled) {
-            HtmlResolver resolver = preprocessingMfe(template);
+        if (preEncoding) {
+            HtmlResolver resolver = mfeEnabled
+                ? preprocessingMfe(template)
+                : preprocessing(template, isIndented);
             return new HtmlView<>(
                 () ->
                     new HtmlViewVisitor(
@@ -264,20 +261,6 @@ public class HtmlFlow {
                         isIndented,
                         resolver
                     ),
-                template,
-                threadSafe
-            );
-        } else if (preEncoding) {
-            HtmlResolver resolver = preprocessing(template, isIndented);
-            return new HtmlView<>(
-                (
-                    () ->
-                        new HtmlViewVisitor(
-                            new StringBuilder(),
-                            isIndented,
-                            resolver
-                        )
-                ),
                 template,
                 threadSafe
             );

@@ -59,7 +59,6 @@ public abstract class HtmlResolverCompiled implements HtmlResolver, Cloneable {
         }
     }
 
-    /** Writes the chain for the given model. */
     protected abstract void write(Appendable out, Object model)
         throws IOException;
 }
