@@ -72,17 +72,19 @@ public final class ChainCompiler {
         HtmlContinuationSyncValue.class
     );
     private static final String APPENDABLE = internal(Appendable.class);
-    private static final String STRING = internal(String.class);
     private static final String STRING_DESC = String.class.descriptorString();
     private static final String CHAR_SEQUENCE_DESC =
         CharSequence.class.descriptorString();
     private static final String OBJECT_DESC = Object.class.descriptorString();
     private static final String TAKES_OBJECT = method(OBJECT_DESC, "");
 
-    /** Called by name from the generated code. See {@link #checkRuntimeHelpers}. */
+    /** Called by name from the generated code. See {@link #helpersFound}. */
     private static final String TEXT = "text";
     private static final String ATTR_NULLABLE = "attrNullable";
     private static final String APPEND = "append";
+
+    /** False when a helper is missing, so every chain stays linked. */
+    private static final boolean HELPERS_FOUND = helpersFound();
 
     private static final int HUGE_METHOD_LIMIT = 8000;
 
@@ -107,9 +109,8 @@ public final class ChainCompiler {
      */
     public static HtmlResolver compile(HtmlContinuation first) {
         Slots slots = Slots.of(first);
-        if (slots == null) return first;
+        if (slots == null || !HELPERS_FOUND) return first;
         try {
-            checkRuntimeHelpers();
             byte[] classFile = classFile(slots);
             if (classFile == null) return first;
             Class<?> gen = LOOKUP
@@ -129,25 +130,35 @@ public final class ChainCompiler {
      * Looks up the helpers the generated code calls by name. The JVM links invokestatic lazily,
      * so a wrong name would pass verification and only throw NoSuchMethodError on first render.
      */
-    private static void checkRuntimeHelpers() throws NoSuchMethodException {
-        HtmlContinuationSyncValue.class.getDeclaredMethod(TEXT, Object.class);
-        for (Class<?> number : new Class<?>[] {
-            int.class,
-            long.class,
-            double.class,
-        }) {
+    private static boolean helpersFound() {
+        try {
             HtmlContinuationSyncValue.class.getDeclaredMethod(
-                    APPEND,
-                    Appendable.class,
-                    number
+                    TEXT,
+                    Object.class
                 );
+            for (Class<?> value : new Class<?>[] {
+                int.class,
+                long.class,
+                double.class,
+                boolean.class,
+                Object.class,
+            }) {
+                HtmlContinuationSyncValue.class.getDeclaredMethod(
+                        APPEND,
+                        Appendable.class,
+                        value
+                    );
+            }
+            HtmlContinuationSyncValue.class.getDeclaredMethod(
+                    ATTR_NULLABLE,
+                    Appendable.class,
+                    String.class,
+                    Object.class
+                );
+            return true;
+        } catch (NoSuchMethodException missing) {
+            return false;
         }
-        HtmlContinuationSyncValue.class.getDeclaredMethod(
-                ATTR_NULLABLE,
-                Appendable.class,
-                String.class,
-                Object.class
-            );
     }
 
     private static byte[] classFile(Slots slots) throws IOException {
@@ -245,9 +256,7 @@ public final class ChainCompiler {
                 pool.method(VALUE_SLOT, TEXT, TAKES_OBJECT + STRING_DESC)
             );
             appendAndPop(code, pool);
-        } else if (
-            kind == Kind.INT || kind == Kind.LONG || kind == Kind.DOUBLE
-        ) {
+        } else {
             Accessor accessor = accessorFor(kind);
             callAccessor(code, pool, i, accessor);
             code.invokeStatic(
@@ -257,19 +266,6 @@ public final class ChainCompiler {
                     method(desc(APPENDABLE) + accessor.returns, "V")
                 )
             );
-        } else {
-            // Booleans and raw values go through String.valueOf, which prints null as "null" like
-            // the linked chain.
-            Accessor accessor = accessorFor(kind);
-            callAccessor(code, pool, i, accessor);
-            code.invokeStatic(
-                pool.method(
-                    STRING,
-                    "valueOf",
-                    method(accessor.returns, STRING_DESC)
-                )
-            );
-            appendAndPop(code, pool);
         }
     }
 

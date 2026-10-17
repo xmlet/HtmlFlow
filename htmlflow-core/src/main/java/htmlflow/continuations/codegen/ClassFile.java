@@ -267,7 +267,6 @@ final class ClassFile {
         private static final int RETURN = 0xb1;
         private static final int GETFIELD = 0xb4;
         private static final int PUTFIELD = 0xb5;
-        private static final int INVOKEVIRTUAL = 0xb6;
         private static final int INVOKESPECIAL = 0xb7;
         private static final int INVOKESTATIC = 0xb8;
         private static final int INVOKEINTERFACE = 0xb9;
@@ -306,10 +305,6 @@ final class ClassFile {
 
         void invokeSpecial(int method) {
             operand(INVOKESPECIAL, method);
-        }
-
-        void invokeVirtual(int method) {
-            operand(INVOKEVIRTUAL, method);
         }
 
         void invokeStatic(int method) {
