@@ -1,13 +1,13 @@
-package org.xmlet.htmlflow.datastar.expressions
+package org.xmlet.htmlflow.datastar.serialization
 
-internal enum class QuoteStyle(
+enum class QuoteStyle(
     val char: Char,
 ) {
     SINGLE('\''),
     DOUBLE('"'),
 }
 
-internal object JavaScriptSerialization {
+internal object JavaScriptLiterals {
     private val identifierRegex = Regex("^[A-Za-z_$][A-Za-z0-9_$]*$")
 
     fun stringLiteral(

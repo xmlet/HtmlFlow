@@ -4,6 +4,7 @@ import htmlflow.div
 import htmlflow.doc
 import htmlflow.html
 import jakarta.ws.rs.Path
+import kotlinx.serialization.Serializable
 import org.xmlet.htmlapifaster.EnumTypeInputType
 import org.xmlet.htmlapifaster.EnumTypeScriptType
 import org.xmlet.htmlapifaster.body
@@ -75,7 +76,8 @@ class SignalComplexDomainTest {
     @Path("/complex-domain/switch-user")
     private fun switchUser() {}
 
-    data class Person(
+    @Serializable
+    class Person(
         val name: String,
         val age: Int,
     )
@@ -89,7 +91,7 @@ class SignalComplexDomainTest {
                     </script>
                 </head>
                 <body>
-                    <div id="person-info" data-signals="{person: {age: 30, name: 'John Doe'}}">
+                    <div id="person-info" data-signals="{person: {name: 'John Doe', age: 30}}">
                         <p data-text="$person.name">
                         </p>
                         <p data-text="$person.age">

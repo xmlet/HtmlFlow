@@ -4,6 +4,8 @@ import com.vanniktech.maven.publish.KotlinJvm
 plugins {
     kotlin("jvm") version "2.3.0"
 
+    kotlin("plugin.serialization") version "2.3.0"
+
     // Apply ktlint plugin for code linting
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
 
@@ -32,6 +34,8 @@ dependencies {
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // Kotlin reflection library
     implementation(kotlin("reflect"))
+    // Kotlinx serialization JSON
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     testImplementation(kotlin("test"))
 }

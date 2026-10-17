@@ -10,6 +10,8 @@ import org.xmlet.htmlflow.datastar.expressions.DataStarExpressionOp
 import org.xmlet.htmlflow.datastar.expressions.ExpressionPrecedence
 import org.xmlet.htmlflow.datastar.expressions.Signal
 import org.xmlet.htmlflow.datastar.expressions.SignalPatchFilter
+import org.xmlet.htmlflow.datastar.serialization.QuoteStyle
+import org.xmlet.htmlflow.datastar.serialization.Serializer
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
 
@@ -278,8 +280,12 @@ class ExpressionBuilder : ExpressionScope {
         return result
     }
 
-    override fun <T> Signal<T>.setValue(value: T): DataStarExpressionOp {
-        val result = DataStarExpressionOp("${this.syntax} = $value", ExpressionPrecedence.ASSIGNMENT)
+    override fun <T> Signal<T>.setValue(
+        value: T,
+        quoteStyle: QuoteStyle,
+    ): DataStarExpressionOp {
+        val serializedValue = Serializer.serializeValue(value)
+        val result = DataStarExpressionOp("${this.syntax} = $serializedValue", ExpressionPrecedence.ASSIGNMENT)
         appendExpression(result)
         return result
     }
