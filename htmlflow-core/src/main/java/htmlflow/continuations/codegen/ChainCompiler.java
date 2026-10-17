@@ -45,8 +45,9 @@ import java.util.function.ToLongFunction;
  * Generates one {@link HtmlResolverCompiled} class for each chain of static blocks and value slots.
  * Every accessor gets its own field and its own call site.
  *
- * <p>The write method appends straight to the output Appendable. Appendable only takes chars, so
- * each number goes through String.valueOf first. Nothing is buffered.
+ * <p>The write method appends straight to the output Appendable. Numbers go through the
+ * HtmlContinuationSyncValue.append helpers, so a StringBuilder takes them without a String copy.
+ * Nothing is buffered.
  *
  * <p>The method never branches, so it needs no StackMapTable, and the stack and local counts are
  * constant. We write the class file directly, so this needs no bytecode library.
@@ -81,6 +82,7 @@ public final class ChainCompiler {
     /** Called by name from the generated code. See {@link #checkRuntimeHelpers}. */
     private static final String TEXT = "text";
     private static final String ATTR_NULLABLE = "attrNullable";
+    private static final String APPEND = "append";
 
     private static final int HUGE_METHOD_LIMIT = 8000;
 
@@ -129,6 +131,17 @@ public final class ChainCompiler {
      */
     private static void checkRuntimeHelpers() throws NoSuchMethodException {
         HtmlContinuationSyncValue.class.getDeclaredMethod(TEXT, Object.class);
+        for (Class<?> number : new Class<?>[] {
+            int.class,
+            long.class,
+            double.class,
+        }) {
+            HtmlContinuationSyncValue.class.getDeclaredMethod(
+                    APPEND,
+                    Appendable.class,
+                    number
+                );
+        }
         HtmlContinuationSyncValue.class.getDeclaredMethod(
                 ATTR_NULLABLE,
                 Appendable.class,
@@ -232,9 +245,21 @@ public final class ChainCompiler {
                 pool.method(VALUE_SLOT, TEXT, TAKES_OBJECT + STRING_DESC)
             );
             appendAndPop(code, pool);
+        } else if (
+            kind == Kind.INT || kind == Kind.LONG || kind == Kind.DOUBLE
+        ) {
+            Accessor accessor = accessorFor(kind);
+            callAccessor(code, pool, i, accessor);
+            code.invokeStatic(
+                pool.method(
+                    VALUE_SLOT,
+                    APPEND,
+                    method(desc(APPENDABLE) + accessor.returns, "V")
+                )
+            );
         } else {
-            // Appendable only takes chars, so the value goes through String.valueOf, which also
-            // prints null as "null" like the linked chain.
+            // Booleans and raw values go through String.valueOf, which prints null as "null" like
+            // the linked chain.
             Accessor accessor = accessorFor(kind);
             callAccessor(code, pool, i, accessor);
             code.invokeStatic(
