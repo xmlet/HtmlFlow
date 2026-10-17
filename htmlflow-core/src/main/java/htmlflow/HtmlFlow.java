@@ -32,6 +32,7 @@ import htmlflow.visitor.HtmlViewVisitorAsyncHot;
 import htmlflow.visitor.HtmlViewVisitorHot;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
+import htmlflow.visitor.PreprocessingVisitorAsyncHot;
 import htmlflow.visitor.PreprocessingVisitorMfe;
 
 /**
@@ -100,15 +101,12 @@ public class HtmlFlow {
     /**
      * @param template An HtmlTemplate function, which depends on an HtmlView used to create HTMl
      *     elements.
-     * @param isIndented Set indentation on or off.
+     * @param pre The visitor that records the chain.
      */
-    private static PreprocessingVisitorAsync preprocessingAsync(
+    private static <V extends PreprocessingVisitorAsync> V preprocessingAsync(
         HtmlTemplate template,
-        boolean isIndented
+        V pre
     ) {
-        PreprocessingVisitorAsync pre = new PreprocessingVisitorAsync(
-            isIndented
-        );
         HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
         /*
          * 1st Performs rendering by invoking the function defined as the template, collecting the
@@ -317,7 +315,7 @@ public class HtmlFlow {
         if (preEncoding) {
             PreprocessingVisitorAsync pre = preprocessingAsync(
                 template,
-                isIndented
+                new PreprocessingVisitorAsync(isIndented)
             );
             return new HtmlViewAsync<>(
                 new HtmlViewVisitorAsync(isIndented, pre.getFirst()),
@@ -328,7 +326,11 @@ public class HtmlFlow {
             return new HtmlViewAsyncHot<>(
                 new HtmlViewVisitorAsyncHot(
                     isIndented,
-                    () -> preprocessingAsync(template, isIndented)
+                    () ->
+                        preprocessingAsync(
+                            template,
+                            new PreprocessingVisitorAsyncHot(isIndented)
+                        )
                 ),
                 template,
                 threadSafe

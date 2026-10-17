@@ -349,8 +349,15 @@ public class PreprocessingVisitor extends HtmlVisitor {
         depth = outerDepth;
         sb().setLength(mark); // the body lives in its own chain, not the page
         staticBlockIndex = mark;
-        // Bound to this visitor, since a hot async view runs the chain without copying it.
-        return ChainCompiler.compile(chain).copy(this);
+        return compileBlock(chain);
+    }
+
+    /**
+     * Compiles the chain of a loop or conditional body. A hot async view overrides it, because it
+     * preprocesses on every render and would define a new class each time.
+     */
+    protected HtmlResolver compileBlock(HtmlContinuation chain) {
+        return ChainCompiler.compile(chain);
     }
 
     /** Appends the static HTML, skipped when empty, and then the node. */

@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 
+import java.lang.management.ClassLoadingMXBean;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -128,6 +130,23 @@ class TestValueSlotsAsync {
         );
         assertEquals(expected, hotView.renderAsync(model).get());
         assertEquals(expected, hotView.renderAsync(model).get());
+    }
+
+    /** A hot view preprocesses on every render, so compiling there would define a class each time. */
+    @Test
+    void a_hot_asynchronous_view_defines_no_class_per_render()
+        throws ExecutionException, InterruptedException {
+        HtmlViewAsync<List<Student>> hotView = HtmlFlow.viewAsync(
+            false,
+            TestValueSlotsAsync::slotTemplate
+        );
+        List<Student> model = students();
+        hotView.renderAsync(model).get(); // loads what any first render needs
+        ClassLoadingMXBean classes = ManagementFactory.getClassLoadingMXBean();
+        long before = classes.getTotalLoadedClassCount();
+        for (int i = 0; i < 100; i++) hotView.renderAsync(model).get();
+        long loaded = classes.getTotalLoadedClassCount() - before;
+        assertTrue(loaded < 50, loaded + " classes loaded in 100 renders");
     }
 
     /** Slot loops before and after an await, so the chain hands over and comes back. */
