@@ -24,6 +24,7 @@
  */
 package htmlflow;
 
+import htmlflow.continuations.HtmlResolver;
 import htmlflow.visitor.HtmlDocVisitor;
 import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
@@ -31,6 +32,7 @@ import htmlflow.visitor.HtmlViewVisitorAsyncHot;
 import htmlflow.visitor.HtmlViewVisitorHot;
 import htmlflow.visitor.PreprocessingVisitor;
 import htmlflow.visitor.PreprocessingVisitorAsync;
+import htmlflow.visitor.PreprocessingVisitorAsyncHot;
 import htmlflow.visitor.PreprocessingVisitorMfe;
 
 /**
@@ -49,8 +51,9 @@ public class HtmlFlow {
      * @param template An HtmlTemplate function, which depends on an HtmlView used to create HTMl
      *     elements.
      * @param isIndented Set indentation on or off.
+     * @return The compiled chain, or the linked chain when it does not compile.
      */
-    private static PreprocessingVisitor preprocessing(
+    private static HtmlResolver preprocessing(
         HtmlTemplate template,
         boolean isIndented
     ) {
@@ -69,7 +72,7 @@ public class HtmlFlow {
          * accumulated in the internal StringBuffer out.
          */
         preView.getVisitor().resolve(null);
-        return pre;
+        return pre.compile();
     }
 
     /**
@@ -77,11 +80,9 @@ public class HtmlFlow {
      * MFE configurations and processes them to enable MFE support in the view.
      *
      * @param template An HtmlTemplate function that defines the HTML structure with MFE components
-     * @return A PreprocessingVisitorMfe containing the processed MFE components
+     * @return The compiled chain, or the linked chain when it does not compile.
      */
-    private static PreprocessingVisitorMfe preprocessingMfe(
-        HtmlTemplate template
-    ) {
+    private static HtmlResolver preprocessingMfe(HtmlTemplate template) {
         PreprocessingVisitorMfe processView = new PreprocessingVisitorMfe(
             false
         );
@@ -94,21 +95,18 @@ public class HtmlFlow {
         template.resolve(preView);
         // second process
         preView.getVisitor().resolve(null);
-        return processView;
+        return processView.compile();
     }
 
     /**
      * @param template An HtmlTemplate function, which depends on an HtmlView used to create HTMl
      *     elements.
-     * @param isIndented Set indentation on or off.
+     * @param pre The visitor that records the chain.
      */
-    private static PreprocessingVisitorAsync preprocessingAsync(
+    private static <V extends PreprocessingVisitorAsync> V preprocessingAsync(
         HtmlTemplate template,
-        boolean isIndented
+        V pre
     ) {
-        PreprocessingVisitorAsync pre = new PreprocessingVisitorAsync(
-            isIndented
-        );
         HtmlView<?> preView = new HtmlView<>(() -> pre, template, false);
         /*
          * 1st Performs rendering by invoking the function defined as the template, collecting the
@@ -186,22 +184,12 @@ public class HtmlFlow {
         boolean preEncoding,
         boolean mfeEnabled
     ) {
-        if (preEncoding && mfeEnabled) {
-            PreprocessingVisitorMfe processView = preprocessingMfe(template);
+        if (preEncoding) {
+            HtmlResolver resolver = mfeEnabled
+                ? preprocessingMfe(template)
+                : preprocessing(template, isIndented);
             return new HtmlView<>(
-                () ->
-                    new HtmlViewVisitor(
-                        out,
-                        isIndented,
-                        processView.getFirst()
-                    ),
-                template,
-                threadSafe
-            );
-        } else if (preEncoding) {
-            PreprocessingVisitor pre = preprocessing(template, isIndented);
-            return new HtmlView<>(
-                (() -> new HtmlViewVisitor(out, isIndented, pre.getFirst())),
+                () -> new HtmlViewVisitor(out, isIndented, resolver),
                 template,
                 threadSafe
             );
@@ -260,29 +248,17 @@ public class HtmlFlow {
         boolean preEncoding,
         boolean mfeEnabled
     ) {
-        if (preEncoding && mfeEnabled) {
-            PreprocessingVisitorMfe processView = preprocessingMfe(template);
+        if (preEncoding) {
+            HtmlResolver resolver = mfeEnabled
+                ? preprocessingMfe(template)
+                : preprocessing(template, isIndented);
             return new HtmlView<>(
                 () ->
                     new HtmlViewVisitor(
                         new StringBuilder(),
                         isIndented,
-                        processView.getFirst()
+                        resolver
                     ),
-                template,
-                threadSafe
-            );
-        } else if (preEncoding) {
-            PreprocessingVisitor pre = preprocessing(template, isIndented);
-            return new HtmlView<>(
-                (
-                    () ->
-                        new HtmlViewVisitor(
-                            new StringBuilder(),
-                            isIndented,
-                            pre.getFirst()
-                        )
-                ),
                 template,
                 threadSafe
             );
@@ -339,7 +315,7 @@ public class HtmlFlow {
         if (preEncoding) {
             PreprocessingVisitorAsync pre = preprocessingAsync(
                 template,
-                isIndented
+                new PreprocessingVisitorAsync(isIndented)
             );
             return new HtmlViewAsync<>(
                 new HtmlViewVisitorAsync(isIndented, pre.getFirst()),
@@ -350,7 +326,11 @@ public class HtmlFlow {
             return new HtmlViewAsyncHot<>(
                 new HtmlViewVisitorAsyncHot(
                     isIndented,
-                    () -> preprocessingAsync(template, isIndented)
+                    () ->
+                        preprocessingAsync(
+                            template,
+                            new PreprocessingVisitorAsyncHot(isIndented)
+                        )
                 ),
                 template,
                 threadSafe

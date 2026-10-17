@@ -31,7 +31,7 @@ public class HtmlContinuationAsync<E extends Element, T>
     }
 
     @Override
-    public final void execute(Object model) {
+    public final void resolve(Object model) {
         if (currentDepth >= 0) {
             this.visitor.setIsClosed(isClosed);
             this.visitor.setDepth(currentDepth);
@@ -41,7 +41,7 @@ public class HtmlContinuationAsync<E extends Element, T>
                 (T) model,
                 () -> {
                     if (next != null) {
-                        next.execute(model);
+                        next.resolve(model);
                     }
                 }
             );

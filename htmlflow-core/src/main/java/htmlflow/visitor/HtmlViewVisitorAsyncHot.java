@@ -117,7 +117,7 @@ public class HtmlViewVisitorAsyncHot extends HtmlVisitorAsync {
         );
 
         continuationProcessor.setAppendable(out);
-        continuationProcessor.getFirst().execute(model);
+        continuationProcessor.getFirst().resolve(model);
 
         return cf;
     }

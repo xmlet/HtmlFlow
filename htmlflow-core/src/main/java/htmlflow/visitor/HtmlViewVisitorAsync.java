@@ -66,7 +66,7 @@ public class HtmlViewVisitorAsync extends HtmlVisitorAsync {
 
     @Override
     public void resolve(Object model) {
-        first.execute(model);
+        first.resolve(model);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class HtmlViewVisitorAsync extends HtmlVisitorAsync {
          */
         setNext(last, terminationNode);
         /** Initializes render on first node. */
-        this.first.execute(model);
+        this.first.resolve(model);
 
         return cf;
     }

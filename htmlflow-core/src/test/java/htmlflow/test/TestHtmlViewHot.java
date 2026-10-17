@@ -3,12 +3,53 @@ package htmlflow.test;
 import htmlflow.*;
 import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlViewVisitorHot;
-import org.junit.jupiter.api.Test;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestHtmlViewHot {
+
+    record Item(int n, String name) {}
+
+    private static void slotsTemplate(HtmlPage page) {
+        page
+            .html()
+            .body()
+            .ul()
+            .forEachOf((List<Item> items) -> items, (ul, item) -> ul
+                .li()
+                    .attrOf("class", item.read(i -> i.n() % 2 == 0 ? "even" : "odd"))
+                    .textOf(item.read(Item::name))
+                    .intOf(item.readInt(Item::n))
+                    .whenOf(
+                        item.readBool(i -> i.n() > 1),
+                        (li, i2) -> li.span().textOf(i2.read(i -> "big:" + i.n())).__(),
+                        (li, i2) -> li.span().textOf(i2.read(i -> "small:" + i.n())).__()
+                    )
+                .__())
+            .__()
+            .__()
+            .__();
+    }
+
+    /**
+     * Slot templates only ever got wired into the preencoding visitor; HtmlViewVisitorHot threw
+     * UnsupportedOperationException for every one of them. This checks the hot visitor now
+     * renders textOf/intOf/attrOf/forEachOf/whenOf the same as the preencoded path.
+     */
+    @Test
+    void hot_visitor_renders_slots_the_same_as_the_preencoded_view() {
+        List<Item> model = List.of(new Item(1, "ana"), new Item(2, "bob"));
+        String preencoded = HtmlFlow
+            .<List<Item>>view(TestHtmlViewHot::slotsTemplate)
+            .render(model);
+        String hot = HtmlFlow
+            .<List<Item>>view(false, TestHtmlViewHot::slotsTemplate)
+            .render(model);
+        assertEquals(preencoded, hot);
+    }
 
     public <M> HtmlView<M> viewHot(HtmlTemplate template) {
         return HtmlFlow.view(false, template);

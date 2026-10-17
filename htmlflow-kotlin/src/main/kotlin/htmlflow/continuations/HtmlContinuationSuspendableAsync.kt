@@ -30,9 +30,9 @@ class HtmlContinuationSuspendableAsync<E : Element<*, *>, T>(
         nextSuspendable?.executeSuspending(model)
     }
 
-    override fun execute(model: Any?) {
+    override fun resolve(model: Any?) {
         throw UnsupportedOperationException(
-            "Illegal use of execute in suspendable continuation! Should use executeSuspending."
+            "Illegal use of resolve in suspendable continuation! Should use executeSuspending."
         )
     }
 
