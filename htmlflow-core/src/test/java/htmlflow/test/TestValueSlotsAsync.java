@@ -111,6 +111,25 @@ class TestValueSlotsAsync {
         assertEquals(expected, actual);
     }
 
+    /**
+     * A hot async view preprocesses on every render and runs that chain without copying it, so
+     * the compiled loop body must already write through the preprocessing visitor.
+     */
+    @Test
+    void value_slots_render_the_same_bytes_on_a_hot_asynchronous_view()
+        throws ExecutionException, InterruptedException {
+        List<Student> model = students();
+        String expected = HtmlFlow
+            .<List<Student>>view(TestValueSlotsAsync::dynamicTemplate)
+            .render(model);
+        HtmlViewAsync<List<Student>> hotView = HtmlFlow.viewAsync(
+            false,
+            TestValueSlotsAsync::slotTemplate
+        );
+        assertEquals(expected, hotView.renderAsync(model).get());
+        assertEquals(expected, hotView.renderAsync(model).get());
+    }
+
     /** Slot loops before and after an await, so the chain hands over and comes back. */
     @Test
     void value_slots_survive_an_await_in_the_middle_of_the_chain()
