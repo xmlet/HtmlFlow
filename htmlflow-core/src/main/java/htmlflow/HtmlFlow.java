@@ -24,6 +24,7 @@
  */
 package htmlflow;
 
+import htmlflow.continuations.HtmlResolver;
 import htmlflow.visitor.HtmlDocVisitor;
 import htmlflow.visitor.HtmlViewVisitor;
 import htmlflow.visitor.HtmlViewVisitorAsync;
@@ -49,8 +50,9 @@ public class HtmlFlow {
      * @param template An HtmlTemplate function, which depends on an HtmlView used to create HTMl
      *     elements.
      * @param isIndented Set indentation on or off.
+     * @return The compiled chain, or the linked chain when it does not compile.
      */
-    private static PreprocessingVisitor preprocessing(
+    private static HtmlResolver preprocessing(
         HtmlTemplate template,
         boolean isIndented
     ) {
@@ -69,8 +71,7 @@ public class HtmlFlow {
          * accumulated in the internal StringBuffer out.
          */
         preView.getVisitor().resolve(null);
-        pre.getFirst().compile();
-        return pre;
+        return pre.compile();
     }
 
     /**
@@ -78,11 +79,9 @@ public class HtmlFlow {
      * MFE configurations and processes them to enable MFE support in the view.
      *
      * @param template An HtmlTemplate function that defines the HTML structure with MFE components
-     * @return A PreprocessingVisitorMfe containing the processed MFE components
+     * @return The compiled chain, or the linked chain when it does not compile.
      */
-    private static PreprocessingVisitorMfe preprocessingMfe(
-        HtmlTemplate template
-    ) {
+    private static HtmlResolver preprocessingMfe(HtmlTemplate template) {
         PreprocessingVisitorMfe processView = new PreprocessingVisitorMfe(
             false
         );
@@ -95,8 +94,7 @@ public class HtmlFlow {
         template.resolve(preView);
         // second process
         preView.getVisitor().resolve(null);
-        processView.getFirst().compile();
-        return processView;
+        return processView.compile();
     }
 
     /**
@@ -125,7 +123,6 @@ public class HtmlFlow {
          * accumulated in the internal StringBuffer out.
          */
         preView.getVisitor().resolve(null);
-        pre.getFirst().compile();
         return pre;
     }
 
@@ -190,21 +187,16 @@ public class HtmlFlow {
         boolean mfeEnabled
     ) {
         if (preEncoding && mfeEnabled) {
-            PreprocessingVisitorMfe processView = preprocessingMfe(template);
+            HtmlResolver resolver = preprocessingMfe(template);
             return new HtmlView<>(
-                () ->
-                    new HtmlViewVisitor(
-                        out,
-                        isIndented,
-                        processView.getFirst()
-                    ),
+                () -> new HtmlViewVisitor(out, isIndented, resolver),
                 template,
                 threadSafe
             );
         } else if (preEncoding) {
-            PreprocessingVisitor pre = preprocessing(template, isIndented);
+            HtmlResolver resolver = preprocessing(template, isIndented);
             return new HtmlView<>(
-                (() -> new HtmlViewVisitor(out, isIndented, pre.getFirst())),
+                (() -> new HtmlViewVisitor(out, isIndented, resolver)),
                 template,
                 threadSafe
             );
@@ -264,26 +256,26 @@ public class HtmlFlow {
         boolean mfeEnabled
     ) {
         if (preEncoding && mfeEnabled) {
-            PreprocessingVisitorMfe processView = preprocessingMfe(template);
+            HtmlResolver resolver = preprocessingMfe(template);
             return new HtmlView<>(
                 () ->
                     new HtmlViewVisitor(
                         new StringBuilder(),
                         isIndented,
-                        processView.getFirst()
+                        resolver
                     ),
                 template,
                 threadSafe
             );
         } else if (preEncoding) {
-            PreprocessingVisitor pre = preprocessing(template, isIndented);
+            HtmlResolver resolver = preprocessing(template, isIndented);
             return new HtmlView<>(
                 (
                     () ->
                         new HtmlViewVisitor(
                             new StringBuilder(),
                             isIndented,
-                            pre.getFirst()
+                            resolver
                         )
                 ),
                 template,

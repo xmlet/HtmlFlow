@@ -24,7 +24,7 @@
 
 package htmlflow.visitor;
 
-import htmlflow.continuations.HtmlContinuation;
+import htmlflow.continuations.HtmlResolver;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.xmlet.htmlapifaster.Element;
@@ -41,16 +41,16 @@ import org.xmlet.htmlapifaster.async.AwaitConsumer;
  */
 public class HtmlViewVisitor extends HtmlVisitor {
 
-    /** The first node to be processed. */
-    public final HtmlContinuation first;
+    /** The compiled chain, or the first node of the linked chain. */
+    public final HtmlResolver first;
 
     public HtmlViewVisitor(
         Appendable out,
         boolean isIndented,
-        HtmlContinuation first
+        HtmlResolver first
     ) {
         super(out, isIndented);
-        this.first = first.compiledCopy(this);
+        this.first = first.copy(this);
     }
 
     /** Processing output through invocation of HtmlContinuation objects chain. */

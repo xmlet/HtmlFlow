@@ -37,14 +37,14 @@ public class HtmlContinuationSyncWhen<M> extends HtmlContinuationSync {
 
     private final Predicate<M> condition;
 
-    private final HtmlContinuation body;
+    private final HtmlResolver body;
 
-    private final HtmlContinuation orElse;
+    private final HtmlResolver orElse;
 
     public HtmlContinuationSyncWhen(
         Predicate<M> condition,
-        HtmlContinuation body,
-        HtmlContinuation orElse,
+        HtmlResolver body,
+        HtmlResolver orElse,
         HtmlVisitor visitor,
         HtmlContinuation next
     ) {

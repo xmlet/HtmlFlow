@@ -8,7 +8,7 @@ import htmlflow.HtmlFlow;
 import htmlflow.HtmlPage;
 import htmlflow.HtmlView;
 import htmlflow.continuations.HtmlContinuation;
-import htmlflow.continuations.codegen.ChainCompiler.Renderer;
+import htmlflow.continuations.HtmlResolverCompiled;
 import htmlflow.exceptions.HtmlFlowAppendException;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -24,9 +24,9 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 /**
- * The generated class has two methods, render for a StringBuilder and write for any other
- * Appendable. Each must produce the HTML of the equivalent dynamic() template. The template uses
- * every kind of slot, so every branch of the generator runs for both methods.
+ * The generated write method must produce the HTML of the equivalent dynamic() template, into a
+ * StringBuilder and into any other Appendable. The template uses every kind of slot, so every
+ * branch of the generator runs.
  */
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class TestChainCodegen {
@@ -88,8 +88,8 @@ class TestChainCodegen {
     }
 
     /**
-     * Every thread shares one Renderer. Its fields are final and it only appends to the
-     * StringBuilder it gets, so sharing is safe.
+     * Every visitor gets its own copy of the compiled resolver. The copies share the accessors,
+     * which are final, and each one writes to the output of its own visitor.
      */
     @Test
     void a_thread_safe_view_renders_the_same_page_from_every_thread()
@@ -238,29 +238,31 @@ class TestChainCodegen {
         HtmlView<List<Row>> view = view();
         view.render(rows());
         Object visitor = view.getVisitor();
-        HtmlContinuation node = (HtmlContinuation) visitor
-            .getClass()
-            .getField("first")
-            .get(visitor);
-        for (; node != null; node = node.getNext()) {
-            if (rendererUnder(node, 4)) return true;
+        Object first = visitor.getClass().getField("first").get(visitor);
+        if (first instanceof HtmlResolverCompiled) return true;
+        for (
+            HtmlContinuation node = (HtmlContinuation) first;
+            node != null;
+            node = node.getNext()
+        ) {
+            if (compiledUnder(node, 4)) return true;
         }
         return false;
     }
 
     /**
-     * Searches the nodes below target for a Renderer field. Searching survives changes to where
-     * the compiled chain hangs.
+     * Searches the nodes below target for a compiled resolver field. Searching survives changes
+     * to where the compiled chain hangs.
      */
-    private static boolean rendererUnder(Object target, int depth) throws Exception {
+    private static boolean compiledUnder(Object target, int depth) throws Exception {
         if (target == null || depth == 0) return false;
         if (!target.getClass().getName().startsWith("htmlflow.")) return false;
         for (Field f : target.getClass().getDeclaredFields()) {
             if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
             f.setAccessible(true);
             Object value = f.get(target);
-            if (value instanceof Renderer) return true;
-            if (rendererUnder(value, depth - 1)) return true;
+            if (value instanceof HtmlResolverCompiled) return true;
+            if (compiledUnder(value, depth - 1)) return true;
         }
         return false;
     }

@@ -37,11 +37,11 @@ public class HtmlContinuationSyncForEach<M, E> extends HtmlContinuationSync {
 
     private final Function<M, ? extends Iterable<E>> items;
 
-    private final HtmlContinuation item;
+    private final HtmlResolver item;
 
     public HtmlContinuationSyncForEach(
         Function<M, ? extends Iterable<E>> items,
-        HtmlContinuation item,
+        HtmlResolver item,
         HtmlVisitor visitor,
         HtmlContinuation next
     ) {

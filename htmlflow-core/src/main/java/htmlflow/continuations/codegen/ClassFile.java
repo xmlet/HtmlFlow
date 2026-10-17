@@ -53,14 +53,11 @@ final class ClassFile {
     private final List<Method> methods = new ArrayList<>();
     private final int thisClass;
     private final int superClass;
-    private final int iface;
     private final int codeAttr;
 
-    ClassFile(String name, String superName, String interfaceName)
-        throws IOException {
+    ClassFile(String name, String superName) throws IOException {
         this.thisClass = pool.clazz(name);
         this.superClass = pool.clazz(superName);
-        this.iface = pool.clazz(interfaceName);
         this.codeAttr = pool.utf8("Code");
     }
 
@@ -100,8 +97,7 @@ final class ClassFile {
         out.writeShort(ACC_PUBLIC | ACC_FINAL | ACC_SUPER);
         out.writeShort(thisClass);
         out.writeShort(superClass);
-        out.writeShort(1); // one interface
-        out.writeShort(iface);
+        out.writeShort(0); // interfaces
 
         out.writeShort(fields.size());
         for (int[] f : fields) {
