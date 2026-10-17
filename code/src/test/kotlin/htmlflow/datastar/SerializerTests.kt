@@ -264,6 +264,16 @@ class SerializerTests {
         assertEquals("[\"a\", \"b\"]", serializeValue(listOf("a", "b"), QuoteStyle.DOUBLE))
     }
 
+    @Test
+    fun `double quote style applies to nested collections`() {
+        assertEquals("""[["a", "b"], "c"]""", serializeValue(listOf(listOf("a", "b"), "c"), QuoteStyle.DOUBLE))
+    }
+
+    @Test
+    fun `double quote style applies to bare map values but keeps non identifier keys single quoted`() {
+        assertEquals("""{a: "b", ab: "c"}""", serializeValue(mapOf("a" to "b", "ab" to "c"), QuoteStyle.DOUBLE))
+    }
+
     // ── serializeValue: kotlinx JSON elements ───────────────────────────
 
     @Test
@@ -356,6 +366,18 @@ class SerializerTests {
     fun `signal value that is a lambda is evaluated`() {
         val result = listOf("total" to "42".asRawJS()).serializeSignals()
         assertEquals("{total: 42}", result)
+    }
+
+    @Test
+    fun `double quote style applies to signal values`() {
+        val result = listOf("name" to "John", "age" to 30).serializeSignals(QuoteStyle.DOUBLE)
+        assertEquals("""{name: "John", age: 30}""", result)
+    }
+
+    @Test
+    fun `double quote style keeps non identifier signal keys single quoted and escapes quotes in values`() {
+        val result = listOf("username" to "He said \"hi\"").serializeSignals(QuoteStyle.DOUBLE)
+        assertEquals("""{username: "He said \"hi\""}""", result)
     }
 
     // ── serializeComputed ───────────────────────────────────────────────
