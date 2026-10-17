@@ -36,7 +36,7 @@ import org.xmlet.htmlapifaster.ElementVisitor;
  * Base class for a linked list of nodes, corresponding to HtmlContinuation objects.
  * HtmlContinuation is responsible for emitting an HTML block and call the next node.
  */
-public abstract class HtmlContinuation {
+public abstract class HtmlContinuation implements HtmlResolver {
 
     /** A negative number means that should be ignored. */
     final int currentDepth;
@@ -94,17 +94,19 @@ public abstract class HtmlContinuation {
     }
 
     /**
-     * Executes this continuation and calls the next one if exist.
+     * Emits this block and calls the next continuation if it exists.
      *
      * @param model
      */
-    public abstract void execute(Object model);
+    @Override
+    public abstract void resolve(Object model);
 
     /**
      * Creates a copy of this HtmlContinuation with a new visitor
      *
      * @param visitor
      */
+    @Override
     public abstract HtmlContinuation copy(HtmlVisitor visitor);
 
     @SuppressWarnings("squid:S3011")

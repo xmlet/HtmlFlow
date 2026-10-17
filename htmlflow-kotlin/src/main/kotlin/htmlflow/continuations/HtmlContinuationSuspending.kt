@@ -23,7 +23,7 @@ class HtmlContinuationSuspending<E : Element<*, *>, T>(
     override val nextSuspendable: HtmlContinuationSuspendable?
         get() = next as? HtmlContinuationSuspendable
 
-    override fun execute(model: Any?) {
+    override fun resolve(model: Any?) {
         throw UnsupportedOperationException(
             "Illegal use fo suspending continuation. This should be used with executeSuspend!"
         )

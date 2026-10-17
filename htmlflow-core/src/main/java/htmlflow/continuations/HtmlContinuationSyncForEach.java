@@ -53,7 +53,7 @@ public class HtmlContinuationSyncForEach<M, E> extends HtmlContinuationSync {
     @SuppressWarnings("unchecked")
     @Override
     protected final void emitHtml(Object model) {
-        for (E e : items.apply((M) model)) item.execute(e);
+        for (E e : items.apply((M) model)) item.resolve(e);
     }
 
     @Override

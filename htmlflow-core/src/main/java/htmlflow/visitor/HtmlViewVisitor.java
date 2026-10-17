@@ -56,7 +56,7 @@ public class HtmlViewVisitor extends HtmlVisitor {
     /** Processing output through invocation of HtmlContinuation objects chain. */
     @Override
     public final void resolve(Object model) {
-        first.execute(model);
+        first.resolve(model);
     }
 
     @Override
