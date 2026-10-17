@@ -21,46 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package htmlflow.continuations;
 
-import htmlflow.continuations.codegen.ChainCompiler.Renderer;
 import htmlflow.exceptions.HtmlFlowAppendException;
 import htmlflow.visitor.HtmlVisitor;
 import java.io.IOException;
 
 /**
- * HtmlContinuation for a chain of static blocks and value slots compiled to bytecode. A
- * StringBuilder gets the render method, which appends numbers without boxing, and any other
- * Appendable gets the write method.
- *
- * @author Bernardo Pereira
+ * Base class of the classes that {@link htmlflow.continuations.codegen.ChainCompiler} generates
+ * for a chain of static blocks and value slots. The generated class implements {@link #write},
+ * and like a continuation it writes to the output of its visitor.
  */
-final class HtmlContinuationSyncCompiled extends HtmlContinuation {
+public abstract class HtmlResolverCompiled implements HtmlResolver, Cloneable {
 
-    private final Renderer renderer;
+    private HtmlVisitor visitor;
 
-    HtmlContinuationSyncCompiled(Renderer renderer, HtmlVisitor visitor) {
-        super(-1, false, visitor, null);
-        this.renderer = renderer;
-    }
+    protected HtmlResolverCompiled() {}
 
     @Override
-    public void resolve(Object model) {
-        Appendable out = visitor.out();
-        if (out instanceof StringBuilder) {
-            renderer.render((StringBuilder) out, model);
-            return;
-        }
+    public final void resolve(Object model) {
         try {
-            renderer.write(out, model);
+            write(visitor.out(), model);
         } catch (IOException e) {
             throw new HtmlFlowAppendException(e);
         }
     }
 
+    /** Shares the accessors with this resolver and writes through the given visitor. */
     @Override
-    public HtmlContinuation copy(HtmlVisitor v) {
-        return new HtmlContinuationSyncCompiled(renderer, v);
+    public final HtmlResolver copy(HtmlVisitor visitor) {
+        try {
+            HtmlResolverCompiled copy = (HtmlResolverCompiled) clone();
+            copy.visitor = visitor;
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException(e); // unreachable, this class is Cloneable
+        }
     }
+
+    /** Writes the chain for the given model. */
+    protected abstract void write(Appendable out, Object model)
+        throws IOException;
 }

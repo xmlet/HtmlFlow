@@ -28,6 +28,8 @@ import htmlflow.continuations.HtmlContinuation;
 import htmlflow.continuations.HtmlContinuationSyncStatic;
 import htmlflow.continuations.HtmlContinuationSyncValue;
 import htmlflow.continuations.HtmlContinuationSyncValue.Kind;
+import htmlflow.continuations.HtmlResolver;
+import htmlflow.continuations.HtmlResolverCompiled;
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -40,18 +42,17 @@ import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 
 /**
- * Generates one {@link Renderer} class for each chain of static blocks and value slots. Every
- * accessor gets its own field and its own call site.
+ * Generates one {@link HtmlResolverCompiled} class for each chain of static blocks and value slots.
+ * Every accessor gets its own field and its own call site.
  *
- * <p>The class has two methods with the same straight-line body. render appends to a
- * StringBuilder, and its numbers go in without boxing. write appends to any other Appendable, which
- * only takes chars, so each number goes through String.valueOf first. Nothing is buffered.
+ * <p>The write method appends straight to the output Appendable. Appendable only takes chars, so
+ * each number goes through String.valueOf first. Nothing is buffered.
  *
- * <p>Neither method branches, so they need no StackMapTable, and the stack and local counts are
+ * <p>The method never branches, so it needs no StackMapTable, and the stack and local counts are
  * constant. We write the class file directly, so this needs no bytecode library.
  *
- * <p>When something goes wrong, {@link #compile} returns null and the caller falls back to the
- * linked chain. A mistake here costs performance, not correctness.
+ * <p>When something goes wrong, {@link #compile} returns the linked chain itself. A mistake here
+ * costs performance, not correctness.
  *
  * @author Bernardo Pereira
  */
@@ -61,15 +62,15 @@ public final class ChainCompiler {
 
     /** Hidden classes land in the lookup's package, so the name must too. */
     private static final String GEN =
-        "htmlflow/continuations/codegen/ChainRendererGen";
+        "htmlflow/continuations/codegen/ChainResolverGen";
 
-    private static final String RENDERER = internal(Renderer.class);
+    private static final String RESOLVER_COMPILED = internal(
+        HtmlResolverCompiled.class
+    );
     private static final String VALUE_SLOT = internal(
         HtmlContinuationSyncValue.class
     );
     private static final String APPENDABLE = internal(Appendable.class);
-    private static final String SB = internal(StringBuilder.class);
-    private static final String OBJECT = internal(Object.class);
     private static final String STRING = internal(String.class);
     private static final String STRING_DESC = String.class.descriptorString();
     private static final String CHAR_SEQUENCE_DESC =
@@ -92,23 +93,23 @@ public final class ChainCompiler {
     /* These are constant because the generated code has no branches. */
     private static final int INIT_MAX_STACK = 4;
     private static final int INIT_MAX_LOCALS = 2;
-    private static final int RENDER_MAX_STACK = 6;
-    private static final int RENDER_MAX_LOCALS = 3;
+    private static final int WRITE_MAX_STACK = 6;
+    private static final int WRITE_MAX_LOCALS = 3;
 
     private ChainCompiler() {}
 
     /**
-     * @return A Renderer for the chain starting in first, or null when the chain holds other
-     *     nodes than static blocks and value slots, when it is too large, or when the definition
-     *     of the class failed.
+     * @return A compiled resolver for the chain starting in first, or first itself when the chain
+     *     holds other nodes than static blocks and value slots, when it is too large, or when the
+     *     definition of the class failed.
      */
-    public static Renderer compile(HtmlContinuation first) {
+    public static HtmlResolver compile(HtmlContinuation first) {
         Slots slots = Slots.of(first);
-        if (slots == null) return null;
+        if (slots == null) return first;
         try {
             checkRuntimeHelpers();
             byte[] classFile = classFile(slots);
-            if (classFile == null) return null;
+            if (classFile == null) return first;
             Class<?> gen = LOOKUP
                 .defineHiddenClass(classFile, true)
                 .lookupClass();
@@ -116,9 +117,9 @@ public final class ChainCompiler {
                 gen,
                 MethodType.methodType(void.class, Object[].class)
             );
-            return (Renderer) constructor.invoke(slots.accessors);
+            return (HtmlResolver) constructor.invoke(slots.accessors);
         } catch (Throwable failed) {
-            return null; // the caller uses the linked chain instead
+            return first;
         }
     }
 
@@ -138,7 +139,7 @@ public final class ChainCompiler {
 
     private static byte[] classFile(Slots slots) throws IOException {
         Kind[] kinds = slots.kinds;
-        ClassFile gen = new ClassFile(GEN, OBJECT, RENDERER);
+        ClassFile gen = new ClassFile(GEN, RESOLVER_COMPILED);
         for (int i = 0; i < kinds.length; i++) {
             gen.field("a" + i, desc(accessorFor(kinds[i]).type));
         }
@@ -150,23 +151,13 @@ public final class ChainCompiler {
             INIT_MAX_LOCALS,
             constructorCode(pool, slots)
         );
-        ClassFile.Bytecode render = renderCode(pool, slots, Target.BUILDER);
-        ClassFile.Bytecode write = renderCode(pool, slots, Target.APPENDABLE);
-        if (Math.max(render.size(), write.size()) >= HUGE_METHOD_LIMIT) {
-            return null;
-        }
-        gen.method(
-            "render",
-            method(desc(SB) + OBJECT_DESC, "V"),
-            RENDER_MAX_STACK,
-            RENDER_MAX_LOCALS,
-            render
-        );
+        ClassFile.Bytecode write = writeCode(pool, slots);
+        if (write.size() >= HUGE_METHOD_LIMIT) return null;
         gen.method(
             "write",
             method(desc(APPENDABLE) + OBJECT_DESC, "V"),
-            RENDER_MAX_STACK,
-            RENDER_MAX_LOCALS,
+            WRITE_MAX_STACK,
+            WRITE_MAX_LOCALS,
             write
         );
         return gen.toBytes();
@@ -180,7 +171,7 @@ public final class ChainCompiler {
         Kind[] kinds = slots.kinds;
         ClassFile.Bytecode code = new ClassFile.Bytecode();
         code.aload(THIS);
-        code.invokeSpecial(pool.method(OBJECT, "<init>", "()V"));
+        code.invokeSpecial(pool.method(RESOLVER_COMPILED, "<init>", "()V"));
         for (int i = 0; i < kinds.length; i++) {
             String type = accessorFor(kinds[i]).type;
             code.aload(THIS);
@@ -194,26 +185,19 @@ public final class ChainCompiler {
         return code;
     }
 
-    /** The output that a generated method appends to. */
-    private enum Target {
-        BUILDER,
-        APPENDABLE,
-    }
-
-    private static ClassFile.Bytecode renderCode(
+    private static ClassFile.Bytecode writeCode(
         ClassFile.ConstantPool pool,
-        Slots slots,
-        Target target
+        Slots slots
     ) throws IOException {
         String[] statics = slots.statics;
         Kind[] kinds = slots.kinds;
         String[] attrNames = slots.attrNames;
         ClassFile.Bytecode code = new ClassFile.Bytecode();
         for (int i = 0; i < kinds.length; i++) {
-            emitStatic(code, pool, target, statics[i]);
-            emitSlot(code, pool, target, i, kinds[i], attrNames[i]);
+            emitStatic(code, pool, statics[i]);
+            emitSlot(code, pool, i, kinds[i], attrNames[i]);
         }
-        emitStatic(code, pool, target, statics[kinds.length]);
+        emitStatic(code, pool, statics[kinds.length]);
         code.returnVoid();
         return code;
     }
@@ -222,19 +206,17 @@ public final class ChainCompiler {
     private static void emitStatic(
         ClassFile.Bytecode code,
         ClassFile.ConstantPool pool,
-        Target target,
         String text
     ) throws IOException {
         if (text.isEmpty()) return;
         code.aload(OUT_LOCAL);
         code.ldc(pool.string(text));
-        appendAndPop(code, pool, target, STRING_DESC);
+        appendAndPop(code, pool);
     }
 
     private static void emitSlot(
         ClassFile.Bytecode code,
         ClassFile.ConstantPool pool,
-        Target target,
         int i,
         Kind kind,
         String attrName
@@ -249,21 +231,20 @@ public final class ChainCompiler {
             code.invokeStatic(
                 pool.method(VALUE_SLOT, TEXT, TAKES_OBJECT + STRING_DESC)
             );
-            appendAndPop(code, pool, target, STRING_DESC);
+            appendAndPop(code, pool);
         } else {
-            // A StringBuilder takes append(int), append(double) and so on, with no boxing. An
-            // Appendable only takes chars, so the value goes through String.valueOf first. That is
-            // also what append(Object) does, so null prints as "null" on both.
+            // Appendable only takes chars, so the value goes through String.valueOf, which also
+            // prints null as "null" like the linked chain.
             Accessor accessor = accessorFor(kind);
             callAccessor(code, pool, i, accessor);
-            String onStack = accessor.returns;
-            if (target == Target.APPENDABLE) {
-                code.invokeStatic(
-                    pool.method(STRING, "valueOf", method(onStack, STRING_DESC))
-                );
-                onStack = STRING_DESC;
-            }
-            appendAndPop(code, pool, target, onStack);
+            code.invokeStatic(
+                pool.method(
+                    STRING,
+                    "valueOf",
+                    method(accessor.returns, STRING_DESC)
+                )
+            );
+            appendAndPop(code, pool);
         }
     }
 
@@ -339,26 +320,18 @@ public final class ChainCompiler {
         );
     }
 
-    /** @param argDesc The type on the stack. An Appendable target takes only a String. */
+    /** Appends the String on the stack to the output and drops the returned Appendable. */
     private static void appendAndPop(
         ClassFile.Bytecode code,
-        ClassFile.ConstantPool pool,
-        Target target,
-        String argDesc
+        ClassFile.ConstantPool pool
     ) throws IOException {
-        if (target == Target.BUILDER) {
-            code.invokeVirtual(
-                pool.method(SB, "append", method(argDesc, desc(SB)))
-            );
-        } else {
-            code.invokeInterface(
-                pool.interfaceMethod(
-                    APPENDABLE,
-                    "append",
-                    method(CHAR_SEQUENCE_DESC, desc(APPENDABLE))
-                )
-            );
-        }
+        code.invokeInterface(
+            pool.interfaceMethod(
+                APPENDABLE,
+                "append",
+                method(CHAR_SEQUENCE_DESC, desc(APPENDABLE))
+            )
+        );
         code.pop();
     }
 
@@ -373,13 +346,6 @@ public final class ChainCompiler {
 
     private static String method(String params, String returns) {
         return '(' + params + ')' + returns;
-    }
-
-    /** Emits the HTML of a chain of static blocks and value slots. */
-    public interface Renderer {
-        void render(StringBuilder sb, Object model);
-
-        void write(Appendable out, Object model) throws IOException;
     }
 
     /** The chain as parallel arrays. Runs of static nodes merge into one append. */

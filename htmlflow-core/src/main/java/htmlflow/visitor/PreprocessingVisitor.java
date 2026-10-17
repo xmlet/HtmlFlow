@@ -38,6 +38,8 @@ import htmlflow.continuations.HtmlContinuationSyncStatic;
 import htmlflow.continuations.HtmlContinuationSyncValue;
 import htmlflow.continuations.HtmlContinuationSyncValue.Kind;
 import htmlflow.continuations.HtmlContinuationSyncWhen;
+import htmlflow.continuations.HtmlResolver;
+import htmlflow.continuations.codegen.ChainCompiler;
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -93,6 +95,15 @@ public class PreprocessingVisitor extends HtmlVisitor {
 
     public HtmlContinuation getFirst() {
         return first;
+    }
+
+    /**
+     * Compiles the chain recorded by {@link #resolve}. Call it once, after the chain is final.
+     *
+     * @return The compiled chain, or the linked chain when it does not compile.
+     */
+    public final HtmlResolver compile() {
+        return ChainCompiler.compile(first);
     }
 
     /**
@@ -276,8 +287,8 @@ public class PreprocessingVisitor extends HtmlVisitor {
         Consumer<T> orElse
     ) {
         String outerStatic = openControlFlow();
-        HtmlContinuation bodyChain = recordBlock(element, body);
-        HtmlContinuation elseChain = recordBlock(element, orElse);
+        HtmlResolver bodyChain = recordBlock(element, body);
+        HtmlResolver elseChain = recordBlock(element, orElse);
         chainStaticThen(
             outerStatic,
             new HtmlContinuationSyncWhen<M>(
@@ -306,7 +317,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
      * Preencodes the body of a loop or conditional into its own chain. Saves and restores all the
      * recording state, so blocks can nest.
      */
-    private <T extends Element> HtmlContinuation recordBlock(
+    private <T extends Element> HtmlResolver recordBlock(
         T element,
         Consumer<T> body
     ) {
@@ -338,8 +349,7 @@ public class PreprocessingVisitor extends HtmlVisitor {
         depth = outerDepth;
         sb().setLength(mark); // the body lives in its own chain, not the page
         staticBlockIndex = mark;
-        chain.compile();
-        return chain.compiledCopy(this);
+        return ChainCompiler.compile(chain);
     }
 
     /** Appends the static HTML, skipped when empty, and then the node. */
