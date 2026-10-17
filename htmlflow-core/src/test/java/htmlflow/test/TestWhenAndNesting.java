@@ -145,4 +145,58 @@ class TestWhenAndNesting {
             "written to an Appendable, the page differs"
         );
     }
+
+    private static void indexedTemplate(HtmlPage page) {
+        page
+            .html()
+            .body()
+            .ol()
+            .forEachIndexedOf((List<Group> groups) -> groups, (ol, row) ->
+                ol
+                    .li()
+                    .attrOf("class", row.read(r -> r.index() % 2 == 0 ? "even" : "odd"))
+                    .intOf(row.readInt(r -> r.index() + 1))
+                    .textOf(row.read(r -> " " + r.item().name))
+                    .__()
+            )
+            .__()
+            .__()
+            .__();
+    }
+
+    private static void indexedAsDynamic(HtmlPage page) {
+        page
+            .html()
+            .body()
+            .ol()
+            .<List<Group>>dynamic((ol, groups) -> {
+                for (int i = 0; i < groups.size(); i++) {
+                    ol
+                        .li()
+                        .attrClass(i % 2 == 0 ? "even" : "odd")
+                        .text(i + 1)
+                        .text(" " + groups.get(i).name)
+                        .__();
+                }
+            })
+            .__()
+            .__()
+            .__();
+    }
+
+    /** The second render checks that the positions start again at 0. */
+    @Test
+    void forEachIndexedOf_numbers_the_items_from_0_on_every_render() {
+        HtmlView<List<Group>> slots = HtmlFlow.view(TestWhenAndNesting::indexedTemplate);
+        String expected = HtmlFlow
+            .<List<Group>>view(TestWhenAndNesting::indexedAsDynamic)
+            .render(GROUPS);
+        assertEquals(expected, slots.render(GROUPS));
+        assertEquals(expected, slots.render(GROUPS), "second render differs from the first");
+        assertEquals(
+            expected,
+            Utils.renderToAppendable(TestWhenAndNesting::indexedTemplate, GROUPS),
+            "written to an Appendable, the page differs"
+        );
+    }
 }
