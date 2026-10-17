@@ -23,10 +23,10 @@ internal object Serializer {
      * @receiver The list of pairs to transform
      * @return The String with the corresponding representation in JSON
      */
-    internal fun List<Pair<String, Any?>>.serializeSignals(): String =
+    internal fun List<Pair<String, Any?>>.serializeSignals(quoteStyle: QuoteStyle = QuoteStyle.SINGLE): String =
         JavaScriptLiterals.objectLiteral(
             this.map { (name, value) ->
-                name to serializeValue(value)
+                name to serializeValue(value, quoteStyle)
             },
         )
 
