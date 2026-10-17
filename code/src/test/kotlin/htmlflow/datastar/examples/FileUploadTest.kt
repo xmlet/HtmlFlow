@@ -73,7 +73,7 @@ class FileUploadTest {
         <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.1/bundles/datastar.js">
         </script>
     </head>
-<body data-signals="{files: ''}">
+<body data-signals="{files: ""}">
     <label>
         <p>
             Pick anything less than 1MB

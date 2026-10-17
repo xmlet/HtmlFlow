@@ -76,7 +76,7 @@ class CustomEventTest {
                 </script>
             </head>
             <body>    
-                <p id="foo" data-signals="{eventDetails: ''}" data-on:myevent="$eventDetails = evt.detail" data-text="`Last Event Details: ${$eventDetails}`">
+                <p id="foo" data-signals="{eventDetails: ""}" data-on:myevent="$eventDetails = evt.detail" data-text="`Last Event Details: ${$eventDetails}`">
                 </p>
                 <script>
                     const foo = document.getElementById("foo");

@@ -6,6 +6,7 @@ import org.xmlet.htmlflow.datastar.expressions.DataStarExpression
 import org.xmlet.htmlflow.datastar.expressions.DataStarExpressionOp
 import org.xmlet.htmlflow.datastar.expressions.Signal
 import org.xmlet.htmlflow.datastar.expressions.SignalPatchFilter
+import org.xmlet.htmlflow.datastar.serialization.QuoteStyle
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
 
@@ -122,7 +123,10 @@ interface ExpressionScope {
     /**
      * Equal to the assignment operator in JavaScript, used to assign the signal value to the new value.
      */
-    fun <T> Signal<T>.setValue(value: T): DataStarExpressionOp
+    fun <T> Signal<T>.setValue(
+        value: T,
+        quoteStyle: QuoteStyle = QuoteStyle.SINGLE,
+    ): DataStarExpressionOp
 
     /**
      * Equal to the assignment operator in JavaScript, used to assign the passed expression to another expression.

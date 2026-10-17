@@ -121,7 +121,7 @@ class DatastarTest {
         </script>
     </head>
 <body>
-    <div data-signals="{response: ''}" data-signals="{answer: 'bread'}" data-computed="{correct: () => $response.toLowerCase() == $answer}">
+    <div data-signals="{response: ""}" data-signals="{answer: 'bread'}" data-computed="{correct: () => $response.toLowerCase() == $answer}">
         <div id="question">
             What do you put in a toaster?
         </div>

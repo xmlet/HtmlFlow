@@ -26,10 +26,10 @@ package org.xmlet.htmlflow.datastar.attributes
 
 import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlflow.datastar.builders.ExpressionBuilder
-import org.xmlet.htmlflow.datastar.expressions.JavaScriptSerialization
 import org.xmlet.htmlflow.datastar.expressions.Signal
 import org.xmlet.htmlflow.datastar.expressions.SignalPatchFilter
 import org.xmlet.htmlflow.datastar.expressions.signal
+import org.xmlet.htmlflow.datastar.serialization.JavaScriptLiterals
 import org.xmlet.htmlflow.datastar.serialization.Serializer
 
 /**
@@ -59,7 +59,7 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataAttr(vararg attrs: Pair<String, Signal<*>>) {
     val serialized =
-        JavaScriptSerialization.objectLiteral(
+        JavaScriptLiterals.objectLiteral(
             attrs.map { (name, value) ->
                 name to value.toString()
             },
@@ -184,7 +184,7 @@ fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataStyle(
  * is a JavaScript expression that computes the style value
  */
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataStyle(vararg styles: Pair<String, String>) {
-    val serialized = JavaScriptSerialization.objectLiteral(styles.asIterable())
+    val serialized = JavaScriptLiterals.objectLiteral(styles.asIterable())
     this.visitor.visitAttribute("data-style", serialized)
 }
 

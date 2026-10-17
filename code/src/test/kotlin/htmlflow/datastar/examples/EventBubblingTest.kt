@@ -129,7 +129,7 @@ class EventBubblingTest {
                 </script>
             </head>
             <body>
-                <div id="demo" data-signals="{key: ''}">
+                <div id="demo" data-signals="{key: ""}">
                     Key pressed: 
                     <span data-text="$key">
                     </span>
