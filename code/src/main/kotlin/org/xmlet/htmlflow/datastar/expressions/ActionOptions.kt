@@ -1,5 +1,7 @@
 package org.xmlet.htmlflow.datastar.expressions
 
+import org.xmlet.htmlflow.datastar.serialization.JavaScriptLiterals
+import org.xmlet.htmlflow.datastar.serialization.QuoteStyle
 import kotlin.time.Duration
 
 /**
@@ -30,10 +32,10 @@ class ActionOptions {
                     add("filterSignals: $filter")
                 }
 
-                selector?.let { add("selector: ${JavaScriptSerialization.stringLiteral(it)}") }
-                headers?.let { add("headers: ${JavaScriptSerialization.stringLiteral(it, QuoteStyle.DOUBLE)}") }
+                selector?.let { add("selector: ${JavaScriptLiterals.stringLiteral(it)}") }
+                headers?.let { add("headers: ${JavaScriptLiterals.stringLiteral(it, QuoteStyle.DOUBLE)}") }
                 openWhenHidden?.let { add("openWhenHidden: $it") }
-                payload?.let { add("payload: ${JavaScriptSerialization.stringLiteral(it, QuoteStyle.DOUBLE)}") }
+                payload?.let { add("payload: ${JavaScriptLiterals.stringLiteral(it, QuoteStyle.DOUBLE)}") }
                 retry?.let { add("retry: '${it.name.lowercase()}'") }
                 retryInterval?.let { add("retryInterval: ${it.inWholeMilliseconds}") }
                 retryScaler?.let { add("retryScaler: $it") }

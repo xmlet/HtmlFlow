@@ -4,6 +4,7 @@ import htmlflow.div
 import htmlflow.doc
 import htmlflow.html
 import jakarta.ws.rs.Path
+import kotlinx.serialization.Serializable
 import org.xmlet.htmlapifaster.EnumTypeInputType
 import org.xmlet.htmlapifaster.EnumTypeScriptType
 import org.xmlet.htmlapifaster.body
@@ -331,7 +332,8 @@ private val expectedDataBindModifiers =
             }
         }
 
-data class Car(
+@Serializable
+class Car(
     val carName: String,
     val year: Int,
 )

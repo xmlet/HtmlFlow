@@ -15,6 +15,7 @@ import org.xmlet.htmlflow.datastar.attributes.dataSignals
 import org.xmlet.htmlflow.datastar.events.Change
 import org.xmlet.htmlflow.datastar.events.Click
 import org.xmlet.htmlflow.datastar.expressions.Signal
+import org.xmlet.htmlflow.datastar.serialization.asRawJS
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -45,7 +46,7 @@ class BulkUpdateTest {
                                 val (fetching, selections) =
                                     dataSignals(
                                         "_fetching" to false,
-                                        "selections" to { "Array(4).fill(false)" },
+                                        "selections" to "Array(4).fill(false)".asRawJS(),
                                     ) { modifiers { ifMissing() } }
                                 buildTable(fetching, selections)
                                 div {

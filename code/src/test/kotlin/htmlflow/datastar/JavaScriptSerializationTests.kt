@@ -3,7 +3,9 @@ package htmlflow.datastar
 import htmlflow.div
 import htmlflow.doc
 import htmlflow.html
+import kotlinx.serialization.Serializable
 import org.xmlet.htmlflow.datastar.attributes.dataAttr
+import org.xmlet.htmlflow.datastar.attributes.dataInit
 import org.xmlet.htmlflow.datastar.attributes.dataSignal
 import org.xmlet.htmlflow.datastar.attributes.dataSignals
 import org.xmlet.htmlflow.datastar.attributes.dataStyle
@@ -38,7 +40,7 @@ class JavaScriptSerializationTests {
     }
 
     @Test
-    fun `data class serialization escapes nested object keys and string values`() {
+    fun `class serialization escapes nested object keys and string values`() {
         val html =
             StringBuilder()
                 .apply {
@@ -55,7 +57,7 @@ class JavaScriptSerializationTests {
             """
             <!DOCTYPE html>
             <html>
-            	<div data-signals="{profile: {address: {street: 'Main\nStreet'}, name: 'O\'Reilly'}}">
+            	<div data-signals="{profile: {name: 'O\'Reilly', address: {street: 'Main\nStreet'}}}">
             	</div>
             </html>
             """.trimIndent(),
@@ -91,12 +93,101 @@ class JavaScriptSerializationTests {
         )
     }
 
-    data class Profile(
+    @Test
+    fun `setValue serializes simple value`() {
+        val html =
+            StringBuilder()
+                .apply {
+                    doc {
+                        html {
+                            div {
+                                val addressSignal = dataSignal("name", "John")
+                                dataInit {
+                                    addressSignal.setValue("Doe")
+                                }
+                            }
+                        }
+                    }
+                }.toString()
+
+        assertEquals(
+            $$"""
+            <!DOCTYPE html>
+            <html>
+            	<div data-signals="{name: 'John'}" data-init="$name = 'Doe'">
+            	</div>
+            </html>
+            """.trimIndent(),
+            html,
+        )
+    }
+
+    @Test
+    fun `setValue serializes class value`() {
+        val html =
+            StringBuilder()
+                .apply {
+                    doc {
+                        html {
+                            div {
+                                val addressSignal = dataSignal("address", Address("Main\nStreet"))
+                                dataInit {
+                                    addressSignal.setValue(Address("Second\nStreet"))
+                                }
+                            }
+                        }
+                    }
+                }.toString()
+
+        assertEquals(
+            $$"""
+            <!DOCTYPE html>
+            <html>
+            	<div data-signals="{address: {street: 'Main\nStreet'}}" data-init="$address = {street: 'Second\nStreet'}">
+            	</div>
+            </html>
+            """.trimIndent(),
+            html,
+        )
+    }
+
+    @Test
+    fun `setValue serializes nested class value`() {
+        val html =
+            StringBuilder()
+                .apply {
+                    doc {
+                        html {
+                            div {
+                                val addressSignal = dataSignal("profile", Profile("John", Address("Main\nStreet")))
+                                dataInit {
+                                    addressSignal.setValue(Profile("Doe", Address("Second\nStreet")))
+                                }
+                            }
+                        }
+                    }
+                }.toString()
+
+        assertEquals(
+            $$"""
+            <!DOCTYPE html>
+            <html>
+            	<div data-signals="{profile: {name: 'John', address: {street: 'Main\nStreet'}}}" data-init="$profile = {name: 'Doe', address: {street: 'Second\nStreet'}}">
+            	</div>
+            </html>
+            """.trimIndent(),
+            html,
+        )
+    }
+
+    @Serializable
+    class Profile(
         val name: String,
         val address: Address,
     )
 
-    data class Address(
+    @Serializable
+    class Address(
         val street: String,
     )
 }

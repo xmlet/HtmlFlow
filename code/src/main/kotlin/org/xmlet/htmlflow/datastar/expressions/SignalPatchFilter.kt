@@ -1,5 +1,7 @@
 package org.xmlet.htmlflow.datastar.expressions
 
+import org.xmlet.htmlflow.datastar.serialization.JavaScriptLiterals
+
 /**
  * Represents a filter object for signal patching.
  *
@@ -15,8 +17,8 @@ class SignalPatchFilter {
 
     override fun toString(): String {
         val parts = mutableListOf<Pair<String, String>>()
-        include?.let { parts.add("include" to JavaScriptSerialization.regexLiteral(it)) }
-        exclude?.let { parts.add("exclude" to JavaScriptSerialization.regexLiteral(it)) }
-        return JavaScriptSerialization.objectLiteral(parts)
+        include?.let { parts.add("include" to JavaScriptLiterals.regexLiteral(it)) }
+        exclude?.let { parts.add("exclude" to JavaScriptLiterals.regexLiteral(it)) }
+        return JavaScriptLiterals.objectLiteral(parts)
     }
 }

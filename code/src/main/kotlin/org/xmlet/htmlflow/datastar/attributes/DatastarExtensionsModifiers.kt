@@ -7,7 +7,6 @@ import org.xmlet.htmlflow.datastar.builders.EventExpressionBuilder
 import org.xmlet.htmlflow.datastar.builders.ExpressionModifierBuilder
 import org.xmlet.htmlflow.datastar.builders.ModifierBuilder
 import org.xmlet.htmlflow.datastar.events.Event
-import org.xmlet.htmlflow.datastar.expressions.JavaScriptSerialization
 import org.xmlet.htmlflow.datastar.expressions.Signal
 import org.xmlet.htmlflow.datastar.expressions.SignalPatchFilter
 import org.xmlet.htmlflow.datastar.expressions.signal
@@ -19,6 +18,10 @@ import org.xmlet.htmlflow.datastar.modifiers.attribute.DataOnIntersectModifiers
 import org.xmlet.htmlflow.datastar.modifiers.attribute.DataOnIntervalModifiers
 import org.xmlet.htmlflow.datastar.modifiers.attribute.DataOnSignalPatchModifiers
 import org.xmlet.htmlflow.datastar.modifiers.attribute.DataSignalsModifiers
+import org.xmlet.htmlflow.datastar.serialization.JavaScriptLiterals
+import org.xmlet.htmlflow.datastar.serialization.QuoteStyle
+import org.xmlet.htmlflow.datastar.serialization.Serializer
+import org.xmlet.htmlflow.datastar.serialization.Serializer.serializeSignals
 
 /**
  * Initializes one or more signals with their initial values and modifiers.
@@ -32,9 +35,10 @@ import org.xmlet.htmlflow.datastar.modifiers.attribute.DataSignalsModifiers
  */
 fun <E : Element<*, *>, P : Element<*, *>, T> Element<E, P>.dataSignals(
     vararg signals: Pair<String, T>,
+    quoteStyle: QuoteStyle = QuoteStyle.SINGLE,
     block: ModifierBuilder<DataSignalsModifiers>.() -> Unit = {},
 ): List<Signal<T>> {
-    signals.toList().toJson().also {
+    signals.toList().serializeSignals(quoteStyle).also {
         val mods = ModifierBuilder(DataSignalsModifiers()).apply(block).getModifiers()
         this.visitor.visitAttribute("data-signals$mods", it)
     }
@@ -58,11 +62,12 @@ fun <E : Element<*, *>, P : Element<*, *>, T> Element<E, P>.dataSignals(
 fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
     name: String,
     value: R,
+    quoteStyle: QuoteStyle = QuoteStyle.SINGLE,
     block: ModifierBuilder<DataSignalsModifiers>.() -> Unit = {},
 ): Signal<R> {
     val mods = ModifierBuilder(DataSignalsModifiers()).apply(block).getModifiers()
-    val serialized = serializeValue(value)
-    this.visitor.visitAttribute("data-signals$mods", JavaScriptSerialization.objectLiteral(listOf(name to serialized)))
+    val serialized = Serializer.serializeValue(value, quoteStyle)
+    this.visitor.visitAttribute("data-signals$mods", JavaScriptLiterals.objectLiteral(listOf(name to serialized)))
 
     return Signal(name)
 }
@@ -80,7 +85,7 @@ fun <E : Element<*, *>, P : Element<*, *>, R> Element<E, P>.dataSignal(
 fun <E : Element<*, *>, P : Element<*, *>> Element<E, P>.dataSignal(
     name: String,
     block: ModifierBuilder<DataSignalsModifiers>.() -> Unit = {},
-): Signal<Any?> = dataSignal(name, null, block)
+): Signal<Any?> = dataSignal(name, "", QuoteStyle.DOUBLE, block)
 
 /**
  * Attaches an event listener to an element, executing an expression whenever the event is triggered.
