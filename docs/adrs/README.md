@@ -17,3 +17,4 @@ Status indicates the outcome of the decision.
 | [ADR-005](./ADR-005-type-safe-action-options.md)        | Accepted | Change action options from raw strings to type-safe Kotlin options.                                      |
 | [ADR-006](./ADR-006-signal-casing-consistency.md)       | Accepted | Refactor signal naming to be in value instead of key, of the attribute.                                  |
 | [ADR-007](./ADR-007-case-modifiers-removal.md)          | Accepted | Removal of case modifiers.                                                                               |
+| [ADR-008](./ADR-008-signal-value-serialization.md)      | Accepted | Serialize signal values with a centralized Kotlinx serialization-based JavaScript-literal serializer.    |

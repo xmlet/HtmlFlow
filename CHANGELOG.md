@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.0
+
+### Added
+- Support for serializing complex signal values through registered `kotlinx.serialization` serializers, including nested collections, maps, arrays, defaults, and explicit nulls.
+- `RawJS` and `asRawJS()` for explicitly embedding a JavaScript expression in a serialized value.
+
+### Changed
+- Replaced reflection-based signal value serialization with a centralized serializer for signal initialization, computed signals, and `setValue` assignments.
+- Added `QuoteStyle` support for selecting the quote style used for serialized string values.
+
+### Removed
+- Implicit raw JavaScript injection through `Function0`; use `asRawJS()` instead.
+
 ## v1.1.0
 
 ### Changed
