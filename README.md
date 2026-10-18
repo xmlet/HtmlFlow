@@ -3,7 +3,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xmlet_HtmlFlow-Datastar&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=xmlet_HtmlFlow-Datastar)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xmlet_HtmlFlow-Datastar&metric=coverage)](https://sonarcloud.io/summary/new_code?id=xmlet_HtmlFlow-Datastar)
 [![Maven Central Version](https://img.shields.io/maven-central/v/com.github.xmlet/htmlflow-datastar?filter=!*alpha*)](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow-datastar)
-[![javadoc](https://javadoc.io/badge2/com.github.xmlet/htmlflow-datastar/1.0.0/javadoc.svg)](https://javadoc.io/doc/com.github.xmlet/htmlflow-datastar/1.0.0)
+[![javadoc](https://javadoc.io/badge2/com.github.xmlet/htmlflow-datastar/1.2.0/javadoc.svg)](https://javadoc.io/doc/com.github.xmlet/htmlflow-datastar/1.2.0)
 [![examples](https://img.shields.io/badge/examples-htmlflow--datastar--examples-blue?logo=github)](https://github.com/xmlet/HtmlFlow-Datastar-Examples)
 
 
