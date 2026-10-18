@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "com.github.xmlet"
-version = "1.1.0"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
