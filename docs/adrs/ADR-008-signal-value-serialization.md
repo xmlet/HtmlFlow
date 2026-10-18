@@ -83,6 +83,15 @@ can produce JSON efficiently. It was not chosen because Datastar attributes use
 JavaScript expressions and need JavaScript-specific literal formatting, quote
 style control, and an explicit raw-expression escape hatch.
 
+### Add a `@NoQuote` Property Annotation
+
+Introducing a `@NoQuote` property annotation was considered for class
+properties whose values should not be serialized. Supporting this annotation
+alongside Kotlinx serialization's `@SerialName` would require serialization
+metadata analysis. The solution explored in the
+`refactor/serialization-noquote` branch was considered too complex for the
+problem it solved, so it was not chosen.
+
 ### Keep `Function0` as the Raw JavaScript Escape Hatch
 
 Retaining `Function0` would preserve the former API, but evaluating a function
