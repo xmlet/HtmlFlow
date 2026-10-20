@@ -1,0 +1,8 @@
+/* Reusable button shared by every MFE. @scope keeps it inside .mfe-shared containers only. */
+@scope (.mfe-shared) {
+    .btn {
+        background-color: rgb(255, 99, 71);
+        border-radius: 8px;
+        padding: 8px 16px;
+    }
+}

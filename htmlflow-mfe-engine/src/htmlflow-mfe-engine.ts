@@ -25,7 +25,7 @@ interface MfeContext {
      * @param eventName - event name to dispatch; falls back to this fragment's configured
      *                     `mfe-trigger-event` attribute value if omitted/falsy.
      */
-    triggerMfeEvent: (message: string, payload: unknown, eventName: string, ) => void;
+    triggerMfeEvent: (message: string, payload: unknown, eventName: string) => void;
     /**
      * Registers a listener on the shared MFE event bus. The listener is tracked and
      * automatically removed the next time this fragment reloads, to avoid leaking
@@ -264,13 +264,16 @@ class Mfe extends HTMLElement {
                 if (node.content.querySelector('slot')) {
                     this.shadowRoot?.append(node.content);
                     continue;
-                }else{
-                    console.error("No <slot> elements were found in the wrapper, content wont be rendered correctly.");
                 }
                 const slotted = node.content.querySelector('[slot]');
                 if (slotted) {
                     const slotName = slotted.getAttribute('slot');
-                    this.shadowRoot?.querySelector(`slot[name="${slotName}"]`)?.append(node.content);
+                    const target = this.shadowRoot?.querySelector(`slot[name="${slotName}"]`);
+                    if (target) {
+                        target.append(node.content);
+                    } else {
+                        console.error(`No <slot name="${slotName}"> found in the wrapper, content won't be rendered correctly.`);
+                    }
                 } else {
                     this.shadowRoot?.append(node.content);
                 }
