@@ -848,8 +848,7 @@ The response must follow a simple contract:
 ```
 
 :::tip
-On the server, write the wrapper, flush it, then write and flush each item. For example, use
-Spring's `StreamingResponseBody` or HtmlFlow's [streaming views](/docs/advanced#streaming-html).
+On the server side, write the wrapper and flush it. Afterwards, write and flush each item.
 An example can be see in the [micro-frontends streaming example](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples/blob/main/shell/src/main/java/com/dev/StreamingExample.java)
 :::
 
