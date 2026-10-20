@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 public class TestMfeView {
 
     @Test
+    @SuppressWarnings("deprecation")
     public void shouldRenderMicroFrontend() {
         HtmlView<?> mfe = HtmlFlow.ViewFactory.builder().mfeEnabled(true).build().view((page -> {
             page.html()

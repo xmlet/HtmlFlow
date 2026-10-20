@@ -9,11 +9,13 @@ abstract sealed class AbstractMfeConfig
     implements MfeConfiguration
     permits HtmlMfeConfig, HtmlMfeConfig.Builder {
 
+    /** The only custom element registered by the htmlflow-mfe-engine. */
+    static final String MFE_ELEMENT_NAME = "micro-frontend";
+
     protected String mfeUrlResource;
     protected String mfeName;
     protected String mfeListeningEventName;
     protected String mfeTriggersEventName;
-    protected String mfeElementName = "micro-frontend";
     protected String mfeScriptUrl;
     protected String mfeScriptIntegrity;
     protected String mfeStylingUrl;
@@ -27,7 +29,6 @@ abstract sealed class AbstractMfeConfig
         this.mfeName = src.mfeName;
         this.mfeListeningEventName = src.mfeListeningEventName;
         this.mfeTriggersEventName = src.mfeTriggersEventName;
-        this.mfeElementName = src.mfeElementName;
         this.mfeScriptUrl = src.mfeScriptUrl;
         this.mfeScriptIntegrity = src.mfeScriptIntegrity;
         this.mfeStylingUrl = src.mfeStylingUrl;
@@ -47,7 +48,7 @@ abstract sealed class AbstractMfeConfig
 
     @Override
     public String getMfeElementName() {
-        return mfeElementName;
+        return MFE_ELEMENT_NAME;
     }
 
     @Override

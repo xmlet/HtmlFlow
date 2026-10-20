@@ -36,9 +36,15 @@ public final class HtmlMfeConfig extends AbstractMfeConfig {
             return this;
         }
 
+        /**
+         * Ignored: the htmlflow-mfe-engine only registers the {@code <micro-frontend>} custom element,
+         * so microfrontends are always rendered with that tag.
+         *
+         * @deprecated the element name is fixed to {@code micro-frontend}; this value is ignored.
+         */
+        @Deprecated
         @Override
         public Builder setMfeElementName(String s) {
-            this.mfeElementName = s;
             return this;
         }
 
