@@ -810,9 +810,9 @@ appear while the service is still producing them.
 
 ```java
 .mfe(cfg -> cfg
-  .setMfeUrlResource("http://localhost:8081/bikes/view")
+  .setMfeUrlResource("http://localhost:8081/bikes/stream")
   .setMfeName("bikes")
-  .setMfeStreamingData("true")
+  .setMfeStreamingData(true)
 ```
 
 </TabItem>
@@ -820,9 +820,9 @@ appear while the service is still producing them.
 
 ```kotlin
 mfe { cfg ->
-  cfg.setMfeUrlResource("http://localhost:8081/bikes/view")
+  cfg.setMfeUrlResource("http://localhost:8081/bikes/stream")
   cfg.setMfeName("bikes")
-  cfg.setMfeStreamingData("true")
+  cfg.setMfeStreamingData(true)
 }
 ```
 
@@ -849,6 +849,7 @@ The response must follow a simple contract:
 
 :::tip
 On the server side, write the wrapper and flush it. Afterwards, write and flush each item.
+For example, use Spring's `StreamingResponseBody` or HtmlFlow's [streaming views](/docs/advanced#streaming-html)
 An example can be see in the [micro-frontends streaming example](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples/blob/main/shell/src/main/java/com/dev/StreamingExample.java)
 :::
 
