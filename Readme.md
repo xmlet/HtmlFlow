@@ -125,10 +125,10 @@ Bonus points it also produces only valid HTML according to HTML 5.2.
 ## Installation
 
 First, in order to include it to your Gradle project, simply add the following dependency,
-or use any other form provided in [Maven Central Repository](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow/5.0.4):
+or use any other form provided in [Maven Central Repository](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow/5.2.0):
 
 ```groovy
-implementation 'com.github.xmlet:htmlflow:5.0.4'
+implementation 'com.github.xmlet:htmlflow:5.2.0'
 ```
 
 You can also download the artifact directly from [Maven
@@ -137,7 +137,7 @@ Central Repository](https://repo1.maven.org/maven2/com/github/xmlet/htmlflow)
 **Kotlin developers should use the [htmlflow-kotlin](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow-kotlin/5.0.4) dependency instead.**:
 
 ```groovy
-implementation 'com.github.xmlet:htmlflow-kotlin:5.0.4'
+implementation 'com.github.xmlet:htmlflow-kotlin:5.2.0'
 ```
 
 Starting with version 5, the Java and Kotlin APIs are provided in separate modules.
@@ -322,6 +322,10 @@ any kind of asynchronous API.
 
 ## References
 
+* 2026, [BRHC: Backend-driven Reactive Hypermedia Controls with a Statically Typed Kotlin DSL](https://arxiv.org/abs/2607.29338) - Submitted to Software: Practice and Experience (Wiley)
+  The paper proposes extending HtmlFlow’s Kotlin DSL with statically typed Datastar
+  attributes and signal-based bindings to reduce JavaScript and improve type safety
+  and maintainability in hypermedia-driven, backend-reactive web applications.
 * 2025, [Enabling Progressive Server-Side Rendering for Traditional Web Template Engines with Java Virtual Threads](https://www.mdpi.com/2674-113X/4/3/20) - MDPI Software Journal.
 This article compares HtmlFlow with other template engines, assessing throughput using ab and JMeter, and raw rendering performance using JMH.
 * 2024, [Progressive Server-Side Rendering with Suspendable Web Templates](https://gamboa.pt/img/my-papers/wise-2024-pssr-async-await.pdf), 25th edition of [WISE](https://wise2024-qatar.com/), Doha, Qatar, ([slides](https://gamboa.pt/img/my-papers/wise-2024-slides.pdf)).
