@@ -29,7 +29,7 @@ repositories.
 Add the **`htmlflow-datastar`** module to your project.
 
 ```groovy
-implementation 'com.github.xmlet:htmlflow-datastar:1.3.0-alpha'
+implementation 'com.github.xmlet:htmlflow-datastar:1.2.0'
 ```
 
 ### 2. Type-safe signals and attributes
@@ -54,7 +54,7 @@ div {
 This produces the equivalent DataStar markup:
 
 ```html
-<div data-signals:count="0">
+<div data-signals="{count: 0}">
   <span id="counter" data-text="$count"></span>
 </div>
 ```
@@ -93,8 +93,8 @@ div {
 Which produces:
 
 ```html
-<div data-signals:search="''">
-  <input type="text" placeholder="Search..." data-bind:search data-on:input__debounce="@get('/examples/search')" />
+<div data-signals="{search: ''}">
+  <input type="text" placeholder="Search..." data-bind="search" data-on:input__debounce="@get('/examples/search')" />
 </div>
 ```
 
@@ -145,6 +145,122 @@ Expressions can be composed and refactored using Kotlin operators instead of str
 
 **HtmlFlow Datastar** generates standard **DataStar** HTML, enabling developers to build reactive user interfaces
 declaratively with a fully **type-safe** Kotlin DSL while preserving compatibility with the **DataStar** runtime.
+
+### 5. Structured signal values
+
+`dataSignal` and `dataSignals` support Kotlin values beyond primitive types. Maps and collections are serialized as
+JavaScript object and array literals, and classes annotated with
+[`@Serializable`](https://kotlinlang.org/docs/serialization.html) (from `kotlinx.serialization`) are serialized as
+object literals, with properties in declaration order. Nested properties can then be accessed in a type-safe way
+through `Signal<T>.on(property)`.
+
+:::note
+Serializing your own classes requires the `kotlinx.serialization` compiler plugin in your project
+(`kotlin("plugin.serialization")`). A class without a serializer is not converted to an object literal: its
+`toString()` is emitted as-is.
+:::
+
+```kotlin
+@Serializable
+data class Person(
+    val name: String,
+    val age: Int,
+)
+
+div {
+    val (person) = dataSignals(
+        "person" to Person("John Doe", 18)
+    )
+
+    input {
+        attrType(EnumTypeInputType.TEXT)
+        dataBind(person.on(Person::name))
+    }
+
+    p {
+        dataText { +person.on(Person::age) }
+    }
+}
+```
+
+This produces:
+
+```html
+<div data-signals="{person: {name: 'John Doe', age: 18}}">
+  <input type="text" data-bind="person.name" />
+  <p data-text="$person.age"></p>
+</div>
+```
+
+The Kotlin type is what matters. A `String` that happens to contain JavaScript object syntax remains a string and is
+not interpreted as a structured value:
+
+```kotlin
+dataSignals(
+    "person" to "{name: 'John Doe', age: 18}"
+)
+```
+
+produces:
+
+```html
+<div data-signals="{person: '{name: \'John Doe\', age: 18}'}"></div>
+```
+
+So use a Kotlin model rather than a string with object syntax, and `Signal.on` rather than a hand-written
+string path such as `"person.name"`.
+
+#### Quote style and raw JavaScript
+
+String values are written with single quotes by default. `dataSignal` and `dataSignals` accept a `quoteStyle`
+parameter to switch to double quotes:
+
+```kotlin
+dataSignal("title", "O'Reilly", quoteStyle = QuoteStyle.DOUBLE)
+// signal value: {title: "O'Reilly"}
+```
+
+When an initial value must be a JavaScript expression rather than a literal, wrap it with `asRawJS()`. The string is
+then emitted unchanged:
+
+```kotlin
+val (selections) = dataSignals(
+    "selections" to "Array(4).fill(false)".asRawJS()
+)
+// data-signals="{selections: Array(4).fill(false)}"
+```
+
+### 6. Assigning signal values
+
+Inside an expression block, such as `dataOn`, `Signal.setValue` can receive either a Kotlin value or another
+signal/expression. These represent different kinds of assignments.
+
+Assigning a Kotlin value produces a literal, serialized with the same rules as signal initialization:
+
+```kotlin
+dataOn(Click) {
+    person.setValue(Person("Jane Doe", 21))
+}
+```
+
+```text
+$person = {name: 'Jane Doe', age: 21}
+```
+
+Assigning another signal keeps the assignment as a DataStar expression:
+
+```kotlin
+dataOn(Click) {
+    person.setValue(otherPerson)
+}
+```
+
+```text
+$person = $otherPerson
+```
+
+The first form describes a concrete Kotlin value; the second refers to another reactive signal, evaluated on the
+client.
 
 ## http4k
 
