@@ -1,107 +1,91 @@
 package htmlflow;
 
-import org.xmlet.htmlapifaster.MfeConfiguration;
+import org.xmlet.htmlapifaster.MfeConfigurationBuilder;
 
-public class HtmlMfeConfig implements MfeConfiguration {
+public final class HtmlMfeConfig extends AbstractMfeConfig {
 
-    private String mfeUrlResource;
-    private String mfeName;
-    private String mfeListeningEventName;
-    private String mfeTriggersEventName;
-    private String mfeElementName = "micro-frontend";
-    private String mfeScriptUrl = null;
-    private String mfeStylingUrl = null;
-    private boolean isMfeStreamingData;
-
-    @Override
-    public String getMfeUrlResource() {
-        return mfeUrlResource;
+    private HtmlMfeConfig(Builder builder) {
+        super(builder);
     }
 
-    @Override
-    public String getMfeName() {
-        return mfeName;
-    }
+    public static non-sealed class Builder
+        extends AbstractMfeConfig
+        implements MfeConfigurationBuilder {
 
-    @Override
-    public String getMfeElementName() {
-        return mfeElementName;
-    }
+        @Override
+        public Builder setMfeUrlResource(String s) {
+            this.mfeUrlResource = s;
+            return this;
+        }
 
-    @Override
-    public String getMfeListeningEventName() {
-        return mfeListeningEventName;
-    }
+        @Override
+        public Builder setMfeName(String s) {
+            this.mfeName = s;
+            return this;
+        }
 
-    @Override
-    public String getMfeTriggerEventName() {
-        return mfeTriggersEventName;
-    }
+        @Override
+        public Builder setMfeListeningEventName(String s) {
+            this.mfeListeningEventName = s;
+            return this;
+        }
 
-    @Override
-    public String getMfeScriptUrl() {
-        return mfeScriptUrl;
-    }
+        @Override
+        public Builder setMfeTriggersEventName(String s) {
+            this.mfeTriggersEventName = s;
+            return this;
+        }
 
-    @Override
-    public String getMfeStylingUrl() {
-        return mfeStylingUrl;
-    }
+        /**
+         * Ignored: the htmlflow-mfe-engine only registers the {@code <micro-frontend>} custom element,
+         * so microfrontends are always rendered with that tag.
+         *
+         * @deprecated the element name is fixed to {@code micro-frontend}; this value is ignored.
+         */
+        @Deprecated
+        @Override
+        public Builder setMfeElementName(String s) {
+            return this;
+        }
 
-    @Override
-    public boolean isMfeStreamingData() {
-        return this.isMfeStreamingData;
-    }
+        @Override
+        public Builder setMfeScriptUrl(String s) {
+            this.mfeScriptUrl = s;
+            return this;
+        }
 
-    @Override
-    public MfeConfiguration setMfeStreamingData(boolean mfeStreamingData) {
-        this.isMfeStreamingData = mfeStreamingData;
-        return this;
-    }
+        @Override
+        public Builder setMfeStylingUrl(String s) {
+            this.mfeStylingUrl = s;
+            return this;
+        }
 
-    @Override
-    public MfeConfiguration setMfeUrlResource(String mfeUrlResource) {
-        this.mfeUrlResource = mfeUrlResource;
-        return this;
-    }
+        @Override
+        public Builder setMfeSharedStylingUrl(String s) {
+            this.mfeSharedStylingUrl = s;
+            return this;
+        }
 
-    @Override
-    public MfeConfiguration setMfeName(String mfeName) {
-        this.mfeName = mfeName;
-        return this;
-    }
+        @Override
+        public Builder setMfeScriptIntegrity(String s) {
+            this.mfeScriptIntegrity = s;
+            return this;
+        }
 
-    @Override
-    public MfeConfiguration setMfeListeningEventName(
-        String mfeListeningEventName
-    ) {
-        this.mfeListeningEventName = mfeListeningEventName;
-        return this;
-    }
+        @Override
+        public Builder setMfeStreamingData(boolean s) {
+            this.isMfeStreamingData = s;
+            return this;
+        }
 
-    @Override
-    public MfeConfiguration setMfeTriggersEventName(
-        String mfeTriggersEventName
-    ) {
-        this.mfeTriggersEventName = mfeTriggersEventName;
-        return this;
-    }
-
-    @Override
-    public MfeConfiguration setMfeElementName(String mfeElementName) {
-        this.mfeElementName = mfeElementName;
-        return this;
-    }
-
-    @Override
-    public MfeConfiguration setMfeScriptUrl(String mfeScriptUrl) {
-        this.mfeScriptUrl = mfeScriptUrl;
-        return this;
-    }
-
-    @Override
-    public MfeConfiguration setMfeStylingUrl(String mfeStylingUrl) {
-        this.mfeStylingUrl = mfeStylingUrl;
-        return this;
+        public HtmlMfeConfig build() {
+            if (mfeUrlResource == null || mfeUrlResource.isBlank()) {
+                throw new IllegalStateException("mfeUrlResource is required");
+            }
+            if (mfeName == null || mfeName.isBlank()) {
+                throw new IllegalStateException("mfeName is required");
+            }
+            return new HtmlMfeConfig(this);
+        }
     }
 }

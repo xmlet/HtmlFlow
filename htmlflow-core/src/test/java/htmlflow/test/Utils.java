@@ -23,6 +23,8 @@
  */
 package htmlflow.test;
 
+import htmlflow.HtmlFlow;
+import htmlflow.HtmlTemplate;
 import htmlflow.HtmlView;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
@@ -60,6 +62,18 @@ public class Utils {
     static <T> Stream<String> htmlWrite(ByteArrayOutputStream mem){
         InputStreamReader actual = new InputStreamReader(new ByteArrayInputStream(mem.toByteArray()));
         return new BufferedReader(actual).lines();
+    }
+
+    /**
+     * Renders into an Appendable that is not a StringBuilder, so a compiled chain runs its write
+     * method instead of render.
+     */
+    static <T> String renderToAppendable(HtmlTemplate template, T model) {
+        StringBuffer out = new StringBuffer();
+        HtmlView<T> view = HtmlFlow.view(template);
+        view.setOut(out);
+        view.write(model);
+        return out.toString();
     }
 
     static <T> Stream<String> htmlRender(HtmlView view, T model){

@@ -46,6 +46,7 @@ import org.xmlet.htmlapifaster.Input;
 import org.xmlet.htmlapifaster.Link;
 import org.xmlet.htmlapifaster.Meta;
 import org.xmlet.htmlapifaster.MfeConfiguration;
+import org.xmlet.htmlapifaster.MfeConfigurationBuilder;
 import org.xmlet.htmlapifaster.Param;
 import org.xmlet.htmlapifaster.Root;
 import org.xmlet.htmlapifaster.Source;
@@ -72,13 +73,13 @@ public abstract class HtmlVisitor extends ElementVisitor {
     /** It the HTML output should be indented or not. */
     public final boolean isIndented;
 
-    private final List<HtmlMfeConfig> mfePage = new ArrayList<>();
+    private final List<MfeConfiguration> mfePage = new ArrayList<>();
 
-    public void addMfePage(HtmlMfeConfig mfePage) {
+    public void addMfePage(MfeConfiguration mfePage) {
         this.mfePage.add(mfePage);
     }
 
-    public final List<HtmlMfeConfig> getMfePage() {
+    public final List<MfeConfiguration> getMfePage() {
         return mfePage;
     }
 
@@ -251,39 +252,61 @@ public abstract class HtmlVisitor extends ElementVisitor {
     @Override
     public <E extends Element> void visitMfe(
         E e,
-        Consumer<MfeConfiguration> mfeConsumerCfg
+        Consumer<MfeConfigurationBuilder> mfeConsumerCfg
     ) {
         // collect the mfe configuration
-        HtmlMfeConfig mfeConfig = new HtmlMfeConfig();
-        mfeConsumerCfg.accept(mfeConfig);
+        HtmlMfeConfig.Builder mfeBuilder = new HtmlMfeConfig.Builder();
+        mfeConsumerCfg.accept(mfeBuilder);
+        HtmlMfeConfig mfeConfig = mfeBuilder.build();
         addMfePage(mfeConfig);
 
         e
             .custom(mfeConfig.getMfeElementName())
             .addAttr("mfe-url", mfeConfig.getMfeUrlResource());
         e.getVisitor().visitAttribute("mfe-name", mfeConfig.getMfeName());
-        e
-            .getVisitor()
-            .visitAttribute("mfe-styling-url", mfeConfig.getMfeStylingUrl());
-        e
-            .getVisitor()
-            .visitAttribute(
-                "mfe-listen-event",
-                mfeConfig.getMfeListeningEventName()
-            );
-        e
-            .getVisitor()
-            .visitAttribute(
-                "mfe-trigger-event",
-                mfeConfig.getMfeTriggerEventName()
-            );
-        if (mfeConfig.isMfeStreamingData()) {
+
+        if (
+            mfeConfig.getMfeStylingUrl() != null &&
+            !mfeConfig.getMfeStylingUrl().isEmpty()
+        ) {
             e
                 .getVisitor()
                 .visitAttribute(
-                    "mfe-stream-data",
-                    String.valueOf(mfeConfig.isMfeStreamingData())
+                    "mfe-styling-url",
+                    mfeConfig.getMfeStylingUrl()
                 );
+        }
+        if (
+            mfeConfig.getMfeSharedStylingUrl() != null &&
+            !mfeConfig.getMfeSharedStylingUrl().isEmpty()
+        ) {
+            e
+                .getVisitor()
+                .visitAttribute(
+                    "mfe-shared-styling-url",
+                    mfeConfig.getMfeSharedStylingUrl()
+                );
+        }
+        if (mfeConfig.getMfeTriggerEventName() != null) {
+            e
+                .getVisitor()
+                .visitAttribute(
+                    "mfe-trigger-event",
+                    mfeConfig.getMfeTriggerEventName()
+                );
+        }
+        if (mfeConfig.getMfeListeningEventName() != null) {
+            e
+                .getVisitor()
+                .visitAttribute(
+                    "mfe-listen-event",
+                    mfeConfig.getMfeListeningEventName()
+                );
+        }
+        if (mfeConfig.isMfeStreamingData()) {
+            e
+                .getVisitor()
+                .visitAttribute("mfe-stream-data", String.valueOf(true));
         }
         e.custom("/" + mfeConfig.getMfeElementName());
     }

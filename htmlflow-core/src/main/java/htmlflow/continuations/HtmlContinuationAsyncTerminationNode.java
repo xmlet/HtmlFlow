@@ -15,7 +15,7 @@ public class HtmlContinuationAsyncTerminationNode extends HtmlContinuation {
         this.cf = cf;
     }
 
-    public void execute(Object model) {
+    public void resolve(Object model) {
         cf.complete(null);
     }
 
