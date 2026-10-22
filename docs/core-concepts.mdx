@@ -550,7 +550,7 @@ from it.
 ## Micro-Frontends
 
 A micro-frontend architecture splits a page into HTML **fragments** owned by independent services.
-With v5, a _shell_ (view) page can be created with the new `mfe()` builder.
+A _shell_ (view) page can be created with the new `mfe()` builder.
 This builder embeds a micro-frontend based on metadata set in the _configuration_ object.
 Each HTML fragment is fetched remotely from the URL configured in the metadata.
 The composition of the micro-frontends is done by a client side
@@ -568,7 +568,7 @@ The _mfe_ feature requires a view built with `mfeEnabled(true)`.
 
 ```java
 static final String ENGINE =
-  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@development/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js";
+  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@master/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js";
 
 HtmlView<?> shell = HtmlFlow.ViewFactory.builder()
   .mfeEnabled(true)
