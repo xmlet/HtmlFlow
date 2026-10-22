@@ -549,39 +549,46 @@ from it.
 
 ## Micro-Frontends
 
-Some content is not known at render time and must be loaded from another service. The v5
-`mfe()` builder embeds a _micro-frontend_: an HTML fragment fetched from a remote URL,
-supporting both server-side rendering (SSR) and client-side rendering (CSR) with optional
-event wiring between fragments. It requires a view built with `mfeEnabled(true)`.
+A micro-frontend architecture splits a page into HTML **fragments** owned by independent services.
+With v5, a _shell_ (view) page can be created with the new `mfe()` builder.
+This builder embeds a micro-frontend based on metadata set in the _configuration_ object.
+Each HTML fragment is fetched remotely from the URL configured in the metadata.
+The composition of the micro-frontends is done by a client side
+script that is required to be set in the view.
+The _mfe_ feature requires a view built with `mfeEnabled(true)`.
+
+### Setup
+
+1. Build the shell view with `mfeEnabled(true)`.
+2. Add the HtmlFlow MFE engine in `<head>` element of the page.
+3. Declare the micro-frontends in the view with `mfe()` method.
 
 <Tabs groupId="lang">
   <TabItem value="java" label="Java">
 
 ```java
-HtmlView<?> view = HtmlFlow.ViewFactory.builder()
+static final String ENGINE =
+  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@development/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js";
+
+HtmlView<?> shell = HtmlFlow.ViewFactory.builder()
   .mfeEnabled(true)
   .build()
   .view(page -> page
     .html()
-      .head().__()
+      .head()
+        .script().attrType(EnumTypeScriptType.MODULE).attrSrc(ENGINE).__()
+      .__() // head
       .body()
-        .div()
-          .mfe(cfg -> {
-            cfg.setMfeUrlResource("http://localhost:8081/bikes");
-            cfg.setMfeName("mfe1");
-            cfg.setMfeElementName("some-element");
-            cfg.setMfeListeningEventName("triggerBikeEvent");
-            cfg.setMfeTriggersEventName("triggerCartEvent");
-            cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js");
-            cfg.setMfeStylingUrl("http://localhost:8081/css/style.css");
-          })
-        .__() // div
+        .mfe(cfg -> cfg
+          .setMfeUrlResource("http://localhost:8081/bikes/view")
+          .setMfeName("bikes")
       .__() // body
     .__() // html
   );
 ```
 
-  </TabItem>
+ </TabItem>
+
   <TabItem value="kotlin" label="Kotlin">
 
 The Kotlin DSL has no sugar for `mfeEnabled`, so build the view through the same
@@ -590,31 +597,298 @@ The Kotlin DSL has no sugar for `mfeEnabled`, so build the view through the same
 ```kotlin
 import htmlflow.*
 
-val view: HtmlView<*> = HtmlFlow.ViewFactory.builder()
+const val ENGINE =
+  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@development/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js"
+
+val shell: HtmlView<*> = HtmlFlow.ViewFactory.builder()
   .mfeEnabled(true)
   .build()
   .view<Any> { page ->
     page.html {
-      head { }
+      head {
+        script { attrType(EnumTypeScriptType.MODULE); attrSrc(ENGINE) }
+      }
       body {
-        div {
-          mfe { cfg ->
-            cfg.setMfeUrlResource("http://localhost:8081/bikes")
-            cfg.setMfeName("mfe1")
-            cfg.setMfeElementName("some-element")
-            cfg.setMfeListeningEventName("triggerBikeEvent")
-            cfg.setMfeTriggersEventName("triggerCartEvent")
-            cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js")
-            cfg.setMfeStylingUrl("http://localhost:8081/css/style.css")
-          }
-        } // div
-      } // body
-    } // html
+        mfe { cfg ->
+          cfg.setMfeUrlResource("http://localhost:8081/bikes/view")
+          cfg.setMfeName("bikes")
+        }
+      }
+    }
   }
 ```
 
   </TabItem>
 </Tabs>
+
+The engine fetches fragments and stylesheets from the browser, therefore services on another origin must
+allow CORS requests from the shell.
+
+:::warning
+When configuring a micro-frontend the url and the name are mandatory (see [MFE Configuration](#micro-frontend-configuration)).
+:::
+Rendering the view `shell.render()` produces the placeholder markup:
+
+```html
+<html>
+  <head>
+    <script type="module" src="https://cdn.jsdelivr.net/.../htmlflow-mfe-engine.js"></script>
+  </head>
+  <body>
+    <micro-frontend mfe-url="http://localhost:8081/bikes/view" mfe-name="bikes"></micro-frontend>
+  </body>
+</html>
+```
+
+The micro-frontend mechanism expects any HTML fragments.
+It can come from HtmlFlow, Thymeleaf, or any other template engine as long as HTML is provided.
+Is it possible to combine server-side rendering (SSR) and client-side rendering (CSR) fragments,
+an example is shown [here](#micro-frontend-configuration)).
+
+### Micro-frontend configuration
+
+The configuration object passed to the mfe method has the following properties:
+| Option | Purpose |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `setMfeUrlResource(url)` **required** | URL that represents the location of HTML fragment. |
+| `setMfeName(name)` **required** | Unique name of the micro-frontend, used by `window.mfe(...)` in scripts. |
+| `setMfeScriptUrl(url)` | Fragment script used for hydration, added to `<head>` as `<script type="module">`. |
+| `setMfeStylingUrl(url)` | Stylesheet scoped to this fragment. |
+| `setMfeSharedStylingUrl(url)` | Theme stylesheet shared by all fragments and the shell. |
+| `setMfeTriggersEventName(name)` | Default event name that this fragment emits. |
+| `setMfeListeningEventName(name)` | Default event name that this fragment listens to. |
+| `setMfeStreamingData(true)` | Render the fragment progressively from stream endpoints (see [Streaming](#streaming-fragments)). |
+| `setMfeScriptIntegrity(hash)` | SRI hash for the fragment script (see [Script integrity](#script-integrity)). |
+
+Leaving out a required option throws an exception when the view is built.
+
+### Hydration of fragments
+
+The entry point for each micro-frontend hydration is `window.mfe(name, callback)`.
+It register a callback that fires when the MFE fragment is mounted in the DOM.
+Because the fragment lives in a Shadow DOM, you can query its elements through `root`:
+
+```js
+// mfe-bikes.js
+mfe('bikes', ({ root, triggerMfeEvent, listenMfeEvent, reloadMfe }) => {
+  root.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => console.log('clicked', btn.id)));
+});
+```
+
+The callback receives a context object with the following properties that allow interaction with the micro-frontend:
+| Context member | Description |
+| -------------------------------------------- | --------------------------------------------------------------------------- |
+| `root` | The fragment's shadow root. |
+| `triggerMfeEvent(message, payload, [event])` | Publish an event. Without `event`, it uses `setMfeTriggersEventName`. |
+| `listenMfeEvent(listener, [event])` | Subscribe to an event. Without `event`, it uses `setMfeListeningEventName`. |
+| `reloadMfe()` | Fetch and render the fragment again. |
+
+:::tip
+Use the reloadMfe() method to refresh the fragment and keep the UI in sync after mutating state in the backend.
+:::
+
+### Communication between micro-frontends
+
+Micro-frontends communicate through an internal event bus managed by the engine leveraging [DOM events](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events).
+Use _setMfeListeningEventName_ to register as a **listener** with the respective name,
+and the _setMfeTriggersEventName_ to **trigger** events with the respective name.
+To establish a two way communication between the micro-frontends
+use the same event name in both configurations.
+In the example bellow, the bikes fragment publishes an event when a bike
+is added and the cart fragment listens for it.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+.mfe(cfg -> cfg
+  .setMfeUrlResource("http://localhost:8081/bikes/view")
+  .setMfeName("bikes")
+  .setMfeTriggersEventName("cartEvent")
+  .setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js"))
+.mfe(cfg -> cfg
+  .setMfeUrlResource("http://localhost:8082/cart/view")
+  .setMfeName("cart")
+  .setMfeListeningEventName("cartEvent")
+  .setMfeScriptUrl("http://localhost:8082/mfe-cart.js"))
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+mfe { cfg ->
+  cfg.setMfeUrlResource("http://localhost:8081/bikes/view")
+  cfg.setMfeName("bikes")
+  cfg.setMfeTriggersEventName("cartEvent")
+  cfg.setMfeScriptUrl("http://localhost:8081/js/mfe-bikes.js")
+}
+mfe { cfg ->
+  cfg.setMfeUrlResource("http://localhost:8082/cart/view")
+  cfg.setMfeName("cart")
+  cfg.setMfeListeningEventName("cartEvent")
+  cfg.setMfeScriptUrl("http://localhost:8082/mfe-cart.js")
+}
+```
+
+  </TabItem>
+</Tabs>
+
+:::tip
+After setting the communication between micro-frontends, use the `triggerMfeEvent` and `listenMfeEvent` methods
+from the context object to send and receive events between them.
+:::
+
+```js
+// mfe-bikes.js: publish an event
+mfe('bikes', ({ root, triggerMfeEvent }) => {
+  root
+    .querySelectorAll('button[data-id]')
+    .forEach(btn => btn.addEventListener('click', () => triggerMfeEvent('add to cart', { id: btn.dataset.id })));
+});
+
+// mfe-cart.js: react to the event, then refresh the fragment
+mfe('cart', ({ listenMfeEvent, reloadMfe }) => {
+  listenMfeEvent(async e => {
+    await fetch(`http://localhost:8082/cart/add/${e.detail.payload.id}`, { method: 'POST' });
+    reloadMfe();
+  });
+});
+```
+
+The listener receives a _custom event_ whose `detail` is `{ message, payload }` object. When a fragment
+reloads, the engine removes the listeners registered to preventing duplications.
+
+### Styling
+
+Each fragment is isolated using Shadow DOM preventing styles leakage between fragments or into the
+shell. Use `setMfeStylingUrl` for fragment-specific styles and `setMfeSharedStylingUrl` if you need
+to to share styles between fragments.
+
+- `setMfeStylingUrl` applies a stylesheet to **this fragment only**.
+- `setMfeSharedStylingUrl` applies a common theme, such as colours, fonts, and CSS variables, to the
+  fragment **and the shell document**. Each URL is fetched once and reused by every fragment that
+  references it.
+
+<Tabs groupId="lang">
+  <TabItem value="java" label="Java">
+
+```java
+.mfe(cfg -> cfg
+  .setMfeUrlResource("http://localhost:8081/bikes/view")
+  .setMfeName("bikes")
+  .setMfeStylingUrl("http://localhost:8081/css/style.css")
+  .setMfeSharedStylingUrl("http://localhost:8080/shared-theme.css"))
+```
+
+  </TabItem>
+  <TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+mfe { cfg ->
+  cfg.setMfeUrlResource("http://localhost:8081/bikes/view")
+  cfg.setMfeName("bikes")
+  cfg.setMfeStylingUrl("http://localhost:8081/css/style.css")
+  cfg.setMfeSharedStylingUrl("http://localhost:8080/shared-theme.css"))
+}
+```
+
+:::tip
+You can see an example of a shared theme in the [micro-frontends theming example](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples/blob/main/shell/src/main/java/com/dev/SharedThemingExample.java)
+:::
+
+  </TabItem>
+</Tabs>
+
+### Streaming fragments
+
+With `setMfeStreamingData(true)`, the engine renders the fragment response chunk by chunk, so items
+appear while the service is still producing them.
+
+<Tabs groupId="lang">
+<TabItem value="java" label="Java">
+
+```java
+.mfe(cfg -> cfg
+  .setMfeUrlResource("http://localhost:8081/bikes/stream")
+  .setMfeName("bikes")
+  .setMfeStreamingData(true)
+```
+
+</TabItem>
+<TabItem value="kotlin" label="Kotlin">
+
+```kotlin
+mfe { cfg ->
+  cfg.setMfeUrlResource("http://localhost:8081/bikes/stream")
+  cfg.setMfeName("bikes")
+  cfg.setMfeStreamingData(true)
+}
+```
+
+  </TabItem>
+</Tabs>
+
+The response must follow a simple contract:
+
+1. The **first chunk** is a wrapper containing one or more named `<slot>` placeholders.
+2. Each **following chunk** carries a `slot="..."` attribute and is appended into the matching
+   slot.
+
+```html
+<!-- chunk 1: wrapper, flushed immediately -->
+<main>
+  <h2>Bikes</h2>
+  <div class="grid"><slot name="bike"></slot></div>
+</main>
+
+<!-- chunks 2..n: one per item, flushed as soon as each is ready -->
+<div slot="bike" class="card">Bike 1</div>
+<div slot="bike" class="card">Bike 2</div>
+```
+
+:::tip
+On the server side, write the wrapper and flush it. Afterwards, write and flush each item.
+For example, use Spring's `StreamingResponseBody` or HtmlFlow's [streaming views](/docs/advanced#streaming-html)
+An example can be see in the [micro-frontends streaming example](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples/blob/main/shell/src/main/java/com/dev/StreamingExample.java)
+:::
+
+### Security
+
+Since the micro-frontends are based on HTML, they need to be safely created in the DOM.
+The engine **sanitizes** fragment HTML before inserting it using the HTML Sanitizer [API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Sanitizer_API).
+The full list of allowed elements and attributes can be seen
+[here](https://github.com/xmlet/HtmlFlow/blob/development/htmlflow-mfe-engine/src/modules/html-sanitizer.ts).
+
+### Script integrity - _Experimental_
+
+Given the decentralization nature of micro-frontends architecture, the attack surface is increased.
+The micro-frontends are composed in the client-side, increasing
+the risk of malicious code injection and potentially compromising other micro-frontends with lateral movement.
+To mitigate this risk, the engine supports [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) for the fragment scripts.
+When fragment scripts come from another origin, it is possible to set the SRI hash for the script using the `setMfeScriptIntegrity` method.
+
+```java
+cfg.setMfeScriptUrl("https://cdn.example.com/mfe-bikes.js")
+cfg.setMfeScriptIntegrity("sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC");
+```
+
+```html
+<script
+  type="module"
+  src="https://cdn.example.com/mfe-bikes.js"
+  integrity="sha384-oqVu…"
+  crossorigin="anonymous"
+></script>
+```
+
+If the hash script does not match the provided hash, the browser will refuse to execute it.
+
+:::tip Full example
+[HtmlFlow-Microfrontend-Examples](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples) is a
+runnable webshop with a shell and bikes, cart, and order services. It demonstrates events,
+reloading, shared theming, and streaming.
+:::
 
 For content that arrives **asynchronously** (reactive streams, futures, or Kotlin suspend
 functions) and for streaming the HTML out progressively, see
