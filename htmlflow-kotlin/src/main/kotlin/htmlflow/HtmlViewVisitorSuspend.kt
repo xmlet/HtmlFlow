@@ -20,7 +20,7 @@ open class HtmlViewVisitorSuspend(
     private val first = first?.copy(this) as? HtmlContinuationSuspendable
 
     override fun resolve(model: Any?) {
-        first?.execute(model)
+        first?.resolve(model)
     }
 
     override fun clone(isIndented: Boolean): HtmlViewVisitorSuspend =
