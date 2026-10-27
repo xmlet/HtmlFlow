@@ -595,10 +595,8 @@ The Kotlin DSL has no sugar for `mfeEnabled`, so build the view through the same
 `ViewFactory`; `mfe { }` is then available inside any element block:
 
 ```kotlin
-import htmlflow.*
-
 const val ENGINE =
-  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@development/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js"
+  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@master/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js";
 
 val shell: HtmlView<*> = HtmlFlow.ViewFactory.builder()
   .mfeEnabled(true)
@@ -643,7 +641,7 @@ Rendering the view `shell.render()` produces the placeholder markup:
 The micro-frontend mechanism expects any HTML fragments.
 It can come from HtmlFlow, Thymeleaf, or any other template engine as long as HTML is provided.
 Is it possible to combine server-side rendering (SSR) and client-side rendering (CSR) fragments,
-an example is shown [here](#micro-frontend-configuration)).
+an example is shown [here](#micro-frontend-configuration).
 
 ### Micro-frontend configuration
 
@@ -793,12 +791,12 @@ mfe { cfg ->
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 :::tip
 You can see an example of a shared theme in the [micro-frontends theming example](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples/blob/main/shell/src/main/java/com/dev/SharedThemingExample.java)
 :::
-
-  </TabItem>
-</Tabs>
 
 ### Streaming fragments
 
