@@ -595,10 +595,8 @@ The Kotlin DSL has no sugar for `mfeEnabled`, so build the view through the same
 `ViewFactory`; `mfe { }` is then available inside any element block:
 
 ```kotlin
-import htmlflow.*
-
 const val ENGINE =
-  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@development/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js"
+  "https://cdn.jsdelivr.net/gh/xmlet/HtmlFlow@master/htmlflow-mfe-engine/dist/htmlflow-mfe-engine.js";
 
 val shell: HtmlView<*> = HtmlFlow.ViewFactory.builder()
   .mfeEnabled(true)
@@ -642,8 +640,8 @@ Rendering the view `shell.render()` produces the placeholder markup:
 
 The micro-frontend mechanism expects any HTML fragments.
 It can come from HtmlFlow, Thymeleaf, or any other template engine as long as HTML is provided.
-Is it possible to combine server-side rendering (SSR) and client-side rendering (CSR) fragments,
-an example is shown [here](#micro-frontend-configuration)).
+Is it possible to **_combine_** server-side rendering (SSR) and client-side rendering (CSR) fragments,
+an example is shown in the [CSR-SSR example](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples/blob/main/shell/src/main/java/com/dev/CsrSsrExample.java).
 
 ### Micro-frontend configuration
 
@@ -654,11 +652,11 @@ The configuration object passed to the mfe method has the following properties:
 | `setMfeName(name)` **required** | Unique name of the micro-frontend, used by `window.mfe(...)` in scripts. |
 | `setMfeScriptUrl(url)` | Fragment script used for hydration, added to `<head>` as `<script type="module">`. |
 | `setMfeStylingUrl(url)` | Stylesheet scoped to this fragment. |
-| `setMfeSharedStylingUrl(url)` | Theme stylesheet shared by all fragments and the shell. |
+| `setMfeSharedStylingUrl(url)` | Theme stylesheet shared by all fragments and the shell. (see [Styling](#styling) |
 | `setMfeTriggersEventName(name)` | Default event name that this fragment emits. |
 | `setMfeListeningEventName(name)` | Default event name that this fragment listens to. |
 | `setMfeStreamingData(true)` | Render the fragment progressively from stream endpoints (see [Streaming](#streaming-fragments)). |
-| `setMfeScriptIntegrity(hash)` | SRI hash for the fragment script (see [Script integrity](#script-integrity)). |
+| `setMfeScriptIntegrity(hash)` | SRI hash for the fragment script (see [Script integrity](#script-integrity---experimental)). |
 
 Leaving out a required option throws an exception when the view is built.
 
@@ -793,12 +791,12 @@ mfe { cfg ->
 }
 ```
 
+  </TabItem>
+</Tabs>
+
 :::tip
 You can see an example of a shared theme in the [micro-frontends theming example](https://github.com/xmlet/HtmlFlow-Microfrontend-Examples/blob/main/shell/src/main/java/com/dev/SharedThemingExample.java)
 :::
-
-  </TabItem>
-</Tabs>
 
 ### Streaming fragments
 
