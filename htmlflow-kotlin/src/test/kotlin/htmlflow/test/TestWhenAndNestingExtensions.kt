@@ -86,6 +86,24 @@ class TestWhenAndNestingExtensions {
         )
     }
 
+    /**
+     * Second version of the same test.
+     * Due to coverage issue on inline function it does not detect the call.
+     */
+    @Test
+    fun forEachIndexedOf_test_2() {
+        val expected =
+            HtmlFlow
+                .view<Iterable<Group>>(::indexedAsDynamic)
+                .render(groups)
+        Assertions.assertEquals(
+            expected,
+            HtmlFlow
+                .view<Iterable<Group>>(::indexedTemplate2)
+                .render(groups),
+        )
+    }
+
     private fun nestedAsDynamic(page: HtmlPage) {
         page.html {
             body {
@@ -139,6 +157,27 @@ class TestWhenAndNestingExtensions {
             body {
                 ol {
                     forEachIndexedOf { row: Slot<Indexed<Group>> ->
+                        li {
+                            attrOf("class", row.read { if (it.index() % 2 == 0) "even" else "odd" })
+                            intOf(row.readInt { it.index() + 1 })
+                            textOf(row.read { " " + it.item().name })
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Second version of the same template but using the overloaded builder forEachIndexedOf
+     * with 2 arguments.
+     * Due to coverage issue on inline function it does not detect the call.
+     */
+    private fun indexedTemplate2(page: HtmlPage) {
+        page.html {
+            body {
+                ol {
+                    forEachIndexedOf({ model: Iterable<Group> -> model }) { row: Slot<Indexed<Group>> ->
                         li {
                             attrOf("class", row.read { if (it.index() % 2 == 0) "even" else "odd" })
                             intOf(row.readInt { it.index() + 1 })
