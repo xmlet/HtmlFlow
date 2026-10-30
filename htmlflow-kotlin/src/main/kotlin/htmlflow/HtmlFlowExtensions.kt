@@ -4,9 +4,13 @@ package htmlflow
 import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
 import htmlflow.visitor.HtmlVisitor
 import htmlflow.visitor.PreprocessingVisitor
+import java.util.function.BiConsumer
+import java.util.function.Function
 import org.xmlet.htmlapifaster.Div
 import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlapifaster.Html
+import org.xmlet.htmlapifaster.Indexed
+import org.xmlet.htmlapifaster.Slot
 import org.xmlet.htmlapifaster.Span
 import org.xmlet.htmlapifaster.Tbody
 import org.xmlet.htmlapifaster.Text
@@ -40,6 +44,65 @@ inline var <T : Element<T, Z>, Z : Element<*, *>> T.text: T
     set(value) {
         visitor.visitText(Text(self(), visitor, value))
     }
+
+/**
+ * Iterates over a collection extracted from the model and applies [itemTemplate] for each item
+ * slot.
+ *
+ * @param T type of the Element receiver
+ * @param Z type of the parent Element of the receiver
+ * @param M type of the model (aka context object)
+ * @param E type of each item in the iterable
+ * @param items maps the model to the iterable to traverse
+ * @param itemTemplate template invoked for each item [Slot]
+ */
+inline fun <T : Element<*, *>, Z : Element<*, *>, M, E> Element<T, Z>.forEachOf(
+    items: Function<M, out Iterable<E>>,
+    crossinline itemTemplate: T.(Slot<E>) -> Unit,
+): T = forEachOf<M, E>(items, BiConsumer { parent, slot -> parent.itemTemplate(slot) })
+
+/**
+ * Iterates when the model itself is an [Iterable] and applies [itemTemplate] for each item slot.
+ *
+ * @param T type of the Element receiver
+ * @param Z type of the parent Element of the receiver
+ * @param M type of the model (aka context object), constrained to [Iterable]
+ * @param E type of each item in the iterable
+ * @param itemTemplate template invoked for each item [Slot]
+ */
+fun <T : Element<*, *>, Z : Element<*, *>, M : Iterable<E>, E> Element<T, Z>.forEachOf(
+    itemTemplate: T.(Slot<E>) -> Unit
+): T = forEachOf(Function<M, Iterable<E>> { items -> items }, itemTemplate)
+
+/**
+ * Iterates over a collection extracted from the model and applies [itemTemplate] for each indexed
+ * item slot.
+ *
+ * @param T type of the Element receiver
+ * @param Z type of the parent Element of the receiver
+ * @param M type of the model (aka context object)
+ * @param E type of each item in the iterable
+ * @param items maps the model to the iterable to traverse
+ * @param itemTemplate template invoked for each indexed item [Slot]
+ */
+inline fun <T : Element<*, *>, Z : Element<*, *>, M, E> Element<T, Z>.forEachIndexedOf(
+    items: Function<M, out Iterable<E>>,
+    crossinline itemTemplate: T.(Slot<Indexed<E>>) -> Unit,
+): T = forEachIndexedOf<M, E>(items, BiConsumer { parent, slot -> parent.itemTemplate(slot) })
+
+/**
+ * Iterates when the model itself is an [Iterable] and applies [itemTemplate] for each indexed item
+ * slot.
+ *
+ * @param T type of the Element receiver
+ * @param Z type of the parent Element of the receiver
+ * @param M type of the model (aka context object), constrained to [Iterable]
+ * @param E type of each item in the iterable
+ * @param itemTemplate template invoked for each indexed item [Slot]
+ */
+fun <T : Element<*, *>, Z : Element<*, *>, M : Iterable<E>, E> Element<T, Z>.forEachIndexedOf(
+    itemTemplate: T.(Slot<Indexed<E>>) -> Unit
+): T = forEachIndexedOf(Function<M, Iterable<E>> { items -> items }, itemTemplate)
 
 /**
  * @param T type of the Element receiver
