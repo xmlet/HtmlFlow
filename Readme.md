@@ -125,10 +125,10 @@ Bonus points it also produces only valid HTML according to HTML 5.2.
 ## Installation
 
 First, in order to include it to your Gradle project, simply add the following dependency,
-or use any other form provided in [Maven Central Repository](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow/5.2.0):
+or use any other form provided in [Maven Central Repository](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow/5.2.1):
 
 ```groovy
-implementation 'com.github.xmlet:htmlflow:5.2.0'
+implementation 'com.github.xmlet:htmlflow:5.2.1'
 ```
 
 You can also download the artifact directly from [Maven
@@ -137,7 +137,7 @@ Central Repository](https://repo1.maven.org/maven2/com/github/xmlet/htmlflow)
 **Kotlin developers should use the [htmlflow-kotlin](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow-kotlin/5.0.4) dependency instead.**:
 
 ```groovy
-implementation 'com.github.xmlet:htmlflow-kotlin:5.2.0'
+implementation 'com.github.xmlet:htmlflow-kotlin:5.2.1'
 ```
 
 Starting with version 5, the Java and Kotlin APIs are provided in separate modules.

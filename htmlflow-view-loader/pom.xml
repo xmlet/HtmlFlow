@@ -5,13 +5,13 @@
     <parent>
         <groupId>com.github.xmlet</groupId>
         <artifactId>htmlflow-parent</artifactId>
-        <version>5.2.1</version>
+        <version>5.2.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>htmlflow-view-loader</artifactId>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
-    <version>5.2.1</version>
+    <version>5.2.2-SNAPSHOT</version>
 
     <distributionManagement>
         <snapshotRepository>
