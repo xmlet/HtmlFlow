@@ -4,8 +4,8 @@ package htmlflow
 import htmlflow.continuations.HtmlContinuationSuspendableTerminationNode
 import htmlflow.visitor.HtmlVisitor
 import htmlflow.visitor.PreprocessingVisitor
-import java.util.function.BiConsumer
 import java.util.function.Function
+import java.util.function.Function.identity
 import org.xmlet.htmlapifaster.Div
 import org.xmlet.htmlapifaster.Element
 import org.xmlet.htmlapifaster.Html
@@ -59,7 +59,7 @@ inline var <T : Element<T, Z>, Z : Element<*, *>> T.text: T
 inline fun <T : Element<*, *>, Z : Element<*, *>, M, E> Element<T, Z>.forEachOf(
     items: Function<M, out Iterable<E>>,
     crossinline itemTemplate: T.(Slot<E>) -> Unit,
-): T = forEachOf<M, E>(items, BiConsumer { parent, slot -> parent.itemTemplate(slot) })
+): T = forEachOf<M, E>(items) { parent, slot -> parent.itemTemplate(slot) }
 
 /**
  * Iterates when the model itself is an [Iterable] and applies [itemTemplate] for each item slot.
@@ -70,9 +70,9 @@ inline fun <T : Element<*, *>, Z : Element<*, *>, M, E> Element<T, Z>.forEachOf(
  * @param E type of each item in the iterable
  * @param itemTemplate template invoked for each item [Slot]
  */
-fun <T : Element<*, *>, Z : Element<*, *>, M : Iterable<E>, E> Element<T, Z>.forEachOf(
-    itemTemplate: T.(Slot<E>) -> Unit
-): T = forEachOf(Function<M, Iterable<E>> { items -> items }, itemTemplate)
+inline fun <T : Element<*, *>, Z : Element<*, *>, M : Iterable<E>, E> Element<T, Z>.forEachOf(
+    crossinline itemTemplate: T.(Slot<E>) -> Unit
+): T = forEachOf<M, E>(identity<M>()) { parent, slot -> parent.itemTemplate(slot) }
 
 /**
  * Iterates over a collection extracted from the model and applies [itemTemplate] for each indexed
@@ -88,7 +88,7 @@ fun <T : Element<*, *>, Z : Element<*, *>, M : Iterable<E>, E> Element<T, Z>.for
 inline fun <T : Element<*, *>, Z : Element<*, *>, M, E> Element<T, Z>.forEachIndexedOf(
     items: Function<M, out Iterable<E>>,
     crossinline itemTemplate: T.(Slot<Indexed<E>>) -> Unit,
-): T = forEachIndexedOf<M, E>(items, BiConsumer { parent, slot -> parent.itemTemplate(slot) })
+): T = forEachIndexedOf<M, E>(items) { parent, slot -> parent.itemTemplate(slot) }
 
 /**
  * Iterates when the model itself is an [Iterable] and applies [itemTemplate] for each indexed item
@@ -100,9 +100,9 @@ inline fun <T : Element<*, *>, Z : Element<*, *>, M, E> Element<T, Z>.forEachInd
  * @param E type of each item in the iterable
  * @param itemTemplate template invoked for each indexed item [Slot]
  */
-fun <T : Element<*, *>, Z : Element<*, *>, M : Iterable<E>, E> Element<T, Z>.forEachIndexedOf(
-    itemTemplate: T.(Slot<Indexed<E>>) -> Unit
-): T = forEachIndexedOf(Function<M, Iterable<E>> { items -> items }, itemTemplate)
+inline fun <T : Element<*, *>, Z : Element<*, *>, M : Iterable<E>, E> Element<T, Z>
+    .forEachIndexedOf(crossinline itemTemplate: T.(Slot<Indexed<E>>) -> Unit): T =
+    forEachIndexedOf<M, E>(identity<M>()) { parent, slot -> parent.itemTemplate(slot) }
 
 /**
  * @param T type of the Element receiver
