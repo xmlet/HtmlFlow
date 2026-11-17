@@ -1,0 +1,46 @@
+name: Build HtmlFlow Datastar
+on:
+  push:
+    branches:
+      - master
+      - development
+    paths:
+      - 'htmlflow-datastar/**'
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    paths:
+      - 'htmlflow-datastar/**'
+
+jobs:
+  build:
+    name: Build HtmlFlow Datastar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-htmlflow-datastar-sonar
+          restore-keys: ${{ runner.os }}-htmlflow-datastar-sonar
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-htmlflow-datastar-gradle-${{ hashFiles('htmlflow-datastar/code/**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-htmlflow-datastar-gradle
+      - name: Build with Gradle
+        working-directory: htmlflow-datastar/code
+        run: ./gradlew check --info
+      - name: Build and analyze
+        working-directory: htmlflow-datastar/code
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_HF_DATASTAR }}
+        run: ./gradlew build sonar --info
