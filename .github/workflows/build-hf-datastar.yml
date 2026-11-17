@@ -42,5 +42,5 @@ jobs:
       - name: Build and analyze
         working-directory: htmlflow-datastar/code
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_HF_DATASTAR }}
         run: ./gradlew build sonar --info
