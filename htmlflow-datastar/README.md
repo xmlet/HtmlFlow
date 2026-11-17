@@ -1,5 +1,8 @@
 # HtmlFlow-Datastar
 
+Architectural decisions are maintained in the root
+[ADR directory](../context/adr/README.md#datastar).
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xmlet_HtmlFlow-Datastar&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=xmlet_HtmlFlow-Datastar)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xmlet_HtmlFlow-Datastar&metric=coverage)](https://sonarcloud.io/summary/new_code?id=xmlet_HtmlFlow-Datastar)
 [![Maven Central Version](https://img.shields.io/maven-central/v/com.github.xmlet/htmlflow-datastar?filter=!*alpha*)](https://central.sonatype.com/artifact/com.github.xmlet/htmlflow-datastar)

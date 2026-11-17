@@ -1,4 +1,4 @@
-# ADR-006: Signal Casing Consistency
+# ADR 2026-1006: Datastar Signal Casing Consistency
 
 **Status:** Accepted
 
@@ -22,7 +22,7 @@ generated this HTML:
 
 ```html
 <div data-signals:birthdate="">
-	<input data-bind:birthdate></input>
+	<input data-bind:birthdate>
 	<p data-text="$birthDate"></p>
 </div> 
 ```

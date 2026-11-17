@@ -1,4 +1,4 @@
-# ADR-007: Case Modifiers Removal
+# ADR 2026-1007: Datastar Case Modifiers Removal
 
 **Status:** Accepted
 

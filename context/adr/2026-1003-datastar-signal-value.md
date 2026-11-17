@@ -1,4 +1,4 @@
-# ADR 002: The existence of value property in Signal:
+# ADR 2026-1003: The Existence of the Value Property in Datastar Signal
 
 **Status:** Accepted
 

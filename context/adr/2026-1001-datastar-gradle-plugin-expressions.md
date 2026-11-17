@@ -1,4 +1,4 @@
-# ADR-001: Gradle Plugin Expressions
+# ADR 2026-1001: Datastar Gradle Plugin Expressions
 
 **Status:** Rejected
 

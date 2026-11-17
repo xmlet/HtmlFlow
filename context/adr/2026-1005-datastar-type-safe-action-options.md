@@ -1,4 +1,4 @@
-# ADR-005: Type-Safe Action Options
+# ADR 2026-1005: Datastar Type-Safe Action Options
 
 **Status:** Accepted
 

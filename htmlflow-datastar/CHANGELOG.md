@@ -71,4 +71,7 @@
 
 ### Removed
 
-- Gradle plugin for DataStar expression transpilation (rejected in ADR-001).
+- Gradle plugin for DataStar expression transpilation
+  (rejected in [ADR 2026-1001][adr-2026-1001]).
+
+[adr-2026-1001]: ../context/adr/2026-1001-datastar-gradle-plugin-expressions.md

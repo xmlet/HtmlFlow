@@ -1,4 +1,4 @@
-# ADR-008: Signal Value Serialization
+# ADR 2026-1008: Datastar Signal Value Serialization
 
 **Status:** Accepted
 

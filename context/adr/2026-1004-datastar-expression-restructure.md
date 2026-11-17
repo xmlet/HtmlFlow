@@ -1,4 +1,4 @@
-# ADR-004: DataStarExpression restructure
+# ADR 2026-1004: DataStarExpression Restructure
 
 **Status:** Accepted
 

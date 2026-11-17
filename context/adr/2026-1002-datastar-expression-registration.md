@@ -1,4 +1,4 @@
-# ADR 001: Expression registration inside DataStar Attributes:
+# ADR 2026-1002: Expression Registration inside Datastar Attributes
 
 **Status:** Accepted
 
