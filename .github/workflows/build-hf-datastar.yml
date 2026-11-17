@@ -1,4 +1,4 @@
-name: Build Datastar
+name: Build HtmlFlow Datastar
 on:
   push:
     branches:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    name: Build Datastar
+    name: Build HtmlFlow Datastar
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,14 +28,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
-          key: ${{ runner.os }}-datastar-sonar
-          restore-keys: ${{ runner.os }}-datastar-sonar
+          key: ${{ runner.os }}-htmlflow-datastar-sonar
+          restore-keys: ${{ runner.os }}-htmlflow-datastar-sonar
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-datastar-gradle-${{ hashFiles('htmlflow-datastar/code/**/*.gradle*') }}
-          restore-keys: ${{ runner.os }}-datastar-gradle
+          key: ${{ runner.os }}-htmlflow-datastar-gradle-${{ hashFiles('htmlflow-datastar/code/**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-htmlflow-datastar-gradle
       - name: Build with Gradle
         working-directory: htmlflow-datastar/code
         run: ./gradlew check --info
