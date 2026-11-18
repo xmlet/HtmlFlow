@@ -1,6 +1,6 @@
 # ADR 2026-0001: Introduce a Value-Based HTML API as an Alternative to `dynamic()` / `dyn()`
 
-**Status:** Proposed  
+**Status:** Released (5.2.1)  
 **Date:** 2026-10-12
 
 ## Table of Contents
